@@ -4,7 +4,7 @@ import { apiAs, authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
-	const api = apiAs(locals.accessToken);
+	const api = apiAs(url.origin, locals.accessToken);
 
 	// Issued together. The curriculum does not depend on the progress, so waiting
 	// for one before asking for the other would add a round trip to the page a
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const [curriculum, progress] = await Promise.all([
 		api.GET('/v1/courses/{slug}', { params: { path: { slug: params.slug } } }),
 		locals.accessToken
-			? authedApi(locals.accessToken).GET('/v1/courses/{slug}/progress', {
+			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/progress', {
 					params: { path: { slug: params.slug } }
 				})
 			: Promise.resolve(null)
@@ -45,7 +45,7 @@ export const actions: Actions = {
 	enrol: async ({ locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-		const { error: problem, response } = await authedApi(locals.accessToken).POST(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/enrol',
 			{ params: { path: { slug: params.slug } } }
 		);
@@ -58,10 +58,10 @@ export const actions: Actions = {
 		return { enrolled: true };
 	},
 
-	cancel: async ({ locals, params }) => {
+	cancel: async ({ locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
 
-		const { error: problem, response } = await authedApi(locals.accessToken).DELETE(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
 			'/v1/courses/{slug}/enrol',
 			{ params: { path: { slug: params.slug } } }
 		);

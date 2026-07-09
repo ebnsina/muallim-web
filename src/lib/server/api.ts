@@ -1,27 +1,34 @@
 import createClient from 'openapi-fetch';
-import { env } from '$env/dynamic/private';
 import type { paths } from '$lib/api/schema';
 
 /**
- * The base URL of lms-api as reached from *this server*, not from a browser.
+ * lms-api is reached at `/api` on the origin of the request being served.
  *
- * lms-api resolves the tenant from the Host header (port stripped, first label
- * taken as the subdomain), so `localhost:8080` resolves the workspace whose
- * subdomain is `localhost`. In a real deployment each workspace therefore needs
- * its own API host, and this value has to be derived per request rather than
- * read from the environment once. Not yet: today there is one workspace.
+ * It resolves the workspace from the Host header — port stripped, first label
+ * taken as the subdomain — so the host a request arrives on decides which
+ * workspace answers it. Calling lms-api directly on an internal address would
+ * send it lms-api's own hostname and resolve the wrong workspace, or none.
+ *
+ * The obvious fix, calling the internal address while overriding the Host
+ * header, is not available: `Host` is a forbidden header name for `fetch`, and
+ * Node's implementation silently drops it. A request routed through the edge
+ * carries the right Host by construction, and needs no header we have to
+ * remember to set or lms-api has to be persuaded to trust.
+ *
+ * In development a Vite proxy plays the edge. In production the edge routes
+ * `acme.lms.com/api/*` to lms-api and everything else here.
  */
-const baseUrl = env.LMS_API_URL ?? 'http://localhost:8080';
+function baseUrlFor(origin: string): string {
+	return `${origin}/api`;
+}
 
 /**
  * A client for calls that carry no credentials: login, register, and the token
  * exchanges that mint a session.
- *
- * It uses the global `fetch` rather than the one SvelteKit hands to `load`. That
- * one simulates the browser's CORS rules, which is right for a request the
- * browser will repeat and wrong for one it never makes.
  */
-export const serverApi = createClient<paths>({ baseUrl });
+export function serverApi(origin: string) {
+	return createClient<paths>({ baseUrl: baseUrlFor(origin) });
+}
 
 /**
  * A client that authenticates as the bearer of `accessToken`.
@@ -30,8 +37,8 @@ export const serverApi = createClient<paths>({ baseUrl });
  * cookie precisely so that no script in the page can read it, and handing it to
  * a client-side fetch would undo that.
  */
-export function authedApi(accessToken: string) {
-	const client = createClient<paths>({ baseUrl });
+export function authedApi(origin: string, accessToken: string) {
+	const client = createClient<paths>({ baseUrl: baseUrlFor(origin) });
 
 	client.use({
 		onRequest({ request }) {
@@ -56,6 +63,6 @@ export function authedApi(accessToken: string) {
  * request with no token rather than a different endpoint. Sending the token
  * whenever there is one is therefore the whole of the rule.
  */
-export function apiAs(accessToken: string | null) {
-	return accessToken ? authedApi(accessToken) : serverApi;
+export function apiAs(origin: string, accessToken: string | null) {
+	return accessToken ? authedApi(origin, accessToken) : serverApi(origin);
 }

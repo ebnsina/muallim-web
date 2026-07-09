@@ -21,7 +21,7 @@ const serializableHeaders = new Set(['content-length', 'content-type']);
  * collapsed — which is only tractable if there is one place they occur.
  */
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.accessToken = await resolveAccessToken(event.cookies);
+	event.locals.accessToken = await resolveAccessToken(event.cookies, event.url.origin);
 
 	return resolve(event, {
 		filterSerializedResponseHeaders: (name) => serializableHeaders.has(name.toLowerCase())

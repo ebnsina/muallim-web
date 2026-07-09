@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		data,
 		error: problem,
 		response
-	} = await authedApi(locals.accessToken).GET('/v1/me/courses', {
+	} = await authedApi(url.origin, locals.accessToken).GET('/v1/me/courses', {
 		params: { query: { limit: PAGE_SIZE, ...(cursor ? { cursor } : {}) } }
 	});
 
@@ -58,7 +58,7 @@ function slugify(title: string): string {
 }
 
 export const actions: Actions = {
-	create: async ({ request, locals }) => {
+	create: async ({ request, locals, url }) => {
 		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach');
 
 		const form = await request.formData();
@@ -79,9 +79,12 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error: problem, response } = await authedApi(locals.accessToken).POST('/v1/courses', {
-			body: { title, slug, summary, difficulty }
-		});
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/courses',
+			{
+				body: { title, slug, summary, difficulty }
+			}
+		);
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
@@ -95,12 +98,12 @@ export const actions: Actions = {
 		redirect(303, '/teach');
 	},
 
-	publish: async ({ request, locals }) => {
+	publish: async ({ request, locals, url }) => {
 		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach');
 
 		const slug = String((await request.formData()).get('slug') ?? '');
 
-		const { error: problem, response } = await authedApi(locals.accessToken).POST(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/publish',
 			{ params: { path: { slug } } }
 		);
@@ -115,12 +118,12 @@ export const actions: Actions = {
 		return { published: slug };
 	},
 
-	unpublish: async ({ request, locals }) => {
+	unpublish: async ({ request, locals, url }) => {
 		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach');
 
 		const slug = String((await request.formData()).get('slug') ?? '');
 
-		const { error: problem, response } = await authedApi(locals.accessToken).POST(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/unpublish',
 			{ params: { path: { slug } } }
 		);

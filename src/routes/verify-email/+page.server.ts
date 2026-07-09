@@ -16,13 +16,15 @@ export const actions: Actions = {
 	 * before the recipient ever saw the email — and, worse, spent by something
 	 * that is not them.
 	 */
-	default: async ({ request }) => {
+	default: async ({ request, url }) => {
 		const form = await request.formData();
 		const token = String(form.get('token') ?? '');
 
 		if (!token) return fail(400, { message: 'This link is missing its token.' });
 
-		const { error, response } = await serverApi.POST('/v1/auth/email/verify', { body: { token } });
+		const { error, response } = await serverApi(url.origin).POST('/v1/auth/email/verify', {
+			body: { token }
+		});
 
 		if (error) {
 			return fail(response?.status ?? 400, {

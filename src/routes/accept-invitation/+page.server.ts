@@ -11,7 +11,7 @@ export const load: PageServerLoad = ({ url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, url }) => {
 		const form = await request.formData();
 		const token = String(form.get('token') ?? '');
 		const name = String(form.get('name') ?? '').trim();
@@ -30,9 +30,12 @@ export const actions: Actions = {
 			});
 		}
 
-		const { data, error, response } = await serverApi.POST('/v1/auth/invitations/accept', {
-			body: { token, name, password }
-		});
+		const { data, error, response } = await serverApi(url.origin).POST(
+			'/v1/auth/invitations/accept',
+			{
+				body: { token, name, password }
+			}
+		);
 
 		if (error || !data) {
 			return fail(response?.status ?? 400, {

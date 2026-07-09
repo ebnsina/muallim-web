@@ -3,12 +3,12 @@ import { problemMessage } from '$lib/api';
 import { apiAs, authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
 	const {
 		data,
 		error: problem,
 		response
-	} = await apiAs(locals.accessToken).GET('/v1/lessons/{id}/content', {
+	} = await apiAs(url.origin, locals.accessToken).GET('/v1/lessons/{id}/content', {
 		params: { path: { id: params.id } }
 	});
 
@@ -47,7 +47,7 @@ export const actions: Actions = {
 			data,
 			error: problem,
 			response
-		} = await authedApi(locals.accessToken).POST('/v1/lessons/{id}/complete', {
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/lessons/{id}/complete', {
 			params: { path: { id: params.id } },
 			body: { complete }
 		});

@@ -72,11 +72,13 @@ export function clearSession(cookies: Cookies): void {
  */
 const inFlight = new Map<string, Promise<Tokens | null>>();
 
-function refreshOnce(refreshToken: string): Promise<Tokens | null> {
+function refreshOnce(origin: string, refreshToken: string): Promise<Tokens | null> {
+	// Keyed on the token alone. A refresh token is 256 bits of entropy issued by
+	// one workspace, so it cannot collide across origins.
 	const existing = inFlight.get(refreshToken);
 	if (existing) return existing;
 
-	const pending = exchangeRefreshToken(refreshToken).finally(() => {
+	const pending = exchangeRefreshToken(origin, refreshToken).finally(() => {
 		inFlight.delete(refreshToken);
 	});
 
@@ -90,9 +92,9 @@ function refreshOnce(refreshToken: string): Promise<Tokens | null> {
  * is deliberate on the API's side: telling the bearer of a stolen token that we
  * spotted the theft tells the thief.
  */
-async function exchangeRefreshToken(refreshToken: string): Promise<Tokens | null> {
+async function exchangeRefreshToken(origin: string, refreshToken: string): Promise<Tokens | null> {
 	try {
-		const { data } = await serverApi.POST('/v1/auth/refresh', {
+		const { data } = await serverApi(origin).POST('/v1/auth/refresh', {
 			body: { refresh_token: refreshToken }
 		});
 		return data ? (data as Tokens) : null;
@@ -111,14 +113,14 @@ async function exchangeRefreshToken(refreshToken: string): Promise<Tokens | null
  * refresh can happen — and therefore the only place the rotation race above has
  * to be defended.
  */
-export async function resolveAccessToken(cookies: Cookies): Promise<string | null> {
+export async function resolveAccessToken(cookies: Cookies, origin: string): Promise<string | null> {
 	const access = cookies.get(ACCESS_COOKIE);
 	if (access) return access;
 
 	const refresh = cookies.get(REFRESH_COOKIE);
 	if (!refresh) return null;
 
-	const tokens = await refreshOnce(refresh);
+	const tokens = await refreshOnce(origin, refresh);
 	if (!tokens) {
 		clearSession(cookies);
 		return null;

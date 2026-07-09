@@ -20,7 +20,7 @@ export const actions: Actions = {
 			return fail(400, { email, message: 'Enter your email address and password.' });
 		}
 
-		const { data, error, response } = await serverApi.POST('/v1/auth/login', {
+		const { data, error, response } = await serverApi(url.origin).POST('/v1/auth/login', {
 			body: { email, password }
 		});
 

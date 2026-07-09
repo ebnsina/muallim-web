@@ -12,7 +12,7 @@ export const load: PageServerLoad = ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, url }) => {
 		const form = await request.formData();
 		const email = String(form.get('email') ?? '').trim();
 		const name = String(form.get('name') ?? '').trim();
@@ -25,7 +25,7 @@ export const actions: Actions = {
 			return invalid(`Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`);
 		}
 
-		const { data, error, response } = await serverApi.POST('/v1/auth/register', {
+		const { data, error, response } = await serverApi(url.origin).POST('/v1/auth/register', {
 			body: { email, name, password }
 		});
 

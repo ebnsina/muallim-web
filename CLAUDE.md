@@ -30,7 +30,9 @@ pnpm build
 
 **Runes only.** No `export let`, no `$:`. `$derived` for anything computable; `$effect` only for genuine side effects, never to sync one piece of state into another.
 
-**All API access goes through the typed client** in `src/lib/api/`. A raw `fetch()` to `lms-api` from a component is a rejection. `schema.d.ts` is generated and gitignored — never hand-edit it.
+**All API access goes through the typed client** in `src/lib/server/api.ts`, from the server, always. A raw `fetch()` to `lms-api` from a component is a rejection, and there is no browser-side client to reach for. `schema.d.ts` is generated and gitignored — never hand-edit it.
+
+**`lms-api` is same-origin at `/api`,** routed there by the edge (a Vite proxy in dev) with `Host` preserved, because `Host` is what selects the workspace. Never call `lms-api` on a direct address: `Host` is a forbidden header for `fetch` and Node drops it, so the request quietly resolves the wrong workspace.
 
 **Fetch in `load`, never in `onMount`.** Use the `fetch` passed to `load`. Mutations are form actions with `use:enhance`, not `onclick` + `fetch`.
 

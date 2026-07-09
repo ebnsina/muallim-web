@@ -31,11 +31,13 @@ The consequence, which is the point: a breaking change in `lms-api` fails `pnpm 
 
 Do not duplicate backend domain rules in the client. Validate for _user experience_ (immediate feedback); the server validates for _correctness_. When they disagree, the server wins.
 
-### Two traps in cross-origin SSR, both already handled
+### `lms-api` is same-origin, at `/api`
 
-`lms-api` is a different origin from this app, in development and in production. That makes every call cross-origin, including the ones SvelteKit makes while server-rendering, and SSR is where it gets subtle. Both of these cost real debugging time once; do not undo the fixes.
+The edge serves this app at `acme.lms.com/` and routes `acme.lms.com/api/*` to `lms-api`, preserving `Host`. A Vite proxy does the same in development. Nothing here is cross-origin, so there is no CORS, no preflight, and no `Origin` header to forge during SSR.
 
-**SvelteKit simulates the browser's CORS rules during SSR.** Its `fetch` rejects any cross-origin response whose `Access-Control-Allow-Origin` does not match the app's origin — but Node sends no `Origin` request header, so a correctly implemented API returns no CORS headers at all and the check fails, even though the request succeeded. `apiFor(fetch, url.origin)` therefore sets `Origin` explicitly on the server, making the SSR request identical to the one the browser will send. Always pass `url.origin` from `load`. The header cannot be set in the browser — `Origin` is a forbidden header name there — so the client guards on `!browser`.
+**`Host` decides the workspace.** `lms-api` strips the port and takes the first label as the subdomain, so a request must reach it carrying the host the _browser_ addressed. Calling `lms-api` on an internal address while overriding `Host` does not work: `Host` is a forbidden header name for `fetch`, and Node drops it silently — the request succeeds, against the wrong workspace, and nothing says so. Never introduce a second, direct route to `lms-api`. The dev proxy sets `changeOrigin: false` for the same reason.
+
+**Every call to `lms-api` is made from the server**, through `src/lib/server/api.ts`, which takes `url.origin` from the request being served. Authenticated reads have no choice: the access token is in an httpOnly cookie so that no script in the page can read it. Anonymous reads follow, because what `lms-api` returns depends on whether a token accompanied the request — an author sees drafts, an enrolled learner sees lesson bodies. There is no browser-side API client, and a relative `/api` URL in a universal `load` would not reach the proxy during SSR anyway.
 
 **Only whitelisted response headers survive SSR serialization.** SvelteKit embeds SSR `fetch` responses in the HTML for hydration and hides every header not named by `filterSerializedResponseHeaders`; reading a hidden one throws. `openapi-fetch` reads `content-length` to decide whether a response has a body, so `handle` in `hooks.server.ts` permits `content-length` and `content-type` — and nothing else, because whatever is listed there ends up in the page source. Never add `set-cookie` or `authorization` to that list.
 

@@ -4,13 +4,13 @@ import { serverApi } from '$lib/server/api';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, url }) => {
 		const form = await request.formData();
 		const email = String(form.get('email') ?? '').trim();
 
 		if (!email) return fail(400, { email, message: 'Enter your email address.' });
 
-		const { error, response } = await serverApi.POST('/v1/auth/password/forgot', {
+		const { error, response } = await serverApi(url.origin).POST('/v1/auth/password/forgot', {
 			body: { email }
 		});
 

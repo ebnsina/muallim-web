@@ -18,7 +18,7 @@ export const load: PageServerLoad = ({ url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, url }) => {
 		const form = await request.formData();
 		const token = String(form.get('token') ?? '');
 		const password = String(form.get('password') ?? '');
@@ -32,7 +32,7 @@ export const actions: Actions = {
 		}
 		if (password !== confirm) return fail(400, { message: 'The two passwords do not match.' });
 
-		const { error, response } = await serverApi.POST('/v1/auth/password/reset', {
+		const { error, response } = await serverApi(url.origin).POST('/v1/auth/password/reset', {
 			body: { token, password }
 		});
 

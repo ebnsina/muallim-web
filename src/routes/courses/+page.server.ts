@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		data,
 		error: problem,
 		response
-	} = await apiAs(locals.accessToken).GET('/v1/courses', {
+	} = await apiAs(url.origin, locals.accessToken).GET('/v1/courses', {
 		params: { query: { limit: PAGE_SIZE, ...(cursor ? { cursor } : {}) } }
 	});
 

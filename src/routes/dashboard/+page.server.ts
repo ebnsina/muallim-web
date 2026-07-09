@@ -12,7 +12,7 @@ function toLogin(pathname: string): never {
 export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 	if (!locals.accessToken) toLogin(url.pathname);
 
-	const api = authedApi(locals.accessToken);
+	const api = authedApi(url.origin, locals.accessToken);
 
 	// Both are needed to render the page and neither depends on the other.
 	const [me, enrolments] = await Promise.all([api.GET('/v1/me'), api.GET('/v1/me/enrolments')]);
@@ -36,21 +36,21 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 };
 
 export const actions: Actions = {
-	logout: async ({ locals, cookies }) => {
+	logout: async ({ locals, cookies, url }) => {
 		// Revoke server-side first. If that fails the cookies are cleared anyway:
 		// a session this browser cannot present is one it cannot use, and the
 		// access token expires on its own within fifteen minutes.
 		if (locals.accessToken) {
-			await authedApi(locals.accessToken).POST('/v1/auth/logout');
+			await authedApi(url.origin, locals.accessToken).POST('/v1/auth/logout');
 		}
 		clearSession(cookies);
 		redirect(303, '/');
 	},
 
-	resendVerification: async ({ locals }) => {
+	resendVerification: async ({ locals, url }) => {
 		if (!locals.accessToken) toLogin('/dashboard');
 
-		const { error: problem, response } = await authedApi(locals.accessToken).POST(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/auth/email/verify/resend'
 		);
 

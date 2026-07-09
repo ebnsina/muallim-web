@@ -6,7 +6,7 @@ It owns presentation. [`lms-api`](../lms-api) owns the domain. The seam between 
 
 ## Requirements
 
-Node 24, pnpm 11. A running `lms-api` on `http://localhost:8080`.
+Node 24, pnpm 11. A running `lms-api` on `http://localhost:8080`, which `vite.config.ts` proxies to `/api`. Override with `LMS_API_URL`.
 
 ## Getting started
 
@@ -25,7 +25,29 @@ cd ../lms-api && make spec    # writes bin/openapi.json
 cd ../lms-web  && pnpm gen:api
 ```
 
-`src/lib/api/schema.d.ts` is generated and gitignored; never hand-edit it. Everything reaching `lms-api` goes through the client in `src/lib/api/`. A raw `fetch()` to the API from a component is a rejection.
+`src/lib/api/schema.d.ts` is generated and gitignored; never hand-edit it. Everything reaching `lms-api` goes through `src/lib/server/api.ts`. A raw `fetch()` to the API from a component is a rejection.
+
+Every call is made from the server. Authenticated reads have no choice — the access token lives in an httpOnly cookie so that no script in the page can read it — and the anonymous reads follow, because what `lms-api` returns depends on whether a token accompanied the request. There is no browser-side API client.
+
+## How a workspace is addressed
+
+`lms-api` resolves the workspace from the `Host` header: it strips the port and takes the first label as the subdomain, or matches a custom domain. The host a request arrives on decides which workspace answers it.
+
+So this app and the API share an origin, and the edge routes between them:
+
+```
+acme.lms.com/            → lms-web
+acme.lms.com/api/v1/*    → lms-api   (strip /api, keep Host)
+school.edu/api/v1/*      → lms-api   (a custom domain, same rule)
+```
+
+Three things follow. There is no cross-origin request, so no CORS and no preflight. `Host` arrives correct without anyone forwarding a header `lms-api` would have to be persuaded to trust. And a custom domain works the moment its DNS points at us.
+
+`vite.config.ts` proxies `/api` to `http://localhost:8080` in development so the two environments differ in nothing that matters. It sets `changeOrigin: false` deliberately: rewriting `Host` to the target would make every request resolve the workspace named after `lms-api`'s own address.
+
+Calling `lms-api` on an internal address instead, while overriding `Host`, is not an option — `Host` is a forbidden header name for `fetch`, and Node drops it silently. A request that went that way would resolve the wrong workspace, or none, and nothing would say so.
+
+Behind a TLS-terminating edge, set `ORIGIN` (or `PROTOCOL_HEADER`/`HOST_HEADER`) for `adapter-node`, or `url.origin` will be `http://` and every API call this app makes will address the wrong scheme.
 
 ## Development
 
