@@ -1,6 +1,7 @@
 import { dev } from '$app/environment';
 import type { Cookies } from '@sveltejs/kit';
 import { serverApi } from './api';
+import { singleFlight } from './single-flight';
 
 /**
  * The session lives in two httpOnly cookies, written by this server and never
@@ -67,23 +68,27 @@ export function clearSession(cookies: Cookies): void {
  * token, and the second would look exactly like a stolen one.
  *
  * Collapsing them means the token is spent once and both requests get the same
- * new pair. Across several Node replicas the race returns, because this map is
- * per process; a shared lock is the fix if that day comes.
+ * new pair.
+ *
+ * The map is per process, so it only holds if both requests reach the same
+ * process. **The edge must route a browser to one replica by hashing the
+ * `lms_rt` cookie.** That is a deployment requirement, not a preference, and it
+ * is written down in the README beside the `/api` routing it sits next to.
+ * Without it, a user with two tabs is logged out of every device by a race that
+ * looks exactly like theft — and reproduces about as often as one would expect
+ * of a race, which is to say rarely, and never on the machine you are debugging.
+ *
+ * A replica restart moves a browser to a new process with an empty map, so a
+ * refresh in flight at that moment can still race. It resolves by re-
+ * authenticating, which is the correct outcome of losing a session, and it is
+ * the residual we accepted rather than putting a database in the web tier.
  */
 const inFlight = new Map<string, Promise<Tokens | null>>();
 
 function refreshOnce(origin: string, refreshToken: string): Promise<Tokens | null> {
 	// Keyed on the token alone. A refresh token is 256 bits of entropy issued by
 	// one workspace, so it cannot collide across origins.
-	const existing = inFlight.get(refreshToken);
-	if (existing) return existing;
-
-	const pending = exchangeRefreshToken(origin, refreshToken).finally(() => {
-		inFlight.delete(refreshToken);
-	});
-
-	inFlight.set(refreshToken, pending);
-	return pending;
+	return singleFlight(inFlight, refreshToken, () => exchangeRefreshToken(origin, refreshToken));
 }
 
 /**

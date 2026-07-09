@@ -49,6 +49,22 @@ Calling `lms-api` on an internal address instead, while overriding `Host`, is no
 
 Behind a TLS-terminating edge, set `ORIGIN` (or `PROTOCOL_HEADER`/`HOST_HEADER`) for `adapter-node`, or `url.origin` will be `http://` and every API call this app makes will address the wrong scheme.
 
+## Sessions must be sticky
+
+**Running more than one replica requires the edge to route a browser to one of them, by hashing the `lms_rt` cookie.** This is a correctness requirement, not a performance one.
+
+`lms-api` rotates a refresh token on every use, and treats a token presented twice as theft: it revokes the whole session family and logs the user out of every device. Two requests arriving together with the same expired access cookie — two tabs, a prefetch, a page and its subresource — each try to spend the same refresh token, and the second looks exactly like a stolen one.
+
+`hooks.server.ts` is the only place a refresh happens, and it collapses concurrent attempts onto a single in-flight promise (`src/lib/server/single-flight.ts`, unit-tested). That map lives in one process. Spread the two requests across two replicas and the collapse never happens.
+
+```
+edge: hash(lms_rt cookie) → replica N
+```
+
+With nginx that is `hash $cookie_lms_rt consistent;` in the `upstream` block. Any load balancer that hashes on that specific cookie will do — but check what yours actually keys on. Hashing the whole `Cookie` header does not work: it also carries `lms_at`, which changes on every refresh, so a browser would hop replicas at exactly the moment it must not.
+
+The residual: a replica restart moves a browser to a process with an empty map, so a refresh in flight at that moment can still race. It resolves by re-authenticating, which is the right outcome of losing a session. The alternative — a shared lock — means a database in the presentation tier, and this app deliberately has none.
+
 ## Development
 
 ```bash

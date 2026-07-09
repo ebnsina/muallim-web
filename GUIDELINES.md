@@ -39,6 +39,8 @@ The edge serves this app at `acme.lms.com/` and routes `acme.lms.com/api/*` to `
 
 **Every call to `lms-api` is made from the server**, through `src/lib/server/api.ts`, which takes `url.origin` from the request being served. Authenticated reads have no choice: the access token is in an httpOnly cookie so that no script in the page can read it. Anonymous reads follow, because what `lms-api` returns depends on whether a token accompanied the request — an author sees drafts, an enrolled learner sees lesson bodies. There is no browser-side API client, and a relative `/api` URL in a universal `load` would not reach the proxy during SSR anyway.
 
+**Refreshing happens in exactly one place, and sessions are sticky.** `lms-api` rotates a refresh token on every use and treats one presented twice as theft — it revokes the whole session family. `hooks.server.ts` is the only place a refresh occurs, and it collapses concurrent attempts onto one in-flight promise. That map is per process, so **the edge must route a browser to one replica by hashing the `lms_rt` cookie.** Adding a second place that refreshes, or load-balancing round-robin, logs users out of every device through a race that reproduces rarely and never while you are watching.
+
 **Only whitelisted response headers survive SSR serialization.** SvelteKit embeds SSR `fetch` responses in the HTML for hydration and hides every header not named by `filterSerializedResponseHeaders`; reading a hidden one throws. `openapi-fetch` reads `content-length` to decide whether a response has a body, so `handle` in `hooks.server.ts` permits `content-length` and `content-type` — and nothing else, because whatever is listed there ends up in the page source. Never add `set-cookie` or `authorization` to that list.
 
 ---
