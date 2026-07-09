@@ -20,14 +20,14 @@
 
 	<p class="text-muted mt-3 text-pretty">
 		A multi-tenant learning management system. This page renders the live state of
-		<code class="bg-surface-2 rounded px-1.5 py-0.5 font-mono text-sm">lms-api</code>.
+		<code class="bg-muted rounded px-1.5 py-0.5 font-mono text-sm">lms-api</code>.
 	</p>
 
 	<!--
 		Four states, not one. A component that renders only the success case is
 		unfinished. There is no loading branch because `load` resolves before render.
 	-->
-	<div class="border-line mt-8 rounded-xl border p-5">
+	<div class="border-border mt-8 rounded-xl border p-5">
 		{#if status.kind === 'ok'}
 			<div class="flex items-start gap-3">
 				<CheckCircle2
@@ -48,8 +48,8 @@
 					<p class="font-medium">API unreachable</p>
 					<p class="text-muted mt-1 text-sm">
 						Nothing is listening. Start it with
-						<code class="bg-surface-2 rounded px-1.5 py-0.5 font-mono">make run</code>
-						in the <code class="bg-surface-2 rounded px-1.5 py-0.5 font-mono">lms-api</code> repo.
+						<code class="bg-muted rounded px-1.5 py-0.5 font-mono">make run</code>
+						in the <code class="bg-muted rounded px-1.5 py-0.5 font-mono">lms-api</code> repo.
 					</p>
 				</div>
 			</div>

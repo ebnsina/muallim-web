@@ -22,7 +22,7 @@
 <main class="flex min-h-dvh items-center justify-center px-6 py-16">
 	<div class="w-full max-w-md text-center">
 		<div
-			class="bg-surface-2 mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl"
+			class="bg-muted mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl"
 			aria-hidden="true"
 		>
 			{#if isNotFound}
@@ -51,8 +51,8 @@
 		<div class="mt-8 flex flex-wrap justify-center gap-3">
 			<a
 				href={resolve('/')}
-				class="bg-accent focus-visible:ring-accent inline-flex items-center gap-2 rounded-lg px-4 py-2.5
-				       text-sm font-medium text-white transition-colors hover:opacity-90
+				class="bg-primary text-primary-foreground focus-visible:ring-ring inline-flex items-center gap-2
+				       rounded-lg px-4 py-2.5 text-sm font-medium transition-colors hover:opacity-90
 				       focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
 				<ArrowLeft class="size-4" aria-hidden="true" />
@@ -63,7 +63,7 @@
 				<button
 					type="button"
 					onclick={reload}
-					class="border-line focus-visible:ring-accent hover:bg-surface-2 inline-flex items-center gap-2
+					class="border-border focus-visible:ring-ring hover:bg-muted inline-flex items-center gap-2
 					       rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors
 					       focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 				>
@@ -76,7 +76,7 @@
 		{#if correlationId}
 			<p class="text-muted mt-8 text-xs">
 				Quote this reference if you contact support:
-				<code class="bg-surface-2 ml-1 rounded px-1.5 py-0.5 font-mono select-all">
+				<code class="bg-muted ml-1 rounded px-1.5 py-0.5 font-mono select-all">
 					{correlationId}
 				</code>
 			</p>
