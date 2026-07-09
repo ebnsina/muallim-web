@@ -77,7 +77,7 @@
 					<div>
 						<a
 							class="font-medium underline-offset-4 hover:underline"
-							href={resolve(`/courses/${course.slug}`)}
+							href={resolve(`/teach/${course.slug}`)}
 						>
 							{course.title}
 						</a>

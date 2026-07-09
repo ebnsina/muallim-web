@@ -1,0 +1,97 @@
+import { error, fail, redirect } from '@sveltejs/kit';
+import { problemMessage } from '$lib/api';
+import { authedApi } from '$lib/server/api';
+import type { Actions, PageServerLoad } from './$types';
+
+const CONTENT_TYPES = ['text', 'video', 'quiz', 'assignment', 'live', 'scorm', 'h5p'] as const;
+const VIDEO_SOURCES = ['none', 'youtube', 'vimeo', 'embed', 'hosted'] as const;
+
+type ContentType = (typeof CONTENT_TYPES)[number];
+type VideoSource = (typeof VIDEO_SOURCES)[number];
+
+/** Narrows a submitted enum rather than asserting it: a form field is user input. */
+function oneOf<T extends string>(allowed: readonly T[], value: string, fallback: T): T {
+	return (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
+}
+
+/**
+ * The author reads the lesson through the same endpoint a learner does. lms-api
+ * answers with `access: "author"` and the full body, because entitlement is
+ * decided there and not here.
+ */
+export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+	const {
+		data,
+		error: problem,
+		response
+	} = await authedApi(url.origin, locals.accessToken).GET('/v1/lessons/{id}/content', {
+		params: { path: { id: params.id } }
+	});
+
+	if (problem || !data) {
+		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
+	}
+
+	// An unpublished lesson a CDN stores is an unpublished lesson it hands to
+	// strangers.
+	setHeaders({ 'cache-control': 'private, no-store' });
+
+	return { lesson: data.lesson, slug: params.slug };
+};
+
+export const actions: Actions = {
+	default: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const title = String(form.get('title') ?? '').trim();
+		if (!title) return fail(400, { message: 'A lesson needs a title.' });
+
+		const contentType: ContentType = oneOf(
+			CONTENT_TYPES,
+			String(form.get('content_type') ?? ''),
+			'text'
+		);
+		const videoSource: VideoSource = oneOf(
+			VIDEO_SOURCES,
+			String(form.get('video_source') ?? ''),
+			'none'
+		);
+
+		const durationRaw = String(form.get('duration_seconds') ?? '').trim();
+		const duration = durationRaw === '' ? 0 : Number(durationRaw);
+		if (!Number.isInteger(duration) || duration < 0) {
+			return fail(400, { message: 'Duration must be a whole number of seconds.' });
+		}
+
+		// Every field the form owns is sent, so this PATCH is a complete statement of
+		// what the author last saw and edited. Sending a subset would let a field
+		// the form renders but omits keep a value nobody can see — and sending an
+		// empty `content` from a form that never showed it would erase the lesson.
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
+			'/v1/lessons/{id}',
+			{
+				params: { path: { id: params.id } },
+				body: {
+					title,
+					content: String(form.get('content') ?? ''),
+					content_type: contentType,
+					video_source: videoSource,
+					video_url: String(form.get('video_url') ?? '').trim(),
+					duration_seconds: duration,
+					is_preview: form.get('is_preview') === 'on'
+				}
+			}
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not save that lesson.')
+			});
+		}
+
+		redirect(303, `/teach/${params.slug}`);
+	}
+};
