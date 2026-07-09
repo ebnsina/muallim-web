@@ -6,6 +6,10 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// Hiding the link is a courtesy, not a control: /teach is guarded by lms-api,
+	// which answers 403 to a student who types the address.
+	const canAuthor = $derived(data.user.role !== 'student');
 </script>
 
 <svelte:head><title>Dashboard — LMS</title></svelte:head>
@@ -17,9 +21,15 @@
 			<p class="text-muted-foreground mt-1 text-sm">{data.user.email} · {data.user.role}</p>
 		</div>
 
-		<form method="POST" action="?/logout" use:enhance>
-			<Button type="submit" variant="outline">Sign out</Button>
-		</form>
+		<div class="flex items-center gap-3">
+			{#if canAuthor}
+				<Button href={resolve('/teach')} variant="outline">Teach</Button>
+			{/if}
+
+			<form method="POST" action="?/logout" use:enhance>
+				<Button type="submit" variant="outline">Sign out</Button>
+			</form>
+		</div>
 	</div>
 
 	{#if form?.resent}
