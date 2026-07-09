@@ -38,3 +38,10 @@ vite.config.ts.timestamp-*
 .idea/
 .vscode/
 *.swp
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/e2e/.auth/
+/e2e/.mail/

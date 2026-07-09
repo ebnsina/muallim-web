@@ -54,9 +54,27 @@ Behind a TLS-terminating edge, set `ORIGIN` (or `PROTOCOL_HEADER`/`HOST_HEADER`)
 ```bash
 pnpm check          # svelte-check + tsc
 pnpm lint           # prettier + eslint
-pnpm test           # vitest
+pnpm test           # unit tests, then end-to-end
+pnpm test:unit      # vitest
+pnpm test:e2e       # playwright
 pnpm build
 ```
+
+## End-to-end tests
+
+```bash
+cd ../lms-api && make db-create && make migrate && make seed
+cd ../lms-web && pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+Playwright starts `lms-api`, its job worker, and this app. Postgres is the one thing it does not bring up.
+
+They run against `lms_test`, not the development database, because they register the workspace's owner — which only works while the workspace is unclaimed. The first run claims it; every run after signs in.
+
+A student is provisioned by invitation, because that is the only way to join a workspace. `lms-api` mails the link and returns it to nobody, so the worker runs with `LMS_MAIL_FILE` set and the setup reads the link out of that file. It is the same path a real student walks.
+
+The suite covers the boundaries that are expensive to get wrong: a draft is invisible to strangers and 404 by its own address; a preview lesson is readable and a gated one is 404, never 403; the authoring pages are forbidden to a student rather than merely ineffective; enrolling opens the gated lesson and completing every lesson reaches 100%; and `forgot-password` says the same thing about an address that exists and one that does not.
 
 ## Stack
 
