@@ -1,4 +1,5 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { resolveAccessToken } from '$lib/server/session';
 
 /**
  * Headers of an SSR `fetch` response that may be serialized into the HTML for
@@ -11,7 +12,17 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
  */
 const serializableHeaders = new Set(['content-length', 'content-type']);
 
+/**
+ * Resolves the session once per request, refreshing an expired access token if a
+ * refresh token is still good.
+ *
+ * This is the only place a refresh happens. Refresh tokens rotate on use and a
+ * token seen twice revokes the whole family, so concurrent refreshes must be
+ * collapsed — which is only tractable if there is one place they occur.
+ */
 export const handle: Handle = async ({ event, resolve }) => {
+	event.locals.accessToken = await resolveAccessToken(event.cookies);
+
 	return resolve(event, {
 		filterSerializedResponseHeaders: (name) => serializableHeaders.has(name.toLowerCase())
 	});

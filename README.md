@@ -16,7 +16,7 @@ pnpm gen:api        # generate the typed client from ../lms-api's spec
 pnpm dev
 ```
 
-The home page renders the live state of `lms-api`. With the API stopped it reports *unreachable* and still returns HTTP 200 — the API going down degrades the page, it does not crash it.
+The home page renders the live state of `lms-api`. With the API stopped it reports _unreachable_ and still returns HTTP 200 — the API going down degrades the page, it does not crash it.
 
 ## The typed API client
 
