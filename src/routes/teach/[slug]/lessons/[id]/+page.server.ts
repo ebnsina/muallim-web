@@ -22,23 +22,41 @@ function oneOf<T extends string>(allowed: readonly T[], value: string, fallback:
 export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-	const {
-		data,
-		error: problem,
-		response
-	} = await authedApi(url.origin, locals.accessToken).GET('/v1/lessons/{id}/content', {
-		params: { path: { id: params.id } }
-	});
+	const api = authedApi(url.origin, locals.accessToken);
 
-	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
+	// The curriculum carries the course's drip mode and this lesson's stored
+	// schedule; the content endpoint carries the body. Neither depends on the
+	// other.
+	const [content, tree] = await Promise.all([
+		api.GET('/v1/lessons/{id}/content', { params: { path: { id: params.id } } }),
+		api.GET('/v1/courses/{slug}', { params: { path: { slug: params.slug } } })
+	]);
+
+	if (content.error || !content.data) {
+		error(
+			content.response?.status ?? 500,
+			problemMessage(content.error, 'That lesson could not be loaded.')
+		);
 	}
 
 	// An unpublished lesson a CDN stores is an unpublished lesson it hands to
 	// strangers.
 	setHeaders({ 'cache-control': 'private, no-store' });
 
-	return { lesson: data.lesson, slug: params.slug };
+	const scheduled = (tree.data?.topics ?? [])
+		.flatMap((t) => t.lessons ?? [])
+		.find((l) => l.id === params.id);
+
+	return {
+		lesson: content.data.lesson,
+		slug: params.slug,
+		dripMode: tree.data?.course.drip_mode ?? 'none',
+
+		// The stored schedule, not the reader's computed unlock date. An author edits
+		// what is written down.
+		availableAt: scheduled?.available_at ?? null,
+		availableAfterDays: scheduled?.available_after_days ?? null
+	};
 };
 
 export const actions: Actions = {
@@ -59,6 +77,31 @@ export const actions: Actions = {
 			String(form.get('video_source') ?? ''),
 			'none'
 		);
+
+		// Sent only in the mode that reads it. A PATCH omitting a field leaves the
+		// column alone, so an author editing a sequential course cannot silently wipe
+		// the dates they will want back when they switch modes again.
+		const dripMode = String(form.get('drip_mode') ?? 'none');
+
+		const availableAtRaw = String(form.get('available_at') ?? '').trim();
+		const availableAt =
+			dripMode === 'scheduled' && availableAtRaw !== ''
+				? new Date(availableAtRaw).toISOString()
+				: undefined;
+
+		const afterDaysRaw = String(form.get('available_after_days') ?? '').trim();
+		const availableAfterDays =
+			dripMode === 'after_enrolment' && afterDaysRaw !== '' ? Number(afterDaysRaw) : undefined;
+
+		if (
+			availableAfterDays !== undefined &&
+			(!Number.isInteger(availableAfterDays) || availableAfterDays < 0)
+		) {
+			return fail(400, { message: 'Days after enrolling must be a whole number, zero or more.' });
+		}
+		if (availableAt !== undefined && Number.isNaN(Date.parse(availableAt))) {
+			return fail(400, { message: 'That release date is not a date.' });
+		}
 
 		const durationRaw = String(form.get('duration_seconds') ?? '').trim();
 		const duration = durationRaw === '' ? 0 : Number(durationRaw);
@@ -81,7 +124,9 @@ export const actions: Actions = {
 					video_source: videoSource,
 					video_url: String(form.get('video_url') ?? '').trim(),
 					duration_seconds: duration,
-					is_preview: form.get('is_preview') === 'on'
+					is_preview: form.get('is_preview') === 'on',
+					...(availableAt !== undefined ? { available_at: availableAt } : {}),
+					...(availableAfterDays !== undefined ? { available_after_days: availableAfterDays } : {})
 				}
 			}
 		);

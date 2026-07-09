@@ -13,6 +13,55 @@
 		if (!seconds) return '';
 		return `${Math.round(seconds / 60)} min`;
 	}
+
+	const openPrerequisites = $derived(data.prerequisites.filter((p) => !p.done));
+
+	const dripNotice: Record<string, string> = {
+		scheduled: 'Lessons in this course open on their own dates.',
+		after_enrolment: 'Lessons open a few days apart, counted from the day you enrol.',
+		sequential: 'Lessons open one at a time, as you finish the one before.'
+	};
+
+	/**
+	 * When a lesson opens, for this reader, or an empty string when it is already
+	 * open — or when nobody can say.
+	 *
+	 * Sequential drip is deliberately absent: only lms-api knows which lesson comes
+	 * next, and guessing here would put a padlock on a lesson the server will hand
+	 * over. A preview is never dripped.
+	 */
+	function opensOn(lesson: {
+		is_preview: boolean;
+		available_at?: string;
+		available_after_days?: number;
+	}): string {
+		if (!enrolled || lesson.is_preview) return '';
+
+		let when: Date | null = null;
+		if (data.course.drip_mode === 'scheduled' && lesson.available_at) {
+			when = new Date(lesson.available_at);
+		} else if (
+			data.course.drip_mode === 'after_enrolment' &&
+			lesson.available_after_days != null &&
+			data.enrolledAt
+		) {
+			// Constructed, not mutated, and by calendar day rather than by adding
+			// milliseconds: lms-api uses AddDate, and a span crossing a daylight-saving
+			// boundary is 23 or 25 hours long, not 24.
+			const from = new Date(data.enrolledAt);
+			when = new Date(
+				from.getFullYear(),
+				from.getMonth(),
+				from.getDate() + lesson.available_after_days,
+				from.getHours(),
+				from.getMinutes(),
+				from.getSeconds()
+			);
+		}
+
+		if (!when || when.getTime() <= Date.now()) return '';
+		return when.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+	}
 </script>
 
 <svelte:head><title>{data.course.title} — LMS</title></svelte:head>
@@ -45,6 +94,29 @@
 		</Alert>
 	{/if}
 
+	{#if data.prerequisites.length > 0}
+		<section class="mt-6">
+			<h2 class="text-sm font-medium">Before you enrol</h2>
+			<ul class="mt-2 space-y-1 text-sm">
+				{#each data.prerequisites as prerequisite (prerequisite.slug)}
+					<li class="text-muted-foreground">
+						<a
+							class="underline-offset-4 hover:underline"
+							href={resolve(`/courses/${prerequisite.slug}`)}
+						>
+							{prerequisite.title}
+						</a>
+						· {prerequisite.done ? 'finished' : 'not finished yet'}
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+
+	{#if data.course.drip_mode !== 'none' && dripNotice[data.course.drip_mode]}
+		<p class="text-muted-foreground mt-4 text-sm">{dripNotice[data.course.drip_mode]}</p>
+	{/if}
+
 	<div class="mt-6 flex items-center gap-4">
 		{#if !data.signedIn}
 			<Button href={`${resolve('/login')}?next=${encodeURIComponent(data.next)}`}>
@@ -58,6 +130,15 @@
 			<form method="POST" action="?/cancel" use:enhance>
 				<Button type="submit" variant="outline" size="sm">Cancel enrolment</Button>
 			</form>
+		{:else if openPrerequisites.length > 0}
+			<!--
+				Disabled because lms-api will refuse. It refuses either way — a disabled
+				button is a courtesy, not the control — and the refusal names the courses.
+			-->
+			<Button disabled>Enrol</Button>
+			<p class="text-muted-foreground text-sm">
+				Finish {openPrerequisites.map((p) => p.title).join(', ')} first.
+			</p>
 		{:else}
 			<form method="POST" action="?/enrol" use:enhance>
 				<Button type="submit">Enrol</Button>
@@ -91,6 +172,8 @@
 
 								<span class="text-muted-foreground shrink-0 text-xs">
 									{#if lesson.is_preview && !enrolled}Preview ·
+									{/if}
+									{#if opensOn(lesson)}Opens {opensOn(lesson)} ·
 									{/if}
 									{lesson.content_type}
 									{#if lesson.duration_seconds}· {minutes(lesson.duration_seconds)}{/if}

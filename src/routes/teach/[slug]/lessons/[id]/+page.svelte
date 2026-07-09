@@ -21,6 +21,19 @@
 
 	let submitting = $state(false);
 
+	/**
+	 * `datetime-local` wants `YYYY-MM-DDTHH:mm` in the browser's own zone, and the
+	 * API speaks RFC 3339 in UTC. Rendering the UTC string straight into the input
+	 * shows the author a time an hour or twelve from the one they set.
+	 */
+	function localDateTime(iso: string | null): string {
+		if (!iso) return '';
+
+		const when = new Date(iso);
+		const offset = when.getTimezoneOffset() * 60_000;
+		return new Date(when.getTime() - offset).toISOString().slice(0, 16);
+	}
+
 	const selectClass = 'border-input bg-background h-9 w-full rounded-md border px-3 text-sm';
 </script>
 
@@ -106,6 +119,49 @@
 		{:else}
 			<!-- Kept in the payload so switching type away from video clears the source. -->
 			<input type="hidden" name="video_source" value="none" />
+		{/if}
+
+		<!--
+			The release schedule, shown only in the mode that reads it. A preview lesson
+			is never held back, so it is never scheduled.
+		-->
+		<input type="hidden" name="drip_mode" value={data.dripMode} />
+
+		{#if data.dripMode === 'scheduled'}
+			<div class="space-y-2">
+				<Label for="available_at">Opens on</Label>
+				<Input
+					id="available_at"
+					name="available_at"
+					type="datetime-local"
+					value={localDateTime(data.availableAt)}
+					aria-describedby="available-at-hint"
+				/>
+				<p id="available-at-hint" class="text-muted-foreground text-xs">
+					The same instant for every learner. Leave blank to keep the current date.
+				</p>
+			</div>
+		{:else if data.dripMode === 'after_enrolment'}
+			<div class="space-y-2">
+				<Label for="available_after_days">Opens this many days after enrolling</Label>
+				<Input
+					id="available_after_days"
+					name="available_after_days"
+					type="number"
+					min="0"
+					step="1"
+					value={data.availableAfterDays ?? ''}
+					aria-describedby="after-days-hint"
+				/>
+				<p id="after-days-hint" class="text-muted-foreground text-xs">
+					Counted from each learner's own enrolment, so they see different dates.
+				</p>
+			</div>
+		{:else if data.dripMode === 'sequential'}
+			<p class="text-muted-foreground text-sm">
+				This course releases one lesson at a time. This lesson opens when the learner has finished
+				every lesson before it — there is nothing to schedule.
+			</p>
 		{/if}
 
 		<div class="space-y-2">

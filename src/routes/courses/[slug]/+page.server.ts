@@ -9,11 +9,17 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	// Issued together. The curriculum does not depend on the progress, so waiting
 	// for one before asking for the other would add a round trip to the page a
 	// learner opens most often.
-	const [curriculum, progress] = await Promise.all([
+	const [curriculum, progress, prerequisites, enrolments] = await Promise.all([
 		api.GET('/v1/courses/{slug}', { params: { path: { slug: params.slug } } }),
 		locals.accessToken
 			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/progress', {
 					params: { path: { slug: params.slug } }
+				})
+			: Promise.resolve(null),
+		api.GET('/v1/courses/{slug}/prerequisites', { params: { path: { slug: params.slug } } }),
+		locals.accessToken
+			? authedApi(url.origin, locals.accessToken).GET('/v1/me/enrolments', {
+					params: { query: { limit: 100 } }
 				})
 			: Promise.resolve(null)
 	]);
@@ -27,11 +33,32 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		);
 	}
 
+	// Which prerequisites this reader has finished. lms-api refuses the enrolment
+	// and names them, but a learner should see the gate before they walk into it.
+	const finished = new Set(
+		(enrolments?.data?.enrolments ?? [])
+			.filter((e) => e.status === 'completed')
+			.map((e) => e.course_slug)
+	);
+
 	return {
 		course: curriculum.data.course,
 		topics: curriculum.data.topics ?? [],
 		lessonCount: curriculum.data.lesson_count,
 		durationSeconds: curriculum.data.duration_seconds,
+
+		prerequisites: (prerequisites.data?.prerequisites ?? []).map((c) => ({
+			slug: c.slug,
+			title: c.title,
+			done: finished.has(c.slug)
+		})),
+
+		// After-enrolment drip counts from this learner's own enrolment, so the page
+		// cannot compute an unlock date without it. Sequential drip has no date at
+		// all, and lms-api is the only thing that knows which lesson comes next.
+		enrolledAt:
+			(enrolments?.data?.enrolments ?? []).find((e) => e.course_slug === params.slug)
+				?.enrolled_at ?? null,
 
 		// A reader who is not enrolled has no progress, and that is an ordinary
 		// answer rather than a failure of this page.

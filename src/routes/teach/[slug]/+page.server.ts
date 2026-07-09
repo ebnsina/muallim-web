@@ -13,22 +13,43 @@ async function curriculum(origin: string, accessToken: string, slug: string) {
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-	const {
-		data,
-		error: problem,
-		response
-	} = await curriculum(url.origin, locals.accessToken, params.slug);
+	const api = authedApi(url.origin, locals.accessToken);
 
-	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That course could not be loaded.'));
+	// Issued together. Neither depends on the other, and an author waiting for two
+	// round trips in series is waiting for no reason.
+	const [tree, prerequisites, mine] = await Promise.all([
+		curriculum(url.origin, locals.accessToken, params.slug),
+		api.GET('/v1/courses/{slug}/prerequisites', { params: { path: { slug: params.slug } } }),
+		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } })
+	]);
+
+	if (tree.error || !tree.data) {
+		error(
+			tree.response?.status ?? 500,
+			problemMessage(tree.error, 'That course could not be loaded.')
+		);
 	}
 
+	// Every other course in the workspace, so the author picks a prerequisite from
+	// a list rather than typing a slug and finding out later that they mistyped it.
+	const candidates = (mine.data?.courses ?? []).filter((c) => c.slug !== params.slug);
+
 	return {
-		course: data.course,
-		topics: data.topics ?? [],
-		lessonCount: data.lesson_count
+		course: tree.data.course,
+		topics: tree.data.topics ?? [],
+		lessonCount: tree.data.lesson_count,
+		prerequisites: prerequisites.data?.prerequisites ?? [],
+		candidates
 	};
 };
+
+const DRIP_MODES = ['none', 'scheduled', 'after_enrolment', 'sequential'] as const;
+type DripMode = (typeof DRIP_MODES)[number];
+
+/** Narrows a submitted mode rather than asserting it: a form field is user input. */
+function toDripMode(value: string): DripMode {
+	return (DRIP_MODES as readonly string[]).includes(value) ? (value as DripMode) : 'none';
+}
 
 /**
  * Returns `ids` with the element at `id` swapped one place in `delta`'s
@@ -220,6 +241,60 @@ export const actions: Actions = {
 		if (reorderProblem) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(reorderProblem, 'Could not reorder the lessons.')
+			});
+		}
+	},
+
+	setDripMode: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const mode = toDripMode(String((await request.formData()).get('mode') ?? ''));
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+			'/v1/courses/{slug}/drip',
+			{ params: { path: { slug: params.slug } }, body: { mode } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not change how this course releases its lessons.')
+			});
+		}
+	},
+
+	addPrerequisite: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const requiresSlug = String((await request.formData()).get('requires_slug') ?? '');
+		if (!requiresSlug) return fail(400, { message: 'Choose a course to require.' });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/courses/{slug}/prerequisites',
+			{ params: { path: { slug: params.slug } }, body: { requires_slug: requiresSlug } }
+		);
+
+		if (problem) {
+			// A cycle comes back 422 and says which edge closed it; a duplicate 409.
+			// Both messages say what to do next, so they are shown as they are.
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not add that prerequisite.')
+			});
+		}
+	},
+
+	removePrerequisite: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const requiresSlug = String((await request.formData()).get('requires_slug') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/courses/{slug}/prerequisites/{requires_slug}',
+			{ params: { path: { slug: params.slug, requires_slug: requiresSlug } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not remove that prerequisite.')
 			});
 		}
 	},

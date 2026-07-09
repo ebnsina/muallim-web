@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import { OWNER_STATE, STUDENT_STATE } from './accounts';
-import { draftCourse, publishedCourse } from './course';
+import { draftCourse, publishedCourse, requirePrerequisite, setDripMode } from './course';
 
 /**
  * Unique per call, not merely per run: a retry re-executes the test body, and a
@@ -105,6 +105,78 @@ test.describe('what a student may see', () => {
 
 		await page.goto(`/courses/${course.slug}`);
 		await expect(page.getByText('1 of 2 lessons')).toBeVisible();
+	});
+});
+
+test.describe('gates a learner meets', () => {
+	test.use({ storageState: STUDENT_STATE });
+
+	// The refusal names the course. A 404 here would hide the reason along with
+	// the button.
+	test('a prerequisite blocks enrolment until it is finished', async ({ page, request }) => {
+		const basics = await publishedCourse(request, slug('basics'));
+		const advanced = await publishedCourse(request, slug('advanced'));
+		await requirePrerequisite(request, advanced.slug, basics.slug);
+
+		await page.goto(`/courses/${advanced.slug}`);
+		await expect(page.getByRole('heading', { name: 'Before you enrol' })).toBeVisible();
+		await expect(page.getByText('not finished yet')).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Enrol', exact: true })).toBeDisabled();
+
+		// Finish the prerequisite. Wait for the enrolment to land: `click()` returns
+		// once the event is dispatched and `use:enhance` posts afterwards, so
+		// navigating away here abandons the request.
+		await page.goto(`/courses/${basics.slug}`);
+		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
+
+		for (const id of [basics.previewLessonId, basics.gatedLessonId]) {
+			await page.goto(`/courses/${basics.slug}/lessons/${id}`);
+			await page.getByRole('button', { name: 'Mark as complete' }).click();
+			await expect(page.getByRole('button', { name: 'Reopen lesson' })).toBeVisible();
+		}
+
+		// The gate opens. `finished` alone would also match "not finished yet", so
+		// the button's state is what this asserts.
+		await page.goto(`/courses/${advanced.slug}`);
+		const enrol = page.getByRole('button', { name: 'Enrol', exact: true });
+		await expect(enrol).toBeEnabled();
+
+		await enrol.click();
+		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
+	});
+
+	// Sequential drip: the lesson exists and the learner is enrolled, so the answer
+	// is "come back", not "no such lesson".
+	test('sequential drip locks the next lesson until the previous one is done', async ({
+		page,
+		request
+	}) => {
+		const course = await publishedCourse(request, slug('drip'));
+		await setDripMode(request, course.slug, 'sequential');
+
+		await page.goto(`/courses/${course.slug}`);
+		await expect(page.getByText('Lessons open one at a time')).toBeVisible();
+		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
+
+		// The preview is never dripped.
+		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
+		await expect(page.getByRole('button', { name: 'Mark as complete' })).toBeVisible();
+
+		// The next one is locked, with 403 and a reason.
+		const locked = await page.goto(`/courses/${course.slug}/lessons/${course.gatedLessonId}`);
+		expect(locked?.status()).toBe(403);
+		await expect(page.getByText('Finish the previous lesson')).toBeVisible();
+
+		// Finish the preview; the next lesson opens.
+		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
+		await page.getByRole('button', { name: 'Mark as complete' }).click();
+		await expect(page.getByRole('button', { name: 'Reopen lesson' })).toBeVisible();
+
+		const open = await page.goto(`/courses/${course.slug}/lessons/${course.gatedLessonId}`);
+		expect(open?.status()).toBe(200);
+		await expect(page.getByText('The body of Behind the paywall.')).toBeVisible();
 	});
 });
 

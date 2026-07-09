@@ -90,3 +90,35 @@ export async function draftCourse(request: APIRequestContext, slug: string): Pro
 
 	return slug;
 }
+
+/** Makes `requires` a prerequisite of `course`, through the API. */
+export async function requirePrerequisite(
+	request: APIRequestContext,
+	slug: string,
+	requiresSlug: string
+): Promise<void> {
+	const token = await bearer(request);
+
+	const response = await request.post(`/api/v1/courses/${slug}/prerequisites`, {
+		headers: { Authorization: `Bearer ${token}` },
+		data: { requires_slug: requiresSlug }
+	});
+	expect(response.ok(), `add prerequisite: ${response.status()} ${await response.text()}`).toBe(
+		true
+	);
+}
+
+/** Sets how a course releases its lessons. */
+export async function setDripMode(
+	request: APIRequestContext,
+	slug: string,
+	mode: 'none' | 'scheduled' | 'after_enrolment' | 'sequential'
+): Promise<void> {
+	const token = await bearer(request);
+
+	const response = await request.put(`/api/v1/courses/${slug}/drip`, {
+		headers: { Authorization: `Bearer ${token}` },
+		data: { mode }
+	});
+	expect(response.ok(), `set drip mode: ${response.status()} ${await response.text()}`).toBe(true);
+}
