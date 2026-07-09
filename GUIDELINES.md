@@ -25,7 +25,7 @@ If a doc and the compiler disagree, the compiler is right.
 pnpm gen:api      # regenerates src/lib/api/schema.d.ts from lms-api's spec
 ```
 
-`schema.d.ts` is **generated and gitignored**. Never hand-edit it. All API access goes through the typed `openapi-fetch` client in `src/lib/api/`; a raw `fetch()` to the API from a component is a rejection.
+`schema.d.ts` is **generated and gitignored**. Never hand-edit it. All API access goes through the typed `openapi-fetch` client in `src/lib/server/api.ts`; a raw `fetch()` to the API from a component is a rejection.
 
 The consequence, which is the point: a breaking change in `lms-api` fails `pnpm check` here, at build time, rather than in production.
 
@@ -69,10 +69,11 @@ Runes only. `export let`, `$:`, and the legacy store-contract-in-components are 
 ```
 src/
   lib/
-    api/          generated schema + typed client. The ONLY place fetch touches lms-api.
+    api/          generated schema + RFC 9457 problem helpers
     components/   presentational, no data fetching, no direct API calls
     features/     feature-scoped composites (course-builder/, quiz-player/, ...)
-    server/       server-only code. NEVER importable from a component.
+    server/       server-only code, incl. api.ts — the ONLY place fetch touches
+                  lms-api. NEVER importable from a component.
     state/        *.svelte.ts shared runes
     utils/
   routes/
@@ -84,9 +85,9 @@ src/
 
 ## 5. Data loading
 
-- Use `load` in `+page.ts` / `+page.server.ts`. Fetching in `onMount` for initial page data is a rejection — it breaks SSR, and it breaks the loading and error boundaries you get for free.
-- Anything holding a secret or a service credential goes in `+page.server.ts` or `+layout.server.ts`.
-- Always use the `fetch` provided to `load`. It carries cookies and dedupes against SSR.
+- Use `load` in `+page.server.ts`. Fetching in `onMount` for initial page data is a rejection — it breaks SSR, and it breaks the loading and error boundaries you get for free.
+- Anything that calls `lms-api`, holds a secret, or reads the session belongs in `+page.server.ts` or `+layout.server.ts`. That is nearly everything: see §2.
+- In a universal `load`, use the `fetch` it provides. It carries cookies and dedupes against SSR.
 - Mutations are **form actions** with progressive enhancement (`use:enhance`), not `onclick` handlers firing `fetch`. Forms work before JavaScript loads; that is not nostalgia, it is the accessibility and reliability baseline.
 
 ---
