@@ -42,3 +42,20 @@ export function authedApi(accessToken: string) {
 
 	return client;
 }
+
+/**
+ * The client to read the catalog with.
+ *
+ * Course listings, curricula, and lesson content are all readable without a
+ * session — that is what a published course and a preview lesson are for — but
+ * what comes back depends on who is asking. An author sees their own drafts; an
+ * enrolled learner sees lesson bodies; a stranger sees neither, and is told the
+ * lesson does not exist rather than that they may not have it.
+ *
+ * lms-api makes that decision from the bearer token, so an anonymous read is a
+ * request with no token rather than a different endpoint. Sending the token
+ * whenever there is one is therefore the whole of the rule.
+ */
+export function apiAs(accessToken: string | null) {
+	return accessToken ? authedApi(accessToken) : serverApi;
+}

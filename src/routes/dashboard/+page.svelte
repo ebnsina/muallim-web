@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import type { PageProps } from './$types';
@@ -41,4 +42,34 @@
 			</AlertDescription>
 		</Alert>
 	{/if}
+
+	<section class="mt-12">
+		<div class="flex items-baseline justify-between gap-3">
+			<h2 class="font-medium">Your courses</h2>
+			<a class="text-muted-foreground text-sm underline" href={resolve('/courses')}
+				>Browse catalog</a
+			>
+		</div>
+
+		{#if data.enrolments.length === 0}
+			<p class="text-muted-foreground mt-4 text-sm">You are not enrolled on anything yet.</p>
+		{:else}
+			<ul class="mt-4 space-y-3">
+				{#each data.enrolments as enrolment (enrolment.course_slug)}
+					<li class="flex items-baseline justify-between gap-3 rounded-lg border p-4 text-sm">
+						<a
+							class="font-medium underline-offset-4 hover:underline"
+							href={resolve(`/courses/${enrolment.course_slug}`)}
+						>
+							{enrolment.course_title}
+						</a>
+						<span class="text-muted-foreground shrink-0">
+							{enrolment.progress?.percent ?? 0}%
+							{#if enrolment.status !== 'active'}· {enrolment.status}{/if}
+						</span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</section>
 </main>

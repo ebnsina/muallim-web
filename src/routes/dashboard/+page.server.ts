@@ -12,7 +12,11 @@ function toLogin(pathname: string): never {
 export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 	if (!locals.accessToken) toLogin(url.pathname);
 
-	const { data, error: problem, response } = await authedApi(locals.accessToken).GET('/v1/me');
+	const api = authedApi(locals.accessToken);
+
+	// Both are needed to render the page and neither depends on the other.
+	const [me, enrolments] = await Promise.all([api.GET('/v1/me'), api.GET('/v1/me/enrolments')]);
+	const { data, error: problem, response } = me;
 
 	// The token verified when `handle` ran, and no longer does: the membership was
 	// revoked, or the role changed and lms-api swept the sessions. Drop the cookies
@@ -26,7 +30,9 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 		error(response?.status ?? 500, problemMessage(problem, 'Could not load your profile.'));
 	}
 
-	return { user: data.user };
+	// A failure to list enrolments is not a failure to show the profile. The
+	// section renders empty rather than taking the page down with it.
+	return { user: data.user, enrolments: enrolments.data?.enrolments ?? [] };
 };
 
 export const actions: Actions = {
