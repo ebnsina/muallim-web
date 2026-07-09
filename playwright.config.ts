@@ -43,7 +43,16 @@ export const apiEnv = {
 		wanted to assert on a 429 could still lower it.
 	*/
 	LMS_AUTH_RATE_BURST: '1000',
-	LMS_AUTH_RATE_EVERY: '10ms'
+	LMS_AUTH_RATE_EVERY: '10ms',
+
+	/*
+		The `embed` video source renders an author's own URL, so it is off unless a
+		deployment names the hosts it trusts. Naming one here is what lets the suite
+		assert that every other host is refused — with an empty allowlist the source
+		is simply unavailable, and "refused because unconfigured" would pass a test
+		meant to prove "refused because unlisted".
+	*/
+	LMS_EMBED_ALLOWED_HOSTS: 'player.example.test'
 };
 
 export default defineConfig({

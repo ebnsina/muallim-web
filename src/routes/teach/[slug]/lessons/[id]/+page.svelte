@@ -112,8 +112,30 @@
 
 			{#if videoSource !== 'none'}
 				<div class="space-y-2">
-					<Label for="video_url">Video URL</Label>
-					<Input id="video_url" name="video_url" type="url" value={data.lesson.video_url ?? ''} />
+					<Label for="video_url">{videoSource === 'hosted' ? 'Video ID' : 'Video URL'}</Label>
+					<!--
+						Deliberately not `type="url"`: a Cloudflare Stream reference is a bare id,
+						and the browser would refuse to submit it. The API decides what is valid
+						here — it is the only thing that knows which hosts this workspace embeds.
+					-->
+					<Input
+						id="video_url"
+						name="video_url"
+						value={data.lesson.video_url ?? ''}
+						aria-describedby="video-url-hint"
+					/>
+					<p id="video-url-hint" class="text-muted-foreground text-xs">
+						{#if videoSource === 'youtube'}
+							Paste any YouTube link. The player is built from the video id, on the no-cookie
+							domain.
+						{:else if videoSource === 'vimeo'}
+							Paste any Vimeo link.
+						{:else if videoSource === 'hosted'}
+							The Cloudflare Stream video id, or the URL you copied from the dashboard.
+						{:else}
+							An https:// player URL, on a host this workspace allows.
+						{/if}
+					</p>
 				</div>
 			{/if}
 		{:else}

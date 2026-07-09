@@ -37,26 +37,30 @@
 		</Alert>
 	{/if}
 
-	{#if data.lesson.video_url}
+	<!--
+		`video_embed_url`, never `video_url`. The first is a player the API built from
+		a video id it recognised, on a host it allows, over https. The second is a
+		string an author typed, and framing it would run their page on this origin for
+		every reader of the lesson.
+
+		Every source is a frame: YouTube, Vimeo, an allowed embed, and Cloudflare
+		Stream all ship their own player, so there is nothing to branch on.
+	-->
+	{#if data.lesson.video_embed_url}
 		<div class="mt-8">
-			{#if data.lesson.video_source === 'youtube' || data.lesson.video_source === 'vimeo' || data.lesson.video_source === 'embed'}
-				<iframe
-					class="aspect-video w-full rounded-lg border"
-					src={data.lesson.video_url}
-					title={data.lesson.title}
-					allowfullscreen
-				></iframe>
-			{:else}
-				<!-- svelte-ignore a11y_media_has_caption -->
-				<video class="aspect-video w-full rounded-lg border" src={data.lesson.video_url} controls
-				></video>
-			{/if}
+			<iframe
+				class="aspect-video w-full rounded-lg border"
+				src={data.lesson.video_embed_url}
+				title={data.lesson.title}
+				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+				allowfullscreen
+			></iframe>
 		</div>
 	{/if}
 
 	{#if data.lesson.content}
 		<div class="mt-8 text-pretty whitespace-pre-wrap">{data.lesson.content}</div>
-	{:else if !data.lesson.video_url}
+	{:else if !data.lesson.video_embed_url}
 		<p class="text-muted-foreground mt-8 text-sm">This lesson has no content yet.</p>
 	{/if}
 

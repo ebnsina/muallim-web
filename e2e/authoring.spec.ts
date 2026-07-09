@@ -131,3 +131,59 @@ test('toggling a preview does not erase the lesson body', async ({ page }) => {
 	await page.getByRole('link', { name: 'Has a body' }).click();
 	await expect(page.getByLabel('Content')).toHaveValue('A body worth keeping.');
 });
+
+/**
+ * An `iframe` src is executed content on this origin, so what an author types is
+ * never what gets framed. A watch link — which does not even play in a frame —
+ * becomes a player URL the API wrote, and a page on a host nobody allowed is
+ * refused rather than stored.
+ */
+test('a video lesson frames a player the server wrote, and nothing else', async ({ page }) => {
+	const title = `Watching ${slug('e2e')}`;
+
+	await page.goto('/teach');
+	await page.getByLabel('Title').fill(title);
+	await page.getByRole('button', { name: 'Create course' }).click();
+	await page.getByRole('link', { name: title }).click();
+
+	await page.getByPlaceholder('New section').fill('Only section');
+	await page.getByRole('button', { name: 'Add section' }).click();
+	await page.getByPlaceholder('New lesson').fill('The lecture');
+	await page.getByRole('button', { name: 'Add lesson' }).click();
+
+	await page.getByRole('link', { name: 'The lecture' }).click();
+	await page.getByLabel('Type').selectOption('video');
+	await page.getByLabel('Video source').selectOption('embed');
+
+	// A page on a host this workspace does not embed. The API decides that, and it
+	// says so rather than saving it.
+	await page.getByLabel('Video URL').fill('https://evil.test/steal');
+	await page.getByRole('button', { name: 'Save lesson' }).click();
+	await expect(page.getByRole('alert')).toContainText('evil.test');
+
+	// A YouTube watch link, with a playlist and a tracker riding along.
+	await page.getByLabel('Video source').selectOption('youtube');
+	await page
+		.getByLabel('Video URL')
+		.fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL1&si=track');
+	await page.getByRole('button', { name: 'Save lesson' }).click();
+
+	// Back on the curriculum, which is where a successful save lands.
+	await expect(page.getByRole('heading', { name: title })).toBeVisible();
+
+	// What was stored is the canonical link, not what was typed.
+	await page.getByRole('link', { name: 'The lecture' }).click();
+	await expect(page.getByLabel('Video URL')).toHaveValue(
+		'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+	);
+
+	// And the reading page frames the no-cookie player the API built from the id.
+	// The editor's own address names both halves: /teach/{slug}/lessons/{id}.
+	const [, , courseSlug, , lessonId] = new URL(page.url()).pathname.split('/');
+	await page.goto(`/courses/${courseSlug}/lessons/${lessonId}`);
+
+	await expect(page.locator('iframe')).toHaveAttribute(
+		'src',
+		'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ'
+	);
+});
