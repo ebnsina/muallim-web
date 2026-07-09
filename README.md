@@ -60,6 +60,12 @@ pnpm test:e2e       # playwright
 pnpm build
 ```
 
+## CI
+
+`.github/workflows/ci.yml` checks out both repos side by side, because that is how they sit on a developer's disk: the typed client is generated from `lms-api`'s spec, and the end-to-end suite starts `lms-api` and its worker from `../lms-api`.
+
+It then runs `pnpm lint`, `pnpm check`, the unit tests, and the full Playwright suite against a real Postgres 17 — whose `lms` role is `NOSUPERUSER NOBYPASSRLS`, so the tenant isolation those tests rely on is actually enforced.
+
 ## End-to-end tests
 
 ```bash

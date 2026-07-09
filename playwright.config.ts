@@ -65,7 +65,14 @@ export default defineConfig({
 	// accounts rather than pretending to be isolated.
 	workers: 1,
 
-	reporter: process.env.CI ? 'github' : 'list',
+	/*
+		On CI, annotate the diff *and* write a report worth downloading. The github
+		reporter alone leaves the upload step with nothing to collect, and a failing
+		end-to-end test is exactly when someone wants the trace.
+	*/
+	reporter: process.env.CI
+		? [['github'], ['html', { open: 'never', outputFolder: 'playwright-report' }]]
+		: 'list',
 
 	/*
 		Ten seconds, not the default five. Every sign-in costs an Argon2id

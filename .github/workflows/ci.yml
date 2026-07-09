@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: lms-web
+
+    steps:
+      # Both repos are checked out side by side, because that is how they sit on a
+      # developer's disk: the typed client is generated from lms-api's spec, and
+      # the end-to-end suite starts lms-api and its worker from `../lms-api`.
+      - uses: actions/checkout@v4
+        with:
+          path: lms-web
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ebnsina/lms-api
+          path: lms-api
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: lms-api/go.mod
+          cache-dependency-path: lms-api/go.sum
+
+      # Reads the pnpm version from lms-web/package.json's `packageManager`.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: lms-web/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: lms-web/pnpm-lock.yaml
+
+      # NOSUPERUSER for the same reason lms-api's own CI insists on it: a
+      # superuser bypasses row level security, and the end-to-end tests would then
+      # exercise tenant isolation that the database is not enforcing.
+      - name: Create the lms role and databases
+        working-directory: lms-api
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -c "CREATE ROLE lms LOGIN PASSWORD 'lms' NOSUPERUSER NOBYPASSRLS"
+          psql -h localhost -U postgres -c "CREATE DATABASE lms OWNER lms"
+          psql -h localhost -U postgres -c "CREATE DATABASE lms_test OWNER lms"
+
+      - name: Migrate and seed the workspace
+        working-directory: lms-api
+        run: |
+          make migrate
+          make seed
+
+      # The contract. `pnpm gen:api` reads it, and a breaking change upstream
+      # fails `pnpm check` below rather than production.
+      - name: Generate the OpenAPI spec
+        working-directory: lms-api
+        run: make spec
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm gen:api
+
+      - run: pnpm lint
+      - run: pnpm check
+      - run: pnpm test:unit --run
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Starts lms-api, its job worker, and this app. Postgres is the only thing
+      # it does not bring up.
+      - run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: lms-web/playwright-report/
+          retention-days: 7
