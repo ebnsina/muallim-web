@@ -1,0 +1,40 @@
+# Internal planning + scratch data — never committed
+docs/
+data/
+
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# Generated from lms-api's OpenAPI spec via `pnpm gen:api`
+src/lib/api/schema.d.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Test / tooling
+/coverage
+/playwright-report
+/test-results
+
+# Editors
+.idea/
+.vscode/
+*.swp

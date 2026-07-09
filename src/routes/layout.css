@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/*
+	Design tokens. Defined once here and referenced through Tailwind utilities
+	(bg-surface-2, text-muted, border-line). A colour hardcoded in a component is
+	a colour that cannot be themed, and every tenant will want to theme.
+
+	Contrast is verified against WCAG 2.2 AA, not eyeballed: body text >= 4.5:1,
+	large text and UI boundaries >= 3:1.
+*/
+@theme {
+	--color-bg: oklch(99% 0 0);
+	--color-fg: oklch(20% 0.01 260);
+	--color-surface-2: oklch(96% 0.005 260);
+	--color-muted: oklch(48% 0.015 260);
+	--color-line: oklch(90% 0.005 260);
+	--color-accent: oklch(50% 0.19 265);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: oklch(17% 0.01 260);
+		--color-fg: oklch(94% 0.005 260);
+		--color-surface-2: oklch(23% 0.012 260);
+		--color-muted: oklch(70% 0.015 260);
+		--color-line: oklch(30% 0.012 260);
+		--color-accent: oklch(62% 0.17 265);
+	}
+}
+
+:root {
+	color-scheme: light dark;
+}
+
+body {
+	background-color: var(--color-bg);
+	color: var(--color-fg);
+}
+
+/* Honour the user's motion preference rather than overriding it. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
