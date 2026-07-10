@@ -23,10 +23,12 @@
 
 	const crumbs = [{ label: 'Teach', href: resolve('/teach') }, { label: 'Certificate templates' }];
 
-	// The default template's wording is the starting point, so an author edits from
-	// something that already works rather than a blank box.
+	// The default wording is the starting point, so an author edits from something
+	// that already works. It is the description only — the learner's name, the
+	// course, the date and the number are printed in their own places, so a body
+	// that repeated them would say everything twice.
 	const DEFAULT_BODY =
-		'This is to certify that {{learner}} has successfully completed the course {{course}} on {{date}}.\n\nCertificate number {{serial}}.';
+		'Awarded in recognition of dedication and the successful completion of every lesson and assessment this course requires.';
 
 	let title = $state('Certificate of Completion');
 	let body = $state(DEFAULT_BODY);
@@ -90,7 +92,12 @@
 	<section class="mt-12">
 		<h2 class="text-sm font-medium tracking-wide uppercase">New template</h2>
 
-		<div class="mt-4 grid gap-8 lg:grid-cols-2">
+		<!--
+			The form sits above the preview, not beside it. A certificate is landscape,
+			and a landscape thing in a half-width column is a cramped thing; below the
+			form it has the whole page to be the shape it is.
+		-->
+		<div class="mt-4 max-w-2xl">
 			<form method="POST" action="?/create" use:enhance class="space-y-5">
 				<Field id="name" label="Name" hint="For your own list. Not printed.">
 					{#snippet children({ id, describedBy, invalid })}
@@ -150,18 +157,26 @@
 
 				<Button type="submit">Create template</Button>
 			</form>
+		</div>
 
-			<!--
-				The certificate as it will print, drawn with the same component the real
-				one uses, against sample values. What an author sees here is what a learner
-				frames — the only difference is the name and the number.
-			-->
-			<div>
-				<p class="text-sm font-medium">Preview</p>
-				<p class="text-muted mt-1 text-xs">Shown for a sample learner and course.</p>
-				<div class="mt-3">
-					<Certificate {title} body={previewBody} {signatory} serial={SAMPLE.serial} />
-				</div>
+		<!--
+			The certificate as it will print, drawn with the same component the real one
+			uses, against sample values. What an author sees here is what a learner
+			frames — the only difference is the name and the number.
+		-->
+		<div class="mt-10">
+			<p class="text-sm font-medium">Preview</p>
+			<p class="text-muted mt-1 text-xs">Shown for a sample learner and course.</p>
+			<div class="mt-3">
+				<Certificate
+					{title}
+					learnerName={SAMPLE.learner}
+					courseTitle={SAMPLE.course}
+					issuedAt={SAMPLE.date}
+					body={previewBody}
+					{signatory}
+					serial={SAMPLE.serial}
+				/>
 			</div>
 		</div>
 	</section>

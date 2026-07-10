@@ -49,6 +49,9 @@
 		<div class="mt-8">
 			<Certificate
 				title={certificate.title}
+				learnerName={certificate.learner_name}
+				courseTitle={certificate.course_title}
+				issuedAt={issued}
 				body={certificate.body}
 				signatory={certificate.signatory}
 				serial={certificate.serial}

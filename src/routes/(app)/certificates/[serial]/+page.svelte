@@ -10,6 +10,12 @@
 
 	const certificate = $derived(data.certificate);
 
+	const issuedAt = $derived(
+		new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(
+			new Date(certificate.issued_at)
+		)
+	);
+
 	const crumbs = $derived([
 		{ label: 'Certificates', href: resolve('/certificates') },
 		{ label: certificate.course_title }
@@ -58,6 +64,9 @@
 
 	<Certificate
 		title={certificate.title}
+		learnerName={certificate.learner_name}
+		courseTitle={certificate.course_title}
+		{issuedAt}
 		body={certificate.body}
 		signatory={certificate.signatory}
 		serial={certificate.serial}
