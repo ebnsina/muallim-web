@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Input, Label } from '$lib/components';
+	import { Alert, AuthShell, Button, Field, Input } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -10,19 +10,23 @@
 
 <svelte:head><title>Sign in — LMS</title></svelte:head>
 
-<main class="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-16">
-	<h1 class="text-2xl font-semibold">Sign in</h1>
-
+<AuthShell
+	title="Sign in"
+	subtitle="Continue where you left off."
+	pitch="Missing account, wrong password, and suspended membership are one error, in constant time. Signing in tells an attacker nothing."
+	attribution="How this system handles credentials"
+>
 	{#if form?.message}
-		<!-- role="alert" so a screen reader announces the failure without moving focus. -->
-		<Alert tone="danger" class="mt-6" role="alert">
-			{form.message}
-		</Alert>
+		<!--
+			`role="alert"` so a screen reader announces the failure without moving
+			focus, which would take the reader out of the field they were fixing.
+		-->
+		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{/if}
 
 	<form
 		method="POST"
-		class="mt-6 space-y-4"
+		class="mt-8 space-y-5"
 		use:enhance={() => {
 			submitting = true;
 			return async ({ update }) => {
@@ -31,38 +35,51 @@
 			};
 		}}
 	>
-		<div class="space-y-2">
-			<Label for="email">Email</Label>
-			<Input
-				id="email"
-				name="email"
-				type="email"
-				autocomplete="email"
-				required
-				value={form?.email ?? ''}
-			/>
-		</div>
+		<Field id="email" label="Email">
+			{#snippet children({ id, describedBy, invalid })}
+				<Input
+					{id}
+					name="email"
+					type="email"
+					autocomplete="email"
+					required
+					aria-describedby={describedBy}
+					{invalid}
+					value={form?.email ?? ''}
+				/>
+			{/snippet}
+		</Field>
 
-		<div class="space-y-2">
-			<Label for="password">Password</Label>
-			<Input
-				id="password"
-				name="password"
-				type="password"
-				autocomplete="current-password"
-				required
-			/>
-		</div>
+		<Field id="password" label="Password">
+			{#snippet children({ id, describedBy, invalid })}
+				<Input
+					{id}
+					name="password"
+					type="password"
+					autocomplete="current-password"
+					required
+					aria-describedby={describedBy}
+					{invalid}
+				/>
+			{/snippet}
+		</Field>
 
-		<Button type="submit" class="w-full" disabled={submitting}>
+		<Button type="submit" size="lg" class="w-full" loading={submitting}>
 			{submitting ? 'Signing in…' : 'Sign in'}
 		</Button>
 	</form>
 
-	<p class="text-muted mt-6 text-sm">
-		<a class="underline" href={resolve('/forgot-password')}>Forgot your password?</a>
-	</p>
-	<p class="text-muted mt-2 text-sm">
-		No account? <a class="underline" href={resolve('/register')}>Create one</a>
-	</p>
-</main>
+	{#snippet footer()}
+		<p>
+			<a class="underline underline-offset-4 hover:text-text" href={resolve('/forgot-password')}>
+				Forgot your password?
+			</a>
+		</p>
+		<p>
+			No account?
+			<a class="underline underline-offset-4 hover:text-text" href={resolve('/register')}>
+				Create one
+			</a>
+		</p>
+	{/snippet}
+</AuthShell>

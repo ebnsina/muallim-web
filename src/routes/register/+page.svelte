@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Input, Label } from '$lib/components';
+	import { Alert, AuthShell, Button, Field, Input } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -10,21 +10,19 @@
 
 <svelte:head><title>Create an account — LMS</title></svelte:head>
 
-<main class="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-16">
-	<h1 class="text-2xl font-semibold">Create an account</h1>
-	<p class="text-muted mt-2 text-sm">
-		Registration claims an unclaimed workspace. After that, joining is by invitation.
-	</p>
-
+<AuthShell
+	title="Create an account"
+	subtitle="Registration claims an unclaimed workspace. After that, joining is by invitation."
+	pitch="A workspace is claimed once. Afterwards every attempt is refused identically, so registration cannot be used to discover who has an account here."
+	attribution="Why you can only do this once"
+>
 	{#if form?.message}
-		<Alert tone="danger" class="mt-6" role="alert">
-			{form.message}
-		</Alert>
+		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{/if}
 
 	<form
 		method="POST"
-		class="mt-6 space-y-4"
+		class="mt-8 space-y-5"
 		use:enhance={() => {
 			submitting = true;
 			return async ({ update }) => {
@@ -33,45 +31,63 @@
 			};
 		}}
 	>
-		<div class="space-y-2">
-			<Label for="name">Name</Label>
-			<Input id="name" name="name" autocomplete="name" required value={form?.name ?? ''} />
-		</div>
+		<Field id="name" label="Name">
+			{#snippet children({ id, describedBy, invalid })}
+				<Input
+					{id}
+					name="name"
+					autocomplete="name"
+					required
+					aria-describedby={describedBy}
+					{invalid}
+					value={form?.name ?? ''}
+				/>
+			{/snippet}
+		</Field>
 
-		<div class="space-y-2">
-			<Label for="email">Email</Label>
-			<Input
-				id="email"
-				name="email"
-				type="email"
-				autocomplete="email"
-				required
-				value={form?.email ?? ''}
-			/>
-		</div>
+		<Field id="email" label="Email">
+			{#snippet children({ id, describedBy, invalid })}
+				<Input
+					{id}
+					name="email"
+					type="email"
+					autocomplete="email"
+					required
+					aria-describedby={describedBy}
+					{invalid}
+					value={form?.email ?? ''}
+				/>
+			{/snippet}
+		</Field>
 
-		<div class="space-y-2">
-			<Label for="password">Password</Label>
-			<Input
-				id="password"
-				name="password"
-				type="password"
-				autocomplete="new-password"
-				minlength={12}
-				required
-				aria-describedby="password-hint"
-			/>
-			<p id="password-hint" class="text-muted text-xs">
-				At least 12 characters. No mandatory symbols or digits.
-			</p>
-		</div>
+		<Field
+			id="password"
+			label="Password"
+			hint="At least 12 characters. No mandatory symbols or digits."
+		>
+			{#snippet children({ id, describedBy, invalid })}
+				<Input
+					{id}
+					name="password"
+					type="password"
+					autocomplete="new-password"
+					minlength={12}
+					required
+					aria-describedby={describedBy}
+					{invalid}
+				/>
+			{/snippet}
+		</Field>
 
-		<Button type="submit" class="w-full" disabled={submitting}>
+		<Button type="submit" size="lg" class="w-full" loading={submitting}>
 			{submitting ? 'Creating account…' : 'Create account'}
 		</Button>
 	</form>
 
-	<p class="text-muted mt-6 text-sm">
-		Already have an account? <a class="underline" href={resolve('/login')}>Sign in</a>
-	</p>
-</main>
+	{#snippet footer()}
+		<p>
+			Already have an account?
+			<a class="underline underline-offset-4 hover:text-text" href={resolve('/login')}>Sign in</a>
+		</p>
+	{/snippet}
+</AuthShell>
