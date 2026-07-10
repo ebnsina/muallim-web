@@ -242,13 +242,22 @@
 								<Icon icon={Tick02Icon} class="size-4" />
 								You have finished this course.
 							</p>
+
+							<!--
+								Finishing a course issues a certificate. The link goes to the
+								learner's list rather than guessing the serial, which is the API's
+								to mint.
+							-->
+							<Button href={resolve('/certificates')} class="mt-5 w-full">
+								View your certificate
+							</Button>
 						{/if}
 
 						<Button
 							href={resolve(`/courses/${data.course.slug}/grades`)}
 							variant="secondary"
 							size="sm"
-							class="mt-6 w-full"
+							class="mt-3 w-full"
 						>
 							See your grades
 						</Button>

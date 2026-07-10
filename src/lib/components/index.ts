@@ -12,6 +12,7 @@ export { default as Badge, type BadgeTone } from './Badge.svelte';
 export { default as Breadcrumbs, type Crumb } from './Breadcrumbs.svelte';
 export { default as Button, type ButtonSize, type ButtonVariant } from './Button.svelte';
 export { default as Card } from './Card.svelte';
+export { default as Certificate } from './Certificate.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as Difficulty } from './Difficulty.svelte';
 export { default as EmptyState } from './EmptyState.svelte';

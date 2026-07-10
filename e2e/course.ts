@@ -3,6 +3,7 @@ import { OWNER, STUDENT } from './accounts';
 
 export interface Course {
 	slug: string;
+	title: string;
 	previewLessonId: string;
 	gatedLessonId: string;
 }
@@ -92,7 +93,7 @@ export async function publishedCourse(request: APIRequestContext, slug: string):
 	const publish = await request.post(`/api/v1/courses/${slug}/publish`, { headers: auth });
 	expect(publish.ok(), `publish: ${publish.status()} ${await publish.text()}`).toBe(true);
 
-	return { slug, previewLessonId, gatedLessonId };
+	return { slug, title: `Course ${slug}`, previewLessonId, gatedLessonId };
 }
 
 /** Creates a course and leaves it a draft. */

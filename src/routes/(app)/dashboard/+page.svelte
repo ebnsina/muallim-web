@@ -193,7 +193,16 @@
 			{/if}
 
 			{#if finished.length > 0}
-				<h2 class="mt-12 text-lg font-semibold">Finished</h2>
+				<div class="mt-12 flex items-baseline justify-between gap-3">
+					<h2 class="text-lg font-semibold">Finished</h2>
+					<!-- Finishing a course issues a certificate; this is where they collect. -->
+					<a
+						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
+						href={resolve('/certificates')}
+					>
+						Your certificates
+					</a>
+				</div>
 				<ul class="mt-5 space-y-2">
 					{#each finished as enrolment (enrolment.course_slug)}
 						<li>
