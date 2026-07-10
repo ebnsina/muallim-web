@@ -151,6 +151,8 @@ test.describe('authoring and marking a quiz', () => {
 
 		// The queue is empty, and marking the last essay settled the grade for good.
 		await page.goto(`/teach/${course.slug}/lessons/${course.lessonId}/quiz/submissions`);
-		await expect(page.getByText('Nothing is waiting to be marked.')).toBeVisible();
+		// The queue's empty state, as `EmptyState` renders it — a title with no full
+		// stop, like every other one in the system.
+		await expect(page.getByText('Nothing is waiting to be marked')).toBeVisible();
 	});
 });

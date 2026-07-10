@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Breadcrumbs, Button, Input, Label, Textarea } from '$lib/components';
+	import {
+		Alert,
+		Breadcrumbs,
+		Button,
+		Input,
+		Label,
+		Page,
+		PageHeader,
+		Textarea
+	} from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -32,19 +41,25 @@
 
 <svelte:head><title>Attempt {data.attempt.number} — Marking</title></svelte:head>
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<Page width="wide">
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-4 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
-
-	<p class="text-muted mt-1 text-sm">
-		{data.attempt.points} of {data.attempt.max_points} · {data.attempt.percent}%
-		{#if settled}
-			· {data.attempt.passed ? 'passed' : 'not passed'}
-		{:else}
-			· awaiting review
-		{/if}
-	</p>
+	<PageHeader class="mt-4" title="Attempt {data.attempt.number}">
+		{#snippet meta()}
+			<!--
+				One run of text, not a Badge per fact. The score and the verdict are read
+				as one sentence, and splitting them into pills makes a marker assemble it.
+			-->
+			<p class="text-muted text-sm">
+				{data.attempt.points} of {data.attempt.max_points} · {data.attempt.percent}%
+				{#if settled}
+					· {data.attempt.passed ? 'passed' : 'not passed'}
+				{:else}
+					· awaiting review
+				{/if}
+			</p>
+		{/snippet}
+	</PageHeader>
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">
@@ -127,4 +142,4 @@
 			</li>
 		{/each}
 	</ol>
-</main>
+</Page>

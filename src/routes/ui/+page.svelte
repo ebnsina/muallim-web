@@ -11,15 +11,20 @@
 	import {
 		Alert,
 		Badge,
+		Breadcrumbs,
 		Button,
 		Card,
 		Checkbox,
+		Difficulty,
 		EmptyState,
 		Field,
 		Input,
+		LessonIcon,
 		Numeral,
+		PageHeader,
 		Progress,
 		Radio,
+		Row,
 		Score,
 		Select,
 		Textarea,
@@ -447,6 +452,112 @@
 				{/snippet}
 			</EmptyState>
 		</div>
+	</section>
+
+	<!-- --------------------------------------------------------- navigation -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Breadcrumbs</h2>
+		<p class="text-muted mt-1 text-sm">
+			The trail down to the page you are on. The last crumb is never a link — the component strips
+			its href, so no caller has to remember.
+		</p>
+
+		<Card class="mt-6 p-5">
+			<Breadcrumbs
+				crumbs={[
+					{ label: 'Courses', href: '/ui' },
+					{ label: 'The Book of Optics', href: '/ui' },
+					{ label: 'An introduction', href: '/ui' },
+					{ label: 'Quiz', href: '/ui' }
+				]}
+			/>
+		</Card>
+	</section>
+
+	<!-- --------------------------------------------------------------- rows -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Row</h2>
+		<p class="text-muted mt-1 text-sm">
+			One item in a list of things. With an <code>href</code> the whole row is the target, because a row
+			whose only clickable area is its title is a row people click and miss.
+		</p>
+
+		<ul class="mt-6 space-y-2">
+			<li>
+				<Row href="/ui">
+					<div>
+						<p class="font-medium">Al-Khwarizmi</p>
+						<p class="text-muted text-xs">Handed in · 2 files</p>
+					</div>
+					<Badge tone="warning">Late</Badge>
+				</Row>
+			</li>
+			<li>
+				<Row>
+					<div>
+						<p class="font-medium">Ibn al-Haytham</p>
+						<p class="text-muted text-xs">Not a link — no href</p>
+					</div>
+					<Badge tone="success">Marked</Badge>
+				</Row>
+			</li>
+		</ul>
+	</section>
+
+	<!-- --------------------------------------------------------- difficulty -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Difficulty</h2>
+		<p class="text-muted mt-1 text-sm">
+			A magnitude, drawn as one. Not a Badge: <code>success</code> and <code>danger</code> mean a pass
+			and a failure everywhere else, and colouring "expert" red says a hard course is a broken one.
+		</p>
+
+		<Card class="mt-6 flex flex-wrap gap-8 p-5">
+			<Difficulty level="beginner" />
+			<Difficulty level="intermediate" />
+			<Difficulty level="advanced" />
+			<Difficulty level="expert" />
+		</Card>
+	</section>
+
+	<!-- ------------------------------------------------------- lesson icons -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Lesson icons</h2>
+		<p class="text-muted mt-1 text-sm">
+			One per <code>content_type</code>. A type this list has not heard of gets the page icon, so a
+			row never renders with a hole where its icon should be.
+		</p>
+
+		<Card class="mt-6 flex flex-wrap gap-6 p-5">
+			{#each ['text', 'video', 'quiz', 'assignment', 'live', 'scorm', 'h5p', 'something-new'] as type (type)}
+				<span class="text-muted flex items-center gap-2 text-sm">
+					<LessonIcon contentType={type} />
+					{type}
+				</span>
+			{/each}
+		</Card>
+	</section>
+
+	<!-- --------------------------------------------------------- page shell -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Page and PageHeader</h2>
+		<p class="text-muted mt-1 text-sm">
+			Every page in the app sits in a <code>Page</code>, at one of three widths, with one
+			<code>PageHeader</code>. Before these existed the same shell was copied fifteen times, and
+			four of the copies had drifted.
+		</p>
+
+		<Card class="mt-6 p-5">
+			<PageHeader title="Marking" description="What has been handed in, and what is still waiting.">
+				{#snippet meta()}
+					<Badge tone="neutral">draft</Badge>
+					<span class="text-muted"><span class="numeral">12</span> submissions</span>
+				{/snippet}
+				{#snippet actions()}
+					<Button size="sm">Publish</Button>
+				{/snippet}
+			</PageHeader>
+		</Card>
 	</section>
 
 	<footer class="mt-20 border-t border-border pt-6 text-xs text-muted">

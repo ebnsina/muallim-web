@@ -16,6 +16,8 @@
 		Difficulty,
 		Icon,
 		LessonIcon,
+		Page,
+		PageHeader,
 		Progress
 	} from '$lib/components';
 	import type { PageProps } from './$types';
@@ -92,7 +94,7 @@
 
 <svelte:head><title>{data.course.title} — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-6xl px-6 py-10">
+<Page width="full">
 	<Breadcrumbs {crumbs} />
 
 	<!--
@@ -102,18 +104,12 @@
 	-->
 	<div class="mt-6 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-14">
 		<div class="order-2 lg:order-1">
-			<header>
-				{#if data.course.status !== 'published'}
-					<Badge tone="warning" class="mb-3">{data.course.status}</Badge>
-				{/if}
+			{#if data.course.status !== 'published'}
+				<Badge tone="warning" class="mb-3">{data.course.status}</Badge>
+			{/if}
 
-				<h1 class="text-3xl font-semibold tracking-tight text-pretty">{data.course.title}</h1>
-
-				{#if data.course.summary}
-					<p class="text-muted mt-3 text-lg text-pretty">{data.course.summary}</p>
-				{/if}
-
-				<div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+			<PageHeader title={data.course.title} description={data.course.summary}>
+				{#snippet meta()}
 					<span class="text-muted flex items-center gap-1.5">
 						<span class="numeral">{data.lessonCount}</span>
 						{data.lessonCount === 1 ? 'lesson' : 'lessons'}
@@ -127,8 +123,8 @@
 					{/if}
 
 					<Difficulty level={data.course.difficulty} />
-				</div>
-			</header>
+				{/snippet}
+			</PageHeader>
 
 			{#if form?.message}
 				<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
@@ -322,4 +318,4 @@
 			</div>
 		</div>
 	</div>
-</main>
+</Page>

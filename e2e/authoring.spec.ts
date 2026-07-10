@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
+import { ready } from './hydration';
 import { OWNER_STATE } from './accounts';
 
 test.use({ storageState: OWNER_STATE });
@@ -152,6 +153,12 @@ test('a video lesson frames a player the server wrote, and nothing else', async 
 	await page.getByRole('button', { name: 'Add lesson' }).click();
 
 	await page.getByRole('link', { name: 'The lecture' }).click();
+
+	// The selects drive each other through Svelte state: choosing `video` is what
+	// reveals "Video source". Before hydration the change event goes nowhere, and
+	// the second select never appears — a flake that failed about one run in six.
+	await ready(page);
+
 	await page.getByLabel('Type').selectOption('video');
 	await page.getByLabel('Video source').selectOption('embed');
 

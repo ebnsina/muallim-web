@@ -8,6 +8,8 @@
 		Checkbox,
 		Input,
 		Label,
+		Page,
+		PageHeader,
 		Radio,
 		Select,
 		Textarea
@@ -46,13 +48,10 @@
 
 <svelte:head><title>{data.quiz.title} — Quiz</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">{data.quiz.title}</h1>
-	{#if data.quiz.description}
-		<p class="text-muted mt-2">{data.quiz.description}</p>
-	{/if}
+	<PageHeader class="mt-4" title={data.quiz.title} description={data.quiz.description} />
 
 	<p class="text-muted mt-2 text-sm">
 		{questions.length} questions · {data.quiz.total_points} points
@@ -222,4 +221,4 @@
 			</div>
 		</form>
 	{/if}
-</main>
+</Page>

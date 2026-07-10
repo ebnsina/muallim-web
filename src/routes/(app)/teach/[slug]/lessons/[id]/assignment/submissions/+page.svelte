@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { Task01Icon } from '@hugeicons/core-free-icons';
-	import { Badge, Breadcrumbs, EmptyState } from '$lib/components';
+	import { Badge, Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -31,10 +31,10 @@
 
 <svelte:head><title>Marking — Assignment</title></svelte:head>
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<Page width="wide">
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Marking</h1>
+	<PageHeader class="mt-4" title="Marking" />
 
 	<!--
 		A filter is a GET, so it is a form and not a button that rewrites the URL. The
@@ -47,9 +47,9 @@
 	>
 		{#if data.awaiting}
 			<input type="hidden" name="all" value="1" />
-			<button type="submit" class="text-sm underline">Show everything handed in</button>
+			<Button type="submit" variant="ghost" size="sm">Show everything handed in</Button>
 		{:else}
-			<button type="submit" class="text-sm underline">Show only what is waiting</button>
+			<Button type="submit" variant="ghost" size="sm">Show only what is waiting</Button>
 		{/if}
 	</form>
 
@@ -67,8 +67,7 @@
 		<ul class="mt-8 space-y-2">
 			{#each submissions as submission (submission.id)}
 				<li>
-					<a
-						class="flex items-center justify-between gap-4 rounded-control border border-border px-4 py-3 transition-colors hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+					<Row
 						href={resolve(
 							`/teach/${data.slug}/lessons/${data.lessonId}/assignment/submissions/${submission.id}`
 						)}
@@ -98,9 +97,9 @@
 								<span class="text-accent-text">Mark</span>
 							{/if}
 						</div>
-					</a>
+					</Row>
 				</li>
 			{/each}
 		</ul>
 	{/if}
-</main>
+</Page>

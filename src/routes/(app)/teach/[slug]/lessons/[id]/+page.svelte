@@ -8,6 +8,8 @@
 		Checkbox,
 		Input,
 		Label,
+		Page,
+		PageHeader,
 		Select,
 		Textarea
 	} from '$lib/components';
@@ -48,10 +50,10 @@
 
 <svelte:head><title>{data.lesson.title} — Teach</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Edit lesson</h1>
+	<PageHeader class="mt-4" title="Edit lesson" />
 
 	<p class="mt-2 flex gap-4 text-sm">
 		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lesson.id}/quiz`)}>
@@ -213,4 +215,4 @@
 
 		<Button type="submit" disabled={submitting}>{submitting ? 'Saving…' : 'Save lesson'}</Button>
 	</form>
-</main>
+</Page>

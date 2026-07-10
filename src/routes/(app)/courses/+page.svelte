@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ArrowRight01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons';
-	import { Button, Difficulty, EmptyState, Icon } from '$lib/components';
+	import { Button, Difficulty, EmptyState, Icon, Page, PageHeader } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -9,13 +9,11 @@
 
 <svelte:head><title>Courses — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-6xl px-6 py-12">
-	<header class="max-w-2xl">
-		<h1 class="text-3xl font-semibold tracking-tight">Courses</h1>
-		<p class="text-muted mt-2 text-pretty">
-			Everything published in this workspace. Open one to read its syllabus before you enrol.
-		</p>
-	</header>
+<Page width="full">
+	<PageHeader
+		title="Courses"
+		description="Everything published in this workspace. Open one to read its syllabus before you enrol."
+	/>
 
 	{#if data.courses.length === 0}
 		<!-- Empty is a state, not an oversight. -->
@@ -84,4 +82,4 @@
 			</div>
 		{/if}
 	{/if}
-</main>
+</Page>

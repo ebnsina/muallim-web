@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Breadcrumbs } from '$lib/components';
+	import { Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import { resolve } from '$app/paths';
+	import { Task01Icon } from '@hugeicons/core-free-icons';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -22,10 +23,10 @@
 
 <svelte:head><title>Marking — Quiz</title></svelte:head>
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<Page width="wide">
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Marking</h1>
+	<PageHeader class="mt-4" title="Marking" />
 
 	<!--
 		A filter is a GET, so it is a form and not a link. The query string it produces
@@ -38,56 +39,65 @@
 	>
 		{#if data.awaiting}
 			<input type="hidden" name="all" value="1" />
-			<button type="submit" class="text-sm underline">Show every attempt</button>
+			<Button type="submit" variant="ghost" size="sm">Show every attempt</Button>
 		{:else}
-			<button type="submit" class="text-sm underline">Show only what is waiting</button>
+			<Button type="submit" variant="ghost" size="sm">Show only what is waiting</Button>
 		{/if}
 	</form>
 
 	{#if submissions.length === 0}
-		<p class="text-muted mt-8 text-sm">
-			{data.awaiting ? 'Nothing is waiting to be marked.' : 'Nobody has submitted this quiz yet.'}
-		</p>
+		<div class="mt-8">
+			<EmptyState
+				icon={Task01Icon}
+				title={data.awaiting ? 'Nothing is waiting to be marked' : 'Nobody has submitted yet'}
+				description={data.awaiting
+					? 'Every attempt has a grade against it.'
+					: 'Attempts appear here the moment a learner submits one.'}
+			/>
+		</div>
 	{:else}
 		<ul class="mt-8 space-y-2">
 			{#each submissions as submission (submission.id)}
-				<li class="flex items-center justify-between gap-4 rounded-control border px-4 py-3">
-					<div>
-						<p class="font-medium">{submission.learner_name}</p>
-						<p class="text-muted text-xs">
-							{submission.learner_email} · attempt {submission.attempt.number}
-						</p>
-					</div>
-
-					<div class="text-right text-sm">
-						{#if submission.attempt.status === 'awaiting_review'}
-							<a
-								class="underline"
-								href={resolve(
-									`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
-								)}
-							>
-								Mark {submission.unmarked}
-								{submission.unmarked === 1 ? 'answer' : 'answers'}
-							</a>
-						{:else if submission.attempt.status === 'grading'}
-							<span class="text-muted">Grading</span>
-						{:else}
-							<a
-								class="underline"
-								href={resolve(
-									`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
-								)}
-							>
-								{submission.attempt.points} of {submission.attempt.max_points}
-							</a>
-							<p class="text-muted text-xs">
-								{submission.attempt.passed ? 'Passed' : 'Not passed'}
+				<li>
+					<Row>
+						<div class="min-w-0">
+							<p class="truncate font-medium">{submission.learner_name}</p>
+							<p class="text-muted truncate text-xs">
+								{submission.learner_email} · attempt
+								<span class="numeral">{submission.attempt.number}</span>
 							</p>
-						{/if}
-					</div>
+						</div>
+
+						<div class="shrink-0 text-right text-sm">
+							{#if submission.attempt.status === 'awaiting_review'}
+								<a
+									class="underline"
+									href={resolve(
+										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
+									)}
+								>
+									Mark {submission.unmarked}
+									{submission.unmarked === 1 ? 'answer' : 'answers'}
+								</a>
+							{:else if submission.attempt.status === 'grading'}
+								<span class="text-muted">Grading</span>
+							{:else}
+								<a
+									class="underline"
+									href={resolve(
+										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
+									)}
+								>
+									{submission.attempt.points} of {submission.attempt.max_points}
+								</a>
+								<p class="text-muted text-xs">
+									{submission.attempt.passed ? 'Passed' : 'Not passed'}
+								</p>
+							{/if}
+						</div>
+					</Row>
 				</li>
 			{/each}
 		</ul>
 	{/if}
-</main>
+</Page>

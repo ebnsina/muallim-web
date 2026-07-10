@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Alert, Breadcrumbs } from '$lib/components';
+	import { Alert, Breadcrumbs, Page, PageHeader } from '$lib/components';
 	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -53,10 +53,10 @@
 
 <svelte:head><title>Attempt {data.attempt.number} — Quiz</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
+	<PageHeader class="mt-4" title="Attempt {data.attempt.number}" />
 
 	{#if grading}
 		<!--
@@ -128,4 +128,4 @@
 			{/each}
 		</ol>
 	{/if}
-</main>
+</Page>

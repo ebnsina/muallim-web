@@ -10,7 +10,18 @@
 		PencilEdit02Icon,
 		PlusSignIcon
 	} from '@hugeicons/core-free-icons';
-	import { Alert, Badge, Button, Card, EmptyState, Icon, Numeral, Progress } from '$lib/components';
+	import {
+		Alert,
+		Badge,
+		Button,
+		Card,
+		EmptyState,
+		Icon,
+		Numeral,
+		Page,
+		PageHeader,
+		Progress
+	} from '$lib/components';
 	import { canAuthor as canAuthorRole } from '$lib/roles';
 	import type { PageProps } from './$types';
 
@@ -70,10 +81,9 @@
 
 <svelte:head><title>Dashboard — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-6xl px-6 py-12">
+<Page width="full">
 	<div>
-		<h1 class="text-3xl font-semibold tracking-tight">Welcome back, {firstName}.</h1>
-		<p class="mt-1.5 text-sm text-muted">{data.user.email}</p>
+		<PageHeader title="Welcome back, {firstName}." description={data.user.email} />
 	</div>
 
 	{#if form?.resent}
@@ -263,4 +273,4 @@
 			</section>
 		{/if}
 	</div>
-</main>
+</Page>

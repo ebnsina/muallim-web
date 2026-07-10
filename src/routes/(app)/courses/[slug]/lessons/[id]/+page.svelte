@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Breadcrumbs, Button } from '$lib/components';
+	import { Alert, Badge, Breadcrumbs, Button, Page, PageHeader } from '$lib/components';
 	import { lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -23,15 +23,17 @@
 
 <svelte:head><title>{data.lesson.title} — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-4 text-2xl font-semibold">{data.lesson.title}</h1>
-
-	<p class="text-muted mt-1 text-xs uppercase">
-		{data.lesson.content_type}{#if data.access === 'preview'}
-			· preview{/if}
-	</p>
+	<PageHeader class="mt-4" title={data.lesson.title}>
+		{#snippet meta()}
+			<Badge tone="neutral">{data.lesson.content_type}</Badge>
+			{#if data.access === 'preview'}
+				<Badge tone="accent">Preview</Badge>
+			{/if}
+		{/snippet}
+	</PageHeader>
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">
@@ -102,4 +104,4 @@
 			{/if}
 		</div>
 	{/if}
-</main>
+</Page>

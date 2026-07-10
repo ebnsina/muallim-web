@@ -8,6 +8,8 @@
 		Checkbox,
 		Input,
 		Label,
+		Page,
+		PageHeader,
 		Select,
 		Textarea
 	} from '$lib/components';
@@ -55,10 +57,10 @@
 
 <svelte:head><title>{data.lessonTitle} — Quiz</title></svelte:head>
 
-<main class="mx-auto max-w-3xl px-6 py-16">
+<Page width="wide">
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Quiz — {data.lessonTitle}</h1>
+	<PageHeader class="mt-4" title="Quiz — {data.lessonTitle}" />
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">
@@ -156,7 +158,7 @@
 			{:else}
 				<ol class="mt-4 space-y-3">
 					{#each data.questions as question, index (question.id)}
-						<li class="rounded-control border px-4 py-3">
+						<li class="rounded-control border border-border px-4 py-3">
 							<div class="flex items-start justify-between gap-4">
 								<div>
 									<p class="font-medium">{index + 1}. {question.prompt}</p>
@@ -338,4 +340,4 @@
 			</form>
 		</section>
 	{/if}
-</main>
+</Page>

@@ -8,6 +8,8 @@
 		Checkbox,
 		Field,
 		Input,
+		Page,
+		PageHeader,
 		Select,
 		Textarea
 	} from '$lib/components';
@@ -46,16 +48,14 @@
 
 <svelte:head><title>{exists ? 'Edit assignment' : 'New assignment'} — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">
-		{exists ? 'Edit the assignment' : 'Add an assignment'}
-	</h1>
-
-	<p class="text-muted mt-1 text-sm">
-		Learners upload files and hand them in. You mark what arrives.
-	</p>
+	<PageHeader
+		class="mt-4"
+		title={exists ? 'Edit the assignment' : 'Add an assignment'}
+		description="Learners upload files and hand them in. You mark what arrives."
+	/>
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
@@ -233,4 +233,4 @@
 			</div>
 		</section>
 	{/if}
-</main>
+</Page>

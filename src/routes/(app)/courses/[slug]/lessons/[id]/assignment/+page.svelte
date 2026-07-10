@@ -11,6 +11,8 @@
 		EmptyState,
 		FileList,
 		Icon,
+		Page,
+		PageHeader,
 		Score
 	} from '$lib/components';
 	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
@@ -126,26 +128,27 @@
 
 <svelte:head><title>{assignment.title} — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<div class="mt-2 flex flex-wrap items-center gap-3">
-		<h1 class="text-2xl font-semibold">{assignment.title}</h1>
+	<PageHeader class="mt-4" title={assignment.title}>
+		{#snippet meta()}
+			{#if graded}
+				<Badge tone="success">Marked</Badge>
+			{:else if handedIn}
+				<Badge tone="accent">Handed in</Badge>
+			{/if}
 
-		{#if graded}
-			<Badge tone="success">Marked</Badge>
-		{:else if handedIn}
-			<Badge tone="accent">Handed in</Badge>
-		{/if}
+			{#if submission?.late}
+				<Badge tone="warning">Late</Badge>
+			{/if}
 
-		{#if submission?.late}
-			<Badge tone="warning">Late</Badge>
-		{/if}
-	</div>
-
-	<p class="text-muted numeral mt-1 text-sm">
-		Worth {assignment.points} points · pass at {assignment.passing_points}
-	</p>
+			<span class="text-muted">
+				Worth <span class="numeral">{assignment.points}</span> points · pass at
+				<span class="numeral">{assignment.passing_points}</span>
+			</span>
+		{/snippet}
+	</PageHeader>
 
 	{#if assignment.due_at}
 		<p class="text-muted mt-3 flex items-center gap-2 text-sm">
@@ -279,4 +282,4 @@
 			{/if}
 		</section>
 	{/if}
-</main>
+</Page>

@@ -10,6 +10,8 @@
 		Field,
 		FileList,
 		Input,
+		Page,
+		PageHeader,
 		Textarea
 	} from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
@@ -59,20 +61,21 @@
 
 <svelte:head><title>Marking — {assignment.title}</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
+<Page>
 	<Breadcrumbs {crumbs} />
 
-	<div class="mt-2 flex flex-wrap items-center gap-3">
-		<h1 class="text-2xl font-semibold">{assignment.title}</h1>
-		{#if submission.late}<Badge tone="warning">Late</Badge>{/if}
-		{#if remarking}<Badge tone="success">Marked</Badge>{/if}
-	</div>
+	<PageHeader class="mt-4" title={assignment.title}>
+		{#snippet meta()}
+			{#if submission.late}<Badge tone="warning">Late</Badge>{/if}
+			{#if remarking}<Badge tone="success">Marked</Badge>{/if}
 
-	<p class="text-muted mt-1 text-sm">
-		{#if submission.submitted_at}
-			Handed in {dateFormat.format(new Date(submission.submitted_at))}
-		{/if}
-	</p>
+			{#if submission.submitted_at}
+				<span class="text-muted">
+					Handed in {dateFormat.format(new Date(submission.submitted_at))}
+				</span>
+			{/if}
+		{/snippet}
+	</PageHeader>
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
@@ -146,4 +149,4 @@
 
 		<Button type="submit">{remarking ? 'Change the grade' : 'Record grade'}</Button>
 	</form>
-</main>
+</Page>

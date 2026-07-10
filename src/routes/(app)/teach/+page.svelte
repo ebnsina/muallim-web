@@ -1,18 +1,37 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Input, Label, Select } from '$lib/components';
+	import { BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import {
+		Alert,
+		Badge,
+		Button,
+		Card,
+		EmptyState,
+		Field,
+		Input,
+		Page,
+		PageHeader,
+		Row,
+		Select
+	} from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 	let submitting = $state(false);
+
+	const DIFFICULTIES = [
+		{ value: 'beginner', label: 'Beginner' },
+		{ value: 'intermediate', label: 'Intermediate' },
+		{ value: 'advanced', label: 'Advanced' },
+		{ value: 'expert', label: 'Expert' }
+	];
 </script>
 
 <svelte:head><title>Teach — Muallim</title></svelte:head>
 
-<main class="mx-auto max-w-2xl px-6 py-16">
-	<h1 class="text-2xl font-semibold">Your courses</h1>
-	<p class="text-muted mt-2 text-sm">Drafts are visible only to you.</p>
+<Page width="wide">
+	<PageHeader title="Your courses" description="Drafts are visible only to you." />
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">
@@ -23,80 +42,101 @@
 	<section class="mt-8">
 		<h2 class="sr-only">New course</h2>
 
-		<form
-			method="POST"
-			action="?/create"
-			class="space-y-4 rounded-card border p-4"
-			use:enhance={() => {
-				submitting = true;
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
-			<div class="space-y-2">
-				<Label for="title">Title</Label>
-				<Input id="title" name="title" required value={form?.title ?? ''} />
-			</div>
+		<Card class="p-5">
+			<form
+				method="POST"
+				action="?/create"
+				class="space-y-5"
+				use:enhance={() => {
+					submitting = true;
+					return async ({ update }) => {
+						await update();
+						submitting = false;
+					};
+				}}
+			>
+				<Field id="title" label="Title">
+					{#snippet children({ id, invalid })}
+						<Input {id} {invalid} name="title" required value={form?.title ?? ''} />
+					{/snippet}
+				</Field>
 
-			<div class="space-y-2">
-				<Label for="summary">Summary</Label>
-				<Input id="summary" name="summary" value={form?.summary ?? ''} />
-			</div>
+				<Field id="summary" label="Summary">
+					{#snippet children({ id, invalid })}
+						<Input {id} {invalid} name="summary" value={form?.summary ?? ''} />
+					{/snippet}
+				</Field>
 
-			<div class="space-y-2">
-				<Label for="difficulty">Difficulty</Label>
-				<Select
-					id="difficulty"
-					name="difficulty"
-					class="border-border-control bg-surface-raised h-9 w-full rounded-control border px-3 text-sm"
-				>
-					<option value="beginner">Beginner</option>
-					<option value="intermediate">Intermediate</option>
-					<option value="advanced">Advanced</option>
-					<option value="expert">Expert</option>
-				</Select>
-			</div>
+				<!--
+					No `class` on the Select. It styles itself, and handing the control its
+					own border, height, and padding back is a second implementation of the
+					same control — one that drifts the first time either of them changes.
+				-->
+				<Field id="difficulty" label="Difficulty">
+					{#snippet children({ id, invalid })}
+						<Select {id} {invalid} name="difficulty">
+							{#each DIFFICULTIES as difficulty (difficulty.value)}
+								<option value={difficulty.value}>{difficulty.label}</option>
+							{/each}
+						</Select>
+					{/snippet}
+				</Field>
 
-			<Button type="submit" disabled={submitting}>
-				{submitting ? 'Creating…' : 'Create course'}
-			</Button>
-		</form>
+				<Button type="submit" loading={submitting}>
+					{submitting ? 'Creating…' : 'Create course'}
+				</Button>
+			</form>
+		</Card>
 	</section>
 
 	{#if data.courses.length === 0}
-		<p class="text-muted mt-10 text-sm">You have not created any courses yet.</p>
+		<div class="mt-10">
+			<EmptyState
+				icon={BookOpen01Icon}
+				title="No courses yet"
+				description="Create one above. It stays a draft until you publish it."
+			/>
+		</div>
 	{:else}
 		<ul class="mt-10 space-y-3">
 			{#each data.courses as course (course.id)}
-				<li class="flex flex-wrap items-center justify-between gap-3 rounded-card border p-4">
-					<div>
-						<a
-							class="font-medium underline-offset-4 hover:underline"
-							href={resolve(`/teach/${course.slug}`)}
-						>
-							{course.title}
-						</a>
-						<p class="text-muted mt-1 text-xs uppercase">{course.status}</p>
-					</div>
+				<li>
+					<Row>
+						<div class="min-w-0">
+							<a
+								class="font-medium underline-offset-4 hover:underline"
+								href={resolve(`/teach/${course.slug}`)}
+							>
+								{course.title}
+							</a>
+							<div class="mt-1.5">
+								<!--
+									A badge, not `text-xs uppercase`. `draft` and `published` are the
+									same word in two states, and the tone is what says which.
+								-->
+								<Badge tone={course.status === 'published' ? 'success' : 'neutral'}>
+									{course.status}
+								</Badge>
+							</div>
+						</div>
 
-					<form
-						method="POST"
-						action={course.status === 'published' ? '?/unpublish' : '?/publish'}
-						use:enhance
-					>
-						<input type="hidden" name="slug" value={course.slug} />
-						<Button type="submit" variant="secondary" size="sm">
-							{course.status === 'published' ? 'Unpublish' : 'Publish'}
-						</Button>
-					</form>
+						<form
+							method="POST"
+							action={course.status === 'published' ? '?/unpublish' : '?/publish'}
+							use:enhance
+						>
+							<input type="hidden" name="slug" value={course.slug} />
+							<Button type="submit" variant="secondary" size="sm">
+								{course.status === 'published' ? 'Unpublish' : 'Publish'}
+							</Button>
+						</form>
+					</Row>
 				</li>
 			{/each}
 		</ul>
 
 		{#if data.nextCursor}
-			<div class="mt-8">
+			<div class="mt-8 flex justify-center">
 				<Button
 					variant="secondary"
 					href={`${resolve('/teach')}?cursor=${encodeURIComponent(data.nextCursor)}`}
@@ -106,4 +146,4 @@
 			</div>
 		{/if}
 	{/if}
-</main>
+</Page>
