@@ -44,7 +44,7 @@
 
 		<!-- Frosted, not solid: a translucent pill that lets the tint show through it. -->
 		<span
-			class="relative inline-flex rounded-full border border-white/30 bg-surface-raised/50 px-3 py-1 text-xs font-medium backdrop-blur-sm"
+			class="relative inline-flex rounded-full bg-surface-raised/50 px-3 py-1 text-xs font-medium backdrop-blur-sm"
 		>
 			{level}
 		</span>
