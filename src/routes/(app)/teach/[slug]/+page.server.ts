@@ -1,43 +1,42 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
-/** The curriculum, as the author sees it: drafts and all. */
+/**
+ * The curriculum, as the author sees it: drafts and all.
+ *
+ * The page reads it from the layout. This is for the reorder actions, which must
+ * not: they need the order as it stands *now*, not as it stood when the page was
+ * rendered, because somebody else may have added a section since.
+ */
 async function curriculum(origin: string, accessToken: string, slug: string) {
 	return authedApi(origin, accessToken).GET('/v1/courses/{slug}', {
 		params: { path: { slug } }
 	});
 }
 
-export const load: PageServerLoad = async ({ locals, params, url }) => {
+export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	// Issued together. Neither depends on the other, and an author waiting for two
-	// round trips in series is waiting for no reason.
-	const [tree, prerequisites, mine] = await Promise.all([
-		curriculum(url.origin, locals.accessToken, params.slug),
+	// Started before the layout's curriculum is awaited, so the two overlap. An
+	// author waiting for two round trips in series is waiting for no reason.
+	const rest = Promise.all([
 		api.GET('/v1/courses/{slug}/prerequisites', { params: { path: { slug: params.slug } } }),
 		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } })
 	]);
 
-	if (tree.error || !tree.data) {
-		error(
-			tree.response?.status ?? 500,
-			problemMessage(tree.error, 'That course could not be loaded.')
-		);
-	}
+	await parent();
+	const [prerequisites, mine] = await rest;
 
 	// Every other course in the workspace, so the author picks a prerequisite from
 	// a list rather than typing a slug and finding out later that they mistyped it.
 	const candidates = (mine.data?.courses ?? []).filter((c) => c.slug !== params.slug);
 
+	// `course`, `topics` and `lessonCount` come from the layout.
 	return {
-		course: tree.data.course,
-		topics: tree.data.topics ?? [],
-		lessonCount: tree.data.lesson_count,
 		prerequisites: prerequisites.data?.prerequisites ?? [],
 		candidates
 	};

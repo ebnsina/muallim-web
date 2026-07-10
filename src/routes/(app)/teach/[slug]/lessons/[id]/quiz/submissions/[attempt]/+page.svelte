@@ -1,10 +1,26 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Input, Label, Textarea } from '$lib/components';
+	import { Alert, Breadcrumbs, Button, Input, Label, Textarea } from '$lib/components';
+	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived(
+		teachTrail(
+			data.slug,
+			data.course.title,
+			data.lessonId,
+			lessonTitle(data.topics, data.lessonId),
+			{ label: 'Quiz', href: resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz`) },
+			{
+				label: 'Marking',
+				href: resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)
+			},
+			{ label: `Attempt ${data.attempt.number}` }
+		)
+	);
 
 	const settled = $derived(data.attempt.status === 'graded');
 
@@ -17,16 +33,9 @@
 <svelte:head><title>Attempt {data.attempt.number} — Marking</title></svelte:head>
 
 <main class="mx-auto max-w-3xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a
-			class="underline"
-			href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)}
-		>
-			Back to the marking queue
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
+	<h1 class="mt-4 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
 
 	<p class="text-muted mt-1 text-sm">
 		{data.attempt.points} of {data.attempt.max_points} · {data.attempt.percent}%

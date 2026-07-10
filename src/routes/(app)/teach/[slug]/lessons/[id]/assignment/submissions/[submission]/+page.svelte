@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Badge, Button, Card, Field, FileList, Input, Textarea } from '$lib/components';
+	import {
+		Alert,
+		Badge,
+		Breadcrumbs,
+		Button,
+		Card,
+		Field,
+		FileList,
+		Input,
+		Textarea
+	} from '$lib/components';
+	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -9,6 +20,26 @@
 	const assignment = $derived(data.assignment);
 	const submission = $derived(data.submission);
 	const remarking = $derived(submission.status === 'graded');
+
+	const crumbs = $derived(
+		teachTrail(
+			data.slug,
+			data.course.title,
+			data.lessonId,
+			lessonTitle(data.topics, data.lessonId),
+			{
+				label: 'Assignment',
+				href: resolve(`/teach/${data.slug}/lessons/${data.lessonId}/assignment`)
+			},
+			{
+				label: 'Marking',
+				href: resolve(`/teach/${data.slug}/lessons/${data.lessonId}/assignment/submissions`)
+			},
+			// "Submission", not the learner's name: `read-assignment-submission` returns
+			// a learner id and no name, and the queue is one click up if you need it.
+			{ label: 'Submission' }
+		)
+	);
 
 	const dateFormat = new Intl.DateTimeFormat(undefined, {
 		dateStyle: 'medium',
@@ -29,14 +60,7 @@
 <svelte:head><title>Marking — {assignment.title}</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a
-			class="underline"
-			href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/assignment/submissions`)}
-		>
-			Back to the queue
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<div class="mt-2 flex flex-wrap items-center gap-3">
 		<h1 class="text-2xl font-semibold">{assignment.title}</h1>

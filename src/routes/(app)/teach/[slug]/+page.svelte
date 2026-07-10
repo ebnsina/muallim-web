@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Input, Label, Select } from '$lib/components';
+	import { Alert, Breadcrumbs, Button, Input, Label, Select } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived([
+		{ label: 'Teach', href: resolve('/teach') },
+		{ label: data.course.title }
+	]);
 
 	const dripModes = [
 		{ value: 'none', label: 'All at once' },
@@ -26,11 +31,9 @@
 <svelte:head><title>{data.course.title} — Teach</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve('/teach')}>Your courses</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">{data.course.title}</h1>
+	<h1 class="mt-4 text-2xl font-semibold">{data.course.title}</h1>
 	<p class="text-muted mt-1 text-sm">
 		{data.course.status} · {data.lessonCount}
 		{data.lessonCount === 1 ? 'lesson' : 'lessons'}

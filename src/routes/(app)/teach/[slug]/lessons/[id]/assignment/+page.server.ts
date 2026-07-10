@@ -45,7 +45,7 @@ function toLocalInput(iso: string | null | undefined): string {
  * lms-api answers 404 for both "no assignment" and "no lesson you may edit", and
  * `teach` has already established the second, so a 404 here means the first.
  */
-export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) error(401, 'Sign in to edit this lesson.');
 
 	const {
@@ -59,8 +59,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) 
 	if (problem && response?.status !== 404) {
 		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

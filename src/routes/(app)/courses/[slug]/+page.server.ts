@@ -1,16 +1,19 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { apiAs, authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, params, url }) => {
+export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	const api = apiAs(url.origin, locals.accessToken);
 
-	// Issued together. The curriculum does not depend on the progress, so waiting
-	// for one before asking for the other would add a round trip to the page a
-	// learner opens most often.
-	const [curriculum, progress, prerequisites, enrolments] = await Promise.all([
-		api.GET('/v1/courses/{slug}', { params: { path: { slug: params.slug } } }),
+	/*
+		Issued before the layout's answer is awaited, not after.
+
+		The curriculum comes from the layout now, and `await parent()` on the first
+		line would hold these three behind it — turning one round trip into two on the
+		page a learner opens most often. Started first, awaited last, they overlap it.
+	*/
+	const rest = Promise.all([
 		locals.accessToken
 			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/progress', {
 					params: { path: { slug: params.slug } }
@@ -24,14 +27,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 			: Promise.resolve(null)
 	]);
 
-	if (curriculum.error || !curriculum.data) {
-		// 404 for a draft, and for a course that never existed. Which one it is, is
-		// not a stranger's business, and lms-api has already declined to say.
-		error(
-			curriculum.response?.status ?? 500,
-			problemMessage(curriculum.error, 'That course could not be loaded.')
-		);
-	}
+	await parent();
+	const [progress, prerequisites, enrolments] = await rest;
 
 	// Which prerequisites this reader has finished. lms-api refuses the enrolment
 	// and names them, but a learner should see the gate before they walk into it.
@@ -42,11 +39,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	);
 
 	return {
-		course: curriculum.data.course,
-		topics: curriculum.data.topics ?? [],
-		lessonCount: curriculum.data.lesson_count,
-		durationSeconds: curriculum.data.duration_seconds,
-
+		// `course`, `topics`, `lessonCount` and `durationSeconds` come from the layout,
+		// which every page below this one needs anyway. SvelteKit merges them in.
 		prerequisites: (prerequisites.data?.prerequisites ?? []).map((c) => ({
 			slug: c.slug,
 			title: c.title,

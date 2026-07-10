@@ -4,7 +4,7 @@ import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
 /** One learner's work, with what it is worth. */
-export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) error(401, 'Sign in to mark this assignment.');
 
 	const {
@@ -18,8 +18,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) 
 	if (problem || !data) {
 		error(response?.status ?? 500, problemMessage(problem, 'That submission could not be loaded.'));
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

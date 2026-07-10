@@ -70,7 +70,7 @@ function options(form: FormData) {
 		.filter((option) => option.content !== '');
 }
 
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const api = authedApi(url.origin, locals.accessToken);
@@ -94,9 +94,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(quiz.error, 'That quiz could not be loaded.')
 		);
 	}
-
-	// An unpublished quiz, with its answers in it, is never a thing a cache may keep.
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

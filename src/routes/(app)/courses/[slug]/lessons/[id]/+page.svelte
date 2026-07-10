@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button } from '$lib/components';
+	import { Alert, Breadcrumbs, Button } from '$lib/components';
+	import { lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived(
+		lessonTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
+	);
 
 	// The action's answer wins over the loaded lesson, so the button flips without
 	// waiting for a reload. `form` is undefined until something has been submitted.
@@ -19,11 +24,9 @@
 <svelte:head><title>{data.lesson.title} — Muallim</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/courses/${data.slug}`)}>Back to the course</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
-	<h1 class="mt-2 text-2xl font-semibold">{data.lesson.title}</h1>
+	<h1 class="mt-4 text-2xl font-semibold">{data.lesson.title}</h1>
 
 	<p class="text-muted mt-1 text-xs uppercase">
 		{data.lesson.content_type}{#if data.access === 'preview'}

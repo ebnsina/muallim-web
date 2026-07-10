@@ -1,10 +1,24 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Checkbox, Input, Label, Select, Textarea } from '$lib/components';
+	import {
+		Alert,
+		Breadcrumbs,
+		Button,
+		Checkbox,
+		Input,
+		Label,
+		Select,
+		Textarea
+	} from '$lib/components';
+	import { teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived(
+		teachTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
+	);
 
 	// The selects drive which fields are shown, so their current value is state.
 	// Initialising that state straight from `data` would capture only the first
@@ -35,9 +49,7 @@
 <svelte:head><title>{data.lesson.title} — Teach</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/teach/${data.slug}`)}>Back to the curriculum</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<h1 class="mt-2 text-2xl font-semibold">Edit lesson</h1>
 

@@ -11,7 +11,7 @@ import type { Actions, PageServerLoad } from './$types';
  * quiz. It also decides what is in it — there are no answers in the response, and
  * there is nowhere in its shape to put one.
  */
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const api = locals.accessToken
 		? authedApi(url.origin, locals.accessToken)
 		: serverApi(url.origin);
@@ -24,10 +24,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(quiz.error, 'That quiz could not be loaded.')
 		);
 	}
-
-	// The questions are the same for everyone, but the attempts are not, and a
-	// shared cache keyed on the URL would hand one learner another's score.
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	const attempts = quiz.data.attempts ?? [];
 

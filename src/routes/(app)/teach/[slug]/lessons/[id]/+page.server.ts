@@ -19,7 +19,7 @@ function oneOf<T extends string>(allowed: readonly T[], value: string, fallback:
  * answers with `access: "author"` and the full body, because entitlement is
  * decided there and not here.
  */
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const api = authedApi(url.origin, locals.accessToken);
@@ -38,10 +38,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(content.error, 'That lesson could not be loaded.')
 		);
 	}
-
-	// An unpublished lesson a CDN stores is an unpublished lesson it hands to
-	// strangers.
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	const scheduled = (tree.data?.topics ?? [])
 		.flatMap((t) => t.lessons ?? [])

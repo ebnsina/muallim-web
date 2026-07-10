@@ -1,10 +1,24 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, Button, Checkbox, Input, Label, Select, Textarea } from '$lib/components';
+	import {
+		Alert,
+		Breadcrumbs,
+		Button,
+		Checkbox,
+		Input,
+		Label,
+		Select,
+		Textarea
+	} from '$lib/components';
+	import { teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived(
+		teachTrail(data.slug, data.course.title, data.lessonId, data.lessonTitle, { label: 'Quiz' })
+	);
 
 	const TYPES = [
 		'true_false',
@@ -42,11 +56,7 @@
 <svelte:head><title>{data.lessonTitle} — Quiz</title></svelte:head>
 
 <main class="mx-auto max-w-3xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}`)}>
-			Back to the lesson
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<h1 class="mt-2 text-2xl font-semibold">Quiz — {data.lessonTitle}</h1>
 

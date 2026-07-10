@@ -10,7 +10,7 @@ import type { Actions, PageServerLoad } from './$types';
  * This and the authoring view are the only two responses in the whole API that
  * carry a correct answer. Both require a permission to reach.
  */
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const submission = await authedApi(url.origin, locals.accessToken).GET('/v1/attempts/{id}', {
@@ -23,8 +23,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(submission.error, 'That attempt could not be loaded.')
 		);
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	const answers = new Map((submission.data.answers ?? []).map((a) => [a.question_id, a]));
 

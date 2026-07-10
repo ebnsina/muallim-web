@@ -1,9 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { Alert02Icon, Clock01Icon, Upload01Icon } from '@hugeicons/core-free-icons';
-	import { Alert, Badge, Button, Card, EmptyState, FileList, Icon, Score } from '$lib/components';
+	import {
+		Alert,
+		Badge,
+		Breadcrumbs,
+		Button,
+		Card,
+		EmptyState,
+		FileList,
+		Icon,
+		Score
+	} from '$lib/components';
+	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
 	import { actionMessage, callAction } from '$lib/form';
 	import { toast } from '$lib/toast.svelte';
 	import {
@@ -16,6 +26,18 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const crumbs = $derived(
+		lessonTrail(
+			data.slug,
+			data.course.title,
+			data.lessonId,
+			lessonTitle(data.topics, data.lessonId),
+			{
+				label: 'Assignment'
+			}
+		)
+	);
 
 	const assignment = $derived(data.assignment);
 	const submission = $derived(data.submission);
@@ -105,11 +127,7 @@
 <svelte:head><title>{assignment.title} — Muallim</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/courses/${data.slug}/lessons/${data.lessonId}`)}>
-			Back to the lesson
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<div class="mt-2 flex flex-wrap items-center gap-3">
 		<h1 class="text-2xl font-semibold">{assignment.title}</h1>

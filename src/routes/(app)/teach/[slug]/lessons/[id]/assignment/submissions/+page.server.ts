@@ -11,7 +11,7 @@ import type { PageServerLoad } from './$types';
  * this endpoint whatever is asked, and a marker has no business reading work
  * nobody has finished.
  */
-export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) error(401, 'Sign in to mark this assignment.');
 
 	const awaiting = !url.searchParams.has('all');
@@ -33,8 +33,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) 
 			problemMessage(problem, 'That marking queue could not be loaded.')
 		);
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

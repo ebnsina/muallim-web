@@ -1,10 +1,22 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Alert } from '$lib/components';
+	import { Alert, Breadcrumbs } from '$lib/components';
+	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const crumbs = $derived(
+		lessonTrail(
+			data.slug,
+			data.course.title,
+			data.lessonId,
+			lessonTitle(data.topics, data.lessonId),
+			{ label: 'Quiz', href: resolve(`/courses/${data.slug}/lessons/${data.lessonId}/quiz`) },
+			{ label: `Attempt ${data.attempt.number}` }
+		)
+	);
 
 	const grading = $derived(data.attempt.status === 'grading');
 
@@ -42,11 +54,7 @@
 <svelte:head><title>Attempt {data.attempt.number} — Quiz</title></svelte:head>
 
 <main class="mx-auto max-w-2xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/courses/${data.slug}/lessons/${data.lessonId}/quiz`)}>
-			Back to the quiz
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<h1 class="mt-2 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
 

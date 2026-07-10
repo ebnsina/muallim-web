@@ -9,7 +9,7 @@ import type { Actions, PageServerLoad } from './$types';
  * lms-api decides who may see this: whoever may read the lesson may read its
  * assignment. A submission comes back only for somebody who has one.
  */
-export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const {
 		data,
 		error: problem,
@@ -21,9 +21,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) 
 	if (problem || !data) {
 		error(response?.status ?? 500, problemMessage(problem, 'That assignment could not be loaded.'));
 	}
-
-	// A grade and a draft are as personal as a page gets.
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

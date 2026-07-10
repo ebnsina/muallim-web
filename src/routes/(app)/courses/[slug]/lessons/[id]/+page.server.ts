@@ -3,7 +3,7 @@ import { problemMessage } from '$lib/api';
 import { apiAs, authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const {
 		data,
 		error: problem,
@@ -18,10 +18,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders, url }) 
 		// keeps it that way.
 		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
 	}
-
-	// What this page contains depends on who asked for it. A shared cache keyed on
-	// the URL alone would hand one reader's entitlement to the next one.
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		lesson: data.lesson,

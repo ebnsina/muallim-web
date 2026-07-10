@@ -1,8 +1,21 @@
 <script lang="ts">
+	import { Breadcrumbs } from '$lib/components';
+	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const crumbs = $derived(
+		teachTrail(
+			data.slug,
+			data.course.title,
+			data.lessonId,
+			lessonTitle(data.topics, data.lessonId),
+			{ label: 'Quiz', href: resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz`) },
+			{ label: 'Marking' }
+		)
+	);
 
 	const submissions = $derived(data.submissions ?? []);
 </script>
@@ -10,11 +23,7 @@
 <svelte:head><title>Marking — Quiz</title></svelte:head>
 
 <main class="mx-auto max-w-3xl px-6 py-16">
-	<p class="text-muted text-sm">
-		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz`)}>
-			Back to the quiz
-		</a>
-	</p>
+	<Breadcrumbs {crumbs} />
 
 	<h1 class="mt-2 text-2xl font-semibold">Marking</h1>
 

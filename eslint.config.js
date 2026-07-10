@@ -46,10 +46,17 @@ export default defineConfig(
 		//
 		// The assignment pages render a signed URL the object store gave us, for a
 		// file in a bucket on another origin. There is no route to resolve.
+		// `Breadcrumbs` is the same shape as `Button`: it renders whatever href its
+		// caller hands it, already resolved.
+		//
 		// Globbed rather than named: `[slug]` is a character class to a matcher, not
 		// a literal, and a pattern that silently matches nothing turns a rule off by
 		// accident somewhere else.
-		files: ['src/lib/components/Button.svelte', 'src/routes/**/assignment/**/+page.svelte'],
+		files: [
+			'src/lib/components/Button.svelte',
+			'src/lib/components/Breadcrumbs.svelte',
+			'src/routes/**/assignment/**/+page.svelte'
+		],
 		rules: {
 			'svelte/no-navigation-without-resolve': 'off'
 		}

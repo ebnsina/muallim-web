@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import { OWNER, OWNER_STATE, STUDENT, STUDENT_STATE } from './accounts';
-import { publishedCourse } from './course';
+import { publishedCourse, quizCourse } from './course';
 import { ready } from './hydration';
 
 const slug = (name: string) =>
@@ -140,5 +140,75 @@ test.describe('the menu on a small screen', () => {
 		// Navigating closes it. Left open, it covers the page it just took you to.
 		await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
 		await expect(page.getByRole('link', { name: 'Courses' })).toHaveCount(0);
+	});
+});
+
+/**
+ * A trail, not a back button.
+ *
+ * Every nested page used to carry one link — "Back to the quiz" — which says
+ * where the button goes and not where you are. A learner four levels into a
+ * course could not name the course they were in.
+ */
+test.describe('breadcrumbs', () => {
+	test.use({ storageState: STUDENT_STATE });
+
+	/**
+	 * Enrol, then open the quiz.
+	 *
+	 * The lesson a quiz hangs off is gated, and lms-api answers 404 to a learner who
+	 * may not read it — not 403, because admitting it exists would leak it. A test
+	 * that skipped this would be testing the error page.
+	 */
+	async function enrolled(page: Page, slug: string) {
+		await page.goto(`/courses/${slug}`);
+		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await expect(page.getByText('Your progress')).toBeVisible();
+	}
+
+	test('name every level above the page you are on', async ({ page, request }) => {
+		const course = await quizCourse(request, slug('crumbs'));
+		await enrolled(page, course.slug);
+
+		await page.goto(`/courses/${course.slug}/lessons/${course.lessonId}/quiz`);
+
+		const trail = page.getByRole('navigation', { name: 'Breadcrumb' });
+		await expect(trail).toBeVisible();
+
+		// Courses › <course> › <lesson> › Quiz
+		await expect(trail.getByRole('link', { name: 'Courses' })).toBeVisible();
+		await expect(trail.getByRole('link', { name: `Course ${course.slug}` })).toBeVisible();
+		await expect(trail.getByRole('link', { name: 'The quiz' })).toBeVisible();
+		await expect(trail.getByText('Quiz', { exact: true })).toBeVisible();
+	});
+
+	/**
+	 * The page you are on is not a link. A link to here does nothing, and announces
+	 * itself to a screen reader as somewhere else to go.
+	 */
+	test('mark the current page, and do not link it', async ({ page, request }) => {
+		const course = await quizCourse(request, slug('current'));
+		await enrolled(page, course.slug);
+		await page.goto(`/courses/${course.slug}/lessons/${course.lessonId}/quiz`);
+
+		const trail = page.getByRole('navigation', { name: 'Breadcrumb' });
+		const current = trail.locator('[aria-current="page"]');
+
+		await expect(current).toHaveText('Quiz');
+		await expect(trail.getByRole('link', { name: 'Quiz', exact: true })).toHaveCount(0);
+	});
+
+	test('climb back to the course', async ({ page, request }) => {
+		const course = await quizCourse(request, slug('climb'));
+		await enrolled(page, course.slug);
+		await page.goto(`/courses/${course.slug}/lessons/${course.lessonId}/quiz`);
+
+		await page
+			.getByRole('navigation', { name: 'Breadcrumb' })
+			.getByRole('link', { name: `Course ${course.slug}` })
+			.click();
+
+		await expect(page).toHaveURL(`/courses/${course.slug}`);
+		await expect(page.getByRole('heading', { name: `Course ${course.slug}` })).toBeVisible();
 	});
 });

@@ -13,7 +13,7 @@ import type { PageServerLoad } from './$types';
  * This is also the only place an attempt's id appears. A learner reaches their own
  * attempts by number, so none of theirs is ever guessable.
  */
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const awaiting = url.searchParams.get('all') !== '1';
@@ -29,8 +29,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(submissions.error, 'The marking queue could not be loaded.')
 		);
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,

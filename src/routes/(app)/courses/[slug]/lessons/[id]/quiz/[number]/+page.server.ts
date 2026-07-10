@@ -10,7 +10,7 @@ import type { PageServerLoad } from './$types';
  * increment into somebody else's result, because lms-api scopes the number to the
  * caller.
  */
-export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const number = Number(params.number);
@@ -27,8 +27,6 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 			problemMessage(review.error, 'That attempt could not be loaded.')
 		);
 	}
-
-	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
 		slug: params.slug,
