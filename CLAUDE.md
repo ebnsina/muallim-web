@@ -56,7 +56,15 @@ pnpm build
 
 **Tints are pastel washes, badges are frosted.** For decorative colour beyond the four semantic tokens, generate a hue with `courseHue()` in `src/lib/tint.ts` and paint it as a theme-aware `oklch(L C var(--h))` (pale in light, muted in dark). Chips over a tint are translucent + `backdrop-blur-sm`, not solid.
 
-**Cards: reach for `TintCard`.** The tinted-panel card (a `rounded-2xl` frame with a light border and small inset, a `rounded-xl` washed panel, a corner glyph, hover-scale) lives in `src/lib/components/TintCard.svelte`. It takes the panel body as its `children` snippet and an optional `footer` snippet, and seeds its hue from `title` + `index` (or an explicit `hue`). Use it for anything card-shaped — the catalogue (`CourseCard` wraps it) and the Teach list already do — rather than re-deriving the frame inline.
+**Cards: reach for `TintCard`.** The tinted-panel card (a `rounded-2xl` frame with a light border and small inset, a `rounded-xl` washed panel, a corner glyph, hover-scale) lives in `src/lib/components/TintCard.svelte`. It takes the panel body as its `children` snippet and an optional `footer` snippet, and seeds its hue from `title` + `index` (or an explicit `hue`). Use it for anything card-shaped — the catalogue (`CourseCard` wraps it) and the Teach list already do — rather than re-deriving the frame inline. In a grid it is full-height with the footer pinned to the bottom, so actions line up across a row.
+
+**Forms: reach for `Sheet`.** `src/lib/components/Sheet.svelte` splits a card into a `header` snippet, `children` (the content), and a `footer` snippet, ruled between. Wrap it in a `<form>` and put the submit `Button` in the footer. Use it for form-shaped pages rather than a bare `Card` with a trailing button.
+
+**Badges are mono.** The `Badge` component (and badge-like pills) set `font-mono` — a tag reads as a tag, not as prose.
+
+**A metric wears an icon, not a coloured dot.** A stat or legend uses a tinted icon tile (`bg-{tone}-surface text-{tone}-text`), never a bare colour dot: a dot is a key nobody was handed.
+
+**Pages use the width they have.** `Page width="full"` (max-w-7xl, aligned with the header) for lists, grids, and anything with a sidebar; `wide` (max-w-5xl) for forms and tables; `prose` (max-w-2xl) only for something to read. Do not leave a page stranded in a narrow column with empty gutters.
 
 **The landing page redesign is deferred** — the user asked to leave `src/routes/+page.svelte` (marketing) for later.
 

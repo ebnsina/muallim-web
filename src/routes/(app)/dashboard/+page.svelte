@@ -5,9 +5,12 @@
 		ArrowRight01Icon,
 		Award01Icon,
 		BookOpen01Icon,
+		ChartAverageIcon,
+		CheckmarkBadge01Icon,
 		CheckmarkCircle02Icon,
 		PencilEdit02Icon,
-		PlusSignIcon
+		PlusSignIcon,
+		TaskDone01Icon
 	} from '@hugeicons/core-free-icons';
 	import {
 		Alert,
@@ -64,16 +67,33 @@
 		dashboards carry off this one.
 	*/
 	const STATS = $derived([
-		{ label: 'In progress', value: active.length, tone: 'accent' as const },
-		{ label: 'Finished', value: finished.length, tone: 'success' as const },
-		{ label: 'Lessons completed', value: lessonsDone, tone: 'accent' as const },
-		{ label: 'Average progress', value: `${averagePercent}%`, tone: 'warning' as const }
+		{ label: 'In progress', value: active.length, tone: 'accent' as const, icon: BookOpen01Icon },
+		{
+			label: 'Finished',
+			value: finished.length,
+			tone: 'success' as const,
+			icon: CheckmarkBadge01Icon
+		},
+		{
+			label: 'Lessons completed',
+			value: lessonsDone,
+			tone: 'accent' as const,
+			icon: TaskDone01Icon
+		},
+		{
+			label: 'Average progress',
+			value: `${averagePercent}%`,
+			tone: 'warning' as const,
+			icon: ChartAverageIcon
+		}
 	]);
 
-	const DOT: Record<string, string> = {
-		accent: 'text-accent',
-		success: 'text-success',
-		warning: 'text-warning'
+	// A tinted tile behind each stat's icon — the mark that replaced the coloured
+	// dot, because a dot is a legend nobody was given the key to.
+	const TILE: Record<string, string> = {
+		accent: 'bg-accent-surface text-accent-text',
+		success: 'bg-success-surface text-success-text',
+		warning: 'bg-warning-surface text-warning-text'
 	};
 </script>
 
@@ -236,14 +256,18 @@
 			     read as a summary, which is what they are. -->
 			<Card class="p-5">
 				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
-				<dl class="mt-4 grid grid-cols-2 gap-y-5">
+				<dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-6">
 					{#each STATS as stat (stat.label)}
 						<div>
-							<dt class="text-muted flex items-center gap-1.5 text-xs">
-								<span class={['text-[0.5rem]', DOT[stat.tone]]}>●</span>
+							<dt class="text-muted flex items-center gap-2 text-xs">
+								<span
+									class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
+								>
+									<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
+								</span>
 								{stat.label}
 							</dt>
-							<dd class="numeral mt-1 text-2xl font-semibold tracking-tight">{stat.value}</dd>
+							<dd class="numeral mt-2 text-2xl font-semibold tracking-tight">{stat.value}</dd>
 						</div>
 					{/each}
 				</dl>

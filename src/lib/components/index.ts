@@ -28,6 +28,7 @@ export { default as LessonIcon } from './LessonIcon.svelte';
 export { default as Numeral } from './Numeral.svelte';
 export { default as Page, type PageWidth } from './Page.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
+export { default as Sheet } from './Sheet.svelte';
 export { default as Progress } from './Progress.svelte';
 export { default as RadialProgress } from './RadialProgress.svelte';
 export { default as Radio } from './Radio.svelte';

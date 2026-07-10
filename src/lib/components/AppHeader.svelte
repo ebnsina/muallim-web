@@ -98,7 +98,7 @@
 
 <header class="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
 	<!-- ------------------------------------------------------ identity bar -->
-	<div class="mx-auto flex h-14 max-w-6xl items-center gap-4 px-6">
+	<div class="mx-auto flex h-14 max-w-7xl items-center gap-4 px-6">
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
 			<span
 				class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent"
@@ -199,7 +199,7 @@
 		where you are is a mark under a word rather than a colour you have to know to
 		read. Hidden on a phone, where the menu button opens the same links stacked.
 	-->
-	<nav aria-label="Main" class="mx-auto hidden max-w-6xl items-center gap-1 px-4 sm:flex">
+	<nav aria-label="Main" class="mx-auto hidden max-w-7xl items-center gap-1 px-4 sm:flex">
 		{#each links as link (link.href)}
 			{@const active = current(link.href)}
 			<a

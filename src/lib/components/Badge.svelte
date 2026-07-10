@@ -29,7 +29,7 @@
 
 <span
 	class={cn(
-		'inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap',
+		'inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-0.5 font-mono text-xs font-medium whitespace-nowrap',
 		TONES[tone],
 		className
 	)}

@@ -6,13 +6,13 @@
 		Alert,
 		Badge,
 		Button,
-		Card,
 		EmptyState,
 		Field,
 		Input,
 		Page,
 		PageHeader,
 		Select,
+		Sheet,
 		TintCard
 	} from '$lib/components';
 	import type { PageProps } from './$types';
@@ -47,53 +47,59 @@
 	{/if}
 
 	<section class="mt-8 max-w-2xl">
-		<h2 class="sr-only">New course</h2>
+		<form
+			method="POST"
+			action="?/create"
+			use:enhance={() => {
+				submitting = true;
+				return async ({ update }) => {
+					await update();
+					submitting = false;
+				};
+			}}
+		>
+			<Sheet>
+				{#snippet header()}
+					<h2 class="font-medium">New course</h2>
+					<p class="text-muted mt-0.5 text-sm">It stays a draft until you publish it.</p>
+				{/snippet}
 
-		<Card class="p-5">
-			<form
-				method="POST"
-				action="?/create"
-				class="space-y-5"
-				use:enhance={() => {
-					submitting = true;
-					return async ({ update }) => {
-						await update();
-						submitting = false;
-					};
-				}}
-			>
-				<Field id="title" label="Title">
-					{#snippet children({ id, invalid })}
-						<Input {id} {invalid} name="title" required value={form?.title ?? ''} />
-					{/snippet}
-				</Field>
+				<div class="space-y-5">
+					<Field id="title" label="Title">
+						{#snippet children({ id, invalid })}
+							<Input {id} {invalid} name="title" required value={form?.title ?? ''} />
+						{/snippet}
+					</Field>
 
-				<Field id="summary" label="Summary">
-					{#snippet children({ id, invalid })}
-						<Input {id} {invalid} name="summary" value={form?.summary ?? ''} />
-					{/snippet}
-				</Field>
+					<Field id="summary" label="Summary">
+						{#snippet children({ id, invalid })}
+							<Input {id} {invalid} name="summary" value={form?.summary ?? ''} />
+						{/snippet}
+					</Field>
 
-				<!--
-					No `class` on the Select. It styles itself, and handing the control its
-					own border, height, and padding back is a second implementation of the
-					same control — one that drifts the first time either of them changes.
-				-->
-				<Field id="difficulty" label="Difficulty">
-					{#snippet children({ id, invalid })}
-						<Select {id} {invalid} name="difficulty">
-							{#each DIFFICULTIES as difficulty (difficulty.value)}
-								<option value={difficulty.value}>{difficulty.label}</option>
-							{/each}
-						</Select>
-					{/snippet}
-				</Field>
+					<!--
+						No `class` on the Select. It styles itself, and handing the control its
+						own border, height, and padding back is a second implementation of the
+						same control — one that drifts the first time either of them changes.
+					-->
+					<Field id="difficulty" label="Difficulty">
+						{#snippet children({ id, invalid })}
+							<Select {id} {invalid} name="difficulty">
+								{#each DIFFICULTIES as difficulty (difficulty.value)}
+									<option value={difficulty.value}>{difficulty.label}</option>
+								{/each}
+							</Select>
+						{/snippet}
+					</Field>
+				</div>
 
-				<Button type="submit" loading={submitting}>
-					{submitting ? 'Creating…' : 'Create course'}
-				</Button>
-			</form>
-		</Card>
+				{#snippet footer()}
+					<Button type="submit" loading={submitting}>
+						{submitting ? 'Creating…' : 'Create course'}
+					</Button>
+				{/snippet}
+			</Sheet>
+		</form>
 	</section>
 
 	{#if data.courses.length === 0}

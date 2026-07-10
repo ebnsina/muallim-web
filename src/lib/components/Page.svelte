@@ -18,8 +18,8 @@
 
 	const WIDTHS: Record<PageWidth, string> = {
 		prose: 'max-w-2xl',
-		wide: 'max-w-3xl',
-		full: 'max-w-6xl'
+		wide: 'max-w-5xl',
+		full: 'max-w-7xl'
 	};
 </script>
 

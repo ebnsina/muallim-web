@@ -14,6 +14,7 @@
 		Input,
 		Page,
 		PageHeader,
+		Sheet,
 		Textarea
 	} from '$lib/components';
 	import { renderPreview, SAMPLE } from '$lib/certificate-preview';
@@ -90,72 +91,81 @@
 
 	<!-- ------------------------------------------------------------ new one -->
 	<section class="mt-12">
-		<h2 class="text-sm font-medium tracking-wide uppercase">New template</h2>
-
 		<!--
 			The form sits above the preview, not beside it. A certificate is landscape,
 			and a landscape thing in a half-width column is a cramped thing; below the
 			form it has the whole page to be the shape it is.
 		-->
-		<div class="mt-4 max-w-2xl">
-			<form method="POST" action="?/create" use:enhance class="space-y-5">
-				<Field id="name" label="Name" hint="For your own list. Not printed.">
-					{#snippet children({ id, describedBy, invalid })}
-						<Input
-							{id}
-							{invalid}
-							name="name"
-							aria-describedby={describedBy}
-							required
-							maxlength={100}
-						/>
+		<div class="max-w-2xl">
+			<form method="POST" action="?/create" use:enhance>
+				<Sheet>
+					{#snippet header()}
+						<h2 class="font-medium">New template</h2>
+						<p class="text-muted mt-0.5 text-sm">The words a certificate carries.</p>
 					{/snippet}
-				</Field>
 
-				<Field id="title" label="Heading">
-					{#snippet children({ id, invalid })}
-						<Input {id} {invalid} name="title" bind:value={title} required maxlength={200} />
+					<div class="space-y-5">
+						<Field id="name" label="Name" hint="For your own list. Not printed.">
+							{#snippet children({ id, describedBy, invalid })}
+								<Input
+									{id}
+									{invalid}
+									name="name"
+									aria-describedby={describedBy}
+									required
+									maxlength={100}
+								/>
+							{/snippet}
+						</Field>
+
+						<Field id="title" label="Heading">
+							{#snippet children({ id, invalid })}
+								<Input {id} {invalid} name="title" bind:value={title} required maxlength={200} />
+							{/snippet}
+						</Field>
+
+						<Field
+							id="body"
+							label="Body"
+							hint="Use {'{{learner}}'}, {'{{course}}'}, {'{{date}}'} and {'{{serial}}'}. Anything else prints exactly as written."
+						>
+							{#snippet children({ id, describedBy, invalid })}
+								<Textarea
+									{id}
+									{invalid}
+									name="body"
+									rows={7}
+									aria-describedby={describedBy}
+									required
+									maxlength={4000}
+									bind:value={body}
+								/>
+							{/snippet}
+						</Field>
+
+						<Field
+							id="signatory"
+							label="Signed by"
+							hint="Optional. A certificate signed by nobody is a receipt."
+						>
+							{#snippet children({ id, describedBy, invalid })}
+								<Input
+									{id}
+									{invalid}
+									name="signatory"
+									aria-describedby={describedBy}
+									maxlength={200}
+									bind:value={signatory}
+									placeholder="The Registrar"
+								/>
+							{/snippet}
+						</Field>
+					</div>
+
+					{#snippet footer()}
+						<Button type="submit">Create template</Button>
 					{/snippet}
-				</Field>
-
-				<Field
-					id="body"
-					label="Body"
-					hint="Use {'{{learner}}'}, {'{{course}}'}, {'{{date}}'} and {'{{serial}}'}. Anything else prints exactly as written."
-				>
-					{#snippet children({ id, describedBy, invalid })}
-						<Textarea
-							{id}
-							{invalid}
-							name="body"
-							rows={7}
-							aria-describedby={describedBy}
-							required
-							maxlength={4000}
-							bind:value={body}
-						/>
-					{/snippet}
-				</Field>
-
-				<Field
-					id="signatory"
-					label="Signed by"
-					hint="Optional. A certificate signed by nobody is a receipt."
-				>
-					{#snippet children({ id, describedBy, invalid })}
-						<Input
-							{id}
-							{invalid}
-							name="signatory"
-							aria-describedby={describedBy}
-							maxlength={200}
-							bind:value={signatory}
-							placeholder="The Registrar"
-						/>
-					{/snippet}
-				</Field>
-
-				<Button type="submit">Create template</Button>
+				</Sheet>
 			</form>
 		</div>
 

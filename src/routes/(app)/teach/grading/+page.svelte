@@ -11,7 +11,8 @@
 		Icon,
 		Input,
 		Page,
-		PageHeader
+		PageHeader,
+		Sheet
 	} from '$lib/components';
 	import { bandTone } from '$lib/grades';
 	import {
@@ -112,10 +113,13 @@
 
 	<!-- ------------------------------------------------------------ new scale -->
 	<section class="mt-12">
-		<h2 class="text-sm font-medium tracking-wide uppercase">New scale</h2>
+		<form method="POST" action="?/create" use:enhance class="grid gap-8 lg:grid-cols-2">
+			<Sheet class="lg:self-start">
+				{#snippet header()}
+					<h2 class="font-medium">New scale</h2>
+					<p class="text-muted mt-0.5 text-sm">Turn a range of percentages into a letter.</p>
+				{/snippet}
 
-		<form method="POST" action="?/create" use:enhance class="mt-4 grid gap-8 lg:grid-cols-2">
-			<Card class="p-5">
 				<div>
 					<label for="scale-name" class="mb-1.5 block text-sm font-medium">Name</label>
 					<Input id="scale-name" name="name" bind:value={name} placeholder="Honours" required />
@@ -186,8 +190,10 @@
 					</ul>
 				{/if}
 
-				<Button type="submit" class="mt-6" disabled={!canSave}>Create scale</Button>
-			</Card>
+				{#snippet footer()}
+					<Button type="submit" disabled={!canSave}>Create scale</Button>
+				{/snippet}
+			</Sheet>
 
 			<!--
 				The scale, drawn as a learner will see it. Reordered to the highest floor

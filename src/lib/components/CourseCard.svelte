@@ -26,7 +26,7 @@
 <TintCard {href} {title} {index}>
 	<!-- Frosted, not solid: a translucent pill that lets the tint show through it. -->
 	<span
-		class="inline-flex rounded-full bg-surface-raised/50 px-3 py-1 text-xs font-medium backdrop-blur-sm"
+		class="inline-flex rounded-full bg-surface-raised/50 px-3 py-1 font-mono text-xs font-medium backdrop-blur-sm"
 	>
 		{level}
 	</span>

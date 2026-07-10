@@ -44,7 +44,7 @@
 
 	const frame = $derived(
 		cn(
-			'group block rounded-2xl border border-border/60 bg-surface-raised p-1',
+			'group flex h-full flex-col rounded-2xl border border-border/60 bg-surface-raised p-1',
 			lifts &&
 				'transition-transform duration-200 ease-out hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
 			className
@@ -60,7 +60,10 @@
 	without any of them re-deriving the wash, the inset, or the hover.
 -->
 {#snippet body()}
-	<div class="panel relative overflow-hidden rounded-xl px-5 pt-5 pb-6" style="--h: {resolvedHue}">
+	<div
+		class="panel relative flex-1 overflow-hidden rounded-xl px-5 pt-5 pb-6"
+		style="--h: {resolvedHue}"
+	>
 		{#if glyph}
 			<!-- The icon strokes with currentColor, so the hue is set on the wrapper. -->
 			<span class="ink pointer-events-none absolute -right-4 -bottom-5 block size-32 opacity-20">

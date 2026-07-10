@@ -152,15 +152,15 @@
 	<div
 		class="relative hidden w-56 overflow-hidden text-white sm:block"
 		style="background:
-			radial-gradient(120% 80% at 70% 15%, oklch(0.55 0.19 265), transparent 60%),
-			linear-gradient(160deg, oklch(0.40 0.15 268), oklch(0.17 0.07 265) 75%);"
+			radial-gradient(120% 80% at 70% 15%, oklch(0.44 0.055 265), transparent 60%),
+			linear-gradient(160deg, oklch(0.32 0.04 268), oklch(0.18 0.025 265) 75%);"
 		aria-hidden="true"
 	>
 		<!-- The emblem, glowing. A blurred disc of light behind a crisp mark. -->
 		<div class="absolute top-14 left-1/2 -translate-x-1/2">
 			<div
 				class="absolute inset-0 -z-10 rounded-full blur-2xl"
-				style="background: oklch(0.6 0.2 270 / 0.55);"
+				style="background: oklch(0.6 0.07 270 / 0.4);"
 			></div>
 			<span
 				class="flex size-20 items-center justify-center rounded-2xl border border-white/20 bg-white/10 backdrop-blur"
@@ -183,8 +183,8 @@
 		<svg viewBox="0 0 120 120" class="size-24 drop-shadow-lg sm:size-28">
 			<defs>
 				<linearGradient id="sealFill" x1="0" y1="0" x2="1" y2="1">
-					<stop offset="0" stop-color="oklch(0.58 0.19 268)" />
-					<stop offset="1" stop-color="oklch(0.34 0.13 266)" />
+					<stop offset="0" stop-color="oklch(0.5 0.07 268)" />
+					<stop offset="1" stop-color="oklch(0.32 0.05 266)" />
 				</linearGradient>
 				<path id="sealArcTop" d="M 60 60 m -37 0 a 37 37 0 0 1 74 0" fill="none" />
 				<path id="sealArcBottom" d="M 60 60 m -34 0 a 34 34 0 0 0 68 0" fill="none" />
