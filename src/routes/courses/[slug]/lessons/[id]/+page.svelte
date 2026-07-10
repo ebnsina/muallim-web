@@ -64,6 +64,18 @@
 		<p class="text-muted-foreground mt-8 text-sm">This lesson has no content yet.</p>
 	{/if}
 
+	<!--
+		A quiz lesson's body is its quiz. The link is shown to anyone who can read the
+		lesson; whether they may *take* it is lms-api's decision, made when they try.
+	-->
+	{#if data.lesson.content_type === 'quiz'}
+		<div class="mt-8">
+			<Button href={resolve(`/courses/${data.slug}/lessons/${data.lesson.id}/quiz`)}>
+				Go to the quiz
+			</Button>
+		</div>
+	{/if}
+
 	{#if data.access === 'preview'}
 		<Alert class="mt-10">
 			<AlertDescription>

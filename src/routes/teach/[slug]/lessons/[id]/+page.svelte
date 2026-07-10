@@ -46,6 +46,12 @@
 
 	<h1 class="mt-2 text-2xl font-semibold">Edit lesson</h1>
 
+	<p class="mt-2 text-sm">
+		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lesson.id}/quiz`)}>
+			Quiz and marking
+		</a>
+	</p>
+
 	{#if form?.message}
 		<Alert variant="destructive" class="mt-6" role="alert">
 			<AlertDescription>{form.message}</AlertDescription>

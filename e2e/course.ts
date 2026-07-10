@@ -1,5 +1,5 @@
 import { expect, type APIRequestContext } from '@playwright/test';
-import { OWNER } from './accounts';
+import { OWNER, STUDENT } from './accounts';
 
 export interface Course {
 	slug: string;
@@ -15,6 +15,7 @@ export interface Course {
  * The access token lives fifteen minutes, comfortably longer than a run.
  */
 let cachedToken: string | undefined;
+let cachedStudentToken: string | undefined;
 
 async function bearer(request: APIRequestContext): Promise<string> {
 	if (cachedToken) return cachedToken;
@@ -27,6 +28,22 @@ async function bearer(request: APIRequestContext): Promise<string> {
 	const { tokens } = await response.json();
 	cachedToken = tokens.access_token as string;
 	return cachedToken;
+}
+
+/** The student's bearer, cached for the same reason the owner's is. */
+async function studentBearer(request: APIRequestContext): Promise<string> {
+	if (cachedStudentToken) return cachedStudentToken;
+
+	const response = await request.post('/api/v1/auth/login', {
+		data: { email: STUDENT.email, password: STUDENT.password }
+	});
+	expect(response.ok(), 'the student should exist by now; the setup project creates them').toBe(
+		true
+	);
+
+	const { tokens } = await response.json();
+	cachedStudentToken = tokens.access_token as string;
+	return cachedStudentToken;
 }
 
 /**
@@ -121,4 +138,148 @@ export async function setDripMode(
 		data: { mode }
 	});
 	expect(response.ok(), `set drip mode: ${response.status()} ${await response.text()}`).toBe(true);
+}
+
+export interface QuizCourse {
+	slug: string;
+	lessonId: string;
+	/** Has the student enrol, take the quiz, and submit it. */
+	studentAttempt: (request: APIRequestContext) => Promise<void>;
+}
+
+/**
+ * A published course with one quiz lesson.
+ *
+ * The quiz has a single-choice question worth 3 and a short answer worth 2,
+ * against a 60% bar — so answering only the first is exactly a pass. With
+ * `essay: true` it also has a ten-point essay, which nothing but a person can
+ * grade.
+ */
+export async function quizCourse(
+	request: APIRequestContext,
+	slug: string,
+	options: { essay?: boolean; withQuiz?: boolean } = {}
+): Promise<QuizCourse> {
+	const { essay = false, withQuiz = true } = options;
+
+	const token = await bearer(request);
+	const auth = { Authorization: `Bearer ${token}` };
+
+	const course = await request.post('/api/v1/courses', {
+		headers: auth,
+		data: { slug, title: `Course ${slug}`, summary: 'Built by an end-to-end test.' }
+	});
+	expect(course.ok(), `create course: ${course.status()} ${await course.text()}`).toBe(true);
+
+	const topic = await request.post(`/api/v1/courses/${slug}/topics`, {
+		headers: auth,
+		data: { title: 'Section one' }
+	});
+	expect(topic.ok()).toBe(true);
+	const topicId = (await topic.json()).topic.id;
+
+	const lesson = await request.post(`/api/v1/topics/${topicId}/lessons`, {
+		headers: auth,
+		data: { title: 'The quiz', content_type: 'quiz', video_source: 'none' }
+	});
+	expect(lesson.ok(), `add lesson: ${lesson.status()} ${await lesson.text()}`).toBe(true);
+	const lessonId = (await lesson.json()).lesson.id as string;
+
+	const publish = await request.post(`/api/v1/courses/${slug}/publish`, { headers: auth });
+	expect(publish.ok(), `publish: ${publish.status()} ${await publish.text()}`).toBe(true);
+
+	if (!withQuiz) {
+		return { slug, lessonId, studentAttempt: async () => {} };
+	}
+
+	const quiz = await request.post(`/api/v1/lessons/${lessonId}/quiz`, {
+		headers: auth,
+		data: { title: 'Chapter one', passing_percent: 60 }
+	});
+	expect(quiz.ok(), `create quiz: ${quiz.status()} ${await quiz.text()}`).toBe(true);
+
+	const question = async (data: Record<string, unknown>) => {
+		const response = await request.post(`/api/v1/lessons/${lessonId}/quiz/questions`, {
+			headers: auth,
+			data
+		});
+		expect(response.ok(), `add question: ${response.status()} ${await response.text()}`).toBe(true);
+		return (await response.json()).question;
+	};
+
+	const choice = await question({
+		type: 'single_choice',
+		prompt: 'Which is compiled?',
+		points: 3,
+		explanation: 'Because it is compiled.',
+		options: [{ content: 'Python' }, { content: 'Go', is_correct: true }]
+	});
+
+	await question({
+		type: 'short_answer',
+		prompt: 'Roman name for Paris?',
+		points: 2,
+		accepted: [['Lutetia']]
+	});
+
+	if (essay) {
+		await question({ type: 'open_ended', prompt: 'Why?', points: 10 });
+	}
+
+	const rightOption = choice.options.find((o: { is_correct: boolean }) => o.is_correct)
+		.id as string;
+
+	return {
+		slug,
+		lessonId,
+
+		async studentAttempt(request: APIRequestContext) {
+			const studentToken = await studentBearer(request);
+			const headers = { Authorization: `Bearer ${studentToken}` };
+
+			const enrolled = await request.post(`/api/v1/courses/${slug}/enrol`, { headers });
+			expect(enrolled.ok(), `enrol: ${enrolled.status()}`).toBe(true);
+
+			const started = await request.post(`/api/v1/lessons/${lessonId}/quiz/attempts`, { headers });
+			expect(started.ok(), `start: ${started.status()}`).toBe(true);
+
+			// Everything the machine can grade, answered rightly: 5 of 15. Only the
+			// essay stands between this attempt and a settled score.
+			const answers: Array<[string, unknown]> = [[choice.id, { choices: [rightOption] }]];
+			const quizView = await request.get(`/api/v1/lessons/${lessonId}/quiz`, { headers });
+			expect(quizView.ok()).toBe(true);
+
+			for (const q of (await quizView.json()).quiz.questions) {
+				if (q.type === 'short_answer') answers.push([q.id, { text: 'Lutetia' }]);
+				if (q.type === 'open_ended') answers.push([q.id, { text: 'Because errors are values.' }]);
+			}
+
+			for (const [questionId, response] of answers) {
+				const saved = await request.put(
+					`/api/v1/lessons/${lessonId}/quiz/attempts/current/answers/${questionId}`,
+					{ headers, data: { response } }
+				);
+				expect(saved.ok(), `answer: ${saved.status()} ${await saved.text()}`).toBe(true);
+			}
+
+			const submitted = await request.post(
+				`/api/v1/lessons/${lessonId}/quiz/attempts/current/submit`,
+				{ headers }
+			);
+			expect(submitted.ok(), `submit: ${submitted.status()}`).toBe(true);
+
+			// Wait for the worker. The marking queue only holds attempts it has reached.
+			await expect
+				.poll(
+					async () => {
+						const attempt = await request.get(`/api/v1/lessons/${lessonId}/quiz/attempts/1`, {
+							headers
+						});
+						return (await attempt.json()).attempt.status;
+					},
+					{ timeout: 15_000 }
+				)
+				.toBe('awaiting_review');
+		}
+	};
 }
