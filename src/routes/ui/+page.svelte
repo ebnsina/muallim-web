@@ -23,6 +23,7 @@
 		Score,
 		Select,
 		Textarea,
+		ThemeToggle,
 		Verdict,
 		type ButtonSize,
 		type ButtonVariant
@@ -69,6 +70,7 @@
 
 <main class="mx-auto min-h-dvh max-w-4xl px-6 py-16">
 	<header>
+		<div class="mb-6 flex justify-end"><ThemeToggle /></div>
 		<p class="text-sm font-medium text-accent-text">Design system</p>
 		<h1 class="mt-1 text-4xl font-semibold">Components</h1>
 		<p class="mt-3 max-w-2xl text-muted">

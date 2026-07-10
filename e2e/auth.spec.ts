@@ -70,7 +70,12 @@ test('signing in and out', async ({ page }) => {
 	await page.getByRole('button', { name: 'Sign in' }).click();
 
 	await expect(page).toHaveURL('/dashboard');
-	await expect(page.getByRole('heading', { name: OWNER.name })).toBeVisible();
+
+	// The dashboard greets by first name, so the email is what identifies whose
+	// session this is. Asserting on the greeting alone would pass for anyone whose
+	// name happens to start the same way.
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome back');
+	await expect(page.getByText(OWNER.email)).toBeVisible();
 
 	await page.getByRole('button', { name: 'Sign out' }).click();
 	await expect(page).toHaveURL('/');

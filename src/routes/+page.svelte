@@ -6,7 +6,7 @@
 		SparklesIcon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
-	import { Badge, Button, Card, Icon, Score, Verdict } from '$lib/components';
+	import { Badge, Button, Card, Icon, Score, ThemeToggle, Verdict } from '$lib/components';
 	import { inview } from '$lib/actions/inview';
 	import {
 		AI_FEATURES,
@@ -60,9 +60,8 @@
 {/snippet}
 
 <div class="min-h-dvh">
-	<!-- The theme toggle floats at top-right, so the header keeps out of its way. -->
 	<header class="sticky top-0 z-30 border-b border-border bg-surface/80 backdrop-blur">
-		<div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-6 pr-16">
+		<div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-6">
 			<a href={resolve('/')} class="flex items-center gap-2.5 font-semibold">
 				<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
 				Muallim
@@ -73,6 +72,7 @@
 					Pricing
 				</Button>
 				<Button href={resolve('/courses')} variant="ghost" size="sm">Courses</Button>
+				<ThemeToggle />
 				<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
 				<Button href={resolve('/register')} size="sm">Get started</Button>
 			</nav>

@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { Mortarboard02Icon } from '@hugeicons/core-free-icons';
 	import Icon from './Icon.svelte';
+	import ThemeToggle from './ThemeToggle.svelte';
 
 	type Props = {
 		title: string;
@@ -27,13 +28,16 @@
 -->
 <div class="grid min-h-dvh lg:grid-cols-2">
 	<div class="flex flex-col px-6 py-10 sm:px-12">
-		<a
-			href={resolve('/')}
-			class="inline-flex w-fit items-center gap-2.5 rounded-pill text-sm font-semibold"
-		>
-			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
-			Muallim
-		</a>
+		<div class="flex items-center justify-between gap-4">
+			<a
+				href={resolve('/')}
+				class="inline-flex w-fit items-center gap-2.5 rounded-pill text-sm font-semibold"
+			>
+				<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
+				Muallim
+			</a>
+			<ThemeToggle />
+		</div>
 
 		<main class="flex flex-1 items-center py-12">
 			<div class="mx-auto w-full max-w-sm">

@@ -14,8 +14,19 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	// Both are needed to render the page and neither depends on the other.
-	const [me, enrolments] = await Promise.all([api.GET('/v1/me'), api.GET('/v1/me/enrolments')]);
+	/*
+		Three reads, in parallel, none of which depends on another.
+
+		`/v1/me/courses` is asked for even by a student, whose answer is 403. Waiting
+		to learn the role from `/v1/me` before deciding whether to ask would put the
+		two calls in series to save a request that costs nothing — and the role is
+		not the authority anyway. lms-api is, and it says no.
+	*/
+	const [me, enrolments, teaching] = await Promise.all([
+		api.GET('/v1/me'),
+		api.GET('/v1/me/enrolments'),
+		api.GET('/v1/me/courses', { params: { query: { limit: 6 } } })
+	]);
 	const { data, error: problem, response } = me;
 
 	// The token verified when `handle` ran, and no longer does: the membership was
@@ -30,9 +41,14 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
 		error(response?.status ?? 500, problemMessage(problem, 'Could not load your profile.'));
 	}
 
-	// A failure to list enrolments is not a failure to show the profile. The
-	// section renders empty rather than taking the page down with it.
-	return { user: data.user, enrolments: enrolments.data?.enrolments ?? [] };
+	// A failure to list either is not a failure to show the profile. The section
+	// renders empty rather than taking the page down with it — and for a student,
+	// the 403 on `/v1/me/courses` *is* the expected answer.
+	return {
+		user: data.user,
+		enrolments: enrolments.data?.enrolments ?? [],
+		teaching: teaching.data?.courses ?? []
+	};
 };
 
 export const actions: Actions = {

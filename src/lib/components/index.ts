@@ -6,6 +6,7 @@
  * gallery every one of these is rendered in.
  */
 export { default as Alert, type AlertTone } from './Alert.svelte';
+export { default as AppHeader } from './AppHeader.svelte';
 export { default as AuthShell } from './AuthShell.svelte';
 export { default as Badge, type BadgeTone } from './Badge.svelte';
 export { default as Button, type ButtonSize, type ButtonVariant } from './Button.svelte';

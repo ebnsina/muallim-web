@@ -44,11 +44,15 @@
 	`overflow-clip` and not `overflow-hidden`: the former does not make the element a
 	scroll container, so a rolling score inside a scrollable page cannot be scrolled
 	to reveal the digits behind it.
+
+	The column is `select-none`, and the readable copy beside it is not. Without
+	that, dragging across "43%" and hitting copy pastes every digit of every
+	column — which is what the DOM says is there, and not what anybody meant.
 -->
 <span class={cn('numeral inline-flex leading-none', className)}>
-	<span class="sr-only">{label ?? value}</span>
+	<span class="sr-only select-text">{label ?? value}</span>
 
-	<span aria-hidden="true" class="inline-flex">
+	<span aria-hidden="true" class="inline-flex select-none">
 		{#each characters as { character, place, digit } (place)}
 			{#if digit === null}
 				<span>{character}</span>
