@@ -4,13 +4,10 @@
 	import { BookOpen01Icon } from '@hugeicons/core-free-icons';
 	import Icon from './Icon.svelte';
 	import { cn } from '$lib/utils';
-	import { DEFAULT_HUE } from '$lib/tint';
 
 	type Props = {
 		/** When set, the whole card is that link and lifts on hover. */
 		href?: string;
-		/** The wash's hue in degrees. Defaults to the brand tint. */
-		hue?: number;
 		/** The faint mark in the far corner. Set to `null` for none. */
 		glyph?: IconSvgElement | null;
 		/** Lift on hover. Defaults to true for a link, false otherwise. */
@@ -25,7 +22,6 @@
 
 	let {
 		href,
-		hue = DEFAULT_HUE,
 		glyph = BookOpen01Icon,
 		interactive,
 		class: className,
@@ -46,17 +42,19 @@
 </script>
 
 <!--
-	The reusable shell behind every tinted card: a lighter frame with a small inset,
-	a `rounded-xl` panel washed in one generated hue, an optional faint mark, and an
-	optional strip below. What goes in the panel and the strip is the caller's, so
-	the same frame carries a marketing card, a management row, or anything else
-	without any of them re-deriving the wash, the inset, or the hover.
+	The reusable shell behind every card: a lighter frame with a small inset, a
+	`rounded-xl` slate panel, an optional faint mark, and an optional strip below.
+	One neutral colour, on purpose — a card's colour is not a place to encode
+	anything, so it encodes nothing and lets a badge or a bar carry the meaning.
+	What goes in the panel and the strip is the caller's, so the same frame carries
+	a catalogue card, a management row, or anything else.
 -->
 {#snippet body()}
-	<div class="panel relative flex-1 overflow-hidden rounded-xl px-5 pt-5 pb-6" style="--h: {hue}">
+	<div class="relative flex-1 overflow-hidden rounded-xl bg-surface-sunken px-5 pt-5 pb-6">
 		{#if glyph}
-			<!-- The icon strokes with currentColor, so the hue is set on the wrapper. -->
-			<span class="ink pointer-events-none absolute -right-4 -bottom-5 block size-32 opacity-20">
+			<span
+				class="text-border-strong pointer-events-none absolute -right-4 -bottom-5 block size-32 opacity-60"
+			>
 				<Icon icon={glyph} class="size-full" strokeWidth={1.5} />
 			</span>
 		{/if}
@@ -79,24 +77,3 @@
 		{@render body()}
 	</div>
 {/if}
-
-<style>
-	/*
-		The wash and its ink, from the one hue the caller hands down. Light and dark
-		are two different jobs: a pale tint on a bright page, a muted one on a dark
-		one — same hue, so a thing looks like itself in either.
-	*/
-	.panel {
-		background-color: oklch(0.955 0.035 var(--h));
-	}
-	.ink {
-		color: oklch(0.5 0.13 var(--h));
-	}
-
-	:global(html[data-theme='dark']) .panel {
-		background-color: oklch(0.3 0.045 var(--h));
-	}
-	:global(html[data-theme='dark']) .ink {
-		color: oklch(0.8 0.09 var(--h));
-	}
-</style>

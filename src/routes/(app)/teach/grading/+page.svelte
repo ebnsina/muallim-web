@@ -52,7 +52,7 @@
 
 <svelte:head><title>Grading scales — Muallim</title></svelte:head>
 
-<Page width="wide">
+<Page width="full">
 	<Breadcrumbs {crumbs} />
 
 	<PageHeader

@@ -1,32 +1,20 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import { BookOpen01Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
 		Button,
 		EmptyState,
-		Field,
-		Input,
+		Icon,
 		Page,
 		PageHeader,
-		Select,
-		Sheet,
 		TintCard
 	} from '$lib/components';
-	import { difficultyHue } from '$lib/tint';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let submitting = $state(false);
-
-	const DIFFICULTIES = [
-		{ value: 'beginner', label: 'Beginner' },
-		{ value: 'intermediate', label: 'Intermediate' },
-		{ value: 'advanced', label: 'Advanced' },
-		{ value: 'expert', label: 'Expert' }
-	];
 </script>
 
 <svelte:head><title>Teach — Muallim</title></svelte:head>
@@ -38,6 +26,10 @@
 			<Button href={resolve('/teach/certificates')} variant="secondary" size="sm">
 				Certificates
 			</Button>
+			<Button href={resolve('/teach/new')} size="sm">
+				<Icon icon={PlusSignIcon} class="size-4" />
+				New course
+			</Button>
 		{/snippet}
 	</PageHeader>
 
@@ -47,69 +39,20 @@
 		</Alert>
 	{/if}
 
-	<section class="mt-8 max-w-2xl">
-		<form
-			method="POST"
-			action="?/create"
-			use:enhance={() => {
-				submitting = true;
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
-			<Sheet>
-				{#snippet header()}
-					<h2 class="font-medium">New course</h2>
-					<p class="text-muted mt-0.5 text-sm">It stays a draft until you publish it.</p>
-				{/snippet}
-
-				<div class="space-y-5">
-					<Field id="title" label="Title">
-						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="title" required value={form?.title ?? ''} />
-						{/snippet}
-					</Field>
-
-					<Field id="summary" label="Summary">
-						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="summary" value={form?.summary ?? ''} />
-						{/snippet}
-					</Field>
-
-					<!--
-						No `class` on the Select. It styles itself, and handing the control its
-						own border, height, and padding back is a second implementation of the
-						same control — one that drifts the first time either of them changes.
-					-->
-					<Field id="difficulty" label="Difficulty">
-						{#snippet children({ id, invalid })}
-							<Select {id} {invalid} name="difficulty">
-								{#each DIFFICULTIES as difficulty (difficulty.value)}
-									<option value={difficulty.value}>{difficulty.label}</option>
-								{/each}
-							</Select>
-						{/snippet}
-					</Field>
-				</div>
-
-				{#snippet footer()}
-					<Button type="submit" loading={submitting}>
-						{submitting ? 'Creating…' : 'Create course'}
-					</Button>
-				{/snippet}
-			</Sheet>
-		</form>
-	</section>
-
 	{#if data.courses.length === 0}
 		<div class="mt-10">
 			<EmptyState
 				icon={BookOpen01Icon}
 				title="No courses yet"
-				description="Create one above. It stays a draft until you publish it."
-			/>
+				description="Create your first course. It stays a draft until you publish it."
+			>
+				{#snippet action()}
+					<Button href={resolve('/teach/new')} size="sm">
+						<Icon icon={PlusSignIcon} class="size-4" />
+						New course
+					</Button>
+				{/snippet}
+			</EmptyState>
 		</div>
 	{:else}
 		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +65,7 @@
 						cannot live inside an anchor — so the title carries the link and the
 						footer carries the button.
 					-->
-					<TintCard hue={difficultyHue(course.difficulty)}>
+					<TintCard>
 						<!--
 							A badge, not `text-xs uppercase`. `draft` and `published` are the same
 							word in two states, and the tone is what says which.

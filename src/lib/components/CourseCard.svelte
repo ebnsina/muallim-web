@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { ArrowRight01Icon } from '@hugeicons/core-free-icons';
-	import Badge from './Badge.svelte';
-	import Icon from './Icon.svelte';
+	import Difficulty from './Difficulty.svelte';
 	import TintCard from './TintCard.svelte';
-	import { difficultyHue } from '$lib/tint';
 
 	type Props = {
 		title: string;
@@ -13,33 +10,23 @@
 	};
 
 	let { title, summary, difficulty, href }: Props = $props();
-
-	const level = $derived(difficulty.charAt(0).toUpperCase() + difficulty.slice(1));
 </script>
 
 <!--
-	A catalogue course, in the shared tinted shell, tinted by its difficulty so the
-	colour is a legend the eye learns. Only what the listing knows — a title, a
-	summary, a difficulty. The reference's task and module counts are absent because
-	the endpoint does not return them, and a number with nothing behind it is worse
-	than no number.
+	A catalogue course. The whole card is the link, so there is no "Open" button to
+	press — a button that only repeats what clicking the card already does. The
+	strip below carries what the listing actually knows instead: the difficulty,
+	drawn by the design-system components. (Lesson and module counts are not in the
+	list payload, so they are not invented here.)
 -->
-<TintCard {href} hue={difficultyHue(difficulty)}>
-	<Badge>{level}</Badge>
-
-	<h2 class="mt-4 text-lg font-semibold text-pretty">{title}</h2>
+<TintCard {href}>
+	<h2 class="text-lg font-semibold text-pretty">{title}</h2>
 
 	{#if summary}
 		<p class="text-muted mt-1.5 line-clamp-2 max-w-[38ch] text-sm text-pretty">{summary}</p>
 	{/if}
 
 	{#snippet footer()}
-		<span class="text-muted text-sm">Read the syllabus</span>
-		<span
-			class="text-muted flex items-center gap-1 text-sm transition-transform group-hover:translate-x-0.5 group-hover:text-text"
-		>
-			Open
-			<Icon icon={ArrowRight01Icon} class="size-4" />
-		</span>
+		<Difficulty level={difficulty} />
 	{/snippet}
 </TintCard>

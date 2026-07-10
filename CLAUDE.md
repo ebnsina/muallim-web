@@ -54,9 +54,13 @@ pnpm build
 
 **Hover is a scale, not a shadow.** Cards and tiles lift with a small `transition-transform hover:scale-[1.02]`, not `hover:shadow-*`.
 
-**A tint means something.** A card's wash comes from a real attribute, never a random seed or its place in a list: `difficultyHue()` in `src/lib/tint.ts` maps a course's difficulty to a hue, and `TintCard` paints it theme-aware as `oklch(L C var(--h))` (pale in light, muted in dark). Colour a reader cannot decode is noise — if you reach for a tint, tie it to something on the record.
+**A card's colour is neutral; meaning goes in a badge or a bar.** Cards are one slate wash (`bg-surface-sunken`), the same for every card — the colour encodes nothing, on purpose. What the card is about is carried by a design-system component inside it: a `Badge` for a state, the `Difficulty` bars for a magnitude. We tried a random rainbow and then a difficulty-keyed hue; both were noise, and the user asked for a single grey/slate instead.
 
-**Cards: reach for `TintCard`.** The tinted-panel card (a `rounded-2xl` frame with a light border and small inset, a `rounded-xl` washed panel, a corner glyph, hover-scale) lives in `src/lib/components/TintCard.svelte`. It takes the panel body as its `children` snippet and an optional `footer` snippet, and an explicit `hue` (from `difficultyHue()`, defaulting to the brand tint). Use it for anything card-shaped — the catalogue (`CourseCard` wraps it) and the Teach list already do — rather than re-deriving the frame inline. In a grid it is full-height with the footer pinned to the bottom, so actions line up across a row.
+**Cards: reach for `TintCard`.** The card shell (a `rounded-2xl` frame with a light border and small inset, a `rounded-xl` slate panel, a corner glyph, hover-scale) lives in `src/lib/components/TintCard.svelte`. It takes the panel body as its `children` snippet and an optional `footer` snippet. Use it for anything card-shaped — the catalogue (`CourseCard` wraps it) and the Teach list already do — rather than re-deriving the frame inline. In a grid it is full-height with the footer pinned to the bottom, so actions line up across a row.
+
+**A clickable card needs no "Open" button.** If the whole card is an `<a>`, do not add an Open/View button that only repeats the click; spend the footer on something the reader does not already know (a difficulty, a state), not on a second copy of the link.
+
+**Create and edit forms get their own route.** A form is a page (`/teach/new`, `/teach/{slug}`), reached by a button from the list — not an inline panel stacked above the list it belongs to. The list stays a list.
 
 **Forms: reach for `Sheet`.** `src/lib/components/Sheet.svelte` splits a card into a `header` snippet, `children` (the content), and a `footer` snippet, ruled between. Wrap it in a `<form>` and put the submit `Button` in the footer. Use it for form-shaped pages rather than a bare `Card` with a trailing button.
 

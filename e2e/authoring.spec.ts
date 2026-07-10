@@ -20,7 +20,7 @@ const slug = (name: string) =>
 test('a course goes from nothing to published', async ({ page }) => {
 	const title = `Composing ${slug('e2e')}`;
 
-	await page.goto('/teach');
+	await page.goto('/teach/new');
 	await page.getByLabel('Title').fill(title);
 	await page.getByRole('button', { name: 'Create course' }).click();
 
@@ -69,7 +69,7 @@ test('a course goes from nothing to published', async ({ page }) => {
 test('sections reorder, and the ends refuse to move further', async ({ page }) => {
 	const title = `Ordering ${slug('e2e')}`;
 
-	await page.goto('/teach');
+	await page.goto('/teach/new');
 	await page.getByLabel('Title').fill(title);
 	await page.getByRole('button', { name: 'Create course' }).click();
 	await page.getByRole('link', { name: title }).click();
@@ -112,7 +112,7 @@ test('sections reorder, and the ends refuse to move further', async ({ page }) =
 test('toggling a preview does not erase the lesson body', async ({ page }) => {
 	const title = `Preserving ${slug('e2e')}`;
 
-	await page.goto('/teach');
+	await page.goto('/teach/new');
 	await page.getByLabel('Title').fill(title);
 	await page.getByRole('button', { name: 'Create course' }).click();
 	await page.getByRole('link', { name: title }).click();
@@ -142,7 +142,7 @@ test('toggling a preview does not erase the lesson body', async ({ page }) => {
 test('a video lesson frames a player the server wrote, and nothing else', async ({ page }) => {
 	const title = `Watching ${slug('e2e')}`;
 
-	await page.goto('/teach');
+	await page.goto('/teach/new');
 	await page.getByLabel('Title').fill(title);
 	await page.getByRole('button', { name: 'Create course' }).click();
 	await page.getByRole('link', { name: title }).click();
