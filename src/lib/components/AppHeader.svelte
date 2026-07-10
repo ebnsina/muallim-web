@@ -63,18 +63,38 @@
 
 	let open = $state(false);
 
-	/*
-		Navigating closes the panel.
+	// The account menu, behind the avatar. Its own flag: the phone menu and this one
+	// are two panels, and closing one should not close the other.
+	let accountOpen = $state(false);
+	let accountRef = $state<HTMLElement>();
 
-		Left open it covers the page it just took you to, along with the button that
-		would have closed it. `afterNavigate` rather than an `$effect` that reads the
-		pathname for its dependency: both work, and only one of them says when it
-		means to run.
+	// A menu that opens on a click closes on a click anywhere else, and on Escape —
+	// the two ways anyone expects to dismiss one. The toggle button lives inside
+	// `accountRef`, so its own click is not counted as "outside".
+	function onWindowClick(event: MouseEvent) {
+		if (accountOpen && accountRef && !accountRef.contains(event.target as Node)) {
+			accountOpen = false;
+		}
+	}
+	function onWindowKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') accountOpen = false;
+	}
+
+	/*
+		Navigating closes both panels.
+
+		Left open they cover the page they just took you to, along with the button
+		that would have closed them. `afterNavigate` rather than an `$effect` that
+		reads the pathname for its dependency: both work, and only one of them says
+		when it means to run.
 	*/
 	afterNavigate(() => {
 		open = false;
+		accountOpen = false;
 	});
 </script>
+
+<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} />
 
 <header class="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
 	<!-- ------------------------------------------------------ identity bar -->
@@ -89,40 +109,70 @@
 		</a>
 
 		<div class="ml-auto flex items-center gap-2 sm:gap-3">
-			<ThemeToggle />
-
 			{#if user}
 				<!--
-					The name, its role, and a monogram — whose session this is. The sign-out
-					sits beside them, because the next question after "who am I" is "how do I
-					stop being them", and a dropdown would hide the answer behind a click.
+					The account, behind its avatar. Who you are and how you stop being them —
+					name, theme, sign out — are one person's business, so they gather under one
+					control rather than spreading across the bar.
 				-->
-				<div class="hidden items-center gap-2.5 sm:flex">
-					<div class="text-right leading-tight">
-						<p class="text-sm font-medium">{user.name}</p>
-						<p class="text-muted text-xs capitalize">{user.role}</p>
-					</div>
-					<span
-						class="flex size-9 items-center justify-center rounded-full bg-accent-surface text-sm font-semibold text-accent-text"
-						aria-hidden="true"
+				<div class="relative hidden sm:block" bind:this={accountRef}>
+					<button
+						type="button"
+						class="flex items-center rounded-full transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+						aria-haspopup="menu"
+						aria-expanded={accountOpen}
+						aria-label="Account"
+						onclick={() => (accountOpen = !accountOpen)}
 					>
-						{initials}
-					</span>
-				</div>
+						<span
+							class="flex size-9 items-center justify-center rounded-full bg-accent-surface text-sm font-semibold text-accent-text"
+						>
+							{initials}
+						</span>
+					</button>
 
-				<!--
-					Its own route, not `/dashboard?/logout`. Signing out from the lesson you
-					were reading should not deposit you on the dashboard on the way.
-				-->
-				<form method="POST" action="/logout" use:enhance class="hidden sm:block">
-					<Button type="submit" variant="secondary" size="sm">Sign out</Button>
-				</form>
+					{#if accountOpen}
+						<div
+							role="menu"
+							aria-label="Account"
+							class="absolute right-0 mt-2 w-60 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 shadow-lg"
+							transition:slide={{ duration: DURATION.instant, easing: cubicOut }}
+						>
+							<div class="px-2.5 py-2">
+								<p class="truncate text-sm font-medium">{user.name}</p>
+								<p class="text-muted truncate text-xs">{user.email}</p>
+								<p class="text-muted mt-1 text-xs capitalize">{user.role}</p>
+							</div>
+
+							<div class="my-1 border-t border-border"></div>
+
+							<div class="flex items-center justify-between gap-3 px-2.5 py-1.5">
+								<span class="text-sm">Theme</span>
+								<ThemeToggle />
+							</div>
+
+							<div class="my-1 border-t border-border"></div>
+
+							<!--
+								Its own route, not `/dashboard?/logout`. Signing out from the lesson
+								you were reading should not deposit you on the dashboard on the way.
+							-->
+							<form method="POST" action="/logout" use:enhance class="p-0.5">
+								<Button type="submit" variant="ghost" size="sm" class="w-full">Sign out</Button>
+							</form>
+						</div>
+					{/if}
+				</div>
 			{:else}
 				<div class="hidden items-center gap-3 sm:flex">
+					<ThemeToggle />
 					<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
 					<Button href={resolve('/register')} size="sm">Get started</Button>
 				</div>
 			{/if}
+
+			<!-- On a phone the theme toggle stays on the bar; the rest is in the menu. -->
+			<div class="sm:hidden"><ThemeToggle /></div>
 
 			<!--
 				A button that says what it controls and whether it is open. An icon that

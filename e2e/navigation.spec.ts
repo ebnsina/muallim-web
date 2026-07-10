@@ -31,9 +31,15 @@ test.describe('the signed-in header', () => {
 			await page.goto(path);
 
 			await expect(page.getByRole('navigation', { name: 'Main' }), path).toBeVisible();
-			await expect(page.getByRole('button', { name: 'Sign out' }), path).toBeVisible();
-			await expect(page.getByText(OWNER.name), path).toBeVisible();
+			await expect(page.getByRole('button', { name: 'Account' }), path).toBeVisible();
 		}
+
+		// Whose session this is, and the way out of it, live behind the avatar now.
+		await ready(page);
+		await page.getByRole('button', { name: 'Account' }).click();
+		const account = page.getByRole('menu', { name: 'Account' });
+		await expect(account.getByText(OWNER.name)).toBeVisible();
+		await expect(account.getByRole('button', { name: 'Sign out' })).toBeVisible();
 	});
 
 	test('marks where you are', async ({ page }) => {
@@ -74,6 +80,8 @@ test.describe('the signed-in header', () => {
 		const course = await publishedCourse(request, slug('signout'));
 
 		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
+		await ready(page);
+		await page.getByRole('button', { name: 'Account' }).click();
 		await page.getByRole('button', { name: 'Sign out' }).click();
 
 		await expect(page).toHaveURL('/');

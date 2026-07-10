@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { OWNER } from './accounts';
+import { ready } from './hydration';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -77,6 +78,8 @@ test('signing in and out', async ({ page }) => {
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome back');
 	await expect(page.getByText(OWNER.email)).toBeVisible();
 
+	await ready(page);
+	await page.getByRole('button', { name: 'Account' }).click();
 	await page.getByRole('button', { name: 'Sign out' }).click();
 	await expect(page).toHaveURL('/');
 
