@@ -2,10 +2,22 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { Alert, AuthShell, Button, Field, Input } from '$lib/components';
+	import DemoAccounts from '$lib/dev/DemoAccounts.svelte';
 	import type { PageProps } from './$types';
 
-	let { form }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	let submitting = $state(false);
+
+	/*
+		The fields are state so that something other than a person can fill them.
+
+		Seeded from `form.email`, which is what the server echoes back after a failed
+		submit — the address survives, the password never does. `$state` and not
+		`$derived`: the moment the reader types, the field is theirs.
+	*/
+	// svelte-ignore state_referenced_locally
+	let email = $state(form?.email ?? '');
+	let password = $state('');
 </script>
 
 <svelte:head><title>Sign in — Muallim</title></svelte:head>
@@ -44,7 +56,7 @@
 					required
 					aria-describedby={describedBy}
 					{invalid}
-					value={form?.email ?? ''}
+					bind:value={email}
 				/>
 			{/snippet}
 		</Field>
@@ -59,6 +71,7 @@
 					required
 					aria-describedby={describedBy}
 					{invalid}
+					bind:value={password}
 				/>
 			{/snippet}
 		</Field>
@@ -67,6 +80,22 @@
 			{submitting ? 'Signing in…' : 'Sign in'}
 		</Button>
 	</form>
+
+	<!--
+		The loader sends these only in development, so production renders nothing here
+		and the response carries no password. The guard is the empty list, not this
+		`{#if}`: the accounts live under `$lib/server`, which the client bundle cannot
+		import at all.
+	-->
+	{#if data.demoAccounts.length > 0}
+		<DemoAccounts
+			accounts={data.demoAccounts}
+			onpick={(account) => {
+				email = account.email;
+				password = account.password;
+			}}
+		/>
+	{/if}
 
 	{#snippet footer()}
 		<p>

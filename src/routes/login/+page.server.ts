@@ -1,11 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { serverApi } from '$lib/server/api';
+import { demoAccounts } from '$lib/server/demo-accounts';
 import { safeRedirect, setSession } from '$lib/server/session';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = ({ locals, url }) => {
 	if (locals.accessToken) redirect(303, safeRedirect(url.searchParams.get('next')));
+
+	// Empty outside development, so the page renders no buttons and the response
+	// carries no password. The decision is made here, on the server, once.
+	return { demoAccounts: demoAccounts() };
 };
 
 export const actions: Actions = {
