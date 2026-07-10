@@ -12,9 +12,8 @@
 
 <AuthShell
 	title="Create an account"
-	subtitle="Registration claims an unclaimed workspace. After that, joining is by invitation."
-	pitch="A workspace is claimed once. Afterwards every attempt is refused identically, so registration cannot be used to discover who has an account here."
-	attribution="Why you can only do this once"
+	subtitle="This creates the school. Everyone else joins by invitation."
+	pitch="Everything you need to teach: lessons, videos, quizzes and marks, in one place your students can reach."
 >
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>

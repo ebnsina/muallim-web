@@ -13,8 +13,7 @@
 <AuthShell
 	title="Sign in"
 	subtitle="Continue where you left off."
-	pitch="Missing account, wrong password, and suspended membership are one error, in constant time. Signing in tells an attacker nothing."
-	attribution="How this system handles credentials"
+	pitch="Pick up exactly where you stopped. The lesson you were reading, the quiz you half-finished, and every mark you have earned are waiting."
 >
 	{#if form?.message}
 		<!--

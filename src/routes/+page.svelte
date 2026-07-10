@@ -1,66 +1,72 @@
+<!--
+	This page is for someone deciding whether to teach here. It says what they get,
+	not how it is built. There is nothing about tenants, transactions, row-level
+	security or iframes on it, because none of those are things a teacher wants and
+	all of them are things a teacher has to translate.
+
+	The healthcheck that used to sit in the middle of it has moved to /status,
+	where the person who needs it can find it.
+-->
+
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
-		Alert02Icon,
-		CheckmarkCircle02Icon,
 		Clock01Icon,
 		Mortarboard02Icon,
 		Quiz01Icon,
 		SquareLock01Icon,
 		UserGroup03Icon,
-		VideoReplayIcon,
-		WifiDisconnected01Icon
+		VideoReplayIcon
 	} from '@hugeicons/core-free-icons';
-	import { Badge, Button, Card, Icon } from '$lib/components';
-	import type { PageProps } from './$types';
-
-	let { data }: PageProps = $props();
-
-	const status = $derived(data.apiStatus);
+	import { Button, Card, Icon } from '$lib/components';
 
 	/*
-		Every claim below is a thing this repository does today. Certificates,
-		assignments and the gradebook are not here, so they are not here.
+		Six things a teacher gets. Each one is something this system does today —
+		certificates, assignments and the gradebook are not built, so they are not
+		advertised — and each is said in the words a teacher would use.
 	*/
 	const FEATURES = [
 		{
 			icon: Quiz01Icon,
-			title: 'Quizzes that grade themselves',
-			body: 'Eight question types, from true/false to matching. Submitting queues a job; nothing is graded in the request, so an essay quiz saves in milliseconds rather than seconds.'
+			title: 'Quizzes that mark themselves',
+			// Marking really is queued, and the result page really does say "marking"
+			// for a moment. Saying "instant" here would be a promise the product breaks
+			// on the first slow day.
+			body: 'Eight kinds of question, from true-or-false to matching pairs. Students hand one in and the result comes back a moment later, however long the quiz.'
 		},
 		{
 			icon: UserGroup03Icon,
-			title: 'Essays a person marks',
-			body: 'What a machine cannot grade waits in a queue with the learner beside it. Marking the last answer settles the score and the pass, in the transaction that recorded it.'
+			title: 'Essays come to you',
+			body: "Anything a computer shouldn't be judging lands in one tidy list, with the student's work beside it. Give it a mark and a comment; the grade settles itself."
 		},
 		{
 			icon: Clock01Icon,
-			title: 'Content that arrives when it should',
-			body: 'Release a course all at once, on a date, a number of days after each learner enrols, or one lesson at a time as they finish the one before.'
+			title: 'Lessons on your schedule',
+			body: 'Open a course all at once, on a chosen date, a few days after each student joins, or one lesson at a time as they finish the last.'
 		},
 		{
 			icon: SquareLock01Icon,
-			title: 'Prerequisites and preview',
-			body: 'Gate enrolment on finishing another course. Offer a lesson as a free sample. A reader who may not see a draft is told it does not exist, not that they are forbidden.'
+			title: 'Let people try before they join',
+			body: 'Offer a lesson as a free sample. Ask students to finish one course before they start the next. Everything else stays yours.'
 		},
 		{
 			icon: VideoReplayIcon,
-			title: 'Video that is safe to embed',
-			body: 'YouTube, Vimeo and Cloudflare Stream links become a player URL the server wrote, from a video id it validated. What an author typed never reaches an iframe.'
+			title: 'Videos that simply play',
+			body: 'Paste a link from YouTube, Vimeo or Cloudflare Stream. We tidy it up, drop the tracking, and it plays.'
 		},
 		{
 			icon: Mortarboard02Icon,
-			title: 'One workspace per school',
-			body: 'Every query is scoped to its tenant, and a row-level security policy in Postgres backs it up. The database refuses what the code forgot.'
+			title: 'A space of your own',
+			body: 'Your courses, your students, your name on the door. Nobody outside your school can see in.'
 		}
 	];
 </script>
 
 <svelte:head>
-	<title>LMS — teach, assess, and prove it</title>
+	<title>LMS — teach what you know</title>
 	<meta
 		name="description"
-		content="A multi-tenant learning management system: courses, drip content, quizzes that grade themselves, and essays a person marks."
+		content="Build a course, invite your students, and let the marking take care of itself."
 	/>
 </svelte:head>
 
@@ -92,40 +98,19 @@
 
 			<div class="relative mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
 				<h1 class="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-					Teach, assess, and prove it.
+					Teach what you know.
 				</h1>
 
 				<p class="mx-auto mt-6 max-w-xl text-lg text-pretty text-muted">
-					A multi-tenant learning platform where grading happens in a background job, content
-					arrives on a schedule, and a learner is never handed the answer.
+					Build a course, invite your students, and let the marking take care of itself.
 				</p>
 
 				<div class="mt-10 flex flex-wrap justify-center gap-3">
-					<Button href={resolve('/register')} size="lg">Create a workspace</Button>
+					<Button href={resolve('/register')} size="lg">Start teaching</Button>
 					<Button href={resolve('/courses')} size="lg" variant="secondary">Browse courses</Button>
 				</div>
 
-				<!--
-					Four states, not one. A page that renders only the success case is
-					unfinished — and this one is the honest signal that the API behind it is
-					or is not answering. There is no loading branch, because `load` resolves
-					before the page renders.
-				-->
-				<div class="mt-10 flex justify-center">
-					{#if status.kind === 'ok'}
-						<Badge tone="success" icon={CheckmarkCircle02Icon}>
-							API reachable · <span class="numeral">{status.version}</span>
-						</Badge>
-					{:else if status.kind === 'unreachable'}
-						<Badge tone="neutral" icon={WifiDisconnected01Icon}>
-							API unreachable — run <code class="mx-1">make run</code> in lms-api
-						</Badge>
-					{:else}
-						<Badge tone="warning" icon={Alert02Icon}>
-							API returned <span class="numeral">{status.status}</span> · {status.message}
-						</Badge>
-					{/if}
-				</div>
+				<p class="mt-6 text-sm text-muted">It takes a minute to set up.</p>
 			</div>
 		</section>
 
@@ -149,10 +134,11 @@
 					Start with one course.
 				</h2>
 				<p class="mx-auto mt-3 max-w-lg text-pretty text-muted">
-					Claim a workspace, write a lesson, attach a quiz. Invite the people who should see it.
+					Write a lesson, add a quiz, invite the people who should see it. You can do the rest
+					later.
 				</p>
 				<div class="mt-8">
-					<Button href={resolve('/register')} size="lg">Create a workspace</Button>
+					<Button href={resolve('/register')} size="lg">Start teaching</Button>
 				</div>
 			</div>
 		</section>
@@ -165,7 +151,8 @@
 			<span class="font-medium text-text">LMS</span>
 			<a class="underline-offset-4 hover:underline" href={resolve('/courses')}>Courses</a>
 			<a class="underline-offset-4 hover:underline" href={resolve('/login')}>Sign in</a>
-			<a class="ml-auto underline-offset-4 hover:underline" href={resolve('/ui')}>Design system</a>
+			<a class="ml-auto underline-offset-4 hover:underline" href={resolve('/status')}>Status</a>
+			<a class="underline-offset-4 hover:underline" href={resolve('/ui')}>Design system</a>
 		</div>
 	</footer>
 </div>
