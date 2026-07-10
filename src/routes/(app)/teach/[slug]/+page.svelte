@@ -45,6 +45,12 @@
 	<Breadcrumbs {crumbs} />
 
 	<PageHeader class="mt-4" title={data.course.title}>
+		{#snippet actions()}
+			<Button href={resolve(`/teach/${data.course.slug}/gradebook`)} variant="secondary" size="sm">
+				Gradebook
+			</Button>
+		{/snippet}
+
 		{#snippet meta()}
 			<Badge tone={data.course.status === 'published' ? 'success' : 'neutral'}>
 				{data.course.status}

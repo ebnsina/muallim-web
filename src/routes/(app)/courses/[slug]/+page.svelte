@@ -244,8 +244,17 @@
 							</p>
 						{/if}
 
-						<form method="POST" action="?/cancel" use:enhance class="mt-6">
-							<Button type="submit" variant="secondary" size="sm" class="w-full">
+						<Button
+							href={resolve(`/courses/${data.course.slug}/grades`)}
+							variant="secondary"
+							size="sm"
+							class="mt-6 w-full"
+						>
+							See your grades
+						</Button>
+
+						<form method="POST" action="?/cancel" use:enhance class="mt-3">
+							<Button type="submit" variant="ghost" size="sm" class="w-full">
 								Cancel enrolment
 							</Button>
 						</form>
