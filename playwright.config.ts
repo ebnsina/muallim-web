@@ -8,8 +8,21 @@ import path from 'node:path';
  */
 export const MAIL_FILE = path.resolve('e2e/.mail/mail.jsonl');
 
-const API_URL = process.env.LMS_API_URL ?? 'http://localhost:8080';
-const WEB_URL = 'http://localhost:5173';
+/*
+	Ports of their own, never the development ones.
+
+	`make run` puts lms-api on :8080 against `lms`, and `pnpm dev` puts this app on
+	:5173. These tests run against `lms_test`, which holds no demo accounts at all.
+	Sharing a port meant one of two failures, depending on who started first: the
+	suite quietly ran against the development database, or it left an API on :8080
+	answering for `lms_test` — where `demo@muallim.test` does not exist, so signing
+	in with the credentials `make seed` printed said the credentials were wrong.
+
+	Neither is a thing anyone should have to diagnose. They are different servers
+	on different databases, so they get different ports.
+*/
+const API_URL = process.env.LMS_API_URL ?? 'http://localhost:8081';
+const WEB_URL = 'http://localhost:5174';
 
 /**
  * The database is the one thing these tests do not bring up. Everything else —
@@ -28,6 +41,7 @@ export const apiEnv = {
 	LMS_DATABASE_URL:
 		process.env.LMS_TEST_DATABASE_URL ??
 		'postgres://lms:lms@localhost:5432/lms_test?sslmode=disable',
+	LMS_ADDR: ':8081',
 	LMS_JWT_SECRET: 'an-end-to-end-test-signing-secret-of-enough-bytes',
 	LMS_LOG_LEVEL: 'warn',
 
@@ -116,6 +130,14 @@ export default defineConfig({
 		}
 	],
 
+	/*
+		Never reused, on CI or off it.
+
+		A server already answering on this port was started by someone else, with
+		someone else's environment — a different database, a different signing key,
+		a different object store. Reusing it saves ten seconds and spends them again
+		the first time somebody wonders why a test that passes alone fails in company.
+	*/
 	webServer: [
 		{
 			command: 'go run ./cmd/api',
@@ -123,13 +145,14 @@ export default defineConfig({
 			url: `${API_URL}/v1/healthz`,
 			env: apiEnv,
 			timeout: 120_000,
-			reuseExistingServer: !process.env.CI
+			reuseExistingServer: false
 		},
 		{
-			command: 'pnpm dev --port 5173',
+			command: 'pnpm dev --port 5174',
 			url: WEB_URL,
+			env: { ...process.env, LMS_API_URL: API_URL },
 			timeout: 120_000,
-			reuseExistingServer: !process.env.CI
+			reuseExistingServer: false
 		}
 	]
 });

@@ -90,7 +90,9 @@ cd ../lms-web && pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Playwright starts `lms-api`, its job worker, and this app. Postgres and MinIO are the two things it does not bring up — `make storage-up` starts MinIO on `:9002`, and without it every assignment upload is refused with a 503.
+Playwright starts `lms-api`, its job worker, and this app. Postgres and MinIO are the two things it does not bring up — `make storage-up` starts MinIO on `:9002`, and without it every assignment upload fails.
+
+It runs on `:8081` and `:5174`, not the development ports, and it never reuses a server that is already listening. `lms_test` holds no demo accounts, so an end-to-end API left answering on `:8080` would tell you the credentials `make seed` printed were wrong. Development and the suite can run side by side.
 
 They run against `lms_test`, not the development database, because they register the workspace's owner — which only works while the workspace is unclaimed. The first run claims it; every run after signs in.
 
