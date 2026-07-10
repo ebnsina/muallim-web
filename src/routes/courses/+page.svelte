@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -13,11 +13,11 @@
 
 	{#if data.courses.length === 0}
 		<!-- Empty is a state, not an oversight. -->
-		<p class="text-muted-foreground mt-6 text-sm">No courses have been published yet.</p>
+		<p class="text-muted mt-6 text-sm">No courses have been published yet.</p>
 	{:else}
 		<ul class="mt-8 space-y-4">
 			{#each data.courses as course (course.id)}
-				<li class="rounded-lg border p-4">
+				<li class="rounded-card border p-4">
 					<!--
 						Every course here is published. lms-api's listing filters on status in
 						SQL and takes no reader into account, so an author does not find their
@@ -30,9 +30,9 @@
 					</h2>
 
 					{#if course.summary}
-						<p class="text-muted-foreground mt-1 text-sm">{course.summary}</p>
+						<p class="text-muted mt-1 text-sm">{course.summary}</p>
 					{/if}
-					<p class="text-muted-foreground mt-2 text-xs">{course.difficulty}</p>
+					<p class="text-muted mt-2 text-xs">{course.difficulty}</p>
 				</li>
 			{/each}
 		</ul>
@@ -44,7 +44,7 @@
 			-->
 			<div class="mt-8">
 				<Button
-					variant="outline"
+					variant="secondary"
 					href={`${resolve('/courses')}?cursor=${encodeURIComponent(data.nextCursor)}`}
 				>
 					Load more

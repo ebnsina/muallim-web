@@ -4,6 +4,32 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+
+		<!--
+			Stamps the theme before the first paint.
+
+			This has to be inline, synchronous, and in the head. A module that ran
+			after hydration would paint light and then swap, which is a flash of white
+			on every navigation for anyone who chose dark. There is no version of this
+			that is not a blocking script; it is four lines, and it runs once.
+
+			Light is the default. A first-time visitor whose system says dark gets
+			dark, and an explicit choice always outranks the system.
+		-->
+		<script>
+			(() => {
+				let theme = 'light';
+				try {
+					theme =
+						localStorage.getItem('theme') ??
+						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+				} catch {
+					// Private browsing can refuse localStorage. Light is the default anyway.
+				}
+				document.documentElement.dataset.theme = theme;
+			})();
+		</script>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

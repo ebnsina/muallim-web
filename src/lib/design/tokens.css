@@ -1,0 +1,341 @@
+/*
+	Design tokens.
+
+	Two layers, and the separation is the whole point:
+
+	  * PRIMITIVES (--n-1 … --n-12, --b-9, --ok-9 …) are raw steps on a colour
+	    ramp. Nothing outside this file may name one.
+	  * SEMANTICS (--color-text, --color-border, --color-accent …) say what a
+	    colour is *for*. Components use only these.
+
+	A component that reaches for a primitive — or worse, a hex — is a component
+	that cannot be themed, and every tenant will want to theme. Primer enforces
+	exactly this rule and it is the one worth stealing.
+	https://github.com/primer/primitives/blob/main/DESIGN_TOKENS_GUIDE.md
+
+	The twelve steps follow Radix's scale, where each step has one assigned job.
+	The value of this over an arbitrary 100–900 ramp is that hover and active
+	states are *in* the palette rather than invented per component:
+
+	   1  app background          7  border, focus ring
+	   2  subtle background       8  border, hovered
+	   3  component background    9  solid fill (the button)
+	   4  component, hovered     10  solid fill, hovered
+	   5  component, active      11  text, low contrast
+	   6  border, subtle         12  text, high contrast
+
+	https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale
+
+	Written in oklch because it is perceptually uniform: stepping lightness by a
+	fixed amount changes the *perceived* lightness by a fixed amount, which is not
+	true of hsl. Every pair this file relies on is checked against WCAG 2.2 AA by
+	`contrast.spec.ts` — computed, not eyeballed. Change a number here and the
+	test tells you what it broke.
+
+	Light is the default and dark is opt-in, keyed off `data-theme` on the root
+	element. That is a choice with a cost: the attribute has to be set before the
+	first paint, or the page flashes light and then goes dark. `app.html` carries
+	an inline script that reads the stored preference and stamps the attribute
+	before the body exists — which is the only place it *can* be done without the
+	flash.
+
+	The dark ramp is hand-tuned, not inverted. A blue tuned for white paper is a
+	neon on a dark surface; chroma comes down as lightness comes up.
+*/
+
+:root {
+	/* Tells the browser to render form controls and scrollbars for both schemes. */
+	color-scheme: light;
+
+	/*
+		Neutral. Not a pure grey: the brand hue bleeds through at very low chroma,
+		which is what makes a UI's greys look considered rather than default.
+		Coursera does the same thing by overlaying its blue on mid-grey at 8%.
+	*/
+	--n-1: oklch(0.9938 0.0015 259);
+	--n-2: oklch(0.9812 0.0028 259);
+	--n-3: oklch(0.9583 0.0043 259);
+	--n-4: oklch(0.9376 0.0055 259);
+	/* Step 5 doubles as the resting border of a field — slate-200's lightness. */
+	--n-5: oklch(0.9288 0.0126 259);
+	--n-6: oklch(0.8918 0.008 259);
+	--n-7: oklch(0.8555 0.0098 259);
+	--n-8: oklch(0.7897 0.0139 259);
+	--n-9: oklch(0.6371 0.0193 259);
+	--n-10: oklch(0.5967 0.0193 259);
+	--n-11: oklch(0.5006 0.0176 259);
+	--n-12: oklch(0.2434 0.0135 259);
+
+	/*
+		Brand.
+
+		Blue, and specifically the blue education products converge on: step 9 is
+		oklch(0.4934 0.204 260.2), which is exactly #0056d2 — Coursera's — converted
+		rather than eyeballed. Three reasons, in order of how much they should count.
+
+		First, hue distance. The primary has to be told apart from the three status
+		colours by people who cannot see hue the way you do. At 262° it sits 200°
+		from success (155°), 240° from danger (22°) and 196° from warning (66°) —
+		about as far from all three as a single hue can get.
+
+		Second, the achievement literature. Elliot & Maier found that even a glimpse
+		of red before a test measurably impaired performance, which they attribute to
+		red's association with failure in achievement contexts. A later meta-analysis
+		found no evidential value for the effect after correcting for publication
+		bias, so this is a reason to *avoid red as a primary in a quiz app*, not a
+		reason to believe blue makes anyone smarter.
+		https://pubmed.ncbi.nlm.nih.gov/17324089/
+		https://link.springer.com/article/10.3758/s13423-020-01772-1
+
+		Third, what the alternatives cost. Green is the success colour and cannot
+		also mean "primary action" — a green Submit beside a green Correct is a
+		sentence with two verbs. Teal drifts toward the same collision. Orange and
+		red are the warning and danger colours. Violet past ~285° starts to read as
+		consumer-social rather than institutional. Blue is what is left, and it is
+		left for a reason.
+	*/
+	--b-1: oklch(0.9938 0.0028 262);
+	--b-2: oklch(0.9793 0.0088 262);
+	--b-3: oklch(0.9528 0.0242 262);
+	--b-4: oklch(0.9247 0.0417 262);
+	--b-5: oklch(0.8909 0.0596 262);
+	--b-6: oklch(0.8437 0.0789 262);
+	--b-7: oklch(0.7739 0.102 262);
+	--b-8: oklch(0.6822 0.1439 262);
+	--b-9: oklch(0.4934 0.204 260.2);
+	--b-10: oklch(0.4508 0.1957 260.2);
+	--b-11: oklch(0.4595 0.1861 262);
+	--b-12: oklch(0.2822 0.0868 262);
+
+	/*
+		Success. A green at the same lightness as the danger red is the same grey to
+		a camera and to a monochrome print, so this one is deliberately darker than
+		the eye asks for: green's luminance coefficient is 0.72 against red's 0.21,
+		and matching them by *appearance* would match them by luminance too.
+	*/
+	--ok-1: oklch(0.9927 0.0032 155);
+	--ok-2: oklch(0.9789 0.0125 155);
+	--ok-3: oklch(0.9498 0.0359 155);
+	--ok-4: oklch(0.9243 0.0524 155);
+	--ok-5: oklch(0.8933 0.0666 155);
+	--ok-6: oklch(0.8266 0.0871 155);
+	--ok-7: oklch(0.757 0.1005 155);
+	--ok-8: oklch(0.6533 0.1189 155);
+	--ok-9: oklch(0.4784 0.1358 155);
+	--ok-10: oklch(0.4404 0.1301 155);
+	--ok-11: oklch(0.4626 0.1136 155);
+	--ok-12: oklch(0.2764 0.0523 155);
+
+	/* Danger. */
+	--no-1: oklch(0.9935 0.0028 22);
+	--no-2: oklch(0.9793 0.0102 22);
+	--no-3: oklch(0.9505 0.0247 22);
+	--no-4: oklch(0.9256 0.0413 22);
+	--no-5: oklch(0.897 0.057 22);
+	--no-6: oklch(0.8382 0.0813 22);
+	--no-7: oklch(0.7742 0.109 22);
+	--no-8: oklch(0.6941 0.155 22);
+	--no-9: oklch(0.5754 0.2109 22);
+	--no-10: oklch(0.5254 0.2109 22);
+	--no-11: oklch(0.4909 0.1786 22);
+	--no-12: oklch(0.2828 0.0812 22);
+
+	/* Warning. Amber sits closest to green under deuteranopia, so it never
+	   appears without an icon and a word beside it. */
+	--wa-1: oklch(0.9948 0.0043 79);
+	--wa-2: oklch(0.9829 0.0173 79);
+	--wa-3: oklch(0.9556 0.0508 79);
+	--wa-4: oklch(0.933 0.0736 79);
+	--wa-5: oklch(0.9046 0.0906 79);
+	--wa-6: oklch(0.8478 0.1102 79);
+	--wa-7: oklch(0.7828 0.1275 75);
+	--wa-8: oklch(0.7307 0.1428 70);
+	--wa-9: oklch(0.6839 0.1495 66);
+	--wa-10: oklch(0.6339 0.1495 66);
+	--wa-11: oklch(0.4934 0.1041 66);
+	--wa-12: oklch(0.2848 0.0498 66);
+
+	/* ---- Semantics. Everything above this line is invisible to components. ---- */
+
+	/*
+		The page is a faint grey and a card is white. That inversion is what lets a
+		field carry a hairline border and still read unmistakably as a field: at
+		rest it is identified by its own fill against the page, not by its edge.
+		A white page with white fields needs a 3:1 border to be legal, and a 3:1
+		border on an input looks like 2009.
+	*/
+	--surface: var(--n-2);
+	--surface-raised: oklch(1 0 0);
+	--surface-sunken: var(--n-3);
+	--surface-hover: var(--n-3);
+	--surface-active: var(--n-4);
+
+	--text: var(--n-12);
+	--text-muted: var(--n-11);
+	--text-on-solid: oklch(1 0 0);
+
+	/*
+		A hairline. Step 5 is slate-200's lightness, and a border is a whisper: it
+		marks where one surface stops and another begins, and it is not a rule drawn
+		on the page. Step 7 is its hovered state, where it is allowed to be seen.
+	*/
+	--border: var(--n-5);
+	--border-strong: var(--n-7);
+
+	/*
+		The resting edge of a field. A hairline, because the field's white fill
+		against the grey page is what marks it as a field; the border only sharpens
+		it. WCAG 1.4.11's 3:1 is satisfied by the *focus* indicator and by the
+		fill-against-page contrast, both of which contrast.spec.ts asserts.
+	*/
+	--border-control: var(--n-5);
+
+	/* The focus indicator, and it is the one that has to clear 3:1. Two pixels,
+	   offset by two, so it survives on top of a filled button. */
+	--ring: var(--b-9);
+
+	--accent: var(--b-9);
+	--accent-hover: var(--b-10);
+	--accent-text: var(--b-11);
+	--accent-surface: var(--b-3);
+	--accent-border: var(--b-6);
+
+	--success: var(--ok-9);
+	--success-text: var(--ok-11);
+	--success-surface: var(--ok-3);
+	--success-border: var(--ok-6);
+
+	--danger: var(--no-9);
+	--danger-hover: oklch(0.5254 0.2109 22);
+	--danger-text: var(--no-11);
+	--danger-surface: var(--no-3);
+	--danger-border: var(--no-6);
+
+	--warning: var(--wa-9);
+	--warning-text: var(--wa-11);
+	--warning-surface: var(--wa-3);
+	--warning-border: var(--wa-6);
+
+	--info: var(--b-9);
+	--info-text: var(--b-11);
+	--info-surface: var(--b-3);
+	--info-border: var(--b-6);
+
+	/*
+		Elevation, semantic and few. Borders separate things in a dense list; a
+		shadow means a surface genuinely floats above the page. A marking queue of
+		forty rows with forty shadows is a marking queue nobody can read.
+	*/
+	--shadow-raised: 0 1px 2px oklch(0.24 0.014 259 / 6%), 0 1px 3px oklch(0.24 0.014 259 / 10%);
+	--shadow-overlay: 0 8px 24px oklch(0.24 0.014 259 / 12%);
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	/*
+		Base is a dark grey, never pure black: black against bright content
+		causes halation, and there is nowhere left to go for a sunken surface.
+		Elevation in dark is a *lighter* surface, not a heavier shadow.
+	*/
+	--n-1: oklch(0.1789 0.0075 259);
+	--n-2: oklch(0.2129 0.009 259);
+	--n-3: oklch(0.2543 0.0119 259);
+	--n-4: oklch(0.2846 0.0144 259);
+	--n-5: oklch(0.3142 0.0164 259);
+	--n-6: oklch(0.3549 0.0186 259);
+	--n-7: oklch(0.4162 0.0212 259);
+	--n-8: oklch(0.5341 0.024 259);
+	--n-9: oklch(0.5729 0.0231 259);
+	--n-10: oklch(0.6283 0.0212 259);
+	--n-11: oklch(0.7683 0.0161 259);
+	--n-12: oklch(0.9491 0.0064 259);
+
+	--b-1: oklch(0.1789 0.0125 260.2);
+	--b-2: oklch(0.2188 0.0324 260.2);
+	--b-3: oklch(0.2716 0.0716 260.2);
+	--b-4: oklch(0.3106 0.099 260.2);
+	--b-5: oklch(0.3506 0.1092 260.2);
+	--b-6: oklch(0.4022 0.1146 260.2);
+	--b-7: oklch(0.4693 0.1284 260.2);
+	--b-8: oklch(0.5556 0.1594 260.2);
+
+	/*
+		Dark mode brightens on hover, and white-on-blue must still clear 4.5:1 —
+		so the resting fill is a step darker here than the eye first wants, and
+		the hover is where the light one lives. The contrast test is what found
+		this; hovering a button is not a moment to lose the label.
+	*/
+	--b-9: oklch(0.5164 0.1913 260.2);
+	--b-10: oklch(0.5484 0.1913 260.2);
+	--b-11: oklch(0.7461 0.1287 260.2);
+	--b-12: oklch(0.9098 0.0561 260.2);
+
+	--ok-1: oklch(0.1793 0.0086 155);
+	--ok-2: oklch(0.2141 0.0212 155);
+	--ok-3: oklch(0.2649 0.0432 155);
+	--ok-4: oklch(0.2989 0.0533 155);
+	--ok-5: oklch(0.3379 0.0616 155);
+	--ok-6: oklch(0.3839 0.0692 155);
+	--ok-7: oklch(0.4454 0.0821 155);
+	--ok-8: oklch(0.5197 0.1054 155);
+	--ok-9: oklch(0.5761 0.1358 155);
+	--ok-10: oklch(0.6261 0.1358 155);
+	--ok-11: oklch(0.7625 0.1379 155);
+	--ok-12: oklch(0.9143 0.0791 155);
+
+	--no-1: oklch(0.1801 0.0094 22);
+	--no-2: oklch(0.2172 0.0243 22);
+	--no-3: oklch(0.2712 0.0562 22);
+	--no-4: oklch(0.3111 0.0713 22);
+	--no-5: oklch(0.3512 0.0824 22);
+	--no-6: oklch(0.3956 0.0947 22);
+	--no-7: oklch(0.4585 0.1136 22);
+	--no-8: oklch(0.5439 0.1483 22);
+	--no-9: oklch(0.5354 0.2109 22);
+	--no-10: oklch(0.5754 0.2109 22);
+	--no-11: oklch(0.7449 0.1553 22);
+	--no-12: oklch(0.9146 0.0509 22);
+
+	--wa-1: oklch(0.1789 0.0072 66);
+	--wa-2: oklch(0.2135 0.0192 66);
+	--wa-3: oklch(0.2604 0.0417 66);
+	--wa-4: oklch(0.2971 0.0518 66);
+	--wa-5: oklch(0.3339 0.0603 66);
+	--wa-6: oklch(0.3777 0.0682 66);
+	--wa-7: oklch(0.4396 0.0808 66);
+	--wa-8: oklch(0.5386 0.1027 66);
+	--wa-9: oklch(0.7639 0.1495 66);
+	--wa-10: oklch(0.8139 0.1495 70);
+	--wa-11: oklch(0.8083 0.1231 79);
+	--wa-12: oklch(0.9358 0.056 79);
+
+	/*
+		The semantics that are not a straight re-pointing.
+
+		In light, the page is step 2 and a card is white — the card is *lighter*
+		than the page. In dark that inversion has to be undone or the two land on
+		the same step and a card loses its edge entirely. (It did, once. The
+		contrast test caught it.)
+
+		Elevation in dark mode is a lighter surface, not a heavier shadow, and the
+		field's border does more work here: a step-2 fill on a step-1 page is a
+		weaker signal than white on grey.
+	*/
+	--surface: var(--n-1);
+	--surface-raised: var(--n-2);
+	--surface-sunken: oklch(0.1476 0.0062 259);
+
+	/* A hairline on a dark surface has to be lighter than the surface, not darker,
+	   and it has less room to work in — so it sits a step further out. */
+	--border: var(--n-4);
+	--border-strong: var(--n-7);
+	--border-control: var(--n-6);
+
+	--text-on-solid: oklch(1 0 0);
+	--danger-hover: oklch(0.5754 0.2109 22);
+
+	/* Shadows do almost nothing on a dark surface; the border carries it. */
+	--shadow-raised: 0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 24%);
+	--shadow-overlay: 0 8px 24px oklch(0 0 0 / 48%);
+}

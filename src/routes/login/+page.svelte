@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -18,8 +15,8 @@
 
 	{#if form?.message}
 		<!-- role="alert" so a screen reader announces the failure without moving focus. -->
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -62,10 +59,10 @@
 		</Button>
 	</form>
 
-	<p class="text-muted-foreground mt-6 text-sm">
+	<p class="text-muted mt-6 text-sm">
 		<a class="underline" href={resolve('/forgot-password')}>Forgot your password?</a>
 	</p>
-	<p class="text-muted-foreground mt-2 text-sm">
+	<p class="text-muted mt-2 text-sm">
 		No account? <a class="underline" href={resolve('/register')}>Create one</a>
 	</p>
 </main>

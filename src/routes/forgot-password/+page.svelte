@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -23,23 +20,21 @@
 			one case and "no such account" in the other hands out a roster.
 		-->
 		<Alert class="mt-6" role="status">
-			<AlertDescription>
-				If that address belongs to an account here, a reset link is on its way. The link expires in
-				an hour and works once.
-			</AlertDescription>
+			If that address belongs to an account here, a reset link is on its way. The link expires in an
+			hour and works once.
 		</Alert>
 
-		<p class="text-muted-foreground mt-6 text-sm">
+		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/login')}>Back to sign in</a>
 		</p>
 	{:else}
-		<p class="text-muted-foreground mt-2 text-sm">
+		<p class="text-muted mt-2 text-sm">
 			Enter your email address and we will send you a link to choose a new password.
 		</p>
 
 		{#if form?.message}
-			<Alert variant="destructive" class="mt-6" role="alert">
-				<AlertDescription>{form.message}</AlertDescription>
+			<Alert tone="danger" class="mt-6" role="alert">
+				{form.message}
 			</Alert>
 		{/if}
 
@@ -71,7 +66,7 @@
 			</Button>
 		</form>
 
-		<p class="text-muted-foreground mt-6 text-sm">
+		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/login')}>Back to sign in</a>
 		</p>
 	{/if}

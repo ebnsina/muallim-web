@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
+	import { Alert, Button } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -67,21 +66,21 @@
 <svelte:head><title>{data.course.title} — LMS</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve('/courses')}>Courses</a>
 	</p>
 
 	<h1 class="mt-2 text-2xl font-semibold">{data.course.title}</h1>
 
 	{#if data.course.status !== 'published'}
-		<p class="text-muted-foreground mt-1 text-xs uppercase">{data.course.status}</p>
+		<p class="text-muted mt-1 text-xs uppercase">{data.course.status}</p>
 	{/if}
 
 	{#if data.course.summary}
-		<p class="text-muted-foreground mt-3 text-pretty">{data.course.summary}</p>
+		<p class="text-muted mt-3 text-pretty">{data.course.summary}</p>
 	{/if}
 
-	<p class="text-muted-foreground mt-3 text-sm">
+	<p class="text-muted mt-3 text-sm">
 		{data.lessonCount}
 		{data.lessonCount === 1 ? 'lesson' : 'lessons'}
 		{#if data.durationSeconds}· {minutes(data.durationSeconds)}{/if}
@@ -89,8 +88,8 @@
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -99,7 +98,7 @@
 			<h2 class="text-sm font-medium">Before you enrol</h2>
 			<ul class="mt-2 space-y-1 text-sm">
 				{#each data.prerequisites as prerequisite (prerequisite.slug)}
-					<li class="text-muted-foreground">
+					<li class="text-muted">
 						<a
 							class="underline-offset-4 hover:underline"
 							href={resolve(`/courses/${prerequisite.slug}`)}
@@ -114,7 +113,7 @@
 	{/if}
 
 	{#if data.course.drip_mode !== 'none' && dripNotice[data.course.drip_mode]}
-		<p class="text-muted-foreground mt-4 text-sm">{dripNotice[data.course.drip_mode]}</p>
+		<p class="text-muted mt-4 text-sm">{dripNotice[data.course.drip_mode]}</p>
 	{/if}
 
 	<div class="mt-6 flex items-center gap-4">
@@ -128,7 +127,7 @@
 				{data.progress?.percent}%
 			</p>
 			<form method="POST" action="?/cancel" use:enhance>
-				<Button type="submit" variant="outline" size="sm">Cancel enrolment</Button>
+				<Button type="submit" variant="secondary" size="sm">Cancel enrolment</Button>
 			</form>
 		{:else if openPrerequisites.length > 0}
 			<!--
@@ -136,7 +135,7 @@
 				button is a courtesy, not the control — and the refusal names the courses.
 			-->
 			<Button disabled>Enrol</Button>
-			<p class="text-muted-foreground text-sm">
+			<p class="text-muted text-sm">
 				Finish {openPrerequisites.map((p) => p.title).join(', ')} first.
 			</p>
 		{:else}
@@ -147,7 +146,7 @@
 	</div>
 
 	{#if data.topics.length === 0}
-		<p class="text-muted-foreground mt-10 text-sm">This course has no lessons yet.</p>
+		<p class="text-muted mt-10 text-sm">This course has no lessons yet.</p>
 	{:else}
 		<ol class="mt-10 space-y-8">
 			{#each data.topics as topic (topic.id)}
@@ -170,7 +169,7 @@
 									{lesson.title}
 								</a>
 
-								<span class="text-muted-foreground shrink-0 text-xs">
+								<span class="text-muted shrink-0 text-xs">
 									{#if lesson.is_preview && !enrolled}Preview ·
 									{/if}
 									{#if opensOn(lesson)}Opens {opensOn(lesson)} ·

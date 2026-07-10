@@ -10,7 +10,7 @@
 <svelte:head><title>Marking — Quiz</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-3xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz`)}>
 			Back to the quiz
 		</a>
@@ -36,16 +36,16 @@
 	</form>
 
 	{#if submissions.length === 0}
-		<p class="text-muted-foreground mt-8 text-sm">
+		<p class="text-muted mt-8 text-sm">
 			{data.awaiting ? 'Nothing is waiting to be marked.' : 'Nobody has submitted this quiz yet.'}
 		</p>
 	{:else}
 		<ul class="mt-8 space-y-2">
 			{#each submissions as submission (submission.id)}
-				<li class="flex items-center justify-between gap-4 rounded-md border px-4 py-3">
+				<li class="flex items-center justify-between gap-4 rounded-control border px-4 py-3">
 					<div>
 						<p class="font-medium">{submission.learner_name}</p>
-						<p class="text-muted-foreground text-xs">
+						<p class="text-muted text-xs">
 							{submission.learner_email} · attempt {submission.attempt.number}
 						</p>
 					</div>
@@ -62,7 +62,7 @@
 								{submission.unmarked === 1 ? 'answer' : 'answers'}
 							</a>
 						{:else if submission.attempt.status === 'grading'}
-							<span class="text-muted-foreground">Grading</span>
+							<span class="text-muted">Grading</span>
 						{:else}
 							<a
 								class="underline"
@@ -72,7 +72,7 @@
 							>
 								{submission.attempt.points} of {submission.attempt.max_points}
 							</a>
-							<p class="text-muted-foreground text-xs">
+							<p class="text-muted text-xs">
 								{submission.attempt.passed ? 'Passed' : 'Not passed'}
 							</p>
 						{/if}

@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import { Compass, ServerCrash, ArrowLeft, RotateCw } from '@lucide/svelte';
+	import {
+		ArrowLeft01Icon,
+		Compass01Icon,
+		RefreshIcon,
+		ServerStack01Icon
+	} from '@hugeicons/core-free-icons';
+	import { Icon } from '$lib/components';
 
 	const isNotFound = $derived(page.status === 404);
 	const correlationId = $derived(page.error?.correlationId);
@@ -22,13 +28,13 @@
 <main class="flex min-h-dvh items-center justify-center px-6 py-16">
 	<div class="w-full max-w-md text-center">
 		<div
-			class="bg-muted mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl"
+			class="bg-surface-hover mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl"
 			aria-hidden="true"
 		>
 			{#if isNotFound}
-				<Compass class="text-muted size-8" />
+				<Icon icon={Compass01Icon} class="size-8 text-muted" />
 			{:else}
-				<ServerCrash class="size-8 text-red-600 dark:text-red-400" />
+				<Icon icon={ServerStack01Icon} class="size-8 text-danger-text" />
 			{/if}
 		</div>
 
@@ -51,11 +57,11 @@
 		<div class="mt-8 flex flex-wrap justify-center gap-3">
 			<a
 				href={resolve('/')}
-				class="bg-primary text-primary-foreground focus-visible:ring-ring inline-flex items-center gap-2
-				       rounded-lg px-4 py-2.5 text-sm font-medium transition-colors hover:opacity-90
+				class="bg-accent text-on-solid focus-visible:ring-ring inline-flex items-center gap-2
+				       rounded-card px-4 py-2.5 text-sm font-medium transition-colors hover:opacity-90
 				       focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
-				<ArrowLeft class="size-4" aria-hidden="true" />
+				<Icon icon={ArrowLeft01Icon} class="size-4" />
 				Back to home
 			</a>
 
@@ -63,11 +69,11 @@
 				<button
 					type="button"
 					onclick={reload}
-					class="border-border focus-visible:ring-ring hover:bg-muted inline-flex items-center gap-2
-					       rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors
+					class="border-border focus-visible:ring-ring hover:bg-surface-hover inline-flex items-center gap-2
+					       rounded-card border px-4 py-2.5 text-sm font-medium transition-colors
 					       focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 				>
-					<RotateCw class="size-4" aria-hidden="true" />
+					<Icon icon={RefreshIcon} class="size-4" />
 					Try again
 				</button>
 			{/if}
@@ -76,7 +82,7 @@
 		{#if correlationId}
 			<p class="text-muted mt-8 text-xs">
 				Quote this reference if you contact support:
-				<code class="bg-muted ml-1 rounded px-1.5 py-0.5 font-mono select-all">
+				<code class="bg-surface-hover ml-1 rounded px-1.5 py-0.5 font-mono select-all">
 					{correlationId}
 				</code>
 			</p>

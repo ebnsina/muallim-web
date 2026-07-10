@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
@@ -15,13 +12,13 @@
 
 <main class="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-16">
 	<h1 class="text-2xl font-semibold">Create an account</h1>
-	<p class="text-muted-foreground mt-2 text-sm">
+	<p class="text-muted mt-2 text-sm">
 		Registration claims an unclaimed workspace. After that, joining is by invitation.
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -64,7 +61,7 @@
 				required
 				aria-describedby="password-hint"
 			/>
-			<p id="password-hint" class="text-muted-foreground text-xs">
+			<p id="password-hint" class="text-muted text-xs">
 				At least 12 characters. No mandatory symbols or digits.
 			</p>
 		</div>
@@ -74,7 +71,7 @@
 		</Button>
 	</form>
 
-	<p class="text-muted-foreground mt-6 text-sm">
+	<p class="text-muted mt-6 text-sm">
 		Already have an account? <a class="underline" href={resolve('/login')}>Sign in</a>
 	</p>
 </main>

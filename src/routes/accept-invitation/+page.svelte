@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -17,17 +14,17 @@
 	<h1 class="text-2xl font-semibold">Accept your invitation</h1>
 
 	{#if !data.token}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>This invitation link is missing its token.</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			This invitation link is missing its token.
 		</Alert>
 	{:else}
-		<p class="text-muted-foreground mt-2 text-sm">
+		<p class="text-muted mt-2 text-sm">
 			If you already have an account, enter its existing password. Otherwise, choose one now.
 		</p>
 
 		{#if form?.message}
-			<Alert variant="destructive" class="mt-6" role="alert">
-				<AlertDescription>{form.message}</AlertDescription>
+			<Alert tone="danger" class="mt-6" role="alert">
+				{form.message}
 			</Alert>
 		{/if}
 
@@ -54,9 +51,7 @@
 					value={form?.name ?? ''}
 					aria-describedby="name-hint"
 				/>
-				<p id="name-hint" class="text-muted-foreground text-xs">
-					Ignored if you already have an account.
-				</p>
+				<p id="name-hint" class="text-muted text-xs">Ignored if you already have an account.</p>
 			</div>
 
 			<div class="space-y-2">
@@ -76,7 +71,7 @@
 			</Button>
 		</form>
 
-		<p class="text-muted-foreground mt-6 text-sm">
+		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/login')}>Back to sign in</a>
 		</p>
 	{/if}

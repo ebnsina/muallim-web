@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -17,20 +14,20 @@
 	<h1 class="text-2xl font-semibold">Choose a new password</h1>
 
 	{#if !data.token}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>This link is missing its token. Request a new one.</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			This link is missing its token. Request a new one.
 		</Alert>
-		<p class="text-muted-foreground mt-6 text-sm">
+		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/forgot-password')}>Request a reset link</a>
 		</p>
 	{:else}
-		<p class="text-muted-foreground mt-2 text-sm">
+		<p class="text-muted mt-2 text-sm">
 			Setting a new password signs you out everywhere in this workspace.
 		</p>
 
 		{#if form?.message}
-			<Alert variant="destructive" class="mt-6" role="alert">
-				<AlertDescription>{form.message}</AlertDescription>
+			<Alert tone="danger" class="mt-6" role="alert">
+				{form.message}
 			</Alert>
 		{/if}
 
@@ -58,7 +55,7 @@
 					required
 					aria-describedby="password-hint"
 				/>
-				<p id="password-hint" class="text-muted-foreground text-xs">At least 12 characters.</p>
+				<p id="password-hint" class="text-muted text-xs">At least 12 characters.</p>
 			</div>
 
 			<div class="space-y-2">

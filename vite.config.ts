@@ -10,6 +10,14 @@ import { sveltekit } from '@sveltejs/kit/vite';
 const apiTarget = process.env.LMS_API_URL ?? 'http://localhost:8080';
 
 export default defineConfig({
+	/*
+		@hugeicons/svelte ships its component as an uncompiled `.svelte` file. Node
+		cannot load that during SSR, so Vite has to bundle and compile it rather than
+		leave it externalised. Without this the server render throws
+		ERR_UNKNOWN_FILE_EXTENSION on the first page that draws an icon.
+	*/
+	ssr: { noExternal: ['@hugeicons/svelte'] },
+
 	plugins: [
 		tailwindcss(),
 		sveltekit({

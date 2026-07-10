@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
+	import { Alert, Button } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -15,24 +14,20 @@
 	<h1 class="text-2xl font-semibold">Confirm your email address</h1>
 
 	{#if form?.verified}
-		<Alert class="mt-6" role="status">
-			<AlertDescription>Your email address is confirmed.</AlertDescription>
-		</Alert>
-		<p class="text-muted-foreground mt-6 text-sm">
+		<Alert class="mt-6" role="status">Your email address is confirmed.</Alert>
+		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/dashboard')}>Go to your dashboard</a>
 		</p>
 	{:else if !data.token}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>This link is missing its token.</AlertDescription>
-		</Alert>
+		<Alert tone="danger" class="mt-6" role="alert">This link is missing its token.</Alert>
 	{:else}
-		<p class="text-muted-foreground mt-2 text-sm">
+		<p class="text-muted mt-2 text-sm">
 			Press the button to confirm the address this link was sent to.
 		</p>
 
 		{#if form?.message}
-			<Alert variant="destructive" class="mt-6" role="alert">
-				<AlertDescription>{form.message}</AlertDescription>
+			<Alert tone="danger" class="mt-6" role="alert">
+				{form.message}
 			</Alert>
 		{/if}
 

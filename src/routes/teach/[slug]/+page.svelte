@@ -1,15 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label, Select } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-
-	const selectClass = 'border-input bg-background h-9 rounded-md border px-3 text-sm';
 
 	const dripModes = [
 		{ value: 'none', label: 'All at once' },
@@ -31,54 +26,54 @@
 <svelte:head><title>{data.course.title} — Teach</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve('/teach')}>Your courses</a>
 	</p>
 
 	<h1 class="mt-2 text-2xl font-semibold">{data.course.title}</h1>
-	<p class="text-muted-foreground mt-1 text-sm">
+	<p class="text-muted mt-1 text-sm">
 		{data.course.status} · {data.lessonCount}
 		{data.lessonCount === 1 ? 'lesson' : 'lessons'}
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
-	<section class="mt-8 space-y-6 rounded-lg border p-4">
+	<section class="mt-8 space-y-6 rounded-card border p-4">
 		<div>
 			<h2 class="font-medium">Release schedule</h2>
-			<p class="text-muted-foreground mt-1 text-sm">
+			<p class="text-muted mt-1 text-sm">
 				How this course hands its lessons to a learner. A free preview is never held back, and
 				neither are you.
 			</p>
 
 			<form method="POST" action="?/setDripMode" class="mt-3 flex items-center gap-2" use:enhance>
 				<Label class="sr-only" for="drip-mode">Release schedule</Label>
-				<select id="drip-mode" name="mode" class={selectClass}>
+				<Select id="drip-mode" name="mode">
 					{#each dripModes as mode (mode.value)}
 						<option value={mode.value} selected={mode.value === data.course.drip_mode}>
 							{mode.label}
 						</option>
 					{/each}
-				</select>
-				<Button type="submit" variant="outline" size="sm">Save</Button>
+				</Select>
+				<Button type="submit" variant="secondary" size="sm">Save</Button>
 			</form>
 
-			<p class="text-muted-foreground mt-2 text-xs">{dripHint}</p>
+			<p class="text-muted mt-2 text-xs">{dripHint}</p>
 		</div>
 
 		<div>
 			<h2 class="font-medium">Prerequisites</h2>
-			<p class="text-muted-foreground mt-1 text-sm">
+			<p class="text-muted mt-1 text-sm">
 				Courses a learner must finish before they may enrol on this one. An administrator granting
 				an enrolment overrides them.
 			</p>
 
 			{#if data.prerequisites.length === 0}
-				<p class="text-muted-foreground mt-3 text-sm">None. Anyone may enrol.</p>
+				<p class="text-muted mt-3 text-sm">None. Anyone may enrol.</p>
 			{:else}
 				<ul class="mt-3 space-y-2">
 					{#each data.prerequisites as prerequisite (prerequisite.id)}
@@ -86,7 +81,7 @@
 							<span>
 								{prerequisite.title}
 								{#if prerequisite.status !== 'published'}
-									<span class="text-muted-foreground ml-2 text-xs uppercase">
+									<span class="text-muted ml-2 text-xs uppercase">
 										{prerequisite.status}
 									</span>
 								{/if}
@@ -108,15 +103,15 @@
 					use:enhance
 				>
 					<Label class="sr-only" for="requires-slug">Course to require</Label>
-					<select id="requires-slug" name="requires_slug" class={selectClass}>
+					<Select id="requires-slug" name="requires_slug">
 						{#each data.candidates as candidate (candidate.id)}
 							<option value={candidate.slug}>{candidate.title}</option>
 						{/each}
-					</select>
-					<Button type="submit" variant="outline" size="sm">Require</Button>
+					</Select>
+					<Button type="submit" variant="secondary" size="sm">Require</Button>
 				</form>
 			{:else}
-				<p class="text-muted-foreground mt-4 text-sm">
+				<p class="text-muted mt-4 text-sm">
 					There is no other course in this workspace to require.
 				</p>
 			{/if}
@@ -124,7 +119,7 @@
 	</section>
 
 	{#if data.topics.length === 0}
-		<p class="text-muted-foreground mt-10 text-sm">
+		<p class="text-muted mt-10 text-sm">
 			This course has no sections yet. A course needs at least one lesson before it can be
 			published.
 		</p>
@@ -132,13 +127,13 @@
 
 	<ol class="mt-8 space-y-6">
 		{#each data.topics as topic, topicIndex (topic.id)}
-			<li class="rounded-lg border p-4">
+			<li class="rounded-card border p-4">
 				<div class="flex flex-wrap items-center justify-between gap-3">
 					<form method="POST" action="?/renameTopic" class="flex items-center gap-2" use:enhance>
 						<input type="hidden" name="id" value={topic.id} />
 						<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
 						<Input id="topic-{topic.id}" name="title" value={topic.title} class="w-64" />
-						<Button type="submit" variant="outline" size="sm">Rename</Button>
+						<Button type="submit" variant="secondary" size="sm">Rename</Button>
 					</form>
 
 					<div class="flex items-center gap-1">
@@ -189,7 +184,7 @@
 							</a>
 
 							<div class="flex items-center gap-1">
-								<span class="text-muted-foreground mr-2 text-xs">{lesson.content_type}</span>
+								<span class="text-muted mr-2 text-xs">{lesson.content_type}</span>
 
 								<form method="POST" action="?/togglePreview" use:enhance>
 									<input type="hidden" name="id" value={lesson.id} />
@@ -248,7 +243,7 @@
 						class="w-64"
 						required
 					/>
-					<Button type="submit" variant="outline" size="sm">Add lesson</Button>
+					<Button type="submit" variant="secondary" size="sm">Add lesson</Button>
 				</form>
 			</li>
 		{/each}

@@ -39,14 +39,11 @@ export default defineConfig(
 		rules: {}
 	},
 	{
-		// src/lib/components/ui is vendored: `shadcn-svelte add` writes it and
-		// `shadcn-svelte add --overwrite` rewrites it. Editing it to satisfy a lint
-		// rule is work the next upgrade discards.
-		//
-		// `no-navigation-without-resolve` wants every href to go through resolve(),
-		// which a generic Button that forwards whatever href it is handed cannot do.
-		// The call sites are ours and are linted; this is the primitive they call.
-		files: ['src/lib/components/ui/**/*.svelte'],
+		// `no-navigation-without-resolve` wants every href to go through resolve().
+		// A generic Button forwards whatever href it is handed and cannot resolve it
+		// a second time. The call sites are ours and are linted; this is the
+		// primitive they call.
+		files: ['src/lib/components/Button.svelte'],
 		rules: {
 			'svelte/no-navigation-without-resolve': 'off'
 		}

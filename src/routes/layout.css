@@ -1,121 +1,203 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn-svelte/tailwind.css';
-@import '@fontsource-variable/inter';
+
+/* Weight axis only. Mona Sans also ships a width axis; nothing here changes
+   width, and shipping the axis would be shipping bytes nobody renders. */
+@import '@fontsource-variable/mona-sans/wght.css';
+@import '@fontsource-variable/geist-mono/wght.css';
+
+@import '../lib/design/tokens.css';
 
 /*
-	Design tokens. Defined once here and referenced through Tailwind utilities
-	(bg-card, text-muted-foreground, border-border). A colour hardcoded in a
-	component is a colour that cannot be themed, and every tenant will want to
-	theme.
-
-	These are shadcn-svelte's semantic names, and they are the only set. A second,
-	parallel vocabulary — `surface-2`, `line`, `accent` — is how half a UI ends up
-	themed and the other half does not, and `accent` in particular means something
-	different in each.
-
-	Contrast is verified against WCAG 2.2 AA, not eyeballed: body text >= 4.5:1,
-	large text and UI boundaries >= 3:1.
-
-	Dark mode is the `prefers-color-scheme` media query, which is Tailwind's
-	default `dark` variant. Overriding it to key off a `.dark` class — as
-	`shadcn-svelte init` does — buys a theme toggle at the cost of requiring
-	JavaScript to set that class, and of a flash of the wrong theme before it
-	runs. There is no toggle yet, so there is no reason to pay either. Introducing
-	one means reinstating `@custom-variant dark` and an inline pre-paint script,
-	deliberately.
+	Binds the semantic tokens to Tailwind's utility namespaces, so `bg-surface`,
+	`text-muted`, `border-control` exist and nothing else does. A component that
+	wants a colour Tailwind cannot name is a component asking for a colour the
+	design system does not have — which is the conversation this file is for.
 */
 @theme {
-	--font-sans: 'Inter Variable', sans-serif;
+	/*
+		Mona Sans for everything a person reads as language. It is a grotesque with
+		a tall x-height and unambiguous letterforms — an `I` that is not an `l`,
+		which matters when a learner is typing back an answer they were shown.
+	*/
+	--font-sans:
+		'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--color-card: var(--card);
-	--color-card-foreground: var(--card-foreground);
-	--color-popover: var(--popover);
-	--color-popover-foreground: var(--popover-foreground);
-	--color-primary: var(--primary);
-	--color-primary-foreground: var(--primary-foreground);
-	--color-secondary: var(--secondary);
-	--color-secondary-foreground: var(--secondary-foreground);
-	--color-muted: var(--muted);
-	--color-muted-foreground: var(--muted-foreground);
-	--color-accent: var(--accent);
-	--color-accent-foreground: var(--accent-foreground);
-	--color-destructive: var(--destructive);
+	/*
+		Geist Mono for everything a person reads as a *quantity*: scores, points,
+		percentages, durations, ids, and code. Proportional digits shift width as
+		they change, so a score ticking from 9 to 10 nudges the text beside it, and
+		a column of marks in the queue does not line up. Monospaced digits do not
+		move. See the `.numeral` utility below.
+	*/
+	--font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+
+	--color-surface: var(--surface);
+	--color-surface-raised: var(--surface-raised);
+	--color-surface-sunken: var(--surface-sunken);
+	--color-surface-hover: var(--surface-hover);
+	--color-surface-active: var(--surface-active);
+
+	--color-text: var(--text);
+	--color-muted: var(--text-muted);
+	--color-on-solid: var(--text-on-solid);
+
 	--color-border: var(--border);
-	--color-input: var(--input);
+	--color-border-strong: var(--border-strong);
+	--color-border-control: var(--border-control);
 	--color-ring: var(--ring);
 
-	--radius-sm: calc(var(--radius) * 0.6);
-	--radius-md: calc(var(--radius) * 0.8);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) * 1.4);
-	--radius-2xl: calc(var(--radius) * 1.8);
-	--radius-3xl: calc(var(--radius) * 2.2);
-	--radius-4xl: calc(var(--radius) * 2.6);
-}
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--accent-hover);
+	--color-accent-text: var(--accent-text);
+	--color-accent-surface: var(--accent-surface);
+	--color-accent-border: var(--accent-border);
 
-:root {
-	/* Tells the browser to render form controls and scrollbars for both schemes. */
-	color-scheme: light dark;
+	--color-success: var(--success);
+	--color-success-text: var(--success-text);
+	--color-success-surface: var(--success-surface);
+	--color-success-border: var(--success-border);
 
-	--radius: 0.625rem;
+	--color-danger: var(--danger);
+	--color-danger-hover: var(--danger-hover);
+	--color-danger-text: var(--danger-text);
+	--color-danger-surface: var(--danger-surface);
+	--color-danger-border: var(--danger-border);
 
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.141 0.005 285.823);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.141 0.005 285.823);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.141 0.005 285.823);
-	--primary: oklch(0.21 0.006 285.885);
-	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.967 0.001 286.375);
-	--secondary-foreground: oklch(0.21 0.006 285.885);
-	--muted: oklch(0.967 0.001 286.375);
-	--muted-foreground: oklch(0.552 0.016 285.938);
-	--accent: oklch(0.967 0.001 286.375);
-	--accent-foreground: oklch(0.21 0.006 285.885);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.92 0.004 286.32);
-	--input: oklch(0.92 0.004 286.32);
-	--ring: oklch(0.705 0.015 286.067);
-}
+	--color-warning: var(--warning);
+	--color-warning-text: var(--warning-text);
+	--color-warning-surface: var(--warning-surface);
+	--color-warning-border: var(--warning-border);
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: oklch(0.141 0.005 285.823);
-		--foreground: oklch(0.985 0 0);
-		--card: oklch(0.21 0.006 285.885);
-		--card-foreground: oklch(0.985 0 0);
-		--popover: oklch(0.21 0.006 285.885);
-		--popover-foreground: oklch(0.985 0 0);
-		--primary: oklch(0.92 0.004 286.32);
-		--primary-foreground: oklch(0.21 0.006 285.885);
-		--secondary: oklch(0.274 0.006 286.033);
-		--secondary-foreground: oklch(0.985 0 0);
-		--muted: oklch(0.274 0.006 286.033);
-		--muted-foreground: oklch(0.705 0.015 286.067);
-		--accent: oklch(0.274 0.006 286.033);
-		--accent-foreground: oklch(0.985 0 0);
-		--destructive: oklch(0.704 0.191 22.216);
-		--border: oklch(1 0 0 / 10%);
-		--input: oklch(1 0 0 / 15%);
-		--ring: oklch(0.552 0.016 285.938);
-	}
+	--color-info: var(--info);
+	--color-info-text: var(--info-text);
+	--color-info-surface: var(--info-surface);
+	--color-info-border: var(--info-border);
+
+	/*
+		Shape. Buttons and badges are pills; cards and sections are 12px. A field is
+		10px — softer than a button would be at that size, and not so round that a
+		row of them reads as a row of buttons.
+	*/
+	--radius-control: 0.625rem;
+	--radius-card: 0.75rem;
+	--radius-overlay: 1rem;
+	--radius-pill: 9999px;
+
+	--shadow-raised: var(--shadow-raised);
+	--shadow-overlay: var(--shadow-overlay);
+
+	/*
+		The measure for lesson prose. 65ch is the middle of the range the reading
+		research argues over — Ruder says 50–60, Bringhurst 66, WCAG caps at 80.
+		https://baymard.com/blog/line-length-readability
+	*/
+	--container-prose: 65ch;
 }
 
 @layer base {
-	* {
-		@apply border-border outline-ring/50;
+	html {
+		font-family: var(--font-sans);
+
+		/* Kerning and the standard ligature set; nothing exotic. `text-rendering`
+		   is deliberately left alone — `optimizeLegibility` disables kerning on
+		   some Android builds, which is the opposite of what it advertises. */
+		font-feature-settings:
+			'kern' 1,
+			'liga' 1;
 	}
 
 	body {
-		@apply bg-background text-foreground;
+		background-color: var(--surface);
+		color: var(--text);
 	}
 
-	html {
-		@apply font-sans;
+	/*
+		Grayscale antialiasing, in dark mode only.
+
+		Subpixel rendering makes light-on-dark text look heavier than dark-on-light
+		at the same weight; switching it off restores the balance. Applying it in
+		light mode too — as most resets do — just thins strokes that were fine.
+	*/
+	@media (prefers-color-scheme: dark) {
+		body {
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+	}
+
+	code,
+	kbd,
+	samp,
+	pre {
+		font-family: var(--font-mono);
+		font-feature-settings: 'zero' 1;
+	}
+
+	/* Headings are set tight; body copy is not. A 48px headline at 1.5 line-height
+	   reads as three unrelated lines. */
+	h1,
+	h2,
+	h3,
+	h4 {
+		line-height: 1.2;
+		letter-spacing: -0.014em;
+		text-wrap: balance;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	/*
+		A visible focus ring on everything that takes focus, and only when the focus
+		came from a keyboard. Two pixels of ring plus two of offset is what makes it
+		survive on top of a filled button, where a ring flush against the edge would
+		be invisible.
+	*/
+	:focus-visible {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+	}
+
+	::selection {
+		background-color: var(--accent-surface);
+		color: var(--accent-text);
+	}
+}
+
+@layer components {
+	/*
+		A number the reader compares against another number: a score, a percentage,
+		a point total, a duration, an id.
+
+		`tabular-nums` fixes every digit to the same advance width, so "8 of 15"
+		and "13 of 15" occupy the same space and a column of them forms a column.
+		`slashed-zero` is for the ids: an unslashed monospace zero next to a capital
+		O is a support ticket. `lining-nums` keeps figures on the cap line rather
+		than letting old-style figures hang below it.
+	*/
+	.numeral {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums lining-nums slashed-zero;
+		letter-spacing: -0.01em;
+	}
+
+	/*
+		Lesson prose, and the one place the 16px UI default is broken.
+
+		18px at 1.6 over a 65ch measure. The measure is the middle of a range the
+		reading research argues about — Ruder 50–60, Bringhurst 66, WCAG's ceiling
+		80 — and the line height clears WCAG 1.4.12's 1.5 minimum.
+		https://baymard.com/blog/line-length-readability
+	*/
+	.prose {
+		max-width: var(--container-prose);
+		font-size: 1.125rem;
+		line-height: 1.6;
+	}
+
+	.prose :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote) {
+		margin-top: 1.5em;
 	}
 }
 

@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label, Textarea } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -20,7 +17,7 @@
 <svelte:head><title>Attempt {data.attempt.number} — Marking</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-3xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a
 			class="underline"
 			href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)}
@@ -31,7 +28,7 @@
 
 	<h1 class="mt-2 text-2xl font-semibold">Attempt {data.attempt.number}</h1>
 
-	<p class="text-muted-foreground mt-1 text-sm">
+	<p class="text-muted mt-1 text-sm">
 		{data.attempt.points} of {data.attempt.max_points} · {data.attempt.percent}%
 		{#if settled}
 			· {data.attempt.passed ? 'passed' : 'not passed'}
@@ -41,17 +38,15 @@
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
 	{#if settled}
 		<Alert class="mt-6">
-			<AlertDescription>
-				This attempt is graded. Marking the last answer settled it, and a settled grade cannot be
-				changed here.
-			</AlertDescription>
+			This attempt is graded. Marking the last answer settled it, and a settled grade cannot be
+			changed here.
 		</Alert>
 	{/if}
 
@@ -61,21 +56,21 @@
 			<li>
 				<p class="font-medium">
 					{index + 1}. {question.prompt}
-					<span class="text-muted-foreground text-sm font-normal">
+					<span class="text-muted text-sm font-normal">
 						({question.points}
 						{question.points === 1 ? 'point' : 'points'})
 					</span>
 				</p>
 
 				{#if question.type === 'open_ended'}
-					<blockquote class="mt-3 rounded-md border px-4 py-3 text-sm whitespace-pre-wrap">
+					<blockquote class="mt-3 rounded-control border px-4 py-3 text-sm whitespace-pre-wrap">
 						{wrote(answer?.response ?? {}) || 'They left this blank.'}
 					</blockquote>
 
 					{#if answer?.graded}
 						<p class="mt-3 text-sm">
 							Marked {answer.points} of {question.points}.
-							{#if answer.feedback}<span class="text-muted-foreground">{answer.feedback}</span>{/if}
+							{#if answer.feedback}<span class="text-muted">{answer.feedback}</span>{/if}
 						</p>
 					{:else}
 						<form method="POST" class="mt-4 space-y-3" use:enhance>
@@ -99,12 +94,7 @@
 
 							<div class="space-y-2">
 								<Label for={`feedback-${question.id}`}>Feedback</Label>
-								<textarea
-									id={`feedback-${question.id}`}
-									name="feedback"
-									rows="3"
-									class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-								></textarea>
+								<Textarea id={`feedback-${question.id}`} name="feedback" rows={3} />
 							</div>
 						</form>
 					{/if}
@@ -116,11 +106,11 @@
 					-->
 					<p class="mt-2 text-sm">
 						{#if answer?.correct}
-							<span class="text-green-700 dark:text-green-500">Correct</span>
+							<span class="text-success-text">Correct</span>
 						{:else}
-							<span class="text-red-700 dark:text-red-500">Not right</span>
+							<span class="text-danger-text">Not right</span>
 						{/if}
-						<span class="text-muted-foreground">
+						<span class="text-muted">
 							· {answer?.points ?? 0} of {question.points} · graded automatically
 						</span>
 					</p>

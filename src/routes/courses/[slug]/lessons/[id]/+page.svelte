@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
+	import { Alert, Button } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -20,20 +19,20 @@
 <svelte:head><title>{data.lesson.title} — LMS</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve(`/courses/${data.slug}`)}>Back to the course</a>
 	</p>
 
 	<h1 class="mt-2 text-2xl font-semibold">{data.lesson.title}</h1>
 
-	<p class="text-muted-foreground mt-1 text-xs uppercase">
+	<p class="text-muted mt-1 text-xs uppercase">
 		{data.lesson.content_type}{#if data.access === 'preview'}
 			· preview{/if}
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -49,7 +48,7 @@
 	{#if data.lesson.video_embed_url}
 		<div class="mt-8">
 			<iframe
-				class="aspect-video w-full rounded-lg border"
+				class="aspect-video w-full rounded-card border"
 				src={data.lesson.video_embed_url}
 				title={data.lesson.title}
 				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -61,7 +60,7 @@
 	{#if data.lesson.content}
 		<div class="mt-8 text-pretty whitespace-pre-wrap">{data.lesson.content}</div>
 	{:else if !data.lesson.video_embed_url}
-		<p class="text-muted-foreground mt-8 text-sm">This lesson has no content yet.</p>
+		<p class="text-muted mt-8 text-sm">This lesson has no content yet.</p>
 	{/if}
 
 	<!--
@@ -78,21 +77,19 @@
 
 	{#if data.access === 'preview'}
 		<Alert class="mt-10">
-			<AlertDescription>
-				This is a free preview. Enrol on the course to read the rest and to track your progress.
-			</AlertDescription>
+			This is a free preview. Enrol on the course to read the rest and to track your progress.
 		</Alert>
 	{:else if canComplete}
 		<div class="mt-10 flex items-center gap-4">
 			<form method="POST" action="?/complete" use:enhance>
 				<input type="hidden" name="complete" value={completed ? 'false' : 'true'} />
-				<Button type="submit" variant={completed ? 'outline' : 'default'}>
+				<Button type="submit" variant={completed ? 'secondary' : 'primary'}>
 					{completed ? 'Reopen lesson' : 'Mark as complete'}
 				</Button>
 			</form>
 
 			{#if completed}
-				<p class="text-muted-foreground text-sm" role="status">Completed.</p>
+				<p class="text-muted text-sm" role="status">Completed.</p>
 			{/if}
 		</div>
 	{/if}

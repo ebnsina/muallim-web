@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Checkbox, Input, Label, Select, Textarea } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -37,8 +34,6 @@
 	// "correct" would set an answer the grader never reads, and lms-api refuses it.
 	const marksCorrect = $derived(chooses && type !== 'ordering');
 
-	const selectClass = 'border-input bg-background h-9 w-full rounded-md border px-3 text-sm';
-
 	function typeLabel(t: string): string {
 		return t.replaceAll('_', ' ');
 	}
@@ -47,7 +42,7 @@
 <svelte:head><title>{data.lessonTitle} — Quiz</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-3xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}`)}>
 			Back to the lesson
 		</a>
@@ -56,14 +51,14 @@
 	<h1 class="mt-2 text-2xl font-semibold">Quiz — {data.lessonTitle}</h1>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
 	{#if !data.quiz}
 		<form method="POST" action="?/create" class="mt-8 space-y-4" use:enhance>
-			<p class="text-muted-foreground text-sm">This lesson has no quiz yet.</p>
+			<p class="text-muted text-sm">This lesson has no quiz yet.</p>
 			<div class="space-y-2">
 				<Label for="title">Title</Label>
 				<Input id="title" name="title" required />
@@ -91,13 +86,12 @@
 
 				<div class="space-y-2">
 					<Label for="description">Description</Label>
-					<textarea
+					<Textarea
 						id="description"
 						name="description"
-						rows="2"
-						class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-						>{data.quiz.description ?? ''}</textarea
-					>
+						rows={2}
+						value={data.quiz.description ?? ''}
+					/>
 				</div>
 
 				<div class="grid gap-4 sm:grid-cols-3">
@@ -122,7 +116,7 @@
 							value={data.quiz.time_limit_seconds}
 							aria-describedby="time-hint"
 						/>
-						<p id="time-hint" class="text-muted-foreground text-xs">Zero means no limit.</p>
+						<p id="time-hint" class="text-muted text-xs">Zero means no limit.</p>
 					</div>
 					<div class="space-y-2">
 						<Label for="max_attempts">Attempts</Label>
@@ -134,7 +128,7 @@
 							value={data.quiz.max_attempts}
 							aria-describedby="attempts-hint"
 						/>
-						<p id="attempts-hint" class="text-muted-foreground text-xs">Zero means unlimited.</p>
+						<p id="attempts-hint" class="text-muted text-xs">Zero means unlimited.</p>
 					</div>
 				</div>
 
@@ -146,17 +140,17 @@
 			<h2 class="text-lg font-medium">Questions</h2>
 
 			{#if data.questions.length === 0}
-				<p class="text-muted-foreground mt-2 text-sm">
+				<p class="text-muted mt-2 text-sm">
 					None yet. A quiz with no questions cannot be attempted.
 				</p>
 			{:else}
 				<ol class="mt-4 space-y-3">
 					{#each data.questions as question, index (question.id)}
-						<li class="rounded-md border px-4 py-3">
+						<li class="rounded-control border px-4 py-3">
 							<div class="flex items-start justify-between gap-4">
 								<div>
 									<p class="font-medium">{index + 1}. {question.prompt}</p>
-									<p class="text-muted-foreground mt-1 text-xs">
+									<p class="text-muted mt-1 text-xs">
 										{typeLabel(question.type)} · {question.points}
 										{question.points === 1 ? 'point' : 'points'}
 									</p>
@@ -167,10 +161,10 @@
 												<li>
 													{option.content}
 													{#if option.is_correct}
-														<span class="text-green-700 dark:text-green-500">— correct</span>
+														<span class="text-success-text">— correct</span>
 													{/if}
 													{#if option.match_content}
-														<span class="text-muted-foreground">→ {option.match_content}</span>
+														<span class="text-muted">→ {option.match_content}</span>
 													{/if}
 												</li>
 											{/each}
@@ -178,7 +172,7 @@
 									{/if}
 
 									{#if question.accepted?.length}
-										<p class="text-muted-foreground mt-2 text-sm">
+										<p class="text-muted mt-2 text-sm">
 											Accepts: {question.accepted
 												.map((blank) => (blank ?? []).join(' or '))
 												.join(' · ')}
@@ -188,7 +182,7 @@
 
 								<form method="POST" action="?/deleteQuestion" use:enhance>
 									<input type="hidden" name="question_id" value={question.id} />
-									<Button type="submit" variant="outline" size="sm">Remove</Button>
+									<Button type="submit" variant="secondary" size="sm">Remove</Button>
 								</form>
 							</div>
 						</li>
@@ -217,22 +211,16 @@
 			>
 				<div class="space-y-2">
 					<Label for="type">Type</Label>
-					<select id="type" name="type" bind:value={type} class={selectClass}>
+					<Select id="type" name="type" bind:value={type}>
 						{#each TYPES as option (option)}
 							<option value={option}>{typeLabel(option)}</option>
 						{/each}
-					</select>
+					</Select>
 				</div>
 
 				<div class="space-y-2">
 					<Label for="prompt">Prompt</Label>
-					<textarea
-						id="prompt"
-						name="prompt"
-						rows="2"
-						required
-						class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-					></textarea>
+					<Textarea id="prompt" name="prompt" rows={2} required />
 				</div>
 
 				<div class="space-y-2">
@@ -255,11 +243,9 @@
 						{#each rows as row, index (index)}
 							<div class="flex items-center gap-2">
 								{#if marksCorrect}
-									<input
-										type="checkbox"
+									<Checkbox
 										name="option_correct"
 										value={index}
-										class="size-4"
 										aria-label={`Option ${index + 1} is correct`}
 									/>
 								{/if}
@@ -287,7 +273,7 @@
 
 						<Button
 							type="button"
-							variant="outline"
+							variant="secondary"
 							size="sm"
 							onclick={() => (rows = [...rows, { content: '', match: '' }])}
 						>
@@ -299,36 +285,34 @@
 				{#if typed}
 					<div class="space-y-2">
 						<Label for="accepted">Accepted answers</Label>
-						<textarea
+						<Textarea
 							id="accepted"
 							name="accepted"
-							rows="3"
+							rows={3}
 							placeholder="4 | four&#10;Paris"
 							aria-describedby="accepted-hint"
-							class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-						></textarea>
-						<p id="accepted-hint" class="text-muted-foreground text-xs">
+						/>
+						<p id="accepted-hint" class="text-muted text-xs">
 							One line per blank; alternatives separated by <code>|</code>. A short answer has
 							exactly one blank.
 						</p>
 					</div>
 
 					<div class="flex items-center gap-2">
-						<input id="case_sensitive" name="case_sensitive" type="checkbox" class="size-4" />
+						<Checkbox id="case_sensitive" name="case_sensitive" />
 						<Label for="case_sensitive">Case must match</Label>
 					</div>
 				{/if}
 
 				<div class="space-y-2">
 					<Label for="explanation">Explanation</Label>
-					<textarea
+					<Textarea
 						id="explanation"
 						name="explanation"
-						rows="2"
+						rows={2}
 						aria-describedby="explanation-hint"
-						class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-					></textarea>
-					<p id="explanation-hint" class="text-muted-foreground text-xs">
+					/>
+					<p id="explanation-hint" class="text-muted text-xs">
 						Shown to the learner once their attempt is graded, never before.
 					</p>
 				</div>
@@ -339,10 +323,8 @@
 
 		<section class="mt-16 border-t pt-6">
 			<form method="POST" action="?/deleteQuiz" use:enhance>
-				<Button type="submit" variant="outline" size="sm">Remove the quiz</Button>
-				<p class="text-muted-foreground mt-2 text-xs">
-					Deletes every question, and every attempt at it.
-				</p>
+				<Button type="submit" variant="secondary" size="sm">Remove the quiz</Button>
+				<p class="text-muted mt-2 text-xs">Deletes every question, and every attempt at it.</p>
 			</form>
 		</section>
 	{/if}

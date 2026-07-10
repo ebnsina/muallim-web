@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Checkbox, Input, Label, Select, Textarea } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -33,14 +30,12 @@
 		const offset = when.getTimezoneOffset() * 60_000;
 		return new Date(when.getTime() - offset).toISOString().slice(0, 16);
 	}
-
-	const selectClass = 'border-input bg-background h-9 w-full rounded-md border px-3 text-sm';
 </script>
 
 <svelte:head><title>{data.lesson.title} — Teach</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve(`/teach/${data.slug}`)}>Back to the curriculum</a>
 	</p>
 
@@ -53,8 +48,8 @@
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -76,44 +71,36 @@
 
 		<div class="space-y-2">
 			<Label for="content_type">Type</Label>
-			<select
+			<Select
 				id="content_type"
 				name="content_type"
 				value={contentType}
 				onchange={(e) => (typeOverride = e.currentTarget.value)}
-				class={selectClass}
 			>
 				{#each ['text', 'video', 'quiz', 'assignment', 'live', 'scorm', 'h5p'] as type (type)}
 					<option value={type}>{type}</option>
 				{/each}
-			</select>
+			</Select>
 		</div>
 
 		<div class="space-y-2">
 			<Label for="content">Content</Label>
-			<textarea
-				id="content"
-				name="content"
-				rows="10"
-				class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-				>{data.lesson.content ?? ''}</textarea
-			>
+			<Textarea id="content" name="content" rows={10} value={data.lesson.content ?? ''} />
 		</div>
 
 		{#if contentType === 'video'}
 			<div class="space-y-2">
 				<Label for="video_source">Video source</Label>
-				<select
+				<Select
 					id="video_source"
 					name="video_source"
 					value={videoSource}
 					onchange={(e) => (sourceOverride = e.currentTarget.value)}
-					class={selectClass}
 				>
 					{#each ['none', 'youtube', 'vimeo', 'embed', 'hosted'] as source (source)}
 						<option value={source}>{source}</option>
 					{/each}
-				</select>
+				</Select>
 			</div>
 
 			{#if videoSource !== 'none'}
@@ -130,7 +117,7 @@
 						value={data.lesson.video_url ?? ''}
 						aria-describedby="video-url-hint"
 					/>
-					<p id="video-url-hint" class="text-muted-foreground text-xs">
+					<p id="video-url-hint" class="text-muted text-xs">
 						{#if videoSource === 'youtube'}
 							Paste any YouTube link. The player is built from the video id, on the no-cookie
 							domain.
@@ -165,7 +152,7 @@
 					value={localDateTime(data.availableAt)}
 					aria-describedby="available-at-hint"
 				/>
-				<p id="available-at-hint" class="text-muted-foreground text-xs">
+				<p id="available-at-hint" class="text-muted text-xs">
 					The same instant for every learner. Leave blank to keep the current date.
 				</p>
 			</div>
@@ -181,12 +168,12 @@
 					value={data.availableAfterDays ?? ''}
 					aria-describedby="after-days-hint"
 				/>
-				<p id="after-days-hint" class="text-muted-foreground text-xs">
+				<p id="after-days-hint" class="text-muted text-xs">
 					Counted from each learner's own enrolment, so they see different dates.
 				</p>
 			</div>
 		{:else if data.dripMode === 'sequential'}
-			<p class="text-muted-foreground text-sm">
+			<p class="text-muted text-sm">
 				This course releases one lesson at a time. This lesson opens when the learner has finished
 				every lesson before it — there is nothing to schedule.
 			</p>
@@ -205,13 +192,7 @@
 		</div>
 
 		<div class="flex items-center gap-2">
-			<input
-				id="is_preview"
-				name="is_preview"
-				type="checkbox"
-				checked={data.lesson.is_preview}
-				class="size-4"
-			/>
+			<Checkbox id="is_preview" name="is_preview" checked={data.lesson.is_preview} />
 			<Label for="is_preview">Free preview — readable without enrolling</Label>
 		</div>
 

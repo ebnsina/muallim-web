@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Checkbox, Input, Label, Radio, Select, Textarea } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -22,14 +19,12 @@
 		const whole = Math.round(seconds / 60);
 		return whole === 1 ? '1 minute' : `${whole} minutes`;
 	}
-
-	const inputClass = 'border-input bg-background h-9 w-full rounded-md border px-3 text-sm';
 </script>
 
 <svelte:head><title>{data.quiz.title} — Quiz</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
-	<p class="text-muted-foreground text-sm">
+	<p class="text-muted text-sm">
 		<a class="underline" href={resolve(`/courses/${data.slug}/lessons/${data.lessonId}`)}>
 			Back to the lesson
 		</a>
@@ -37,10 +32,10 @@
 
 	<h1 class="mt-2 text-2xl font-semibold">{data.quiz.title}</h1>
 	{#if data.quiz.description}
-		<p class="text-muted-foreground mt-2">{data.quiz.description}</p>
+		<p class="text-muted mt-2">{data.quiz.description}</p>
 	{/if}
 
-	<p class="text-muted-foreground mt-2 text-sm">
+	<p class="text-muted mt-2 text-sm">
 		{questions.length} questions · {data.quiz.total_points} points
 		{#if data.quiz.passing_percent > 0}
 			· pass at {data.quiz.passing_percent}%
@@ -54,15 +49,13 @@
 	</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
 	{#if form?.saved}
-		<Alert class="mt-6" role="status">
-			<AlertDescription>Saved. Your answers are kept until you submit.</AlertDescription>
-		</Alert>
+		<Alert class="mt-6" role="status">Saved. Your answers are kept until you submit.</Alert>
 	{/if}
 
 	{#if finished.length > 0}
@@ -79,7 +72,7 @@
 						>
 							Attempt {attempt.number}
 						</a>
-						<span class="text-muted-foreground">
+						<span class="text-muted">
 							{#if attempt.status === 'grading'}
 								— grading
 							{:else if attempt.status === 'awaiting_review'}
@@ -99,9 +92,7 @@
 
 	{#if !data.signedIn}
 		<Alert class="mt-8">
-			<AlertDescription>
-				<a class="underline" href={resolve('/login')}>Sign in</a> and enrol to take this quiz.
-			</AlertDescription>
+			<a class="underline" href={resolve('/login')}>Sign in</a> and enrol to take this quiz.
 		</Alert>
 	{:else if !data.open}
 		<form method="POST" action="?/start" class="mt-8" use:enhance>
@@ -134,7 +125,7 @@
 
 					<legend class="font-medium">
 						{index + 1}. {question.prompt}
-						<span class="text-muted-foreground text-sm font-normal">
+						<span class="text-muted text-sm font-normal">
 							({question.points}
 							{question.points === 1 ? 'point' : 'points'})
 						</span>
@@ -143,40 +134,23 @@
 					{#if question.type === 'true_false' || question.type === 'single_choice'}
 						{#each question.options ?? [] as option (option.id)}
 							<div class="flex items-center gap-2">
-								<input
-									type="radio"
-									id={option.id}
-									name={`q:${id}:choice`}
-									value={option.id}
-									class="size-4"
-								/>
+								<Radio id={option.id} name={`q:${id}:choice`} value={option.id} />
 								<Label for={option.id}>{option.content}</Label>
 							</div>
 						{/each}
 					{:else if question.type === 'multiple_choice'}
-						<p class="text-muted-foreground text-xs">Choose every correct answer.</p>
+						<p class="text-muted text-xs">Choose every correct answer.</p>
 						{#each question.options ?? [] as option (option.id)}
 							<div class="flex items-center gap-2">
-								<input
-									type="checkbox"
-									id={option.id}
-									name={`q:${id}:choices`}
-									value={option.id}
-									class="size-4"
-								/>
+								<Checkbox id={option.id} name={`q:${id}:choices`} value={option.id} />
 								<Label for={option.id}>{option.content}</Label>
 							</div>
 						{/each}
 					{:else if question.type === 'short_answer'}
 						<Input name={`q:${id}:text`} aria-label={question.prompt} />
 					{:else if question.type === 'open_ended'}
-						<textarea
-							name={`q:${id}:text`}
-							rows="6"
-							aria-label={question.prompt}
-							class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-						></textarea>
-						<p class="text-muted-foreground text-xs">An instructor marks this one.</p>
+						<Textarea name={`q:${id}:text`} rows={6} aria-label={question.prompt} />
+						<p class="text-muted text-xs">An instructor marks this one.</p>
 					{:else if question.type === 'fill_blanks'}
 						{#each Array.from({ length: question.blanks ?? 0 }, (_, at) => at) as blank (blank)}
 							<div class="flex items-center gap-2">
@@ -185,7 +159,7 @@
 							</div>
 						{/each}
 					{:else if question.type === 'ordering'}
-						<p class="text-muted-foreground text-xs">Number these from 1.</p>
+						<p class="text-muted text-xs">Number these from 1.</p>
 						{#each question.options ?? [] as option (option.id)}
 							<div class="flex items-center gap-2">
 								<Input
@@ -203,16 +177,16 @@
 						{#each question.options ?? [] as option (option.id)}
 							<div class="flex items-center gap-2">
 								<Label for={option.id} class="w-40">{option.content}</Label>
-								<select id={option.id} name={`q:${id}:pair:${option.id}`} class={inputClass}>
+								<Select id={option.id} name={`q:${id}:pair:${option.id}`}>
 									<option value="">—</option>
 									{#each question.matches ?? [] as match (match.id)}
 										<option value={match.id}>{match.content}</option>
 									{/each}
-								</select>
+								</Select>
 							</div>
 						{/each}
 					{:else}
-						<p class="text-muted-foreground text-sm">
+						<p class="text-muted text-sm">
 							This question needs a newer version of this app. Submitting will leave it blank.
 						</p>
 					{/if}
@@ -223,7 +197,7 @@
 				<Button type="submit" name="intent" value="submit" disabled={submitting}>
 					{submitting ? 'Submitting…' : 'Submit for grading'}
 				</Button>
-				<Button type="submit" name="intent" value="save" variant="outline" disabled={submitting}>
+				<Button type="submit" name="intent" value="save" variant="secondary" disabled={submitting}>
 					Save and finish later
 				</Button>
 			</div>

@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Alert, Button, Input, Label, Select } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -15,11 +12,11 @@
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
 	<h1 class="text-2xl font-semibold">Your courses</h1>
-	<p class="text-muted-foreground mt-2 text-sm">Drafts are visible only to you.</p>
+	<p class="text-muted mt-2 text-sm">Drafts are visible only to you.</p>
 
 	{#if form?.message}
-		<Alert variant="destructive" class="mt-6" role="alert">
-			<AlertDescription>{form.message}</AlertDescription>
+		<Alert tone="danger" class="mt-6" role="alert">
+			{form.message}
 		</Alert>
 	{/if}
 
@@ -29,7 +26,7 @@
 		<form
 			method="POST"
 			action="?/create"
-			class="space-y-4 rounded-lg border p-4"
+			class="space-y-4 rounded-card border p-4"
 			use:enhance={() => {
 				submitting = true;
 				return async ({ update }) => {
@@ -50,16 +47,16 @@
 
 			<div class="space-y-2">
 				<Label for="difficulty">Difficulty</Label>
-				<select
+				<Select
 					id="difficulty"
 					name="difficulty"
-					class="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+					class="border-border-control bg-surface-raised h-9 w-full rounded-control border px-3 text-sm"
 				>
 					<option value="beginner">Beginner</option>
 					<option value="intermediate">Intermediate</option>
 					<option value="advanced">Advanced</option>
 					<option value="expert">Expert</option>
-				</select>
+				</Select>
 			</div>
 
 			<Button type="submit" disabled={submitting}>
@@ -69,11 +66,11 @@
 	</section>
 
 	{#if data.courses.length === 0}
-		<p class="text-muted-foreground mt-10 text-sm">You have not created any courses yet.</p>
+		<p class="text-muted mt-10 text-sm">You have not created any courses yet.</p>
 	{:else}
 		<ul class="mt-10 space-y-3">
 			{#each data.courses as course (course.id)}
-				<li class="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4">
+				<li class="flex flex-wrap items-center justify-between gap-3 rounded-card border p-4">
 					<div>
 						<a
 							class="font-medium underline-offset-4 hover:underline"
@@ -81,7 +78,7 @@
 						>
 							{course.title}
 						</a>
-						<p class="text-muted-foreground mt-1 text-xs uppercase">{course.status}</p>
+						<p class="text-muted mt-1 text-xs uppercase">{course.status}</p>
 					</div>
 
 					<form
@@ -90,7 +87,7 @@
 						use:enhance
 					>
 						<input type="hidden" name="slug" value={course.slug} />
-						<Button type="submit" variant="outline" size="sm">
+						<Button type="submit" variant="secondary" size="sm">
 							{course.status === 'published' ? 'Unpublish' : 'Publish'}
 						</Button>
 					</form>
@@ -101,7 +98,7 @@
 		{#if data.nextCursor}
 			<div class="mt-8">
 				<Button
-					variant="outline"
+					variant="secondary"
 					href={`${resolve('/teach')}?cursor=${encodeURIComponent(data.nextCursor)}`}
 				>
 					Load more
