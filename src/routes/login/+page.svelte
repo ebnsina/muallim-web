@@ -8,7 +8,7 @@
 	let submitting = $state(false);
 </script>
 
-<svelte:head><title>Sign in — LMS</title></svelte:head>
+<svelte:head><title>Sign in — Muallim</title></svelte:head>
 
 <AuthShell
 	title="Sign in"

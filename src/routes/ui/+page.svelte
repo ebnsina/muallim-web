@@ -65,7 +65,7 @@
 	const TOAST_TONES = ['info', 'success', 'warning', 'danger'] as const;
 </script>
 
-<svelte:head><title>Design system — LMS</title></svelte:head>
+<svelte:head><title>Design system — Muallim</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-4xl px-6 py-16">
 	<header>
@@ -107,7 +107,7 @@
 			</p>
 			<table class="mt-3 text-sm">
 				<tbody>
-					{#each [{ who: 'Ada Lovelace', score: 8, of: 15 }, { who: 'Grace Hopper', score: 13, of: 15 }, { who: 'Alan Turing', score: 145, of: 150 }] as row (row.who)}
+					{#each [{ who: 'Fatima al-Fihri', score: 8, of: 15 }, { who: 'Maryam al-Astrulabi', score: 13, of: 15 }, { who: 'Al-Khwarizmi', score: 145, of: 150 }] as row (row.who)}
 						<tr>
 							<td class="py-1 pr-8">{row.who}</td>
 							<td class="numeral py-1 text-right">{row.score}</td>

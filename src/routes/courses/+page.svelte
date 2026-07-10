@@ -6,7 +6,7 @@
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Courses — LMS</title></svelte:head>
+<svelte:head><title>Courses — Muallim</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
 	<h1 class="text-2xl font-semibold">Courses</h1>

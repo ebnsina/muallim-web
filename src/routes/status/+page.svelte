@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>Status — LMS</title>
+	<title>Status — Muallim</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 

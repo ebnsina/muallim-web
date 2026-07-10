@@ -32,7 +32,7 @@
 			class="inline-flex w-fit items-center gap-2.5 rounded-pill text-sm font-semibold"
 		>
 			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
-			LMS
+			Muallim
 		</a>
 
 		<main class="flex flex-1 items-center py-12">

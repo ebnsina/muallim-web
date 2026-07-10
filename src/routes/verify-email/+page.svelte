@@ -8,7 +8,7 @@
 	let submitting = $state(false);
 </script>
 
-<svelte:head><title>Confirm your email — LMS</title></svelte:head>
+<svelte:head><title>Confirm your email — Muallim</title></svelte:head>
 
 <main class="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-16">
 	<h1 class="text-2xl font-semibold">Confirm your email address</h1>

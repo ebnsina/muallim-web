@@ -63,7 +63,7 @@
 	}
 </script>
 
-<svelte:head><title>{data.course.title} — LMS</title></svelte:head>
+<svelte:head><title>{data.course.title} — Muallim</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
 	<p class="text-muted text-sm">

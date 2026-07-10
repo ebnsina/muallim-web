@@ -8,7 +8,7 @@
 	let submitting = $state(false);
 </script>
 
-<svelte:head><title>Create an account — LMS</title></svelte:head>
+<svelte:head><title>Create an account — Muallim</title></svelte:head>
 
 <AuthShell
 	title="Create an account"

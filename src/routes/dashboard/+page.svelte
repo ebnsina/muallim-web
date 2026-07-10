@@ -11,7 +11,7 @@
 	const canAuthor = $derived(data.user.role !== 'student');
 </script>
 
-<svelte:head><title>Dashboard — LMS</title></svelte:head>
+<svelte:head><title>Dashboard — Muallim</title></svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl px-6 py-16">
 	<div class="flex items-start justify-between gap-4">
