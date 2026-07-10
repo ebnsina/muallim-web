@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { BookOpen01Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
+	import {
+		BookOpen01Icon,
+		CheckmarkCircle02Icon,
+		PencilEdit02Icon,
+		PlusSignIcon
+	} from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -55,7 +60,7 @@
 			</EmptyState>
 		</div>
 	{:else}
-		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<!--
@@ -70,7 +75,10 @@
 							A badge, not `text-xs uppercase`. `draft` and `published` are the same
 							word in two states, and the tone is what says which.
 						-->
-						<Badge tone={course.status === 'published' ? 'success' : 'neutral'}>
+						<Badge
+							tone={course.status === 'published' ? 'success' : 'neutral'}
+							icon={course.status === 'published' ? CheckmarkCircle02Icon : PencilEdit02Icon}
+						>
 							{course.status}
 						</Badge>
 

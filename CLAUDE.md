@@ -64,7 +64,9 @@ pnpm build
 
 **Forms: reach for `Sheet`.** `src/lib/components/Sheet.svelte` splits a card into a `header` snippet, `children` (the content), and a `footer` snippet, ruled between. Wrap it in a `<form>` and put the submit `Button` in the footer. Use it for form-shaped pages rather than a bare `Card` with a trailing button.
 
-**Badges are mono.** The `Badge` component (and badge-like pills) set `font-mono` — a tag reads as a tag, not as prose.
+**Badges: default style, capitalized, with an icon.** The `Badge` component sets `capitalize` (so an API's `draft` reads as `Draft`) and takes an `icon` — a status wears a mark, not a colour alone. No `font-mono`; that was tried and dropped.
+
+**Reordering is drag-and-drop.** Sortable lists (the curriculum's sections and lessons) use `@thisux/sveltednd` with a `.drag-handle` grip, not up/down buttons. The list is a writable `$derived` of the loaded data: a drop assigns the new order for an instant response, submits the whole order to a reorder action, and the next load resettles it. No CSS ships with the package — the one `:global(.dragging)` rule is local.
 
 **A metric wears an icon, not a coloured dot.** A stat or legend uses a tinted icon tile (`bg-{tone}-surface text-{tone}-text`), never a bare colour dot: a dot is a key nobody was handed.
 

@@ -30,7 +30,7 @@
 			and takes no reader into account, so an author does not find their own
 			drafts here either — there is no "my courses" endpoint behind this page.
 		-->
-		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<CourseCard

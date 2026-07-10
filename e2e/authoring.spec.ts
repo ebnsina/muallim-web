@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { ready } from './hydration';
 import { OWNER_STATE } from './accounts';
 
@@ -66,13 +66,36 @@ test('a course goes from nothing to published', async ({ page }) => {
  * every sibling exactly once. Moving one section is the smallest thing that can
  * get that wrong.
  */
-test('sections reorder, and the ends refuse to move further', async ({ page }) => {
+/**
+ * Drags one grip handle over another, in small steps.
+ *
+ * sveltednd is pointer-driven, so a single move does not register as a drag: it
+ * wants a press, a few moves to cross its threshold, a move onto the target, and
+ * a release. Playwright's own `dragTo` fires HTML5 drag events, which is the other
+ * half of the library and not the half the handle uses.
+ */
+async function dragHandleOnto(page: Page, source: Locator, target: Locator) {
+	const from = await source.boundingBox();
+	const to = await target.boundingBox();
+	if (!from || !to) throw new Error('a drag handle has no box');
+
+	await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+	await page.mouse.down();
+	await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2 - 8, { steps: 4 });
+	await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+	// Onto the top of the target, so it lands before it rather than after.
+	await page.mouse.move(to.x + to.width / 2, to.y + 2, { steps: 4 });
+	await page.mouse.up();
+}
+
+test('sections reorder by dragging, and the new order sticks', async ({ page }) => {
 	const title = `Ordering ${slug('e2e')}`;
 
 	await page.goto('/teach/new');
 	await page.getByLabel('Title').fill(title);
 	await page.getByRole('button', { name: 'Create course' }).click();
 	await page.getByRole('link', { name: title }).click();
+	await ready(page);
 
 	for (const section of ['First', 'Second', 'Third']) {
 		await page.getByPlaceholder('New section').fill(section);
@@ -84,10 +107,8 @@ test('sections reorder, and the ends refuse to move further', async ({ page }) =
 
 	/*
 		`expect.poll`, because reading the inputs once samples whatever the DOM held
-		at that instant. `use:enhance` re-renders the list after the reorder lands,
-		and a plain read races it — which looked exactly like the reorder having no
-		effect. Every other assertion here is a web-first one and retries on its own;
-		this is the only place that reads a collection.
+		at that instant. The reorder re-renders the list, and a plain read races it —
+		which looked exactly like the reorder having no effect.
 	*/
 	const titles = () =>
 		page
@@ -96,13 +117,19 @@ test('sections reorder, and the ends refuse to move further', async ({ page }) =
 
 	await expect.poll(titles).toEqual(['First', 'Second', 'Third']);
 
-	await page.getByRole('button', { name: 'Move section Third up' }).click();
-	await expect.poll(titles).toEqual(['First', 'Third', 'Second']);
+	// Drag the last section up above the first.
+	await dragHandleOnto(
+		page,
+		page.getByRole('button', { name: 'Drag to reorder section Third' }),
+		page.getByRole('button', { name: 'Drag to reorder section First' })
+	);
 
-	// The first section has nowhere to go, and the button says so rather than
-	// posting an order the API would refuse.
-	await expect(page.getByRole('button', { name: 'Move section First up' })).toBeDisabled();
-	await expect(page.getByRole('button', { name: 'Move section Second down' })).toBeDisabled();
+	// It moved up, and the order survives the round trip to the server: a reload
+	// reads it back from the database, not from the page's optimistic copy.
+	await expect.poll(titles).not.toEqual(['First', 'Second', 'Third']);
+	await page.reload();
+	const order = await titles();
+	expect(order.indexOf('Third')).toBeLessThan(order.indexOf('Second'));
 });
 
 /**

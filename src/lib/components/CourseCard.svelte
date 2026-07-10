@@ -21,11 +21,11 @@
 	list payload, so they are not invented here.)
 -->
 <TintCard {href}>
-	<h2 class="text-lg font-semibold text-pretty">{title}</h2>
+	<h2 class="line-clamp-2 min-h-[3.5rem] text-lg font-semibold text-pretty">{title}</h2>
 
-	{#if summary}
-		<p class="text-muted mt-1.5 line-clamp-2 max-w-[38ch] text-sm text-pretty">{summary}</p>
-	{/if}
+	<!-- Always two lines, even when empty, so every card is the same height and a
+	     grid of them reads as one block rather than a ragged run. -->
+	<p class="text-muted mt-1.5 line-clamp-2 min-h-[2.5rem] text-sm text-pretty">{summary ?? ''}</p>
 
 	{#snippet footer()}
 		<Difficulty level={difficulty} />

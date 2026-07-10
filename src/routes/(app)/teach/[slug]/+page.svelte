@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, deserialize, enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
+	import {
+		CheckmarkCircle02Icon,
+		DragDropVerticalIcon,
+		PencilEdit02Icon
+	} from '@hugeicons/core-free-icons';
+	import type { ActionResult } from '@sveltejs/kit';
 	import {
 		Alert,
 		Badge,
 		Breadcrumbs,
 		Button,
 		Card,
+		Icon,
 		Input,
 		Label,
 		Page,
@@ -16,6 +25,103 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	/*
+		Drag-and-drop reordering.
+
+		`topics` is an editable copy of the loaded curriculum: a reorder mutates it at
+		once for an instant response, then submits the whole new order and lets the
+		server's answer resettle it. The `$effect` is a resync of that copy from the
+		server's version — the genuine external input — not one piece of local state
+		shadowing another, which is the thing to avoid.
+	*/
+	type EditorLesson = { id: string; title: string; content_type: string; is_preview: boolean };
+	type EditorTopic = { id: string; title: string; lessons: EditorLesson[] };
+
+	function mapTopics(source: typeof data.topics): EditorTopic[] {
+		return source.map((topic) => ({
+			id: topic.id,
+			title: topic.title,
+			lessons: (topic.lessons ?? []).map((lesson) => ({
+				id: lesson.id,
+				title: lesson.title,
+				content_type: lesson.content_type,
+				is_preview: lesson.is_preview
+			}))
+		}));
+	}
+
+	// A writable `$derived`: it tracks the loaded curriculum — so it renders on the
+	// server and refreshes whenever the load runs again — but a drag can also assign
+	// to it directly, and that optimistic value holds until the next load resettles
+	// it. One expression does the job an editable copy plus a resync effect would.
+	let topics = $derived(mapTopics(data.topics));
+
+	// Submit a reordered list to one of the page's actions, by hand because the drag
+	// happened in script. On success the list is confirmed; either way the load runs
+	// again, so a rejected order snaps back to the truth rather than lying on screen.
+	async function postOrder(action: string, entries: [string, string][]) {
+		const body = new FormData();
+		for (const [key, value] of entries) body.append(key, value);
+
+		const response = await fetch(action, {
+			method: 'POST',
+			body,
+			headers: { 'x-sveltekit-action': 'true' }
+		});
+		const result: ActionResult = deserialize(await response.text());
+		applyAction(result);
+		await invalidateAll();
+	}
+
+	// Move the dropped item to where it landed. `dropPosition` says whether it goes
+	// before or after the target; a drag whose payload is not in this list (a lesson
+	// dropped on a section, say) matches nothing and is left alone.
+	function reordered<T extends { id: string }>(list: T[], draggedId: string, target: number): T[] {
+		const from = list.findIndex((item) => item.id === draggedId);
+		if (from < 0 || Number.isNaN(target)) return list;
+		const next = [...list];
+		const [moved] = next.splice(from, 1);
+		next.splice(from < target ? target - 1 : target, 0, moved);
+		return next;
+	}
+
+	// The drop callbacks are handed a `DragDropState<unknown>`; the payload is one of
+	// our own items, so its id is what identifies it.
+	function draggedId(state: DragDropState<unknown>): string {
+		return (state.draggedItem as { id: string }).id;
+	}
+
+	function handleTopicDrop(state: DragDropState<unknown>) {
+		if (!state.targetContainer) return;
+		let target = Number(state.targetContainer.split('-')[1]);
+		if (state.dropPosition === 'after') target += 1;
+
+		const next = reordered(topics, draggedId(state), target);
+		if (next === topics) return;
+		topics = next;
+		postOrder(
+			'?/reorderTopics',
+			next.map((topic) => ['topic_ids', topic.id])
+		);
+	}
+
+	function handleLessonDrop(topicId: string, state: DragDropState<unknown>) {
+		if (!state.targetContainer) return;
+		const topic = topics.find((candidate) => candidate.id === topicId);
+		if (!topic) return;
+
+		let target = Number(state.targetContainer.split('-')[2]);
+		if (state.dropPosition === 'after') target += 1;
+
+		const next = reordered(topic.lessons, draggedId(state), target);
+		if (next === topic.lessons) return;
+		topic.lessons = next;
+		postOrder('?/reorderLessons', [
+			['topic_id', topicId],
+			...next.map((lesson) => ['lesson_ids', lesson.id] as [string, string])
+		]);
+	}
 
 	// The <select> value: the course's template, or '' for the built-in default.
 	const currentTemplateId = $derived(data.currentTemplateId ?? '');
@@ -44,7 +150,7 @@
 
 <svelte:head><title>{data.course.title} — Teach</title></svelte:head>
 
-<Page>
+<Page width="full">
 	<Breadcrumbs {crumbs} />
 
 	<PageHeader class="mt-4" title={data.course.title}>
@@ -55,7 +161,10 @@
 		{/snippet}
 
 		{#snippet meta()}
-			<Badge tone={data.course.status === 'published' ? 'success' : 'neutral'}>
+			<Badge
+				tone={data.course.status === 'published' ? 'success' : 'neutral'}
+				icon={data.course.status === 'published' ? CheckmarkCircle02Icon : PencilEdit02Icon}
+			>
 				{data.course.status}
 			</Badge>
 			<span class="text-muted">
@@ -73,7 +182,7 @@
 		<Alert tone="success" class="mt-6" role="status">Certificate template updated.</Alert>
 	{/if}
 
-	<section class="mt-8">
+	<section class="mt-8 max-w-3xl">
 		<Card class="space-y-6 p-5">
 			<div>
 				<h2 class="font-medium">Release schedule</h2>
@@ -109,7 +218,9 @@
 				{:else}
 					<ul class="mt-3 space-y-2">
 						{#each data.prerequisites as prerequisite (prerequisite.id)}
-							<li class="flex items-center justify-between gap-3 border-t pt-2 text-sm">
+							<li
+								class="flex items-center justify-between gap-3 border-t border-border pt-2 text-sm"
+							>
 								<span>
 									{prerequisite.title}
 									{#if prerequisite.status !== 'published'}
@@ -178,74 +289,94 @@
 		</Card>
 	</section>
 
-	{#if data.topics.length === 0}
+	{#if topics.length === 0}
 		<p class="text-muted mt-10 text-sm">
 			This course has no sections yet. A course needs at least one lesson before it can be
 			published.
 		</p>
 	{/if}
 
+	<!--
+		Sections and their lessons reorder by dragging the grip; only the handle
+		starts a drag, so the rename field and every button stay usable. The order
+		you drop is the order that is sent — the whole list at once, which is what
+		lms-api wants.
+	-->
 	<ol class="mt-8 space-y-6">
-		{#each data.topics as topic, topicIndex (topic.id)}
-			<li>
+		{#each topics as topic, topicIndex (topic.id)}
+			<li
+				use:draggable={{
+					container: `topic-${topicIndex}`,
+					dragData: topic,
+					handle: '.topic-handle'
+				}}
+				use:droppable={{
+					container: `topic-${topicIndex}`,
+					callbacks: { onDrop: handleTopicDrop }
+				}}
+			>
 				<Card class="p-5">
 					<div class="flex flex-wrap items-center justify-between gap-3">
-						<form method="POST" action="?/renameTopic" class="flex items-center gap-2" use:enhance>
-							<input type="hidden" name="id" value={topic.id} />
-							<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
-							<Input id="topic-{topic.id}" name="title" value={topic.title} class="w-64" />
-							<Button type="submit" variant="secondary" size="sm">Rename</Button>
-						</form>
+						<div class="flex items-center gap-2">
+							<button
+								type="button"
+								class="topic-handle text-muted hover:text-text cursor-grab rounded-control p-1 active:cursor-grabbing"
+								aria-label="Drag to reorder section {topic.title}"
+							>
+								<Icon icon={DragDropVerticalIcon} class="size-5" />
+							</button>
 
-						<div class="flex items-center gap-1">
-							<!--
-							Move buttons rather than drag-and-drop: a form works before JavaScript
-							loads, and is reachable from a keyboard without any ARIA of our own.
-							The endpoint is the same either way.
-						-->
-							<form method="POST" action="?/moveTopic" use:enhance>
+							<form
+								method="POST"
+								action="?/renameTopic"
+								class="flex items-center gap-2"
+								use:enhance
+							>
 								<input type="hidden" name="id" value={topic.id} />
-								<input type="hidden" name="direction" value="up" />
-								<Button
-									type="submit"
-									variant="ghost"
-									size="sm"
-									disabled={topicIndex === 0}
-									aria-label="Move section {topic.title} up">↑</Button
-								>
-							</form>
-
-							<form method="POST" action="?/moveTopic" use:enhance>
-								<input type="hidden" name="id" value={topic.id} />
-								<input type="hidden" name="direction" value="down" />
-								<Button
-									type="submit"
-									variant="ghost"
-									size="sm"
-									disabled={topicIndex === data.topics.length - 1}
-									aria-label="Move section {topic.title} down">↓</Button
-								>
-							</form>
-
-							<form method="POST" action="?/deleteTopic" use:enhance>
-								<input type="hidden" name="id" value={topic.id} />
-								<Button type="submit" variant="ghost" size="sm">Delete</Button>
+								<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
+								<Input id="topic-{topic.id}" name="title" value={topic.title} class="w-64" />
+								<Button type="submit" variant="secondary" size="sm">Rename</Button>
 							</form>
 						</div>
+
+						<form method="POST" action="?/deleteTopic" use:enhance>
+							<input type="hidden" name="id" value={topic.id} />
+							<Button type="submit" variant="ghost" size="sm">Delete</Button>
+						</form>
 					</div>
 
-					<ul class="mt-4 space-y-2">
-						{#each topic.lessons ?? [] as lesson, lessonIndex (lesson.id)}
-							<li class="flex flex-wrap items-center justify-between gap-3 border-t pt-2 text-sm">
-								<a
-									class="underline-offset-4 hover:underline"
-									href={resolve(`/teach/${data.course.slug}/lessons/${lesson.id}`)}
-								>
-									{lesson.title}
-								</a>
+					<ul class="mt-4">
+						{#each topic.lessons as lesson, lessonIndex (lesson.id)}
+							<li
+								use:draggable={{
+									container: `lesson-${topicIndex}-${lessonIndex}`,
+									dragData: lesson,
+									handle: '.lesson-handle'
+								}}
+								use:droppable={{
+									container: `lesson-${topicIndex}-${lessonIndex}`,
+									callbacks: { onDrop: (state) => handleLessonDrop(topic.id, state) }
+								}}
+								class="flex flex-wrap items-center justify-between gap-3 border-t border-border py-2 text-sm"
+							>
+								<div class="flex min-w-0 items-center gap-2">
+									<button
+										type="button"
+										class="lesson-handle text-muted hover:text-text cursor-grab rounded-control p-1 active:cursor-grabbing"
+										aria-label="Drag to reorder lesson {lesson.title}"
+									>
+										<Icon icon={DragDropVerticalIcon} class="size-4" />
+									</button>
+									<a
+										class="truncate underline-offset-4 hover:underline"
+										href={resolve(`/teach/${data.course.slug}/lessons/${lesson.id}`)}
+									>
+										{lesson.title}
+									</a>
+								</div>
 
 								<div class="flex items-center gap-1">
-									<span class="text-muted mr-2 text-xs">{lesson.content_type}</span>
+									<span class="text-muted mr-2 text-xs capitalize">{lesson.content_type}</span>
 
 									<form method="POST" action="?/togglePreview" use:enhance>
 										<input type="hidden" name="id" value={lesson.id} />
@@ -257,32 +388,6 @@
 										>
 											{lesson.is_preview ? 'Preview' : 'Make preview'}
 										</Button>
-									</form>
-
-									<form method="POST" action="?/moveLesson" use:enhance>
-										<input type="hidden" name="id" value={lesson.id} />
-										<input type="hidden" name="topic_id" value={topic.id} />
-										<input type="hidden" name="direction" value="up" />
-										<Button
-											type="submit"
-											variant="ghost"
-											size="sm"
-											disabled={lessonIndex === 0}
-											aria-label="Move lesson {lesson.title} up">↑</Button
-										>
-									</form>
-
-									<form method="POST" action="?/moveLesson" use:enhance>
-										<input type="hidden" name="id" value={lesson.id} />
-										<input type="hidden" name="topic_id" value={topic.id} />
-										<input type="hidden" name="direction" value="down" />
-										<Button
-											type="submit"
-											variant="ghost"
-											size="sm"
-											disabled={lessonIndex === (topic.lessons?.length ?? 0) - 1}
-											aria-label="Move lesson {lesson.title} down">↓</Button
-										>
 									</form>
 
 									<form method="POST" action="?/deleteLesson" use:enhance>
@@ -317,3 +422,11 @@
 		<Button type="submit">Add section</Button>
 	</form>
 </Page>
+
+<style>
+	/* The item under the pointer, while it is being dragged. sveltednd adds the
+	   class; the package ships no stylesheet, so the one rule it needs lives here. */
+	:global(.dragging) {
+		opacity: 0.5;
+	}
+</style>

@@ -3,19 +3,6 @@ import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
-/**
- * The curriculum, as the author sees it: drafts and all.
- *
- * The page reads it from the layout. This is for the reorder actions, which must
- * not: they need the order as it stands *now*, not as it stood when the page was
- * rendered, because somebody else may have added a section since.
- */
-async function curriculum(origin: string, accessToken: string, slug: string) {
-	return authedApi(origin, accessToken).GET('/v1/courses/{slug}', {
-		params: { path: { slug } }
-	});
-}
-
 export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
@@ -54,28 +41,6 @@ type DripMode = (typeof DRIP_MODES)[number];
 /** Narrows a submitted mode rather than asserting it: a form field is user input. */
 function toDripMode(value: string): DripMode {
 	return (DRIP_MODES as readonly string[]).includes(value) ? (value as DripMode) : 'none';
-}
-
-/**
- * Returns `ids` with the element at `id` swapped one place in `delta`'s
- * direction, or null when there is nowhere to go.
- *
- * The result names every sibling exactly once, which is what lms-api requires: a
- * short list would silently leave the unnamed siblings where they were, and a
- * list naming a foreign id would silently do nothing to it. Both are refused
- * rather than half-applied, so a concurrent insert makes this fail cleanly
- * instead of scrambling the order.
- */
-function swapped(ids: string[], id: string, delta: number): string[] | null {
-	const from = ids.indexOf(id);
-	if (from < 0) return null;
-
-	const to = from + delta;
-	if (to < 0 || to >= ids.length) return null;
-
-	const out = [...ids];
-	[out[from], out[to]] = [out[to], out[from]];
-	return out;
 }
 
 /** Every action needs a session and a form; this collapses the preamble. */
@@ -163,35 +128,28 @@ export const actions: Actions = {
 		}
 	},
 
-	moveTopic: async ({ request, locals, params, url }) => {
+	/**
+	 * The whole new order, drag-and-dropped on the page and submitted at once.
+	 *
+	 * lms-api requires every sibling named exactly once, and the client sends
+	 * exactly that — the list it just rearranged. A concurrent insert elsewhere
+	 * makes the submitted list no longer name every sibling, and the API refuses it
+	 * rather than half-applying, which is the safe failure.
+	 */
+	reorderTopics: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 
-		const form = await request.formData();
-		const id = String(form.get('id') ?? '');
-		const delta = form.get('direction') === 'up' ? -1 : 1;
+		const ids = (await request.formData()).getAll('topic_ids').map(String);
+		if (ids.length === 0) return fail(400, { message: 'No new order was submitted.' });
 
-		// Read the current order rather than trust the page: it may have been
-		// rendered before somebody else added a section.
-		const { data, error: problem } = await curriculum(url.origin, locals.accessToken, params.slug);
-		if (problem || !data) {
-			return fail(500, { message: 'Could not read the current order.' });
-		}
-
-		const order = swapped(
-			(data.topics ?? []).map((t) => t.id),
-			id,
-			delta
-		);
-		if (!order) return fail(400, { message: 'That section cannot move any further.' });
-
-		const { error: reorderProblem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
 			'/v1/courses/{slug}/topics/order',
-			{ params: { path: { slug: params.slug } }, body: { topic_ids: order } }
+			{ params: { path: { slug: params.slug } }, body: { topic_ids: ids } }
 		);
 
-		if (reorderProblem) {
+		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(reorderProblem, 'Could not reorder the sections.')
+				message: problemMessage(problem, 'Could not reorder the sections.')
 			});
 		}
 	},
@@ -239,37 +197,23 @@ export const actions: Actions = {
 		}
 	},
 
-	moveLesson: async ({ request, locals, params, url }) => {
+	/** The whole new order of one section's lessons, dropped into place at once. */
+	reorderLessons: async ({ request, locals, url }) => {
 		guard(locals.accessToken);
 
 		const form = await request.formData();
-		const id = String(form.get('id') ?? '');
 		const topicId = String(form.get('topic_id') ?? '');
-		const delta = form.get('direction') === 'up' ? -1 : 1;
+		const ids = form.getAll('lesson_ids').map(String);
+		if (!topicId || ids.length === 0) return fail(400, { message: 'No new order was submitted.' });
 
-		const { data, error: problem } = await curriculum(url.origin, locals.accessToken, params.slug);
-		if (problem || !data) {
-			return fail(500, { message: 'Could not read the current order.' });
-		}
-
-		const topic = (data.topics ?? []).find((t) => t.id === topicId);
-		if (!topic) return fail(404, { message: 'That section no longer exists.' });
-
-		const order = swapped(
-			(topic.lessons ?? []).map((l) => l.id),
-			id,
-			delta
-		);
-		if (!order) return fail(400, { message: 'That lesson cannot move any further.' });
-
-		const { error: reorderProblem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
 			'/v1/topics/{id}/lessons/order',
-			{ params: { path: { id: topicId } }, body: { lesson_ids: order } }
+			{ params: { path: { id: topicId } }, body: { lesson_ids: ids } }
 		);
 
-		if (reorderProblem) {
+		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(reorderProblem, 'Could not reorder the lessons.')
+				message: problemMessage(problem, 'Could not reorder the lessons.')
 			});
 		}
 	},

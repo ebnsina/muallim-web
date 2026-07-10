@@ -8,6 +8,7 @@
 		Breadcrumbs,
 		Button,
 		Card,
+		Checkbox,
 		Icon,
 		Input,
 		Page,
@@ -154,7 +155,7 @@
 								</div>
 
 								<label class="flex items-center gap-1.5 pb-2.5 text-sm">
-									<input type="checkbox" name="pass.{index}" bind:checked={band.isPass} />
+									<Checkbox name="pass.{index}" bind:checked={band.isPass} />
 									Pass
 								</label>
 
