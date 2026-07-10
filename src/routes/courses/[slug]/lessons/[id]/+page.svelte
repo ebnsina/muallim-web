@@ -73,6 +73,12 @@
 				Go to the quiz
 			</Button>
 		</div>
+	{:else if data.lesson.content_type === 'assignment'}
+		<div class="mt-8">
+			<Button href={resolve(`/courses/${data.slug}/lessons/${data.lesson.id}/assignment`)}>
+				Go to the assignment
+			</Button>
+		</div>
 	{/if}
 
 	{#if data.access === 'preview'}

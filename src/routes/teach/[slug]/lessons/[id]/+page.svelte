@@ -41,9 +41,12 @@
 
 	<h1 class="mt-2 text-2xl font-semibold">Edit lesson</h1>
 
-	<p class="mt-2 text-sm">
+	<p class="mt-2 flex gap-4 text-sm">
 		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lesson.id}/quiz`)}>
 			Quiz and marking
+		</a>
+		<a class="underline" href={resolve(`/teach/${data.slug}/lessons/${data.lesson.id}/assignment`)}>
+			Assignment
 		</a>
 	</p>
 

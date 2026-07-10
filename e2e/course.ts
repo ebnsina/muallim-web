@@ -283,3 +283,70 @@ export async function quizCourse(
 		}
 	};
 }
+
+export interface AssignmentCourse {
+	slug: string;
+	lessonId: string;
+}
+
+/**
+ * A published course whose one lesson carries a file assignment, with the
+ * student already enrolled.
+ *
+ * Enrolled through the API rather than through the page: this fixture exists so
+ * an upload test can start at the upload, and clicking "Enrol" first is the
+ * enrolment test's job.
+ */
+export async function assignmentCourse(
+	request: APIRequestContext,
+	slug: string,
+	assignment: Record<string, unknown> = {}
+): Promise<AssignmentCourse> {
+	const token = await bearer(request);
+	const auth = { Authorization: `Bearer ${token}` };
+
+	const course = await request.post('/api/v1/courses', {
+		headers: auth,
+		data: { slug, title: `Course ${slug}`, summary: 'Built by an end-to-end test.' }
+	});
+	expect(course.ok(), `create course: ${course.status()} ${await course.text()}`).toBe(true);
+
+	const topic = await request.post(`/api/v1/courses/${slug}/topics`, {
+		headers: auth,
+		data: { title: 'Section one' }
+	});
+	expect(topic.ok()).toBe(true);
+	const topicId = (await topic.json()).topic.id;
+
+	const lesson = await request.post(`/api/v1/topics/${topicId}/lessons`, {
+		headers: auth,
+		data: { title: 'The assignment', content_type: 'assignment', video_source: 'none' }
+	});
+	expect(lesson.ok(), `add lesson: ${lesson.status()} ${await lesson.text()}`).toBe(true);
+	const lessonId = (await lesson.json()).lesson.id as string;
+
+	const created = await request.post(`/api/v1/lessons/${lessonId}/assignment`, {
+		headers: auth,
+		data: {
+			title: 'Essay: the House of Wisdom',
+			instructions: 'Describe one translation made there, and why it mattered.',
+			points: 100,
+			passing_points: 60,
+			max_files: 2,
+			max_bytes: 1048576,
+			allow_late: true,
+			...assignment
+		}
+	});
+	expect(created.ok(), `create assignment: ${created.status()} ${await created.text()}`).toBe(true);
+
+	const publish = await request.post(`/api/v1/courses/${slug}/publish`, { headers: auth });
+	expect(publish.ok(), `publish: ${publish.status()} ${await publish.text()}`).toBe(true);
+
+	const enrol = await request.post(`/api/v1/courses/${slug}/enrol`, {
+		headers: { Authorization: `Bearer ${await studentBearer(request)}` }
+	});
+	expect(enrol.ok(), `enrol: ${enrol.status()} ${await enrol.text()}`).toBe(true);
+
+	return { slug, lessonId };
+}

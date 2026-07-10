@@ -52,7 +52,21 @@ export const apiEnv = {
 		is simply unavailable, and "refused because unconfigured" would pass a test
 		meant to prove "refused because unlisted".
 	*/
-	LMS_EMBED_ALLOWED_HOSTS: 'player.example.test'
+	LMS_EMBED_ALLOWED_HOSTS: 'player.example.test',
+
+	/*
+		The object store. Without it lms-api refuses every upload with a 503, and the
+		assignment suite fails for a reason that has nothing to do with the browser.
+
+		This is the MinIO `make storage-up` starts, and the same bucket the Go tests
+		use. They do not collide: every object key begins with a workspace id.
+	*/
+	LMS_S3_ENDPOINT: process.env.LMS_TEST_S3_ENDPOINT ?? 'http://localhost:9002',
+	LMS_S3_BUCKET: 'lms-uploads',
+	LMS_S3_ACCESS_KEY: 'lms',
+	LMS_S3_SECRET_KEY: 'lms-secret-key',
+	LMS_S3_REGION: 'auto',
+	LMS_S3_PATH_STYLE: 'true'
 };
 
 export default defineConfig({

@@ -85,18 +85,20 @@ It then runs `pnpm lint`, `pnpm check`, the unit tests, and the full Playwright 
 ## End-to-end tests
 
 ```bash
-cd ../lms-api && make db-create && make migrate && make seed
+cd ../lms-api && make db-create && make migrate && make seed && make storage-up
 cd ../lms-web && pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Playwright starts `lms-api`, its job worker, and this app. Postgres is the one thing it does not bring up.
+Playwright starts `lms-api`, its job worker, and this app. Postgres and MinIO are the two things it does not bring up — `make storage-up` starts MinIO on `:9002`, and without it every assignment upload is refused with a 503.
 
 They run against `lms_test`, not the development database, because they register the workspace's owner — which only works while the workspace is unclaimed. The first run claims it; every run after signs in.
 
 A student is provisioned by invitation, because that is the only way to join a workspace. `lms-api` mails the link and returns it to nobody, so the worker runs with `LMS_MAIL_FILE` set and the setup reads the link out of that file. It is the same path a real student walks.
 
 The suite covers the boundaries that are expensive to get wrong: a draft is invisible to strangers and 404 by its own address; a preview lesson is readable and a gated one is 404, never 403; the authoring pages are forbidden to a student rather than merely ineffective; enrolling opens the gated lesson and completing every lesson reaches 100%; and `forgot-password` says the same thing about an address that exists and one that does not.
+
+`assignment.spec.ts` covers the one leg nothing else can. A learner's browser PUTs the file straight to the object store, on another origin, with a URL `lms-api` signed and a `Content-Length` the browser fills in itself — a header a script is forbidden to set, which is exactly what makes the signed size a limit rather than a suggestion. No unit test can see that, and neither can a Go test.
 
 ## Stack
 

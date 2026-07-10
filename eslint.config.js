@@ -43,7 +43,13 @@ export default defineConfig(
 		// A generic Button forwards whatever href it is handed and cannot resolve it
 		// a second time. The call sites are ours and are linted; this is the
 		// primitive they call.
-		files: ['src/lib/components/Button.svelte'],
+		//
+		// The assignment pages render a signed URL the object store gave us, for a
+		// file in a bucket on another origin. There is no route to resolve.
+		// Globbed rather than named: `[slug]` is a character class to a matcher, not
+		// a literal, and a pattern that silently matches nothing turns a rule off by
+		// accident somewhere else.
+		files: ['src/lib/components/Button.svelte', 'src/routes/**/assignment/**/+page.svelte'],
 		rules: {
 			'svelte/no-navigation-without-resolve': 'off'
 		}

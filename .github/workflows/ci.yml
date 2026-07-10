@@ -28,6 +28,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # A real S3 API, for the assignment suite. A learner's browser uploads
+      # straight to it, on another origin, with a URL lms-api signed — and there
+      # is no other test anywhere that exercises that leg.
+      #
+      # Port 9002 because that is where docker-compose puts it, so the config
+      # needs no second address for CI.
+      minio:
+        image: bitnami/minio:latest
+        env:
+          MINIO_ROOT_USER: lms
+          MINIO_ROOT_PASSWORD: lms-secret-key
+          MINIO_DEFAULT_BUCKETS: lms-uploads
+        ports: ['9002:9000']
+
     defaults:
       run:
         working-directory: lms-web
@@ -72,6 +86,18 @@ jobs:
           psql -h localhost -U postgres -c "CREATE ROLE lms LOGIN PASSWORD 'lms' NOSUPERUSER NOBYPASSRLS"
           psql -h localhost -U postgres -c "CREATE DATABASE lms OWNER lms"
           psql -h localhost -U postgres -c "CREATE DATABASE lms_test OWNER lms"
+
+      # The service container reports healthy before MinIO has created the bucket,
+      # and an upload into a bucket that is not there yet fails for a reason that
+      # has nothing to do with the change under review.
+      - name: Wait for MinIO
+        run: |
+          for _ in $(seq 1 30); do
+            if curl -fsS http://localhost:9002/minio/health/live; then exit 0; fi
+            sleep 1
+          done
+          echo "::error::MinIO never came up"
+          exit 1
 
       - name: Migrate and seed the workspace
         working-directory: lms-api
