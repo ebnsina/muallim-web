@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { OWNER_STATE, STUDENT_STATE } from './accounts';
 import { assignmentCourse } from './course';
+import { ready } from './hydration';
 
 const slug = (name: string) =>
 	`${name}-${process.env.E2E_RUN_ID ?? 'local'}-${randomUUID().slice(0, 8)}`;
@@ -13,18 +14,6 @@ const slug = (name: string) =>
  * whatever the test says it is — which is the number the presigned URL is signed
  * against.
  */
-/**
- * Waits until the page has its event handlers.
- *
- * Choosing a file before the `change` listener is attached fires the event into
- * nothing, and the page then looks exactly as it does when no file was chosen —
- * a failure with no symptom. The root layout marks the document once Svelte has
- * hydrated it.
- */
-async function ready(page: Page) {
-	await page.waitForSelector('html[data-hydrated]', { state: 'attached' });
-}
-
 /**
  * The attached file, in the list — not in the toast that says it attached.
  *
