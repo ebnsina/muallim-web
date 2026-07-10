@@ -135,8 +135,13 @@
 				       transition-[transform,opacity] duration-200 ease-out"
 				style="{transform(index)} z-index: {toast.toasts.length - index};"
 			>
+				<!--
+					A toast is the one thing here that genuinely floats, and it still gets no
+					shadow. Its tinted fill against the page, and its own coloured border, are
+					what lift it — and unlike a shadow, both of them theme.
+				-->
 				<div
-					class="flex items-start gap-3 rounded-card border px-4 py-3 text-sm shadow-overlay
+					class="flex items-start gap-3 rounded-card border px-4 py-3 text-sm
 					       {TONES[item.tone].class}"
 				>
 					<Icon icon={TONES[item.tone].icon} class="mt-0.5 size-4 shrink-0" />

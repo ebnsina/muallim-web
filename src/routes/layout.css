@@ -83,9 +83,6 @@
 	--radius-overlay: 1rem;
 	--radius-pill: 9999px;
 
-	--shadow-raised: var(--shadow-raised);
-	--shadow-overlay: var(--shadow-overlay);
-
 	/*
 		The measure for lesson prose. 65ch is the middle of the range the reading
 		research argues over — Ruder says 50–60, Bringhurst 66, WCAG caps at 80.
@@ -263,18 +260,20 @@
 		}
 	}
 
-	/* A card that lifts a little when you point at it. One pixel, not six. */
+	/*
+		A card that lifts a little when you point at it. Two pixels, and the border
+		warms towards the brand — no shadow, because the rest of this system does not
+		use them and a hover state is a poor place to introduce one.
+	*/
 	.lift {
 		transition:
 			transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
-			border-color 220ms ease,
-			box-shadow 220ms ease;
+			border-color 220ms ease;
 	}
 
 	.lift:hover {
 		transform: translateY(-2px);
 		border-color: var(--b-6);
-		box-shadow: var(--shadow-raised);
 	}
 
 	/* Fades the ends of a row, so names run off the edge rather than stopping at it. */
