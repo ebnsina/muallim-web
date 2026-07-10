@@ -80,6 +80,11 @@
 							</a>
 						</h2>
 
+						<p class="text-muted mt-1.5 text-sm">
+							<span class="numeral">{course.lesson_count}</span>
+							{course.lesson_count === 1 ? 'lesson' : 'lessons'}
+						</p>
+
 						{#snippet footer()}
 							<a
 								class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"

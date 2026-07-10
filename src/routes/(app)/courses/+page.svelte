@@ -37,6 +37,7 @@
 						title={course.title}
 						summary={course.summary}
 						difficulty={course.difficulty}
+						lessonCount={course.lesson_count}
 						href={resolve(`/courses/${course.slug}`)}
 					/>
 				</li>

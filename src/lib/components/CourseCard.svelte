@@ -6,10 +6,11 @@
 		title: string;
 		summary?: string;
 		difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+		lessonCount?: number;
 		href: string;
 	};
 
-	let { title, summary, difficulty, href }: Props = $props();
+	let { title, summary, difficulty, lessonCount, href }: Props = $props();
 </script>
 
 <!--
@@ -28,5 +29,11 @@
 
 	{#snippet footer()}
 		<Difficulty level={difficulty} />
+		{#if lessonCount != null}
+			<span class="text-muted text-sm">
+				<span class="numeral">{lessonCount}</span>
+				{lessonCount === 1 ? 'lesson' : 'lessons'}
+			</span>
+		{/if}
 	{/snippet}
 </TintCard>
