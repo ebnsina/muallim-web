@@ -46,6 +46,20 @@ pnpm build
 
 **Performance is the competitive claim.** SSR by default, no fetch waterfalls, explicit image dimensions, guard the bundle.
 
+## Design conventions (the user keeps repeating these — do not forget)
+
+**Reach for the design system first.** Use the components in `src/lib/components` and the semantic tokens (`bg-surface`, `text-muted`, `accent`/`success`/`warning`/`danger` with their `-surface`/`-text`/`-border`, `.numeral`, `rounded-card`/`rounded-control`). If a piece is missing, build it to the same pattern and reuse it — never one-off inline styling that drifts from the rest.
+
+**Never invent data.** Show only what the API returns. No points/PX, streaks, "insights", task/module/quiz counts, or hours unless there is a real field behind them. A number nobody can check is worse than no number — the user has flagged this more than once.
+
+**Hover is a scale, not a shadow.** Cards and tiles lift with a small `transition-transform hover:scale-[1.02]`, not `hover:shadow-*`.
+
+**Tints are pastel washes, badges are frosted.** For decorative colour beyond the four semantic tokens, generate a hue with `courseHue()` in `src/lib/tint.ts` and paint it as a theme-aware `oklch(L C var(--h))` (pale in light, muted in dark). Chips over a tint are translucent + `backdrop-blur-sm`, not solid.
+
+**Cards: a tinted panel inset in a lighter frame.** A `rounded-2xl` outer with a light border (`border-border/60`) and a small `p-1` inset, a `rounded-xl` tinted panel inside, the plain action on a strip below.
+
+**The landing page redesign is deferred** — the user asked to leave `src/routes/+page.svelte` (marketing) for later.
+
 ## Git
 
 Author every commit as `ebnsina <ebnsina.me@gmail.com>`, configured **per repo**:
