@@ -56,7 +56,7 @@ pnpm build
 
 **Tints are pastel washes, badges are frosted.** For decorative colour beyond the four semantic tokens, generate a hue with `courseHue()` in `src/lib/tint.ts` and paint it as a theme-aware `oklch(L C var(--h))` (pale in light, muted in dark). Chips over a tint are translucent + `backdrop-blur-sm`, not solid.
 
-**Cards: a tinted panel inset in a lighter frame.** A `rounded-2xl` outer with a light border (`border-border/60`) and a small `p-1` inset, a `rounded-xl` tinted panel inside, the plain action on a strip below.
+**Cards: reach for `TintCard`.** The tinted-panel card (a `rounded-2xl` frame with a light border and small inset, a `rounded-xl` washed panel, a corner glyph, hover-scale) lives in `src/lib/components/TintCard.svelte`. It takes the panel body as its `children` snippet and an optional `footer` snippet, and seeds its hue from `title` + `index` (or an explicit `hue`). Use it for anything card-shaped — the catalogue (`CourseCard` wraps it) and the Teach list already do — rather than re-deriving the frame inline.
 
 **The landing page redesign is deferred** — the user asked to leave `src/routes/+page.svelte` (marketing) for later.
 
