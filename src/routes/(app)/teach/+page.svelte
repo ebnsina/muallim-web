@@ -31,7 +31,14 @@
 <svelte:head><title>Teach — Muallim</title></svelte:head>
 
 <Page width="wide">
-	<PageHeader title="Your courses" description="Drafts are visible only to you." />
+	<PageHeader title="Your courses" description="Drafts are visible only to you.">
+		{#snippet actions()}
+			<Button href={resolve('/teach/grading')} variant="secondary" size="sm">Grading scales</Button>
+			<Button href={resolve('/teach/certificates')} variant="secondary" size="sm">
+				Certificates
+			</Button>
+		{/snippet}
+	</PageHeader>
 
 	{#if form?.message}
 		<Alert tone="danger" class="mt-6" role="alert">

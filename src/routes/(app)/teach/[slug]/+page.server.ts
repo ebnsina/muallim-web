@@ -21,15 +21,17 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	// Started before the layout's curriculum is awaited, so the two overlap. An
-	// author waiting for two round trips in series is waiting for no reason.
+	// Started before the layout's curriculum is awaited, so they overlap. An author
+	// waiting for round trips in series is waiting for no reason.
 	const rest = Promise.all([
 		api.GET('/v1/courses/{slug}/prerequisites', { params: { path: { slug: params.slug } } }),
-		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } })
+		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } }),
+		api.GET('/v1/certificate-templates'),
+		api.GET('/v1/courses/{slug}/certificate-template', { params: { path: { slug: params.slug } } })
 	]);
 
 	await parent();
-	const [prerequisites, mine] = await rest;
+	const [prerequisites, mine, templates, courseTemplate] = await rest;
 
 	// Every other course in the workspace, so the author picks a prerequisite from
 	// a list rather than typing a slug and finding out later that they mistyped it.
@@ -38,7 +40,11 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	// `course`, `topics` and `lessonCount` come from the layout.
 	return {
 		prerequisites: prerequisites.data?.prerequisites ?? [],
-		candidates
+		candidates,
+
+		// The certificate template picker. `null` template_id is the built-in default.
+		certificateTemplates: templates.data?.templates ?? [],
+		currentTemplateId: courseTemplate.data?.template_id ?? null
 	};
 };
 
@@ -78,6 +84,30 @@ function guard(accessToken: string | null): asserts accessToken is string {
 }
 
 export const actions: Actions = {
+	/** Choose what this course's certificate says. Empty is the built-in default. */
+	setCertificateTemplate: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const chosen = String(form.get('template_id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+			'/v1/courses/{slug}/certificate-template',
+			{
+				params: { path: { slug: params.slug } },
+				body: { template_id: chosen === '' ? null : chosen }
+			}
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'That certificate template could not be applied.')
+			});
+		}
+
+		return { templateSaved: true };
+	},
+
 	addTopic: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 

@@ -17,6 +17,9 @@
 
 	let { data, form }: PageProps = $props();
 
+	// The <select> value: the course's template, or '' for the built-in default.
+	const currentTemplateId = $derived(data.currentTemplateId ?? '');
+
 	const crumbs = $derived([
 		{ label: 'Teach', href: resolve('/teach') },
 		{ label: data.course.title }
@@ -66,6 +69,8 @@
 		<Alert tone="danger" class="mt-6" role="alert">
 			{form.message}
 		</Alert>
+	{:else if form?.templateSaved}
+		<Alert tone="success" class="mt-6" role="status">Certificate template updated.</Alert>
 	{/if}
 
 	<section class="mt-8">
@@ -140,6 +145,35 @@
 						There is no other course in this workspace to require.
 					</p>
 				{/if}
+			</div>
+
+			<div class="border-t border-border pt-6">
+				<h2 class="font-medium">Certificate</h2>
+				<p class="text-muted mt-1 text-sm">
+					The words a learner's certificate carries when they finish. Write templates on the
+					<a class="underline underline-offset-4" href={resolve('/teach/certificates')}>
+						certificate templates
+					</a> page.
+				</p>
+
+				<form
+					method="POST"
+					action="?/setCertificateTemplate"
+					use:enhance
+					class="mt-3 flex items-end gap-2"
+				>
+					<div class="min-w-0 flex-1">
+						<Label class="sr-only" for="cert-template">Certificate template</Label>
+						<Select id="cert-template" name="template_id" value={currentTemplateId}>
+							{#each data.certificateTemplates as template (template.id ?? 'builtin')}
+								<option value={template.id ?? ''}>
+									{template.name}{template.builtin ? ' (built in)' : ''}
+								</option>
+							{/each}
+						</Select>
+					</div>
+					<Button type="submit" variant="secondary" size="sm">Apply</Button>
+				</form>
 			</div>
 		</Card>
 	</section>
