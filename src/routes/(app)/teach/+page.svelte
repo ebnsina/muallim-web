@@ -15,6 +15,7 @@
 		Sheet,
 		TintCard
 	} from '$lib/components';
+	import { difficultyHue } from '$lib/tint';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -112,15 +113,16 @@
 		</div>
 	{:else}
 		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.courses as course, index (course.id)}
+			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<!--
-						The same tinted shell as the catalogue, filled with what an author needs
-						instead: the draft/live state, and the one action that changes it. Not a
-						whole-card link — a publish button cannot live inside an anchor — so the
-						title carries the link and the footer carries the button.
+						The same tinted shell as the catalogue, tinted by the same difficulty,
+						filled with what an author needs instead: the draft/live state, and the
+						one action that changes it. Not a whole-card link — a publish button
+						cannot live inside an anchor — so the title carries the link and the
+						footer carries the button.
 					-->
-					<TintCard title={course.title} {index}>
+					<TintCard hue={difficultyHue(course.difficulty)}>
 						<!--
 							A badge, not `text-xs uppercase`. `draft` and `published` are the same
 							word in two states, and the tone is what says which.

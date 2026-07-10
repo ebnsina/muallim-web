@@ -1,21 +1,23 @@
-const GOLDEN_ANGLE = 137.508;
+/** The brand hue, for a tinted thing that names no difficulty of its own. */
+export const DEFAULT_HUE = 255;
 
-/**
- * A hue, in degrees, for a decorative pastel tint.
- *
- * The four semantic tokens (accent, success, warning, danger) are too few for a
- * grid of cards — a page repeats them, and two of the four read as the same
- * blue. This gives a whole wheel instead: the golden angle steps successive
- * cards as far apart as a circle allows, so a colour never marches down a
- * column, and the title mixes in so the run is not identical on every page.
- *
- * A hue only — the card turns it into a wash with `oklch(L C hue)`, choosing L
- * and C per theme, so the same number is a soft tint in light mode and a muted
- * one in the dark. Deterministic, so the server and the browser never disagree
- * and paint two different colours across a hydration.
- */
-export function courseHue(title: string, index = 0): number {
-	let h = 0;
-	for (let i = 0; i < title.length; i++) h = (Math.imul(h, 31) + title.charCodeAt(i)) | 0;
-	return Math.round((index * GOLDEN_ANGLE + Math.abs(h)) % 360);
+/*
+	A hue per difficulty — a ramp a reader can learn in one glance: a green
+	beginner, a blue intermediate, an amber advanced, a rose expert. Colour that
+	means something and is the same on every card, rather than a shade picked at
+	random from the card's place in a list.
+
+	A hue only — the card turns it into a wash with `oklch(L C hue)`, choosing L and
+	C per theme, so the same difficulty is a soft tint in light mode and a muted one
+	in the dark.
+*/
+const DIFFICULTY_HUE: Record<string, number> = {
+	beginner: 150,
+	intermediate: 255,
+	advanced: 60,
+	expert: 350
+};
+
+export function difficultyHue(difficulty: string): number {
+	return DIFFICULTY_HUE[difficulty] ?? DEFAULT_HUE;
 }

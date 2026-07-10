@@ -4,16 +4,12 @@
 	import { BookOpen01Icon } from '@hugeicons/core-free-icons';
 	import Icon from './Icon.svelte';
 	import { cn } from '$lib/utils';
-	import { courseHue } from '$lib/tint';
+	import { DEFAULT_HUE } from '$lib/tint';
 
 	type Props = {
 		/** When set, the whole card is that link and lifts on hover. */
 		href?: string;
-		/** Seeds the tint when no explicit `hue` is given. */
-		title?: string;
-		/** Its place in a list, to spread the tints across a grid. */
-		index?: number;
-		/** An explicit hue in degrees, overriding the one derived from the title. */
+		/** The wash's hue in degrees. Defaults to the brand tint. */
 		hue?: number;
 		/** The faint mark in the far corner. Set to `null` for none. */
 		glyph?: IconSvgElement | null;
@@ -29,9 +25,7 @@
 
 	let {
 		href,
-		title,
-		index = 0,
-		hue,
+		hue = DEFAULT_HUE,
 		glyph = BookOpen01Icon,
 		interactive,
 		class: className,
@@ -39,7 +33,6 @@
 		footer
 	}: Props = $props();
 
-	const resolvedHue = $derived(hue ?? courseHue(title ?? '', index));
 	const lifts = $derived(interactive ?? href != null);
 
 	const frame = $derived(
@@ -60,10 +53,7 @@
 	without any of them re-deriving the wash, the inset, or the hover.
 -->
 {#snippet body()}
-	<div
-		class="panel relative flex-1 overflow-hidden rounded-xl px-5 pt-5 pb-6"
-		style="--h: {resolvedHue}"
-	>
+	<div class="panel relative flex-1 overflow-hidden rounded-xl px-5 pt-5 pb-6" style="--h: {hue}">
 		{#if glyph}
 			<!-- The icon strokes with currentColor, so the hue is set on the wrapper. -->
 			<span class="ink pointer-events-none absolute -right-4 -bottom-5 block size-32 opacity-20">

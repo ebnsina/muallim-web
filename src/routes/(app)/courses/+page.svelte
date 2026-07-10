@@ -31,14 +31,13 @@
 			drafts here either — there is no "my courses" endpoint behind this page.
 		-->
 		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.courses as course, index (course.id)}
+			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<CourseCard
 						title={course.title}
 						summary={course.summary}
 						difficulty={course.difficulty}
 						href={resolve(`/courses/${course.slug}`)}
-						{index}
 					/>
 				</li>
 			{/each}

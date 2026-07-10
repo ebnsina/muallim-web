@@ -1,35 +1,31 @@
 <script lang="ts">
 	import { ArrowRight01Icon } from '@hugeicons/core-free-icons';
+	import Badge from './Badge.svelte';
 	import Icon from './Icon.svelte';
 	import TintCard from './TintCard.svelte';
+	import { difficultyHue } from '$lib/tint';
 
 	type Props = {
 		title: string;
 		summary?: string;
 		difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
 		href: string;
-		/** Its place in the list, to spread the tints across the grid. */
-		index?: number;
 	};
 
-	let { title, summary, difficulty, href, index = 0 }: Props = $props();
+	let { title, summary, difficulty, href }: Props = $props();
 
 	const level = $derived(difficulty.charAt(0).toUpperCase() + difficulty.slice(1));
 </script>
 
 <!--
-	A catalogue course, in the shared tinted shell. Only what the listing knows — a
-	title, a summary, a difficulty. The reference's task and module counts are
-	absent because the endpoint does not return them, and a number with nothing
-	behind it is worse than no number.
+	A catalogue course, in the shared tinted shell, tinted by its difficulty so the
+	colour is a legend the eye learns. Only what the listing knows — a title, a
+	summary, a difficulty. The reference's task and module counts are absent because
+	the endpoint does not return them, and a number with nothing behind it is worse
+	than no number.
 -->
-<TintCard {href} {title} {index}>
-	<!-- Frosted, not solid: a translucent pill that lets the tint show through it. -->
-	<span
-		class="inline-flex rounded-full bg-surface-raised/50 px-3 py-1 font-mono text-xs font-medium backdrop-blur-sm"
-	>
-		{level}
-	</span>
+<TintCard {href} hue={difficultyHue(difficulty)}>
+	<Badge>{level}</Badge>
 
 	<h2 class="mt-4 text-lg font-semibold text-pretty">{title}</h2>
 
