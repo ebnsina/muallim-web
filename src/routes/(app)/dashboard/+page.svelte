@@ -4,9 +4,7 @@
 	import {
 		ArrowRight01Icon,
 		Award01Icon,
-		Book02Icon,
 		BookOpen01Icon,
-		ChartLineData01Icon,
 		CheckmarkCircle02Icon,
 		PencilEdit02Icon,
 		PlusSignIcon
@@ -18,12 +16,12 @@
 		Card,
 		EmptyState,
 		Icon,
-		Numeral,
 		Page,
-		PageHeader,
-		Progress
+		Progress,
+		RadialProgress
 	} from '$lib/components';
 	import { canAuthor as canAuthorRole } from '$lib/roles';
+	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -34,17 +32,14 @@
 
 	const firstName = $derived(data.user.name.split(' ')[0]);
 
-	const active = $derived(data.enrolments.filter((e) => e.status === 'active'));
+	// Furthest along first: the top of the list is the thing to resume.
+	const active = $derived(
+		data.enrolments
+			.filter((e) => e.status === 'active')
+			.sort((a, b) => (b.progress?.percent ?? 0) - (a.progress?.percent ?? 0))
+	);
 	const finished = $derived(data.enrolments.filter((e) => e.status === 'completed'));
 
-	/*
-		The mean of the per-course percentages, and the card says "average" so it
-		cannot be mistaken for the other one.
-
-		A learner three lessons into a thirty-lesson course and one lesson into a
-		two-lesson course is 30% done on average and 12% done by lessons. Neither is
-		wrong. This is the one people mean when they ask.
-	*/
 	const averagePercent = $derived(
 		data.enrolments.length === 0
 			? 0
@@ -54,73 +49,53 @@
 				)
 	);
 
-	/** What to open next: furthest along, and not yet finished. */
-	const continueWith = $derived(
-		[...active].sort((a, b) => (b.progress?.percent ?? 0) - (a.progress?.percent ?? 0)).slice(0, 3)
-	);
-
-	/** Lessons finished across every course. A number the learner could count. */
 	const lessonsDone = $derived(
 		data.enrolments.reduce((total, e) => total + (e.progress?.lessons_completed ?? 0), 0)
 	);
 
-	/*
-		No "courses you teach" figure here, and the omission is deliberate.
+	function lessonsLeft(progress: { lessons_total?: number; lessons_completed?: number } | null) {
+		return Math.max(0, (progress?.lessons_total ?? 0) - (progress?.lessons_completed ?? 0));
+	}
 
-		`/v1/me/courses` is a page, not a count — asking it for six courses and then
-		reporting `6` would report the page size to anyone with more than six, and
-		report it confidently. The list below says "recent" and links to the rest.
-		A number nobody can check is a number nobody should be shown.
+	/*
+		Four numbers, each one the learner could count for themselves. No streak, no
+		hours studied, no points, no "insights": a figure nobody can check is a figure
+		nobody should be shown, and that rule is what keeps the invented widgets other
+		dashboards carry off this one.
 	*/
 	const STATS = $derived([
-		{
-			icon: BookOpen01Icon,
-			label: 'Courses in progress',
-			value: active.length,
-			suffix: '',
-			tone: 'accent'
-		},
-		{
-			icon: CheckmarkCircle02Icon,
-			label: 'Courses finished',
-			value: finished.length,
-			suffix: '',
-			tone: 'success'
-		},
-		{
-			icon: ChartLineData01Icon,
-			label: 'Average progress',
-			value: averagePercent,
-			suffix: '%',
-			tone: 'warning'
-		},
-		{ icon: Book02Icon, label: 'Lessons completed', value: lessonsDone, suffix: '', tone: 'accent' }
-	] as const);
+		{ label: 'In progress', value: active.length, tone: 'accent' as const },
+		{ label: 'Finished', value: finished.length, tone: 'success' as const },
+		{ label: 'Lessons completed', value: lessonsDone, tone: 'accent' as const },
+		{ label: 'Average progress', value: `${averagePercent}%`, tone: 'warning' as const }
+	]);
 
-	// The icon chip's colour, per stat. Written out rather than composed, because
-	// Tailwind reads class strings statically and cannot see `bg-${tone}-surface`.
-	const CHIP: Record<string, string> = {
-		accent: 'bg-accent-surface text-accent-text',
-		success: 'bg-success-surface text-success-text',
-		warning: 'bg-warning-surface text-warning-text'
+	const DOT: Record<string, string> = {
+		accent: 'text-accent',
+		success: 'text-success',
+		warning: 'text-warning'
 	};
 </script>
 
 <svelte:head><title>Dashboard — Muallim</title></svelte:head>
 
 <Page width="full">
-	<div>
-		<PageHeader title="Welcome back, {firstName}." description={data.user.email} />
+	<div class="flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Welcome back, {firstName}.</h1>
+			<p class="text-muted mt-1 text-sm">{data.user.email}</p>
+		</div>
+		<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
 	</div>
 
 	{#if form?.resent}
-		<Alert class="mt-8" role="status">
+		<Alert class="mt-6" role="status">
 			A new confirmation link is on its way. Any earlier link has stopped working.
 		</Alert>
 	{:else if form?.message}
-		<Alert tone="danger" class="mt-8" role="alert">{form.message}</Alert>
+		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{:else if !data.user.email_verified}
-		<Alert tone="warning" class="mt-8">
+		<Alert tone="warning" class="mt-6">
 			<div class="flex flex-wrap items-center gap-3">
 				<span>Your email address is not confirmed yet.</span>
 				<form method="POST" action="?/resendVerification" use:enhance>
@@ -130,54 +105,13 @@
 		</Alert>
 	{/if}
 
-	<!--
-		Four numbers, and each is one the learner could count for themselves. No
-		streak, no engagement score, no badge: a figure nobody can check is a figure
-		nobody should be shown.
-	-->
-	<section aria-label="Your progress" class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-		{#each STATS as stat (stat.label)}
-			<Card class="flex items-center gap-4 p-5">
-				<!--
-					The colour lives in the chip, not the card. A wall of four fully-tinted
-					cards is louder than the numbers on them; a small badge of colour tells
-					the eye which is which without shouting.
-				-->
-				<span
-					class={[
-						'flex size-11 shrink-0 items-center justify-center rounded-card',
-						CHIP[stat.tone]
-					]}
-				>
-					<Icon icon={stat.icon} class="size-5" />
-				</span>
-				<div class="min-w-0">
-					<p class="truncate text-sm text-muted">{stat.label}</p>
-					<p class="flex items-baseline text-2xl font-semibold tracking-tight">
-						<Numeral value={stat.value} />{stat.suffix}
-					</p>
-				</div>
-			</Card>
-		{/each}
-	</section>
+	<div class="mt-8 grid gap-8 lg:grid-cols-3">
+		<!-- ===================================================== learning (main) -->
+		<div class="lg:col-span-2">
+			<h2 class="text-lg font-semibold">Continue learning</h2>
 
-	<div class="mt-12 grid gap-10 lg:grid-cols-3">
-		<!-- --------------------------------------------------------- keep going -->
-		<!-- A student has no teaching column, so this takes the whole width rather
-		     than leaving a third of the page empty beside it. -->
-		<section class={canAuthor ? 'lg:col-span-2' : 'lg:col-span-3'}>
-			<div class="flex items-baseline justify-between gap-3">
-				<h2 class="text-lg font-semibold">Keep going</h2>
-				<a
-					class="text-sm text-muted underline-offset-4 hover:text-text hover:underline"
-					href={resolve('/courses')}
-				>
-					Browse the catalogue
-				</a>
-			</div>
-
-			{#if continueWith.length === 0}
-				<div class="mt-5">
+			{#if active.length === 0}
+				<div class="mt-4">
 					<EmptyState
 						icon={BookOpen01Icon}
 						title="Nothing on the go"
@@ -189,48 +123,71 @@
 					</EmptyState>
 				</div>
 			{:else}
-				<ul class="mt-5 space-y-3">
-					{#each continueWith as enrolment (enrolment.course_slug)}
+				<ul class="mt-4 space-y-4">
+					{#each active as enrolment, index (enrolment.course_slug)}
 						{@const progress = enrolment.progress}
+						{@const percent = progress?.percent ?? 0}
 						<li>
-							<Card class="lift p-5">
-								<div class="flex items-start justify-between gap-4">
-									<div class="flex min-w-0 items-start gap-3">
-										<span
-											class="flex size-10 shrink-0 items-center justify-center rounded-card bg-accent-surface text-accent-text"
-										>
-											<Icon icon={BookOpen01Icon} class="size-5" />
-										</span>
-										<div class="min-w-0">
-											<a
-												class="font-medium underline-offset-4 hover:underline"
+							<!--
+								The furthest-along course is the one to resume, so it wears a colour
+								the others do not — a tinted wash and its border in the accent — and
+								carries the ring. The rest are plain cards. One highlight, not five.
+							-->
+							<Card
+								class={cn(
+									'lift p-5 sm:p-6',
+									index === 0 &&
+										'border-accent-border bg-gradient-to-br from-accent-surface to-surface-raised'
+								)}
+							>
+								<div class="flex items-start gap-5">
+									{#if index === 0}
+										<div class="hidden shrink-0 sm:block">
+											<RadialProgress value={percent} label="{percent}% complete" size={84} />
+										</div>
+									{/if}
+
+									<div class="min-w-0 flex-1">
+										<div class="flex flex-wrap items-start justify-between gap-3">
+											<div class="min-w-0">
+												{#if index === 0}
+													<p class="text-accent-text text-xs font-medium tracking-wide uppercase">
+														Pick up where you left off
+													</p>
+												{/if}
+												<a
+													class="mt-1 block font-semibold text-pretty underline-offset-4 hover:underline"
+													href={resolve(`/courses/${enrolment.course_slug}`)}
+												>
+													{enrolment.course_title}
+												</a>
+											</div>
+
+											<Button
 												href={resolve(`/courses/${enrolment.course_slug}`)}
+												variant={index === 0 ? 'primary' : 'secondary'}
+												size="sm"
 											>
-												{enrolment.course_title}
-											</a>
-											<p class="numeral mt-0.5 text-xs text-muted">
-												{progress?.lessons_completed ?? 0} of {progress?.lessons_total ?? 0} lessons
-											</p>
+												Continue
+												<Icon icon={ArrowRight01Icon} class="size-4" />
+											</Button>
+										</div>
+
+										<div class="mt-4 flex items-center justify-between gap-3 text-sm">
+											<span class="numeral font-medium">{percent}% done</span>
+											<span class="text-muted numeral text-xs">
+												{lessonsLeft(progress)}
+												{lessonsLeft(progress) === 1 ? 'lesson' : 'lessons'} left
+											</span>
+										</div>
+										<div class="mt-2">
+											<Progress
+												value={progress?.lessons_completed ?? 0}
+												max={progress?.lessons_total ?? 1}
+												label="{percent}% of {enrolment.course_title} complete"
+											/>
 										</div>
 									</div>
-
-									<Button
-										href={resolve(`/courses/${enrolment.course_slug}`)}
-										variant="secondary"
-										size="sm"
-									>
-										Resume
-										<Icon icon={ArrowRight01Icon} class="size-4" />
-									</Button>
-								</div>
-
-								<div class="mt-4 flex items-center gap-3">
-									<Progress
-										value={progress?.lessons_completed ?? 0}
-										max={progress?.lessons_total ?? 1}
-										label="{progress?.percent ?? 0}% of {enrolment.course_title} complete"
-									/>
-									<span class="numeral shrink-0 text-xs text-muted">{progress?.percent ?? 0}%</span>
 								</div>
 							</Card>
 						</li>
@@ -239,9 +196,8 @@
 			{/if}
 
 			{#if finished.length > 0}
-				<div class="mt-12 flex items-baseline justify-between gap-3">
+				<div class="mt-10 flex items-baseline justify-between gap-3">
 					<h2 class="text-lg font-semibold">Finished</h2>
-					<!-- Finishing a course issues a certificate; this is where they collect. -->
 					<a
 						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
 						href={resolve('/certificates')}
@@ -249,7 +205,7 @@
 						Your certificates
 					</a>
 				</div>
-				<ul class="mt-5 space-y-2">
+				<ul class="mt-4 space-y-2">
 					{#each finished as enrolment (enrolment.course_slug)}
 						<li>
 							<Card class="flex items-center justify-between gap-4 px-5 py-3.5">
@@ -272,67 +228,84 @@
 					{/each}
 				</ul>
 			{/if}
-		</section>
+		</div>
 
-		<!-- ---------------------------------------------------------- you teach -->
-		{#if canAuthor}
-			<section>
-				<div class="flex items-baseline justify-between gap-3">
-					<h2 class="text-lg font-semibold">Recently taught</h2>
-					<a
-						class="text-sm text-muted underline-offset-4 hover:text-text hover:underline"
-						href={resolve('/teach')}
-					>
-						All courses
-					</a>
-				</div>
+		<!-- =================================================== summary (aside) -->
+		<aside class="space-y-8">
+			<!-- The four numbers, a compact block rather than a strip: on the side they
+			     read as a summary, which is what they are. -->
+			<Card class="p-5">
+				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+				<dl class="mt-4 grid grid-cols-2 gap-y-5">
+					{#each STATS as stat (stat.label)}
+						<div>
+							<dt class="text-muted flex items-center gap-1.5 text-xs">
+								<span class={['text-[0.5rem]', DOT[stat.tone]]}>●</span>
+								{stat.label}
+							</dt>
+							<dd class="numeral mt-1 text-2xl font-semibold tracking-tight">{stat.value}</dd>
+						</div>
+					{/each}
+				</dl>
+			</Card>
 
-				{#if data.teaching.length === 0}
-					<div class="mt-5">
-						<EmptyState
-							icon={PencilEdit02Icon}
-							title="No courses yet"
-							description="Write the first one."
+			{#if canAuthor}
+				<section>
+					<div class="flex items-baseline justify-between gap-3">
+						<h2 class="text-lg font-semibold">Recently taught</h2>
+						<a
+							class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
+							href={resolve('/teach')}
 						>
-							{#snippet action()}
-								<Button href={resolve('/teach')} size="sm">
-									<Icon icon={PlusSignIcon} class="size-4" />
-									Create a course
-								</Button>
-							{/snippet}
-						</EmptyState>
+							All courses
+						</a>
 					</div>
-				{:else}
-					<ul class="mt-5 space-y-2">
-						{#each data.teaching as course (course.slug)}
-							<li>
-								<Card class="lift px-5 py-3.5">
-									<div class="flex items-start justify-between gap-3">
-										<a
-											class="text-sm font-medium underline-offset-4 hover:underline"
-											href={resolve(`/teach/${course.slug}`)}
-										>
-											{course.title}
-										</a>
 
-										<!-- Draft and live differ by icon and word, never by colour alone. -->
-										{#if course.status === 'published'}
-											<Badge tone="success" icon={CheckmarkCircle02Icon}>Live</Badge>
-										{:else}
-											<Badge icon={PencilEdit02Icon}>Draft</Badge>
-										{/if}
-									</div>
-								</Card>
-							</li>
-						{/each}
-					</ul>
+					{#if data.teaching.length === 0}
+						<div class="mt-4">
+							<EmptyState
+								icon={PencilEdit02Icon}
+								title="No courses yet"
+								description="Write the first one."
+							>
+								{#snippet action()}
+									<Button href={resolve('/teach')} size="sm">
+										<Icon icon={PlusSignIcon} class="size-4" />
+										Create a course
+									</Button>
+								{/snippet}
+							</EmptyState>
+						</div>
+					{:else}
+						<ul class="mt-4 space-y-2">
+							{#each data.teaching as course (course.slug)}
+								<li>
+									<Card class="lift px-5 py-3.5">
+										<div class="flex items-start justify-between gap-3">
+											<a
+												class="text-sm font-medium underline-offset-4 hover:underline"
+												href={resolve(`/teach/${course.slug}`)}
+											>
+												{course.title}
+											</a>
+											{#if course.status === 'published'}
+												<Badge tone="success" icon={CheckmarkCircle02Icon}>Live</Badge>
+											{:else}
+												<Badge icon={PencilEdit02Icon}>Draft</Badge>
+											{/if}
+										</div>
+									</Card>
+								</li>
+							{/each}
+						</ul>
 
-					<Button href={resolve('/teach')} variant="secondary" size="sm" class="mt-5 w-full">
-						<Icon icon={PlusSignIcon} class="size-4" />
-						New course
-					</Button>
-				{/if}
-			</section>
-		{/if}
+						<Button href={resolve('/teach')} variant="secondary" size="sm" class="mt-4 w-full">
+							<Icon icon={PlusSignIcon} class="size-4" />
+							New course
+						</Button>
+					{/if}
+				</section>
+			{/if}
+		</aside>
 	</div>
 </Page>
