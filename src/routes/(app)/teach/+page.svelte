@@ -12,8 +12,8 @@
 		Input,
 		Page,
 		PageHeader,
-		Row,
-		Select
+		Select,
+		TintCard
 	} from '$lib/components';
 	import type { PageProps } from './$types';
 
@@ -30,7 +30,7 @@
 
 <svelte:head><title>Teach — Muallim</title></svelte:head>
 
-<Page width="wide">
+<Page width="full">
 	<PageHeader title="Your courses" description="Drafts are visible only to you.">
 		{#snippet actions()}
 			<Button href={resolve('/teach/grading')} variant="secondary" size="sm">Grading scales</Button>
@@ -46,7 +46,7 @@
 		</Alert>
 	{/if}
 
-	<section class="mt-8">
+	<section class="mt-8 max-w-2xl">
 		<h2 class="sr-only">New course</h2>
 
 		<Card class="p-5">
@@ -105,39 +105,50 @@
 			/>
 		</div>
 	{:else}
-		<ul class="mt-10 space-y-3">
-			{#each data.courses as course (course.id)}
-				<li>
-					<Row>
-						<div class="min-w-0">
-							<a
-								class="font-medium underline-offset-4 hover:underline"
-								href={resolve(`/teach/${course.slug}`)}
-							>
+		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+			{#each data.courses as course, index (course.id)}
+				<li class="contents">
+					<!--
+						The same tinted shell as the catalogue, filled with what an author needs
+						instead: the draft/live state, and the one action that changes it. Not a
+						whole-card link — a publish button cannot live inside an anchor — so the
+						title carries the link and the footer carries the button.
+					-->
+					<TintCard title={course.title} {index}>
+						<!--
+							A badge, not `text-xs uppercase`. `draft` and `published` are the same
+							word in two states, and the tone is what says which.
+						-->
+						<Badge tone={course.status === 'published' ? 'success' : 'neutral'}>
+							{course.status}
+						</Badge>
+
+						<h2 class="mt-4 text-lg font-semibold text-pretty">
+							<a class="underline-offset-4 hover:underline" href={resolve(`/teach/${course.slug}`)}>
 								{course.title}
 							</a>
-							<div class="mt-1.5">
-								<!--
-									A badge, not `text-xs uppercase`. `draft` and `published` are the
-									same word in two states, and the tone is what says which.
-								-->
-								<Badge tone={course.status === 'published' ? 'success' : 'neutral'}>
-									{course.status}
-								</Badge>
-							</div>
-						</div>
+						</h2>
 
-						<form
-							method="POST"
-							action={course.status === 'published' ? '?/unpublish' : '?/publish'}
-							use:enhance
-						>
-							<input type="hidden" name="slug" value={course.slug} />
-							<Button type="submit" variant="secondary" size="sm">
-								{course.status === 'published' ? 'Unpublish' : 'Publish'}
-							</Button>
-						</form>
-					</Row>
+						{#snippet footer()}
+							<a
+								class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
+								href={resolve(`/teach/${course.slug}`)}
+							>
+								Edit
+							</a>
+
+							<form
+								method="POST"
+								action={course.status === 'published' ? '?/unpublish' : '?/publish'}
+								use:enhance
+							>
+								<input type="hidden" name="slug" value={course.slug} />
+								<Button type="submit" variant="secondary" size="sm">
+									{course.status === 'published' ? 'Unpublish' : 'Publish'}
+								</Button>
+							</form>
+						{/snippet}
+					</TintCard>
 				</li>
 			{/each}
 		</ul>
