@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import {
 		ArrowRight01Icon,
+		Award01Icon,
 		Book02Icon,
 		BookOpen01Icon,
 		ChartLineData01Icon,
@@ -72,11 +73,37 @@
 		A number nobody can check is a number nobody should be shown.
 	*/
 	const STATS = $derived([
-		{ icon: BookOpen01Icon, label: 'Courses in progress', value: active.length, suffix: '' },
-		{ icon: CheckmarkCircle02Icon, label: 'Courses finished', value: finished.length, suffix: '' },
-		{ icon: ChartLineData01Icon, label: 'Average progress', value: averagePercent, suffix: '%' },
-		{ icon: Book02Icon, label: 'Lessons completed', value: lessonsDone, suffix: '' }
-	]);
+		{
+			icon: BookOpen01Icon,
+			label: 'Courses in progress',
+			value: active.length,
+			suffix: '',
+			tone: 'accent'
+		},
+		{
+			icon: CheckmarkCircle02Icon,
+			label: 'Courses finished',
+			value: finished.length,
+			suffix: '',
+			tone: 'success'
+		},
+		{
+			icon: ChartLineData01Icon,
+			label: 'Average progress',
+			value: averagePercent,
+			suffix: '%',
+			tone: 'warning'
+		},
+		{ icon: Book02Icon, label: 'Lessons completed', value: lessonsDone, suffix: '', tone: 'accent' }
+	] as const);
+
+	// The icon chip's colour, per stat. Written out rather than composed, because
+	// Tailwind reads class strings statically and cannot see `bg-${tone}-surface`.
+	const CHIP: Record<string, string> = {
+		accent: 'bg-accent-surface text-accent-text',
+		success: 'bg-success-surface text-success-text',
+		warning: 'bg-warning-surface text-warning-text'
+	};
 </script>
 
 <svelte:head><title>Dashboard — Muallim</title></svelte:head>
@@ -110,14 +137,26 @@
 	-->
 	<section aria-label="Your progress" class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 		{#each STATS as stat (stat.label)}
-			<Card class="p-5">
-				<div class="flex items-center justify-between gap-3">
-					<p class="text-sm text-muted">{stat.label}</p>
-					<Icon icon={stat.icon} class="size-5 shrink-0 text-muted" />
+			<Card class="flex items-center gap-4 p-5">
+				<!--
+					The colour lives in the chip, not the card. A wall of four fully-tinted
+					cards is louder than the numbers on them; a small badge of colour tells
+					the eye which is which without shouting.
+				-->
+				<span
+					class={[
+						'flex size-11 shrink-0 items-center justify-center rounded-card',
+						CHIP[stat.tone]
+					]}
+				>
+					<Icon icon={stat.icon} class="size-5" />
+				</span>
+				<div class="min-w-0">
+					<p class="truncate text-sm text-muted">{stat.label}</p>
+					<p class="flex items-baseline text-2xl font-semibold tracking-tight">
+						<Numeral value={stat.value} />{stat.suffix}
+					</p>
 				</div>
-				<p class="mt-3 flex items-baseline text-3xl font-semibold">
-					<Numeral value={stat.value} />{stat.suffix}
-				</p>
 			</Card>
 		{/each}
 	</section>
@@ -156,16 +195,23 @@
 						<li>
 							<Card class="lift p-5">
 								<div class="flex items-start justify-between gap-4">
-									<div class="min-w-0">
-										<a
-											class="font-medium underline-offset-4 hover:underline"
-											href={resolve(`/courses/${enrolment.course_slug}`)}
+									<div class="flex min-w-0 items-start gap-3">
+										<span
+											class="flex size-10 shrink-0 items-center justify-center rounded-card bg-accent-surface text-accent-text"
 										>
-											{enrolment.course_title}
-										</a>
-										<p class="numeral mt-1 text-xs text-muted">
-											{progress?.lessons_completed ?? 0} of {progress?.lessons_total ?? 0} lessons
-										</p>
+											<Icon icon={BookOpen01Icon} class="size-5" />
+										</span>
+										<div class="min-w-0">
+											<a
+												class="font-medium underline-offset-4 hover:underline"
+												href={resolve(`/courses/${enrolment.course_slug}`)}
+											>
+												{enrolment.course_title}
+											</a>
+											<p class="numeral mt-0.5 text-xs text-muted">
+												{progress?.lessons_completed ?? 0} of {progress?.lessons_total ?? 0} lessons
+											</p>
+										</div>
 									</div>
 
 									<Button
@@ -207,12 +253,19 @@
 					{#each finished as enrolment (enrolment.course_slug)}
 						<li>
 							<Card class="flex items-center justify-between gap-4 px-5 py-3.5">
-								<a
-									class="text-sm font-medium underline-offset-4 hover:underline"
-									href={resolve(`/courses/${enrolment.course_slug}`)}
-								>
-									{enrolment.course_title}
-								</a>
+								<div class="flex min-w-0 items-center gap-3">
+									<span
+										class="flex size-9 shrink-0 items-center justify-center rounded-card bg-success-surface text-success-text"
+									>
+										<Icon icon={Award01Icon} class="size-5" />
+									</span>
+									<a
+										class="min-w-0 truncate text-sm font-medium underline-offset-4 hover:underline"
+										href={resolve(`/courses/${enrolment.course_slug}`)}
+									>
+										{enrolment.course_title}
+									</a>
+								</div>
 								<Badge tone="success" icon={CheckmarkCircle02Icon}>Complete</Badge>
 							</Card>
 						</li>

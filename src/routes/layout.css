@@ -31,6 +31,16 @@
 	*/
 	--font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 
+	/*
+		A serif, used in exactly one place: the certificate. An award reads as an
+		award partly because of the face it is set in, and a grotesque cannot do the
+		job a diploma's letterforms do. No webfont for it — a certificate that waited
+		on a download would print half-styled — so it is the platform's own serif,
+		which every device already has.
+	*/
+	--font-serif:
+		ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+
 	--color-surface: var(--surface);
 	--color-surface-raised: var(--surface-raised);
 	--color-surface-sunken: var(--surface-sunken);

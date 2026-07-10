@@ -5,7 +5,15 @@
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Cancel01Icon, Menu01Icon, Mortarboard02Icon } from '@hugeicons/core-free-icons';
+	import {
+		BookOpen01Icon,
+		Cancel01Icon,
+		Menu01Icon,
+		Mortarboard02Icon,
+		TeachingIcon,
+		DashboardSquare01Icon
+	} from '@hugeicons/core-free-icons';
+	import type { IconSvgElement } from '@hugeicons/svelte';
 	import { DURATION } from '$lib/motion';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
@@ -20,18 +28,38 @@
 
 	let { user, canAuthor = false }: Props = $props();
 
+	type Tab = { href: string; label: string; icon: IconSvgElement; show: boolean };
+
 	const links = $derived(
-		[
-			{ href: resolve('/dashboard'), label: 'Dashboard', show: Boolean(user) },
-			{ href: resolve('/courses'), label: 'Courses', show: true },
-			{ href: resolve('/teach'), label: 'Teach', show: canAuthor }
-		].filter((link) => link.show)
+		(
+			[
+				{
+					href: resolve('/dashboard'),
+					label: 'Dashboard',
+					icon: DashboardSquare01Icon,
+					show: Boolean(user)
+				},
+				{ href: resolve('/courses'), label: 'Courses', icon: BookOpen01Icon, show: true },
+				{ href: resolve('/teach'), label: 'Teach', icon: TeachingIcon, show: canAuthor }
+			] satisfies Tab[]
+		).filter((link) => link.show)
 	);
 
 	// `startsWith` on a trailing slash, not equality: /teach/algebra lights up
 	// "Teach", and /teaching does not.
 	const current = (href: string) =>
 		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
+
+	// A monogram, from the first letters of the name. A face nobody uploaded is a
+	// grey silhouette; two initials in the accent are a person.
+	const initials = $derived(
+		(user?.name ?? '')
+			.split(/\s+/)
+			.filter(Boolean)
+			.slice(0, 2)
+			.map((word) => word[0]?.toUpperCase() ?? '')
+			.join('')
+	);
 
 	let open = $state(false);
 
@@ -48,40 +76,38 @@
 	});
 </script>
 
-<header class="sticky top-0 z-30 border-b border-border bg-surface/80 backdrop-blur">
-	<div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-6">
+<header class="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
+	<!-- ------------------------------------------------------ identity bar -->
+	<div class="mx-auto flex h-14 max-w-6xl items-center gap-4 px-6">
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
-			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
-			<span class="hidden sm:inline">Muallim</span>
+			<span
+				class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent"
+			>
+				<Icon icon={Mortarboard02Icon} class="size-5" />
+			</span>
+			<span class="hidden text-[0.95rem] tracking-tight sm:inline">Muallim</span>
 		</a>
 
-		<nav aria-label="Main" class="hidden items-center gap-1 sm:flex">
-			{#each links as link (link.href)}
-				<a
-					href={link.href}
-					aria-current={current(link.href) ? 'page' : undefined}
-					class={cn(
-						'rounded-pill px-3 py-1.5 text-sm font-medium transition-colors',
-						current(link.href) ? 'bg-surface-active text-text' : 'text-muted hover:text-text'
-					)}
-				>
-					{link.label}
-				</a>
-			{/each}
-		</nav>
-
-		<div class="ml-auto flex items-center gap-3">
+		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			<ThemeToggle />
 
 			{#if user}
 				<!--
-					The name and the sign-out sit together, because that is the question the
-					name answers: whose session is this, and how do I end it. A dropdown
-					would hide the second behind a click and buy nothing.
+					The name, its role, and a monogram — whose session this is. The sign-out
+					sits beside them, because the next question after "who am I" is "how do I
+					stop being them", and a dropdown would hide the answer behind a click.
 				-->
-				<div class="hidden text-right sm:block">
-					<p class="text-sm leading-tight font-medium">{user.name}</p>
-					<p class="text-muted text-xs">{user.role}</p>
+				<div class="hidden items-center gap-2.5 sm:flex">
+					<div class="text-right leading-tight">
+						<p class="text-sm font-medium">{user.name}</p>
+						<p class="text-muted text-xs capitalize">{user.role}</p>
+					</div>
+					<span
+						class="flex size-9 items-center justify-center rounded-full bg-accent-surface text-sm font-semibold text-accent-text"
+						aria-hidden="true"
+					>
+						{initials}
+					</span>
 				</div>
 
 				<!--
@@ -116,6 +142,32 @@
 		</div>
 	</div>
 
+	<!-- --------------------------------------------------------- tab row -->
+	<!--
+		A row of tabs with an underline under the current one, the shape every
+		application header has converged on: the sections are always visible, and
+		where you are is a mark under a word rather than a colour you have to know to
+		read. Hidden on a phone, where the menu button opens the same links stacked.
+	-->
+	<nav aria-label="Main" class="mx-auto hidden max-w-6xl items-center gap-1 px-4 sm:flex">
+		{#each links as link (link.href)}
+			{@const active = current(link.href)}
+			<a
+				href={link.href}
+				aria-current={active ? 'page' : undefined}
+				class={cn(
+					'-mb-px flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors',
+					active
+						? 'border-accent text-text'
+						: 'border-transparent text-muted hover:border-border-strong hover:text-text'
+				)}
+			>
+				<Icon icon={link.icon} class="size-4" />
+				{link.label}
+			</a>
+		{/each}
+	</nav>
+
 	{#if open}
 		<div
 			id="mobile-nav"
@@ -128,10 +180,11 @@
 						href={link.href}
 						aria-current={current(link.href) ? 'page' : undefined}
 						class={cn(
-							'rounded-control px-3 py-2.5 text-sm font-medium transition-colors',
+							'flex items-center gap-2.5 rounded-control px-3 py-2.5 text-sm font-medium transition-colors',
 							current(link.href) ? 'bg-surface-active text-text' : 'text-muted hover:text-text'
 						)}
 					>
+						<Icon icon={link.icon} class="size-4" />
 						{link.label}
 					</a>
 				{/each}
