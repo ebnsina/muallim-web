@@ -55,6 +55,7 @@ export default defineConfig(
 		files: [
 			'src/lib/components/Button.svelte',
 			'src/lib/components/Breadcrumbs.svelte',
+			'src/lib/components/CourseCard.svelte',
 			'src/lib/components/Row.svelte',
 			'src/routes/**/assignment/**/+page.svelte'
 		],

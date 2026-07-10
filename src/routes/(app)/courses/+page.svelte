@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { ArrowRight01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons';
-	import { Button, Difficulty, EmptyState, Icon, Page, PageHeader } from '$lib/components';
+	import { BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import { Button, CourseCard, EmptyState, Page, PageHeader } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -30,39 +30,16 @@
 			and takes no reader into account, so an author does not find their own
 			drafts here either — there is no "my courses" endpoint behind this page.
 		-->
-		<ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.courses as course (course.id)}
+		<ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+			{#each data.courses as course, index (course.id)}
 				<li class="contents">
-					<!--
-						The whole card is the link, not the title inside it. A card whose
-						clickable area is one line of text is a card people click and miss.
-						`group` is what lets the arrow answer a hover anywhere on it.
-					-->
-					<a
+					<CourseCard
+						title={course.title}
+						summary={course.summary}
+						difficulty={course.difficulty}
 						href={resolve(`/courses/${course.slug}`)}
-						class="group flex flex-col rounded-card border border-border bg-surface-raised p-5 transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-					>
-						<h2 class="font-medium text-pretty">{course.title}</h2>
-
-						{#if course.summary}
-							<!--
-								Two lines, then an ellipsis. A summary that decides the card's height
-								turns a grid into a row of ragged boxes.
-							-->
-							<p class="text-muted mt-1.5 line-clamp-2 text-sm text-pretty">{course.summary}</p>
-						{/if}
-
-						<div class="mt-5 flex items-center justify-between gap-3 pt-1">
-							<Difficulty level={course.difficulty} />
-
-							<span
-								class="text-muted flex items-center gap-1 text-xs transition-transform group-hover:translate-x-0.5 group-hover:text-text"
-							>
-								Open
-								<Icon icon={ArrowRight01Icon} class="size-3.5" />
-							</span>
-						</div>
-					</a>
+						{index}
+					/>
 				</li>
 			{/each}
 		</ul>
