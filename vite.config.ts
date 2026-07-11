@@ -11,12 +11,12 @@ const apiTarget = process.env.LMS_API_URL ?? 'http://localhost:8080';
 
 export default defineConfig({
 	/*
-		@hugeicons/svelte ships its component as an uncompiled `.svelte` file. Node
-		cannot load that during SSR, so Vite has to bundle and compile it rather than
-		leave it externalised. Without this the server render throws
-		ERR_UNKNOWN_FILE_EXTENSION on the first page that draws an icon.
+		Both ship uncompiled `.svelte` files that Node cannot load during SSR, so Vite
+		has to bundle and compile them rather than leave them externalised. Without
+		this the server render throws on the first page that draws an icon
+		(@hugeicons/svelte) or mounts an AI control (@tanstack/ai-svelte's create-chat).
 	*/
-	ssr: { noExternal: ['@hugeicons/svelte'] },
+	ssr: { noExternal: ['@hugeicons/svelte', '@tanstack/ai-svelte'] },
 
 	plugins: [
 		tailwindcss(),

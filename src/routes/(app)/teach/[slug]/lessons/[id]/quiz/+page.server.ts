@@ -1,5 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -103,6 +104,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		slug: params.slug,
 		lessonId: params.id,
 		lessonTitle: lesson.data.lesson.title,
+		lessonContent: lesson.data.lesson.content ?? '',
+		aiEnabled: aiEnabled(),
 		quiz: quiz.data?.quiz ?? null,
 		questions: quiz.data?.questions ?? [],
 		bank: bank.data?.questions ?? [],
@@ -232,6 +235,77 @@ export const actions: Actions = {
 				message: problemMessage(problem, 'That question could not be added.')
 			});
 		}
+	},
+
+	/**
+	 * Add a batch of AI-generated questions. Each is mapped to the same body a hand
+	 * authored one would send and POSTed individually, so lms-api's validator — the
+	 * one a human submission hits — refuses a malformed question rather than trusting
+	 * the model. Returns how many landed and how many were rejected.
+	 */
+	addFromAi: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		let items: unknown;
+		try {
+			items = JSON.parse(String((await request.formData()).get('questions') ?? '[]'));
+		} catch {
+			return fail(400, { message: 'The generated questions could not be read.' });
+		}
+		if (!Array.isArray(items) || items.length === 0) {
+			return fail(400, { message: 'No questions to add.' });
+		}
+
+		const api = authedApi(url.origin, locals.accessToken);
+		const CHOICE = new Set(['single_choice', 'multiple_choice', 'true_false']);
+		let added = 0;
+		let rejected = 0;
+
+		for (const raw of items as Array<Record<string, unknown>>) {
+			const type = String(raw.type ?? '');
+			const prompt = String(raw.prompt ?? '').trim();
+			if (!prompt || !TYPES.includes(type as QuestionType)) {
+				rejected++;
+				continue;
+			}
+			const points = Number.isInteger(raw.points) ? (raw.points as number) : 1;
+			const body: Record<string, unknown> = {
+				type,
+				prompt,
+				points,
+				explanation: '',
+				case_sensitive: false
+			};
+
+			if (CHOICE.has(type)) {
+				const opts = Array.isArray(raw.options) ? raw.options : [];
+				body.options = opts
+					.map((o) => {
+						const opt = (o ?? {}) as Record<string, unknown>;
+						return {
+							content: String(opt.content ?? '').trim(),
+							is_correct: Boolean(opt.correct),
+							match_content: ''
+						};
+					})
+					.filter((o) => o.content !== '');
+			} else if (type === 'short_answer') {
+				const answers = Array.isArray(raw.answers) ? raw.answers : [];
+				body.accepted = [answers.map((a) => String(a).trim()).filter(Boolean)];
+			} else {
+				rejected++;
+				continue;
+			}
+
+			const { error: problem } = await api.POST('/v1/lessons/{id}/quiz/questions', {
+				params: { path: { id: params.id } },
+				body: body as never
+			});
+			if (problem) rejected++;
+			else added++;
+		}
+
+		return { aiAdded: added, aiRejected: rejected };
 	},
 
 	saveToBank: async ({ request, locals, url }) => {

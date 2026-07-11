@@ -5,7 +5,8 @@
  * primitive step or a hex. See `$lib/design/tokens.css`, and `/ui` for the
  * gallery every one of these is rendered in.
  */
-export { default as AiField } from './AiField.svelte';
+// AiField/AiQuiz are imported directly where used, not re-exported here: they pull
+// in the TanStack AI SDK, and the barrel is on every page's import path.
 export { default as Alert, type AlertTone } from './Alert.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
 export { default as AuroraBackdrop } from './AuroraBackdrop.svelte';

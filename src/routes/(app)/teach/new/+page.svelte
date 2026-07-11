@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import {
-		AiField,
 		Alert,
 		Breadcrumbs,
 		Button,
@@ -13,6 +12,7 @@
 		Select,
 		Sheet
 	} from '$lib/components';
+	import AiField from '$lib/components/AiField.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();

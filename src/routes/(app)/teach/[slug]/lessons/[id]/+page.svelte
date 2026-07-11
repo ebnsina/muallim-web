@@ -14,6 +14,7 @@
 		Sheet,
 		Textarea
 	} from '$lib/components';
+	import AiField from '$lib/components/AiField.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -51,6 +52,17 @@
 
 	const contentType = $derived(typeOverride ?? data.lesson.content_type);
 	const videoSource = $derived(sourceOverride ?? data.lesson.video_source);
+
+	// The content is controlled so the AI draft can write into it; it re-seeds only
+	// when the lesson itself changes (navigation), never on a re-render mid-edit.
+	let content = $state('');
+	let loadedId = $state('');
+	$effect(() => {
+		if (data.lesson.id !== loadedId) {
+			loadedId = data.lesson.id;
+			content = data.lesson.content ?? '';
+		}
+	});
 
 	let submitting = $state(false);
 
@@ -132,7 +144,14 @@
 
 				<div class="space-y-2">
 					<Label for="content">Content</Label>
-					<Textarea id="content" name="content" rows={10} value={data.lesson.content ?? ''} />
+					<Textarea id="content" name="content" rows={10} bind:value={content} />
+					<AiField
+						enabled={data.aiEnabled}
+						label="Draft this lesson"
+						prompt={() =>
+							`Write the body of a short lesson titled "${data.lesson.title}"${data.courseTitle ? ` for a course on ${data.courseTitle}` : ''}. Two to four clear paragraphs a learner can follow. Plain text, no headings.`}
+						onaccept={(text) => (content = text)}
+					/>
 				</div>
 
 				{#if contentType === 'video'}

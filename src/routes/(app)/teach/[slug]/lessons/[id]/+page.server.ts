@@ -1,5 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -46,6 +47,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	return {
 		lesson: content.data.lesson,
 		slug: params.slug,
+		aiEnabled: aiEnabled(),
+		courseTitle: tree.data?.course.title ?? '',
 		dripMode: tree.data?.course.drip_mode ?? 'none',
 
 		// The stored schedule, not the reader's computed unlock date. An author edits

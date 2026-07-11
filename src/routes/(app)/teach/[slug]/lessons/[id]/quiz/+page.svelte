@@ -13,6 +13,7 @@
 		Select,
 		Textarea
 	} from '$lib/components';
+	import AiQuiz from '$lib/components/AiQuiz.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -283,6 +284,16 @@
 				</ul>
 			{/if}
 		</section>
+
+		{#if data.aiEnabled}
+			<section class="mt-12">
+				<AiQuiz
+					enabled={data.aiEnabled}
+					lessonTitle={data.lessonTitle}
+					lessonContent={data.lessonContent}
+				/>
+			</section>
+		{/if}
 
 		<section class="mt-12">
 			<h2 class="text-lg font-medium">Add a question</h2>
