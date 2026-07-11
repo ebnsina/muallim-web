@@ -32,7 +32,9 @@
 		'ordering',
 		'matching',
 		'open_ended',
-		'range'
+		'range',
+		'image_answering',
+		'image_matching'
 	];
 
 	let type = $state('single_choice');
@@ -46,8 +48,10 @@
 
 	const chooses = $derived(!['open_ended', 'short_answer', 'fill_blanks', 'range'].includes(type));
 	const typed = $derived(type === 'short_answer' || type === 'fill_blanks');
-	const matches = $derived(type === 'matching');
+	const matches = $derived(type === 'matching' || type === 'image_matching');
 	const isRange = $derived(type === 'range');
+	// Image types carry an image URL where the others carry text.
+	const isImage = $derived(type === 'image_answering' || type === 'image_matching');
 
 	// An ordering question's answer is the order the rows are in. Marking one
 	// "correct" would set an answer the grader never reads, and lms-api refuses it.
@@ -357,7 +361,13 @@
 								<Input
 									name="option_content"
 									bind:value={row.content}
-									placeholder={matches ? 'Left' : `Option ${index + 1}`}
+									placeholder={matches
+										? isImage
+											? 'Left image URL'
+											: 'Left'
+										: isImage
+											? `Image URL ${index + 1}`
+											: `Option ${index + 1}`}
 									aria-label={`Option ${index + 1}`}
 								/>
 
@@ -365,7 +375,7 @@
 									<Input
 										name="option_match"
 										bind:value={row.match}
-										placeholder="Right"
+										placeholder={isImage ? 'Right image URL' : 'Right'}
 										aria-label={`Match ${index + 1}`}
 									/>
 								{:else}

@@ -61,7 +61,8 @@ export function readResponse(form: FormData): Answer[] {
 function answerFor(form: FormData, id: string, type: string): QuizResponse {
 	switch (type) {
 		case 'true_false':
-		case 'single_choice': {
+		case 'single_choice':
+		case 'image_answering': {
 			const choice = form.get(`q:${id}:choice`);
 			return choice ? { choices: [String(choice)] } : {};
 		}
@@ -80,6 +81,7 @@ function answerFor(form: FormData, id: string, type: string): QuizResponse {
 			return { order: ordered(form, `q:${id}:rank:`) };
 
 		case 'matching':
+		case 'image_matching':
 			return { pairs: paired(form, `q:${id}:pair:`) };
 
 		case 'range': {

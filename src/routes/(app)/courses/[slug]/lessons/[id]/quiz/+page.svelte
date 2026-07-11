@@ -174,6 +174,22 @@
 									<Label for={option.id}>{option.content}</Label>
 								</div>
 							{/each}
+						{:else if question.type === 'image_answering'}
+							<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+								{#each question.options ?? [] as option (option.id)}
+									<div class="rounded-card border border-border p-2">
+										<img
+											src={option.content}
+											alt=""
+											class="aspect-video w-full rounded-control object-cover"
+										/>
+										<div class="mt-2 flex items-center gap-2">
+											<Radio id={option.id} name={`q:${id}:choice`} value={option.id} />
+											<Label for={option.id}>Choose</Label>
+										</div>
+									</div>
+								{/each}
+							</div>
 						{:else if question.type === 'multiple_choice'}
 							<p class="text-muted text-xs">Choose every correct answer.</p>
 							{#each question.options ?? [] as option (option.id)}
@@ -217,6 +233,27 @@
 										<option value="">—</option>
 										{#each question.matches ?? [] as match (match.id)}
 											<option value={match.id}>{match.content}</option>
+										{/each}
+									</Select>
+								</div>
+							{/each}
+						{:else if question.type === 'image_matching'}
+							<p class="text-muted text-xs">Match each image on the left to a numbered image.</p>
+							<div class="mb-3 flex flex-wrap gap-3">
+								{#each question.matches ?? [] as match, i (match.id)}
+									<div class="text-center">
+										<img src={match.content} alt="" class="size-16 rounded-control object-cover" />
+										<span class="numeral text-muted text-xs">{i + 1}</span>
+									</div>
+								{/each}
+							</div>
+							{#each question.options ?? [] as option (option.id)}
+								<div class="flex items-center gap-2">
+									<img src={option.content} alt="" class="size-16 rounded-control object-cover" />
+									<Select id={option.id} name={`q:${id}:pair:${option.id}`} class="w-24">
+										<option value="">—</option>
+										{#each question.matches ?? [] as match, i (match.id)}
+											<option value={match.id}>{i + 1}</option>
 										{/each}
 									</Select>
 								</div>

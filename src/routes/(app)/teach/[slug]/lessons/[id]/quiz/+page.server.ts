@@ -13,7 +13,9 @@ const TYPES = [
 	'ordering',
 	'matching',
 	'open_ended',
-	'range'
+	'range',
+	'image_answering',
+	'image_matching'
 ] as const;
 
 type QuestionType = (typeof TYPES)[number];
