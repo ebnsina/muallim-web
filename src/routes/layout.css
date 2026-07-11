@@ -254,11 +254,11 @@
 		layers to their own compositor layers costs more than the animation does.
 	*/
 	.aurora {
-		animation: drift 28s ease-in-out infinite alternate;
+		animation: drift 70s ease-in-out infinite alternate;
 	}
 
 	.aurora-slow {
-		animation: drift 40s ease-in-out infinite alternate-reverse;
+		animation: drift 100s ease-in-out infinite alternate-reverse;
 	}
 
 	@keyframes drift {
