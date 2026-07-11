@@ -76,7 +76,15 @@ pnpm build
 
 **Pages use the width they have.** `Page width="full"` (max-w-7xl, aligned with the header) for lists, grids, and anything with a sidebar; `wide` (max-w-5xl) for forms and tables; `prose` (max-w-2xl) only for something to read. Do not leave a page stranded in a narrow column with empty gutters.
 
-**The landing page redesign is deferred** — the user asked to leave `src/routes/+page.svelte` (marketing) for later.
+**The marketing site has its own look — keep to it.** Landing (`src/routes/+page.svelte`) plus a per-audience page at `/solutions/[slug]`, one template driven by `src/lib/content/segments.ts` (nonprofits, creators, schools, coaching, agencies). Conventions the user converged on, the hard way:
+
+- **Dark hero, light body.** The hero is a full-bleed dark aurora band (`.hero-blue` + `AuroraBackdrop`), fixed-dark in either theme; the rest of the page follows the app theme, **light by default** — do not lock it dark. A quiet page-wide `PageAurora` carries the hero's colour behind everything.
+- **Header floats, then leaves.** `MarketingHeader` is `absolute` over the hero (white nav via `overDark`) and scrolls away — not sticky, no border. Menu (Solutions dropdown, Pricing) sits left by the logo; Sign in + Contact sales sit right. No "Courses". Buttons are pills (`Button pill`); the app keeps `rounded-control`.
+- **Sections separate by rounded tinted panels, not borders.** A shaded block is `rounded-3xl bg-surface-sunken`, inset with `px-4 sm:px-6`. No `border-t` dividers between sections.
+- **Cards: `Card aurora`.** The tint blooms on **hover** (a `::before` cross-fade in `.card-aurora`), not at rest. FAQ items are plain — no aurora — and animate open/close with `transition:slide`, one at a time, centred.
+- **Show the product, framed.** The bento is one browser-chrome frame around real design-system UI (a dashboard), not tilted floating widgets.
+- **Honesty is the voice.** Solution pages split into "works today" and "on the roadmap"; the roadmap is a two-up split with its card vertically centred so a single item never leaves an empty grid; section eyebrows are text, not `Badge`s.
+- **Placeholders are flagged.** Pricing numbers, the logo strip, and hero/segment images are Unsplash/invented placeholders marked in-code — replace before launch. Icons are verified Hugeicons only.
 
 ## Git
 
