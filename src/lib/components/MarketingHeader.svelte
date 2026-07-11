@@ -6,35 +6,24 @@
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
-	// `overDark` pages (the landing) sit the header over a dark hero, so at the top
-	// the nav is white; every page frosts and returns to normal text once scrolled.
-	let { overDark = false }: { overDark?: boolean } = $props();
+	// The header sits over the hero and scrolls away with it — not sticky. `overDark`
+	// pages (every hero is dark now) get white nav text.
+	let { overDark = true }: { overDark?: boolean } = $props();
 
-	let scrolled = $state(false);
-	$effect(() => {
-		const onScroll = () => (scrolled = window.scrollY > 8);
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		return () => window.removeEventListener('scroll', onScroll);
-	});
-
-	const light = $derived(overDark && !scrolled);
 	const home = resolve('/');
-	const ghost = $derived(light ? '!text-white hover:!bg-white/10' : '');
+	const ghost = $derived(overDark ? '!text-white hover:!bg-white/10' : '');
 </script>
 
-<header
-	class={cn(
-		'sticky top-0 z-50 transition-colors duration-200',
-		scrolled ? 'bg-surface/80 backdrop-blur' : 'bg-transparent'
-	)}
->
+<header class="absolute inset-x-0 top-0 z-50">
 	<div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
 		<a
 			href={home}
-			class={cn('flex shrink-0 items-center gap-2.5 font-semibold', light && 'text-white')}
+			class={cn('flex shrink-0 items-center gap-2.5 font-semibold', overDark && 'text-white')}
 		>
-			<Icon icon={Mortarboard02Icon} class={cn('size-6', light ? 'text-white' : 'text-accent')} />
+			<Icon
+				icon={Mortarboard02Icon}
+				class={cn('size-6', overDark ? 'text-white' : 'text-accent')}
+			/>
 			Muallim
 		</a>
 
@@ -45,7 +34,7 @@
 					type="button"
 					class={cn(
 						'inline-flex items-center gap-1 rounded-control px-3 py-1.5 font-medium transition-colors',
-						light ? 'text-white/80 hover:text-white' : 'text-muted hover:text-text'
+						overDark ? 'text-white/80 hover:text-white' : 'text-muted hover:text-text'
 					)}
 				>
 					Solutions
@@ -69,14 +58,13 @@
 				</div>
 			</div>
 
-			<Button href="{home}#pricing" variant="ghost" size="sm" class={ghost}>Pricing</Button>
-			<Button href={resolve('/courses')} variant="ghost" size="sm" class={ghost}>Courses</Button>
+			<Button href="{home}#pricing" variant="ghost" size="sm" pill class={ghost}>Pricing</Button>
 		</nav>
 
 		<!-- Sign in and Contact sales on the right. -->
 		<div class="ml-auto flex items-center gap-1 sm:gap-2">
-			<Button href={resolve('/login')} variant="ghost" size="sm" class={ghost}>Sign in</Button>
-			<Button href="{home}#pricing" size="sm">Contact sales</Button>
+			<Button href={resolve('/login')} variant="ghost" size="sm" pill class={ghost}>Sign in</Button>
+			<Button href="{home}#pricing" size="sm" pill>Contact sales</Button>
 		</div>
 	</div>
 </header>

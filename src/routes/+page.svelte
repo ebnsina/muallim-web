@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { fly } from 'svelte/transition';
 	import { ArrowRight01Icon, SparklesIcon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import {
+		AuroraBackdrop,
 		Badge,
 		Button,
 		Card,
@@ -38,6 +40,20 @@
 	// Placeholder photo (Unsplash) — swap for a licensed image before launch.
 	const HERO_IMAGE =
 		'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=70';
+
+	// The audiences, cycled through the headline one at a time.
+	const ROLES = [
+		'solo creators',
+		'schools & academies',
+		'coaching businesses',
+		'agencies',
+		'communities'
+	];
+	let roleIndex = $state(0);
+	$effect(() => {
+		const id = setInterval(() => (roleIndex = (roleIndex + 1) % ROLES.length), 2400);
+		return () => clearInterval(id);
+	});
 </script>
 
 <svelte:head>
@@ -53,10 +69,10 @@
 	not how it is built. Anything not built yet wears a "Coming soon" badge; the AI
 	section says so in its own headline. See `$lib/content/landing` for that rule.
 
-	The layout: a full-bleed centered hero on a dark-blue wash with the product in a
-	browser frame beneath it, a marquee of names, two-tone section intros, and a
-	bento of real product UI rather than screenshots. The header is transparent over
-	the hero and frosts on scroll.
+	The layout: a full-bleed centered hero on a dark aurora wash with a rotating
+	audience in the headline and the product in a browser frame beneath it, a marquee
+	of names, two-tone section intros, and a bento of real product UI. The header is
+	transparent over the hero and scrolls away with it.
 -->
 
 {#snippet intro(eyebrow: string, bold: string, rest: string)}
@@ -68,82 +84,71 @@
 	</div>
 {/snippet}
 
-<div class="min-h-dvh">
-	<MarketingHeader overDark />
+<div class="relative min-h-dvh">
+	<MarketingHeader />
 
 	<main>
-		<!-- Full-bleed, and pulled up under the transparent header so the blue runs
-		     behind it; the top padding clears the nav. -->
-		<section class="hero-blue relative isolate -mt-16 overflow-hidden">
-			<!-- Aurora mesh: soft blue and violet blobs drifting behind the title. -->
-			<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-				<div
-					class="aurora absolute -top-24 left-[18%] size-[34rem] rounded-full blur-3xl"
-					style="background: radial-gradient(closest-side, #4f7cff, transparent 70%); opacity: 0.4;"
-				></div>
-				<div
-					class="aurora-slow absolute -top-16 right-[14%] size-[30rem] rounded-full blur-3xl"
-					style="background: radial-gradient(closest-side, #8b5cf6, transparent 70%); opacity: 0.34;"
-				></div>
-				<div
-					class="aurora absolute top-1/4 left-1/2 size-[40rem] -translate-x-1/2 rounded-full blur-3xl"
-					style="background: radial-gradient(closest-side, #22a7f0, transparent 72%); opacity: 0.28;"
-				></div>
-				<div class="grain absolute inset-0 opacity-[0.18]"></div>
-			</div>
+		<!-- Full-bleed dark hero; the header floats over it and scrolls away. -->
+		<section class="hero-blue relative isolate overflow-hidden">
+			<AuroraBackdrop />
 
-			<div class="mx-auto max-w-5xl px-6 pt-32 text-center sm:pt-40">
+			<div class="mx-auto max-w-5xl px-6 pt-36 text-center sm:pt-44">
 				<h1
 					use:inview
 					class="text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl"
 				>
-					Teach what you know.<br />
-					<span class="text-white/55">The marking marks itself.</span>
+					The platform built for
+					<!-- The audience cycles in place; the row is a fixed height so nothing shifts. -->
+					<span class="relative mt-1 block h-[1.2em] overflow-hidden">
+						{#key roleIndex}
+							<span
+								in:fly={{ y: 44, duration: 500 }}
+								out:fly={{ y: -44, duration: 500 }}
+								class="absolute inset-x-0 top-0 bg-gradient-to-r from-[#6aa8ff] to-[#b794ff] bg-clip-text text-transparent"
+							>
+								{ROLES[roleIndex]}
+							</span>
+						{/key}
+					</span>
 				</h1>
 
 				<p
 					use:inview={{ delay: 80 }}
 					class="mx-auto mt-6 max-w-xl text-lg text-pretty text-white/75"
 				>
-					Build a course, invite your students, and hand back marked work the moment it comes in —
-					quizzes graded in seconds, essays waiting in one tidy list.
+					One place to build, teach, quiz, and grade — with the marking handled for you and the
+					reasons to come back built in.
 				</p>
 
-				<div use:inview={{ delay: 140 }} class="mt-10 flex justify-center gap-3">
+				<div use:inview={{ delay: 140 }} class="mt-10 flex justify-center">
 					<Button
 						href={resolve('/register')}
 						size="lg"
+						pill
 						class="!border-transparent !bg-white !text-black hover:!bg-white/90"
 					>
 						Start teaching
 						<Icon icon={ArrowRight01Icon} class="size-4" />
 					</Button>
-					<Button
-						href={resolve('/courses')}
-						size="lg"
-						variant="ghost"
-						class="border border-white/25 !text-white hover:!bg-white/10"
-					>
-						Browse courses
-					</Button>
 				</div>
 			</div>
 
-			<!-- The product, in a browser frame, sitting flush at the foot of the hero. -->
+			<!-- The product, in a browser frame, sitting flush at the foot of the hero.
+			     A fixed image height keeps the layout from shifting as it loads. -->
 			<div use:inview={{ delay: 160 }} class="mx-auto mt-16 max-w-5xl px-6">
 				<div class="overflow-hidden rounded-t-overlay border border-white/15 bg-surface-raised">
 					<div class="flex items-center gap-2 border-b border-border px-4 py-3">
 						<span class="size-3 rounded-full bg-danger/60"></span>
 						<span class="size-3 rounded-full bg-warning/60"></span>
 						<span class="size-3 rounded-full bg-success/60"></span>
-						<span class="numeral ml-3 text-xs text-muted">muallim.test/courses</span>
+						<span class="numeral ml-3 text-xs text-muted">muallim.test</span>
 					</div>
 					<img
 						src={HERO_IMAGE}
 						alt="A course open in Muallim"
 						width="1600"
 						height="900"
-						class="aspect-[16/9] w-full object-cover"
+						class="h-60 w-full object-cover sm:h-[460px]"
 					/>
 				</div>
 			</div>
@@ -336,14 +341,20 @@
 							</a>
 						{/each}
 
-						<!-- The router's own catch-all, carrying the ribbon so it reads as the CTA. -->
-						<div use:inview={{ delay: 160 }} class="relative overflow-hidden rounded-card">
-							<div aria-hidden="true" class="ribbon absolute inset-0 opacity-90"></div>
+						<!-- The router's own catch-all, in the locked dark look so it reads as the CTA. -->
+						<div
+							use:inview={{ delay: 160 }}
+							class="hero-blue relative overflow-hidden rounded-card"
+						>
 							<div class="relative flex h-full flex-col justify-between gap-6 p-6">
 								<p class="text-lg font-semibold text-pretty text-white">
 									Not sure where to start? Begin with one course, free.
 								</p>
-								<Button href={resolve('/register')} variant="secondary" class="self-start">
+								<Button
+									href={resolve('/register')}
+									pill
+									class="self-start !border-transparent !bg-white !text-black hover:!bg-white/90"
+								>
 									Get started
 									<Icon icon={ArrowRight01Icon} class="size-4" />
 								</Button>
@@ -459,6 +470,7 @@
 									<Button
 										href={resolve('/register')}
 										size="lg"
+										pill
 										variant={plan.highlighted ? 'primary' : 'secondary'}
 										class="mt-8 w-full"
 									>
@@ -511,11 +523,8 @@
 			</section>
 
 			<!-- --------------------------------------------------------------- CTA -->
-			<section class="relative isolate overflow-hidden border-t border-border">
-				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-					<div class="ribbon absolute inset-0 opacity-95"></div>
-					<div class="ribbon-threads absolute inset-0"></div>
-				</div>
+			<section class="hero-blue relative isolate overflow-hidden rounded-overlay">
+				<AuroraBackdrop />
 
 				<div use:inview class="px-6 py-28 text-center sm:px-10">
 					<h2 class="text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">
@@ -526,8 +535,14 @@
 						later.
 					</p>
 					<div class="mt-10">
-						<Button href={resolve('/register')} size="lg" variant="secondary">Start teaching</Button
+						<Button
+							href={resolve('/register')}
+							size="lg"
+							pill
+							class="!border-transparent !bg-white !text-black hover:!bg-white/90"
 						>
+							Start teaching
+						</Button>
 					</div>
 				</div>
 			</section>

@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ArrowRight01Icon, Clock01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
-	import { Badge, Button, Card, Icon, MarketingFooter, MarketingHeader } from '$lib/components';
+	import {
+		AuroraBackdrop,
+		Badge,
+		Button,
+		Card,
+		Icon,
+		MarketingFooter,
+		MarketingHeader
+	} from '$lib/components';
 	import { inview } from '$lib/actions/inview';
 	import type { PageData } from './$types';
 
@@ -19,63 +27,72 @@
 	<meta name="description" content={segment.blurb} />
 </svelte:head>
 
-<div class="min-h-dvh">
+<div class="relative min-h-dvh">
 	<MarketingHeader />
 
 	<main>
-		<div class="mx-auto max-w-6xl">
-			<!-- ------------------------------------------------------------- hero -->
-			<!-- Pulled up under the transparent header; the top padding clears the nav. -->
-			<section class="relative isolate -mt-16 overflow-hidden">
-				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-					<div class="grid-lines absolute inset-0"></div>
-					<div class="ribbon absolute -top-40 -right-52 size-[48rem] rounded-full opacity-80"></div>
-					<div class="ribbon-threads absolute -top-40 -right-52 size-[48rem]"></div>
-				</div>
+		<!-- Full-bleed dark hero, matching the landing. -->
+		<section class="hero-blue relative isolate overflow-hidden">
+			<AuroraBackdrop />
 
-				<div
-					class="grid items-center gap-12 px-6 pt-28 pb-20 sm:px-8 sm:pt-36 sm:pb-28 lg:grid-cols-2"
+			<div class="mx-auto max-w-4xl px-6 pt-36 text-center sm:pt-44">
+				<span
+					use:inview
+					class="inline-flex items-center gap-2 rounded-pill border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white"
 				>
-					<div>
-						<p use:inview class="inline-flex">
-							<Badge tone="accent" icon={segment.heroIcon}>{segment.eyebrow}</Badge>
-						</p>
+					<Icon icon={segment.heroIcon} class="size-3.5" />
+					{segment.eyebrow}
+				</span>
 
-						<h1
-							use:inview={{ delay: 60 }}
-							class="mt-6 text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
-						>
-							{headA}
-							{#if headB}<span class="text-muted">{headB}</span>{/if}
-						</h1>
+				<h1
+					use:inview={{ delay: 60 }}
+					class="mt-6 text-4xl font-semibold tracking-tight text-balance text-white sm:text-6xl"
+				>
+					{headA}
+					{#if headB}<span class="text-white/55">{headB}</span>{/if}
+				</h1>
 
-						<p use:inview={{ delay: 120 }} class="mt-6 max-w-xl text-lg text-pretty text-muted">
-							{segment.blurb}
-						</p>
+				<p
+					use:inview={{ delay: 120 }}
+					class="mx-auto mt-6 max-w-xl text-lg text-pretty text-white/75"
+				>
+					{segment.blurb}
+				</p>
 
-						<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
-							<Button href={resolve('/register')} size="lg">
-								Get started
-								<Icon icon={ArrowRight01Icon} class="size-4" />
-							</Button>
-							<Button href={resolve('/courses')} size="lg" variant="secondary"
-								>Browse courses</Button
-							>
-						</div>
-					</div>
-
-					<div use:inview={{ delay: 120 }}>
-						<img
-							src={segment.image}
-							alt={segment.imageAlt}
-							width="1200"
-							height="900"
-							class="aspect-[4/3] w-full rounded-overlay border border-border object-cover"
-						/>
-					</div>
+				<div use:inview={{ delay: 180 }} class="mt-10 flex justify-center">
+					<Button
+						href={resolve('/register')}
+						size="lg"
+						pill
+						class="!border-transparent !bg-white !text-black hover:!bg-white/90"
+					>
+						Get started
+						<Icon icon={ArrowRight01Icon} class="size-4" />
+					</Button>
 				</div>
-			</section>
+			</div>
 
+			<!-- The segment image in a browser frame; fixed height, no layout shift. -->
+			<div use:inview={{ delay: 160 }} class="mx-auto mt-16 max-w-5xl px-6">
+				<div class="overflow-hidden rounded-t-overlay border border-white/15 bg-surface-raised">
+					<div class="flex items-center gap-2 border-b border-border px-4 py-3">
+						<span class="size-3 rounded-full bg-danger/60"></span>
+						<span class="size-3 rounded-full bg-warning/60"></span>
+						<span class="size-3 rounded-full bg-success/60"></span>
+						<span class="numeral ml-3 text-xs text-muted">muallim.test</span>
+					</div>
+					<img
+						src={segment.image}
+						alt={segment.imageAlt}
+						width="1600"
+						height="900"
+						class="h-60 w-full object-cover sm:h-[460px]"
+					/>
+				</div>
+			</div>
+		</section>
+
+		<div class="mx-auto max-w-6xl">
 			<!-- ------------------------------------------------- what works today -->
 			<section class="border-t border-border">
 				<div class="px-6 py-24 sm:px-10">
@@ -204,11 +221,8 @@
 			</section>
 
 			<!-- ------------------------------------------------------------- CTA -->
-			<section class="relative isolate overflow-hidden border-t border-border">
-				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-					<div class="ribbon absolute inset-0 opacity-95"></div>
-					<div class="ribbon-threads absolute inset-0"></div>
-				</div>
+			<section class="hero-blue relative isolate overflow-hidden rounded-overlay">
+				<AuroraBackdrop />
 
 				<div use:inview class="px-6 py-28 text-center sm:px-10">
 					<h2 class="text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">
@@ -218,7 +232,14 @@
 						Everything that works today is free to try. Build it now; the rest arrives as it lands.
 					</p>
 					<div class="mt-10">
-						<Button href={resolve('/register')} size="lg" variant="secondary">Get started</Button>
+						<Button
+							href={resolve('/register')}
+							size="lg"
+							pill
+							class="!border-transparent !bg-white !text-black hover:!bg-white/90"
+						>
+							Get started
+						</Button>
 					</div>
 				</div>
 			</section>

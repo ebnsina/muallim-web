@@ -229,29 +229,10 @@
 	}
 
 	/*
-		A faint grid, fading out towards the edges.
-
-		The mask is what keeps it from looking like graph paper: the lines exist only
-		where the eye is already looking, and the section boundary never has to cut
-		one off.
-	*/
-	.grid-lines {
-		background-image:
-			linear-gradient(to right, var(--n-5) 1px, transparent 1px),
-			linear-gradient(to bottom, var(--n-5) 1px, transparent 1px);
-		background-size: 4rem 4rem;
-		mask-image: radial-gradient(55rem 34rem at 50% 0%, black, transparent 78%);
-	}
-
-	/*
-		Two slow washes of the brand ramp behind the hero. Blue only — the ramp this
-		product already has — because a landing page whose gradient introduces two
-		colours the design system has never heard of is a landing page that belongs
-		to a different product.
-
-		They drift, over half a minute, far enough to notice only if you are looking
-		for it. `will-change` is deliberately absent: promoting two full-bleed blurred
-		layers to their own compositor layers costs more than the animation does.
+		The aurora blobs behind the hero drift, over a minute-plus, far enough to
+		notice only if you are looking for it. `will-change` is deliberately absent:
+		promoting full-bleed blurred layers to their own compositor layers costs more
+		than the animation does.
 	*/
 	.aurora {
 		animation: drift 70s ease-in-out infinite alternate;
@@ -336,52 +317,6 @@
 	.grain {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 		mix-blend-mode: overlay;
-	}
-
-	/*
-		The hero ribbon — Stripe's signature flowing spectrum, asked for by name, and
-		a deliberate exception to the blue-only rule above. It lives only in this
-		decorative graphic; every pixel of product UI stays on the brand ramp.
-
-		Two sibling layers, never nested: `.ribbon` is the blurred colour flow, and
-		its blur must not reach the threads, so `.ribbon-threads` is a separate,
-		un-blurred sibling that lays fine silk striations over the top.
-	*/
-	.ribbon {
-		background:
-			radial-gradient(50% 60% at 76% 26%, rgba(255, 255, 255, 0.55), transparent 62%),
-			conic-gradient(
-				from 200deg at 66% 32%,
-				#38bdf8 0deg,
-				#6366f1 52deg,
-				#a855f7 104deg,
-				#ec4899 156deg,
-				#fb923c 206deg,
-				#f472b6 262deg,
-				#818cf8 318deg,
-				#38bdf8 360deg
-			);
-		filter: blur(44px) saturate(1.2);
-		animation: ribbon-drift 32s ease-in-out infinite alternate;
-	}
-
-	.ribbon-threads {
-		background: repeating-linear-gradient(
-			104deg,
-			rgba(255, 255, 255, 0.14) 0 1px,
-			transparent 1px 9px
-		);
-		mask-image: radial-gradient(120% 100% at 74% 26%, black, transparent 66%);
-		mix-blend-mode: overlay;
-	}
-
-	@keyframes ribbon-drift {
-		from {
-			transform: translate3d(-2%, -1%, 0) scale(1.02) rotate(-1deg);
-		}
-		to {
-			transform: translate3d(3%, 2%, 0) scale(1.1) rotate(2deg);
-		}
 	}
 }
 

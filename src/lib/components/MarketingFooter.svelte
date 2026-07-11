@@ -41,9 +41,6 @@
 				<ul class="mt-4 space-y-2.5 text-sm text-muted">
 					<li><a class="underline-offset-4 hover:underline" href="{home}#pricing">Pricing</a></li>
 					<li>
-						<a class="underline-offset-4 hover:underline" href={resolve('/courses')}>Courses</a>
-					</li>
-					<li>
 						<a class="underline-offset-4 hover:underline" href={resolve('/ui')}>Design system</a>
 					</li>
 				</ul>

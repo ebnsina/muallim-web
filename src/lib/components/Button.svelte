@@ -14,6 +14,8 @@
 		/** Renders an anchor. The e2e suite depends on this being a link, not a button. */
 		href?: string;
 		loading?: boolean;
+		/** Fully round, for the marketing site; the app uses the default rounded-xl. */
+		pill?: boolean;
 		class?: string;
 		children: Snippet;
 	} & Omit<HTMLButtonAttributes, 'class'> &
@@ -26,6 +28,7 @@
 		type = 'button',
 		disabled = false,
 		loading = false,
+		pill = false,
 		class: className,
 		children,
 		...rest
@@ -51,12 +54,15 @@
 	};
 
 	// rounded-xl, matching the field radius so button and input read as one family.
+	// The marketing site opts into a full pill via `pill`.
 	const base =
-		'inline-flex shrink-0 items-center justify-center rounded-control font-medium whitespace-nowrap ' +
+		'inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap ' +
 		'transition-colors select-none disabled:pointer-events-none disabled:opacity-50 ' +
 		'aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4';
 
-	const classes = $derived(cn(base, VARIANTS[variant], SIZES[size], className));
+	const classes = $derived(
+		cn(base, pill ? 'rounded-pill' : 'rounded-control', VARIANTS[variant], SIZES[size], className)
+	);
 
 	// A busy button is not a disabled one — it keeps its focus, so a screen reader
 	// stays where the user put it — but it must not fire twice.

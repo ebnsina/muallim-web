@@ -7,6 +7,7 @@
  */
 export { default as Alert, type AlertTone } from './Alert.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
+export { default as AuroraBackdrop } from './AuroraBackdrop.svelte';
 export { default as AuthShell } from './AuthShell.svelte';
 export { default as Badge, type BadgeTone } from './Badge.svelte';
 export { default as Breadcrumbs, type Crumb } from './Breadcrumbs.svelte';
