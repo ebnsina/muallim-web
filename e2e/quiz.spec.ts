@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
+import { ready } from './hydration';
 import { OWNER_STATE, STUDENT, STUDENT_STATE } from './accounts';
 import { quizCourse } from './course';
 
@@ -126,6 +127,25 @@ test.describe('authoring and marking a quiz', () => {
 
 		await expect(page.getByText('1. Which is compiled?')).toBeVisible();
 		await expect(page.getByText('— correct')).toBeVisible();
+	});
+
+	test('an author adds a range question with numeric bounds', async ({ page, request }) => {
+		const course = await quizCourse(request, slug('range'), { withQuiz: false });
+
+		await page.goto(`/teach/${course.slug}/lessons/${course.lessonId}/quiz`);
+		await ready(page);
+		await page.getByLabel('Title').fill('Numbers');
+		await page.getByRole('button', { name: 'Create the quiz' }).click();
+		await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+		await ready(page);
+
+		await page.getByLabel('Type').selectOption('range');
+		await page.getByLabel('Prompt').fill('Boiling point of water in °C?');
+		await page.getByPlaceholder('Low').fill('99.5');
+		await page.getByPlaceholder('High').fill('100.5');
+		await page.getByRole('button', { name: 'Add the question' }).click();
+
+		await expect(page.getByText('Boiling point of water', { exact: false })).toBeVisible();
 	});
 
 	test('an instructor marks an essay, and the score settles', async ({ page, request }) => {

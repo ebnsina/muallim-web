@@ -221,6 +221,15 @@
 									</Select>
 								</div>
 							{/each}
+						{:else if question.type === 'range'}
+							<Input
+								name={`q:${id}:number`}
+								type="number"
+								step="any"
+								class="w-40"
+								aria-label={question.prompt}
+								placeholder="A number"
+							/>
 						{:else}
 							<p class="text-muted text-sm">
 								This question needs a newer version of this app. Submitting will leave it blank.

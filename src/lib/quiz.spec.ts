@@ -32,6 +32,25 @@ describe('readResponse', () => {
 		]);
 	});
 
+	it('reads a range answer as a number, and a blank or non-numeric one as unanswered', () => {
+		const answers = readResponse(
+			form([
+				['q:a:type', 'range'],
+				['q:a:number', '100.5'],
+				['q:b:type', 'range'],
+				['q:b:number', '  '],
+				['q:c:type', 'range'],
+				['q:c:number', 'twelve']
+			])
+		);
+
+		expect(answers).toEqual([
+			{ questionId: 'a', response: { number: 100.5 } },
+			{ questionId: 'b', response: {} },
+			{ questionId: 'c', response: {} }
+		]);
+	});
+
 	// A question left entirely alone still produces an entry. It is graded, not
 	// skipped, and omitting it would keep whatever an earlier save had stored.
 	it('sends an empty answer for a question nobody touched', () => {

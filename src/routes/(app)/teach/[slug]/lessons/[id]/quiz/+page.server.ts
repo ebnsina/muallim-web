@@ -11,7 +11,8 @@ const TYPES = [
 	'short_answer',
 	'ordering',
 	'matching',
-	'open_ended'
+	'open_ended',
+	'range'
 ] as const;
 
 type QuestionType = (typeof TYPES)[number];
@@ -187,7 +188,18 @@ export const actions: Actions = {
 		}
 
 		const typed = type === 'short_answer' || type === 'fill_blanks';
-		const chooses = type !== 'open_ended' && !typed;
+		const chooses = type !== 'open_ended' && type !== 'range' && !typed;
+
+		// A range's bounds ride in `accepted` as a single [low, high] pair.
+		const range =
+			type === 'range'
+				? [
+						[
+							String(form.get('range_low') ?? '').trim(),
+							String(form.get('range_high') ?? '').trim()
+						]
+					]
+				: null;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/lessons/{id}/quiz/questions',
@@ -203,6 +215,7 @@ export const actions: Actions = {
 					// Sent only for the types that read them. An `accepted` array on a
 					// choice question is an answer nothing reads, and lms-api says so.
 					...(typed ? { accepted: acceptedAnswers(String(form.get('accepted') ?? '')) } : {}),
+					...(range ? { accepted: range } : {}),
 					...(chooses ? { options: options(form) } : {})
 				}
 			}

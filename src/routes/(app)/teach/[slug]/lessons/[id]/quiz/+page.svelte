@@ -30,7 +30,8 @@
 		'short_answer',
 		'ordering',
 		'matching',
-		'open_ended'
+		'open_ended',
+		'range'
 	];
 
 	let type = $state('single_choice');
@@ -42,9 +43,10 @@
 		{ content: '', match: '' }
 	]);
 
-	const chooses = $derived(!['open_ended', 'short_answer', 'fill_blanks'].includes(type));
+	const chooses = $derived(!['open_ended', 'short_answer', 'fill_blanks', 'range'].includes(type));
 	const typed = $derived(type === 'short_answer' || type === 'fill_blanks');
 	const matches = $derived(type === 'matching');
+	const isRange = $derived(type === 'range');
 
 	// An ordering question's answer is the order the rows are in. Marking one
 	// "correct" would set an answer the grader never reads, and lms-api refuses it.
@@ -183,7 +185,11 @@
 										</ul>
 									{/if}
 
-									{#if question.accepted?.length}
+									{#if question.type === 'range' && question.accepted?.[0]}
+										<p class="text-muted mt-2 text-sm">
+											Accepts any number from {question.accepted[0][0]} to {question.accepted[0][1]}
+										</p>
+									{:else if question.accepted?.length}
 										<p class="text-muted mt-2 text-sm">
 											Accepts: {question.accepted
 												.map((blank) => (blank ?? []).join(' or '))
@@ -292,6 +298,27 @@
 							Add an option
 						</Button>
 					</fieldset>
+				{/if}
+
+				{#if isRange}
+					<div class="space-y-2">
+						<Label for="range_low">Accepted range</Label>
+						<div class="flex items-center gap-2">
+							<Input
+								id="range_low"
+								name="range_low"
+								type="number"
+								step="any"
+								class="w-32"
+								placeholder="Low"
+							/>
+							<span class="text-muted">to</span>
+							<Input name="range_high" type="number" step="any" class="w-32" placeholder="High" />
+						</div>
+						<p class="text-muted text-xs">
+							Any number from the low bound to the high bound counts as right.
+						</p>
+					</div>
 				{/if}
 
 				{#if typed}

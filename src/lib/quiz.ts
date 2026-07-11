@@ -10,6 +10,7 @@ export interface QuizResponse {
 	blanks?: string[];
 	order?: string[];
 	pairs?: Record<string, string>;
+	number?: number;
 }
 
 export interface Answer {
@@ -80,6 +81,13 @@ function answerFor(form: FormData, id: string, type: string): QuizResponse {
 
 		case 'matching':
 			return { pairs: paired(form, `q:${id}:pair:`) };
+
+		case 'range': {
+			// A blank or non-numeric answer is unanswered, not zero.
+			const raw = String(form.get(`q:${id}:number`) ?? '').trim();
+			const n = Number(raw);
+			return raw !== '' && Number.isFinite(n) ? { number: n } : {};
+		}
 
 		default:
 			// A type this build cannot render. Sending nothing is the honest answer;
