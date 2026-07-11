@@ -18,7 +18,11 @@
 	knows.
 -->
 <div class="flex min-h-dvh flex-col">
-	<AppHeader user={data.user ?? undefined} canAuthor={canAuthor(data.user)} />
+	<AppHeader
+		user={data.user ?? undefined}
+		canAuthor={canAuthor(data.user)}
+		unread={data.unread ?? 0}
+	/>
 
 	<div class="flex-1">
 		{@render children()}

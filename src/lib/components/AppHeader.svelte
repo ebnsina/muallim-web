@@ -10,6 +10,7 @@
 		Cancel01Icon,
 		Menu01Icon,
 		Mortarboard02Icon,
+		Notification03Icon,
 		TeachingIcon,
 		DashboardSquare01Icon
 	} from '@hugeicons/core-free-icons';
@@ -24,9 +25,11 @@
 		user?: { name: string; email: string; role: string };
 		/** Shown only to somebody who may author. Hiding it is a courtesy, not a control. */
 		canAuthor?: boolean;
+		/** Unread notification count for the bell badge. */
+		unread?: number;
 	};
 
-	let { user, canAuthor = false }: Props = $props();
+	let { user, canAuthor = false, unread = 0 }: Props = $props();
 
 	type Tab = { href: string; label: string; icon: IconSvgElement; show: boolean };
 
@@ -110,6 +113,26 @@
 
 		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			{#if user}
+				<!--
+					The bell. A link to the notifications page rather than a dropdown — one
+					place notices live, reachable on a phone too. The badge caps at 9+ so a
+					busy count does not stretch the bar.
+				-->
+				<a
+					href={resolve('/notifications')}
+					class="relative rounded-control p-2 text-muted transition-colors hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+					aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+				>
+					<Icon icon={Notification03Icon} class="size-5" />
+					{#if unread > 0}
+						<span
+							class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.65rem] leading-4 font-semibold text-on-solid"
+						>
+							{unread > 9 ? '9+' : unread}
+						</span>
+					{/if}
+				</a>
+
 				<!--
 					The account, behind its avatar. Who you are and how you stop being them —
 					name, theme, sign out — are one person's business, so they gather under one

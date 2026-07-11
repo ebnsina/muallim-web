@@ -16,9 +16,16 @@ import type { LayoutServerLoad } from './$types';
  * request per page for an answer that does not change between them.
  */
 export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
-	if (!locals.accessToken) return { user: null };
+	if (!locals.accessToken) return { user: null, unread: 0 };
 
-	const { data, response } = await authedApi(url.origin, locals.accessToken).GET('/v1/me');
+	// The person and their unread bell count, together, for every page under this
+	// layout. Started as a pair so the count costs no extra round trip.
+	const api = authedApi(url.origin, locals.accessToken);
+	const [me, unreadResult] = await Promise.all([
+		api.GET('/v1/me'),
+		api.GET('/v1/notifications/unread-count')
+	]);
+	const { data, response } = me;
 
 	/*
 		The token verified when `handle` ran and no longer does: the membership was
@@ -30,8 +37,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	*/
 	if (response?.status === 401 || response?.status === 403) {
 		clearSession(cookies);
-		return { user: null };
+		return { user: null, unread: 0 };
 	}
 
-	return { user: data?.user ?? null };
+	return { user: data?.user ?? null, unread: unreadResult.data?.unread ?? 0 };
 };
