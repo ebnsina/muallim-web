@@ -116,11 +116,43 @@
 
 		const next = reordered(topic.lessons, draggedId(state), target);
 		if (next === topic.lessons) return;
-		topic.lessons = next;
+		commitLessons(topicId, next);
+	}
+
+	// Writing the reordered lessons back onto the whole `topics` value, not onto the
+	// topic object in place: `topics` is the writable derived the template reads, and
+	// only reassigning it makes the change show. Then the new order is submitted.
+	function commitLessons(topicId: string, lessons: EditorLesson[]) {
+		topics = topics.map((topic) => (topic.id === topicId ? { ...topic, lessons } : topic));
 		postOrder('?/reorderLessons', [
 			['topic_id', topicId],
-			...next.map((lesson) => ['lesson_ids', lesson.id] as [string, string])
+			...lessons.map((lesson) => ['lesson_ids', lesson.id] as [string, string])
 		]);
+	}
+
+	// Keyboard reordering, so the grip is not a mouse-only control. Arrow keys on a
+	// handle move its row one place; focus rides along because the list is keyed by
+	// id, so the same button survives the re-render and the next arrow keeps going.
+	function nudgeTopic(index: number, delta: number) {
+		const to = index + delta;
+		if (to < 0 || to >= topics.length) return;
+		const next = [...topics];
+		[next[index], next[to]] = [next[to], next[index]];
+		topics = next;
+		postOrder(
+			'?/reorderTopics',
+			next.map((topic) => ['topic_ids', topic.id])
+		);
+	}
+
+	function nudgeLesson(topicId: string, index: number, delta: number) {
+		const topic = topics.find((candidate) => candidate.id === topicId);
+		if (!topic) return;
+		const to = index + delta;
+		if (to < 0 || to >= topic.lessons.length) return;
+		const next = [...topic.lessons];
+		[next[index], next[to]] = [next[to], next[index]];
+		commitLessons(topicId, next);
 	}
 
 	// The <select> value: the course's template, or '' for the built-in default.
@@ -304,24 +336,41 @@
 	-->
 	<ol class="mt-8 space-y-6">
 		{#each topics as topic, topicIndex (topic.id)}
-			<li
-				use:draggable={{
-					container: `topic-${topicIndex}`,
-					dragData: topic,
-					handle: '.topic-handle'
-				}}
-				use:droppable={{
-					container: `topic-${topicIndex}`,
-					callbacks: { onDrop: handleTopicDrop }
-				}}
-			>
+			<li>
 				<Card class="p-5">
-					<div class="flex flex-wrap items-center justify-between gap-3">
+					<!--
+						The section's drag zone is its header row, not the whole card. A card
+						contains its lessons, and a lesson's own drop would be swallowed by the
+						section's if the section were the outer drop target — so they do not
+						nest: sections reorder by their header, lessons by their row.
+					-->
+					<div
+						use:draggable={{
+							container: `topic-${topicIndex}`,
+							dragData: topic,
+							handle: '.topic-handle'
+						}}
+						use:droppable={{
+							container: `topic-${topicIndex}`,
+							callbacks: { onDrop: handleTopicDrop }
+						}}
+						class="flex flex-wrap items-center justify-between gap-3"
+					>
 						<div class="flex items-center gap-2">
 							<button
 								type="button"
-								class="topic-handle text-muted hover:text-text cursor-grab rounded-control p-1 active:cursor-grabbing"
-								aria-label="Drag to reorder section {topic.title}"
+								class="topic-handle text-muted hover:text-text focus-visible:ring-ring cursor-grab rounded-control p-1 focus-visible:ring-2 focus-visible:outline-none active:cursor-grabbing"
+								aria-label="Reorder section {topic.title}. Drag, or use the arrow keys."
+								aria-keyshortcuts="ArrowUp ArrowDown"
+								onkeydown={(event) => {
+									if (event.key === 'ArrowUp') {
+										event.preventDefault();
+										nudgeTopic(topicIndex, -1);
+									} else if (event.key === 'ArrowDown') {
+										event.preventDefault();
+										nudgeTopic(topicIndex, 1);
+									}
+								}}
 							>
 								<Icon icon={DragDropVerticalIcon} class="size-5" />
 							</button>
@@ -362,8 +411,18 @@
 								<div class="flex min-w-0 items-center gap-2">
 									<button
 										type="button"
-										class="lesson-handle text-muted hover:text-text cursor-grab rounded-control p-1 active:cursor-grabbing"
-										aria-label="Drag to reorder lesson {lesson.title}"
+										class="lesson-handle text-muted hover:text-text focus-visible:ring-ring cursor-grab rounded-control p-1 focus-visible:ring-2 focus-visible:outline-none active:cursor-grabbing"
+										aria-label="Reorder lesson {lesson.title}. Drag, or use the arrow keys."
+										aria-keyshortcuts="ArrowUp ArrowDown"
+										onkeydown={(event) => {
+											if (event.key === 'ArrowUp') {
+												event.preventDefault();
+												nudgeLesson(topic.id, lessonIndex, -1);
+											} else if (event.key === 'ArrowDown') {
+												event.preventDefault();
+												nudgeLesson(topic.id, lessonIndex, 1);
+											}
+										}}
 									>
 										<Icon icon={DragDropVerticalIcon} class="size-4" />
 									</button>

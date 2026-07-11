@@ -120,8 +120,8 @@ test('sections reorder by dragging, and the new order sticks', async ({ page }) 
 	// Drag the last section up above the first.
 	await dragHandleOnto(
 		page,
-		page.getByRole('button', { name: 'Drag to reorder section Third' }),
-		page.getByRole('button', { name: 'Drag to reorder section First' })
+		page.getByRole('button', { name: 'Reorder section Third' }),
+		page.getByRole('button', { name: 'Reorder section First' })
 	);
 
 	// It moved up, and the order survives the round trip to the server: a reload
@@ -130,6 +130,39 @@ test('sections reorder by dragging, and the new order sticks', async ({ page }) 
 	await page.reload();
 	const order = await titles();
 	expect(order.indexOf('Third')).toBeLessThan(order.indexOf('Second'));
+});
+
+test('sections reorder from the keyboard, and the new order sticks', async ({ page }) => {
+	const title = `Keyed ${slug('e2e')}`;
+
+	await page.goto('/teach/new');
+	await page.getByLabel('Title').fill(title);
+	await page.getByRole('button', { name: 'Create course' }).click();
+	await page.getByRole('link', { name: title }).click();
+	await ready(page);
+
+	for (const section of ['First', 'Second', 'Third']) {
+		await page.getByPlaceholder('New section').fill(section);
+		await page.getByRole('button', { name: 'Add section' }).click();
+		await expect(
+			page.getByRole('textbox', { name: 'Section title', exact: true }).last()
+		).toHaveValue(section);
+	}
+
+	const titles = () =>
+		page
+			.getByRole('textbox', { name: 'Section title', exact: true })
+			.evaluateAll((inputs) => inputs.map((input) => (input as HTMLInputElement).value));
+
+	await expect.poll(titles).toEqual(['First', 'Second', 'Third']);
+
+	// The grip is a real control: focus the last one and press Up to move it.
+	await page.getByRole('button', { name: 'Reorder section Third' }).focus();
+	await page.keyboard.press('ArrowUp');
+
+	await expect.poll(titles).toEqual(['First', 'Third', 'Second']);
+	await page.reload();
+	await expect.poll(titles).toEqual(['First', 'Third', 'Second']);
 });
 
 /**
