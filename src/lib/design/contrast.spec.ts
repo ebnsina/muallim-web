@@ -84,7 +84,9 @@ function declarations(block: string): Map<string, string> {
 	return found;
 }
 
-const DARK_SELECTOR = ":root[data-theme='dark'] {";
+// Matches the start of the dark rule's selector list, which also carries the bare
+// `[data-theme='dark']` so a nested subtree (the marketing site) can opt in.
+const DARK_SELECTOR = ":root[data-theme='dark']";
 
 const lightBlock = CSS.slice(CSS.indexOf(':root {'), CSS.indexOf(DARK_SELECTOR));
 const darkBlock = CSS.slice(CSS.indexOf(DARK_SELECTOR));

@@ -8,7 +8,8 @@
 		Card,
 		Icon,
 		MarketingFooter,
-		MarketingHeader
+		MarketingHeader,
+		PageAurora
 	} from '$lib/components';
 	import { inview } from '$lib/actions/inview';
 	import type { PageData } from './$types';
@@ -27,7 +28,8 @@
 	<meta name="description" content={segment.blurb} />
 </svelte:head>
 
-<div class="relative min-h-dvh">
+<div data-theme="dark" class="relative min-h-dvh bg-surface text-text">
+	<PageAurora />
 	<MarketingHeader />
 
 	<main>
@@ -108,7 +110,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each segment.today as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full p-6">
+								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
 									<Icon icon={item.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{item.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{item.body}</p>
@@ -120,7 +122,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------------- highlight -->
-			<section class="relative overflow-hidden border-t border-border bg-surface-raised">
+			<section class="relative overflow-hidden border-t border-border">
 				<div
 					aria-hidden="true"
 					class="pointer-events-none absolute inset-0 -z-10 opacity-70"
@@ -171,7 +173,9 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each segment.roadmap as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift flex h-full gap-4 p-6">
+								<Card
+									class="lift flex h-full gap-4 border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+								>
 									<Icon icon={item.icon} class="mt-0.5 size-6 shrink-0 text-muted" />
 									<div>
 										<div class="flex flex-wrap items-center gap-2">
@@ -188,7 +192,7 @@
 			</section>
 
 			<!-- --------------------------------------------------------- verdict -->
-			<section class="border-t border-border bg-surface-raised">
+			<section class="border-t border-border">
 				<div class="px-6 py-24 sm:px-10">
 					<div use:inview class="max-w-3xl">
 						<p class="text-sm font-semibold text-accent-text">The honest bottom line</p>

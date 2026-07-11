@@ -31,6 +31,7 @@ export { default as MarketingFooter } from './MarketingFooter.svelte';
 export { default as MarketingHeader } from './MarketingHeader.svelte';
 export { default as Numeral } from './Numeral.svelte';
 export { default as Page, type PageWidth } from './Page.svelte';
+export { default as PageAurora } from './PageAurora.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Sheet } from './Sheet.svelte';
 export { default as Progress } from './Progress.svelte';

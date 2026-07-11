@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { fly } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import { ArrowRight01Icon, SparklesIcon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import {
 		AuroraBackdrop,
@@ -10,6 +10,7 @@
 		Icon,
 		MarketingFooter,
 		MarketingHeader,
+		PageAurora,
 		Progress,
 		Score,
 		Verdict
@@ -84,7 +85,8 @@
 	</div>
 {/snippet}
 
-<div class="relative min-h-dvh">
+<div data-theme="dark" class="relative min-h-dvh bg-surface text-text">
+	<PageAurora />
 	<MarketingHeader />
 
 	<main>
@@ -98,13 +100,14 @@
 					class="text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl"
 				>
 					The platform built for
-					<!-- The audience cycles in place; the row is a fixed height so nothing shifts. -->
-					<span class="relative mt-1 block h-[1.2em] overflow-hidden">
+					<!-- The audience cross-fades in place. A fixed row height keeps the layout
+					     steady; no overflow clip, so descenders are never cut. -->
+					<span class="relative mt-1 block h-[1.3em]">
 						{#key roleIndex}
 							<span
-								in:fly={{ y: 44, duration: 500 }}
-								out:fly={{ y: -44, duration: 500 }}
-								class="absolute inset-x-0 top-0 bg-gradient-to-r from-[#6aa8ff] to-[#b794ff] bg-clip-text text-transparent"
+								in:fade={{ duration: 320 }}
+								out:fade={{ duration: 320 }}
+								class="absolute inset-x-0 top-0 text-[#3a9ae6]"
 							>
 								{ROLES[roleIndex]}
 							</span>
@@ -157,7 +160,7 @@
 		<div class="mx-auto max-w-6xl">
 			<!-- --------------------------------------------------------- logo strip -->
 			{#if LOGOS.length > 0}
-				<section class="bg-surface-raised">
+				<section>
 					<div class="px-6 py-12 sm:px-8">
 						<p class="text-center text-xs font-medium tracking-wide text-muted uppercase">
 							Taught with Muallim
@@ -231,7 +234,7 @@
 						<div class="flex flex-col gap-4 lg:col-span-2">
 							<!-- A quiz result, graded. -->
 							<div use:inview={{ delay: 80 }} class="flex-1">
-								<Card elevation="raised" class="h-full p-5">
+								<Card elevation="raised" class="lift h-full rotate-1 p-5">
 									<p class="text-sm font-medium">Chapter one quiz</p>
 									<p class="mt-1 text-xs text-muted">Graded a moment after it was handed in.</p>
 									<div class="mt-4">
@@ -246,7 +249,7 @@
 
 							<!-- Points and a leaderboard — the reason to come back. -->
 							<div use:inview={{ delay: 160 }} class="flex-1">
-								<Card elevation="raised" class="h-full p-5">
+								<Card elevation="raised" class="lift h-full -rotate-1 p-5">
 									<p class="text-sm font-medium">This week's leaders</p>
 									<ul class="mt-3 space-y-2.5">
 										{#each BOARD as row, i (row.who)}
@@ -283,7 +286,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: index * 80 }}>
-								<Card class="lift h-full p-6">
+								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
 									<Icon icon={feature.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{feature.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{feature.body}</p>
@@ -292,7 +295,7 @@
 						{/each}
 						{#each MORE_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full p-6">
+								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
 									<div class="flex items-start justify-between gap-3">
 										<Icon icon={feature.icon} class="size-6 text-accent" />
 										{#if feature.status === 'planned'}
@@ -309,7 +312,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------- solutions router -->
-			<section class="border-t border-border bg-surface-raised">
+			<section class="border-t border-border">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'Built for how you teach',
@@ -324,7 +327,12 @@
 								href={resolve('/solutions/[slug]', { slug: s.slug })}
 								class="group"
 							>
-								<Card class="lift flex h-full flex-col p-6">
+								<Card
+									class="lift flex h-full flex-col border-white/10 bg-white/[0.04] p-6 backdrop-blur {index %
+									2
+										? '-rotate-[0.6deg]'
+										: 'rotate-[0.6deg]'}"
+								>
 									<Icon icon={s.heroIcon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{s.nav}</h3>
 									<p class="mt-2 flex-1 text-sm text-pretty text-muted">{s.tagline}</p>
@@ -389,7 +397,9 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2">
 						{#each AI_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 2) * 80 }}>
-								<Card class="lift flex h-full gap-4 p-6">
+								<Card
+									class="lift flex h-full gap-4 border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+								>
 									<Icon icon={feature.icon} class="mt-0.5 size-6 shrink-0 text-accent" />
 									<div>
 										<div class="flex flex-wrap items-center gap-2">
@@ -427,7 +437,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------------- pricing -->
-			<section id="pricing" class="scroll-mt-20 border-t border-border bg-surface-raised">
+			<section id="pricing" class="scroll-mt-20 border-t border-border">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'Pricing',

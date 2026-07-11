@@ -259,11 +259,15 @@
 	.lift {
 		transition:
 			transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+			rotate 220ms cubic-bezier(0.16, 1, 0.3, 1),
 			border-color 220ms ease;
 	}
 
+	/* Straighten on hover — a no-op for cards that were never tilted, and the
+	   settle for the ones the marketing grid rotates a touch. */
 	.lift:hover {
 		transform: translateY(-2px);
+		rotate: 0deg;
 		border-color: var(--b-6);
 	}
 
