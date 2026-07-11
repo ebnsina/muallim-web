@@ -17,6 +17,7 @@ export { default as TintCard } from './TintCard.svelte';
 export { default as Certificate } from './Certificate.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as Difficulty } from './Difficulty.svelte';
+export { default as HighlightableText } from './HighlightableText.svelte';
 export { default as EmptyState } from './EmptyState.svelte';
 export { default as Field } from './Field.svelte';
 export { default as FileList } from './FileList.svelte';

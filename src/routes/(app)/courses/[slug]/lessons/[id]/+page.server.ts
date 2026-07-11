@@ -15,6 +15,11 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 				params: { path: { id: params.id } }
 			})
 		: null;
+	const highlightsRequest = locals.accessToken
+		? authedApi(url.origin, locals.accessToken).GET('/v1/lessons/{id}/highlights', {
+				params: { path: { id: params.id } }
+			})
+		: null;
 
 	const { data, error: problem, response } = await contentRequest;
 
@@ -25,16 +30,18 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
 	}
 
-	// A note that fails to load is not worth failing the lesson over — the reader
-	// came to read, not to write. It falls back to empty, and saving still works.
-	const noteResult = noteRequest ? await noteRequest : null;
+	// The margin — note and marks — that fails to load is not worth failing the
+	// lesson over: the reader came to read, not to annotate. It falls back to empty,
+	// and writing still works.
+	const [noteResult, highlightsResult] = await Promise.all([noteRequest, highlightsRequest]);
 
 	return {
 		lesson: data.lesson,
 		access: data.access,
 		slug: params.slug,
 		signedIn: Boolean(locals.accessToken),
-		note: noteResult?.data?.note.body ?? ''
+		note: noteResult?.data?.note.body ?? '',
+		highlights: highlightsResult?.data?.highlights ?? []
 	};
 };
 
@@ -95,5 +102,74 @@ export const actions: Actions = {
 		}
 
 		return { noteSaved: true };
+	},
+
+	/** Mark a passage. The offsets and quote come from the reader's selection. */
+	addHighlight: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const form = await request.formData();
+		const quote = String(form.get('quote') ?? '');
+		const start = Number(form.get('start'));
+		const end = Number(form.get('end'));
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/lessons/{id}/highlights', {
+			params: { path: { id: params.id } },
+			body: { quote, start, end, note: '' }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				highlightMessage: problemMessage(problem, 'Could not save that highlight.')
+			});
+		}
+
+		return { highlight: data.highlight };
+	},
+
+	/** Change the note on a marked passage, by its own id. */
+	editHighlight: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const form = await request.formData();
+		const id = String(form.get('id') ?? '');
+		const note = String(form.get('note') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
+			'/v1/highlights/{id}',
+			{ params: { path: { id } }, body: { note } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				highlightMessage: problemMessage(problem, 'Could not save that note.')
+			});
+		}
+
+		return { highlightSaved: true };
+	},
+
+	/** Remove a marked passage. */
+	deleteHighlight: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const id = String((await request.formData()).get('id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/highlights/{id}',
+			{ params: { path: { id } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				highlightMessage: problemMessage(problem, 'Could not remove that highlight.')
+			});
+		}
+
+		return { highlightDeleted: true };
 	}
 };

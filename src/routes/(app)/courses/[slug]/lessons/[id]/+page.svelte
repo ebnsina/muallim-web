@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import {
 		ArrowLeft01Icon,
 		ArrowRight01Icon,
 		Clock01Icon,
+		Delete02Icon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -12,6 +14,7 @@
 		Badge,
 		Breadcrumbs,
 		Button,
+		HighlightableText,
 		Icon,
 		LessonIcon,
 		Page,
@@ -19,12 +22,38 @@
 		Textarea
 	} from '$lib/components';
 	import { lessonTrail } from '$lib/breadcrumbs';
+	import { callAction } from '$lib/form';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	let savingNote = $state(false);
+
+	// The marks live here so a new one shows the instant it is made and a removed one
+	// goes at once; the writable derived resettles from the server on the next load.
+	let highlights = $derived(data.highlights);
+	let focusedHighlight = $state<string | null>(null);
+
+	// Add a mark for the reader's selection, then jump to its note field so they can
+	// write straight away. On failure the list reloads to the truth.
+	async function addHighlight(selection: { quote: string; start: number; end: number }) {
+		const result = await callAction('?/addHighlight', selection);
+		if (result.type === 'success' && result.data?.highlight) {
+			focusedHighlight = String(result.data.highlight.id);
+		}
+		await invalidateAll();
+	}
+
+	async function saveHighlightNote(id: string, note: string) {
+		await callAction('?/editHighlight', { id, note });
+	}
+
+	async function removeHighlight(id: string) {
+		highlights = highlights.filter((h) => h.id !== id);
+		await callAction('?/deleteHighlight', { id });
+		await invalidateAll();
+	}
 
 	const crumbs = $derived(
 		lessonTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
@@ -192,10 +221,22 @@
 
 			{#if data.lesson.content}
 				<!-- A readable measure and generous leading: this is where the reading is
-				     actually done, so it gets the typography of a page, not of a field. -->
-				<div class="mt-8 max-w-2xl leading-relaxed text-pretty whitespace-pre-wrap">
-					{data.lesson.content}
-				</div>
+				     actually done, so it gets the typography of a page, not of a field.
+
+				     Signed in, the text is selectable into a highlight; otherwise it is
+				     just text, because marks are the reader's own and a stranger has none. -->
+				{#if data.signedIn}
+					<HighlightableText
+						content={data.lesson.content}
+						{highlights}
+						onadd={addHighlight}
+						class="mt-8 max-w-2xl leading-relaxed text-pretty"
+					/>
+				{:else}
+					<div class="mt-8 max-w-2xl leading-relaxed text-pretty whitespace-pre-wrap">
+						{data.lesson.content}
+					</div>
+				{/if}
 			{:else if !data.lesson.video_embed_url}
 				<p class="text-muted mt-8 text-sm">This lesson has no content yet.</p>
 			{/if}
@@ -286,6 +327,57 @@
 							{/if}
 						</div>
 					</form>
+
+					<!--
+						The passages marked in the text, each with its own remark. Select any
+						words above to add one; the quote is the anchor, kept so the passage is
+						recognisable even after the lesson is edited under it.
+					-->
+					{#if highlights.length > 0}
+						<div class="mt-10">
+							<h2 class="text-sm font-medium tracking-wide uppercase">Highlighted passages</h2>
+
+							<ul class="mt-3 space-y-3">
+								{#each highlights as highlight (highlight.id)}
+									<li
+										id="highlight-{highlight.id}"
+										class={cn(
+											'rounded-card border p-4 transition-colors',
+											focusedHighlight === highlight.id
+												? 'border-warning-border bg-warning-surface/40'
+												: 'border-border'
+										)}
+									>
+										<div class="flex items-start justify-between gap-3">
+											<blockquote
+												class="border-l-2 border-warning-border pl-3 text-sm text-pretty text-muted italic"
+											>
+												{highlight.quote}
+											</blockquote>
+
+											<button
+												type="button"
+												class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+												aria-label="Remove this highlight"
+												onclick={() => removeHighlight(highlight.id)}
+											>
+												<Icon icon={Delete02Icon} class="size-4" />
+											</button>
+										</div>
+
+										<Textarea
+											class="mt-3"
+											rows={2}
+											value={highlight.note}
+											aria-label="Note on this passage"
+											placeholder="Add a note on this passage…"
+											onblur={(event) => saveHighlightNote(highlight.id, event.currentTarget.value)}
+										/>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
 				</section>
 			{/if}
 
