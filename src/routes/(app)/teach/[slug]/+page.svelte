@@ -17,16 +17,21 @@
 		Breadcrumbs,
 		Button,
 		Card,
+		Field,
 		Icon,
 		Input,
 		Label,
 		Page,
 		PageHeader,
-		Select
+		Select,
+		Sheet,
+		Textarea
 	} from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 	/*
 		Drag-and-drop reordering.
@@ -325,6 +330,65 @@
 				</form>
 			</div>
 		</Card>
+	</section>
+
+	<!-- ----------------------------------------------------- announcements -->
+	<section class="mt-8 max-w-3xl">
+		<h2 class="text-sm font-medium tracking-wide uppercase">Announcements</h2>
+		<p class="text-muted mt-1 text-sm">
+			Notices your learners see at the top of the course page. The newest is first.
+		</p>
+
+		{#if form?.announcementMessage}
+			<Alert tone="danger" class="mt-4" role="alert">{form.announcementMessage}</Alert>
+		{/if}
+
+		<form method="POST" action="?/postAnnouncement" use:enhance class="mt-4">
+			<Sheet>
+				<div class="space-y-4">
+					<Field id="announcement-title" label="Title">
+						{#snippet children({ id, invalid })}
+							<Input {id} {invalid} name="title" required maxlength={200} />
+						{/snippet}
+					</Field>
+
+					<Field id="announcement-body" label="Message">
+						{#snippet children({ id, invalid })}
+							<Textarea {id} {invalid} name="body" rows={4} required maxlength={5000} />
+						{/snippet}
+					</Field>
+				</div>
+
+				{#snippet footer()}
+					<Button type="submit">Post announcement</Button>
+				{/snippet}
+			</Sheet>
+		</form>
+
+		{#if data.announcements.length > 0}
+			<ul class="mt-6 space-y-3">
+				{#each data.announcements as announcement (announcement.id)}
+					<li>
+						<Card class="p-4">
+							<div class="flex items-start justify-between gap-3">
+								<div class="min-w-0">
+									<p class="font-medium text-pretty">{announcement.title}</p>
+									<p class="text-muted numeral mt-0.5 text-xs">
+										{announcementDate.format(new Date(announcement.created_at))}
+									</p>
+								</div>
+
+								<form method="POST" action="?/deleteAnnouncement" use:enhance>
+									<input type="hidden" name="id" value={announcement.id} />
+									<Button type="submit" variant="ghost" size="sm">Remove</Button>
+								</form>
+							</div>
+							<p class="text-muted mt-2 text-sm whitespace-pre-wrap">{announcement.body}</p>
+						</Card>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	</section>
 
 	{#if topics.length === 0}

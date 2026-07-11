@@ -4,6 +4,7 @@
 	import {
 		Alert02Icon,
 		Clock01Icon,
+		Megaphone01Icon,
 		SquareLock01Icon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
@@ -23,6 +24,8 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 	const enrolled = $derived(data.progress !== null);
 
@@ -135,6 +138,32 @@
 					<Icon icon={Alert02Icon} class="mt-0.5 size-3.5 shrink-0" />
 					{dripNotice[data.course.drip_mode]}
 				</p>
+			{/if}
+
+			<!-- ----------------------------------------------------- announcements -->
+			{#if data.announcements.length > 0}
+				<section class="mt-10">
+					<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
+						<Icon icon={Megaphone01Icon} class="size-4" />
+						Announcements
+					</h2>
+
+					<ul class="mt-4 space-y-3">
+						{#each data.announcements as announcement (announcement.id)}
+							<li>
+								<Card class="border-accent-border bg-accent-surface/40 p-5">
+									<div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+										<h3 class="font-medium text-pretty">{announcement.title}</h3>
+										<time class="text-muted numeral shrink-0 text-xs">
+											{announcementDate.format(new Date(announcement.created_at))}
+										</time>
+									</div>
+									<p class="text-muted mt-2 text-sm whitespace-pre-wrap">{announcement.body}</p>
+								</Card>
+							</li>
+						{/each}
+					</ul>
+				</section>
 			{/if}
 
 			<!-- ------------------------------------------------------- curriculum -->

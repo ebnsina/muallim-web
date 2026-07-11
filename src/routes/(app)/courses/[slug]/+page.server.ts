@@ -24,11 +24,16 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			? authedApi(url.origin, locals.accessToken).GET('/v1/me/enrolments', {
 					params: { query: { limit: 100 } }
 				})
+			: Promise.resolve(null),
+		locals.accessToken
+			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/announcements', {
+					params: { path: { slug: params.slug } }
+				})
 			: Promise.resolve(null)
 	]);
 
 	await parent();
-	const [progress, prerequisites, enrolments] = await rest;
+	const [progress, prerequisites, enrolments, announcements] = await rest;
 
 	// Which prerequisites this reader has finished. lms-api refuses the enrolment
 	// and names them, but a learner should see the gate before they walk into it.
@@ -57,6 +62,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		// A reader who is not enrolled has no progress, and that is an ordinary
 		// answer rather than a failure of this page.
 		progress: progress?.data?.progress ?? null,
+		announcements: announcements?.data?.announcements ?? [],
 		signedIn: Boolean(locals.accessToken),
 		next: url.pathname
 	};

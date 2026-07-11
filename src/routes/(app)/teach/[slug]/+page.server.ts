@@ -14,11 +14,12 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		api.GET('/v1/courses/{slug}/prerequisites', { params: { path: { slug: params.slug } } }),
 		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } }),
 		api.GET('/v1/certificate-templates'),
-		api.GET('/v1/courses/{slug}/certificate-template', { params: { path: { slug: params.slug } } })
+		api.GET('/v1/courses/{slug}/certificate-template', { params: { path: { slug: params.slug } } }),
+		api.GET('/v1/courses/{slug}/announcements', { params: { path: { slug: params.slug } } })
 	]);
 
 	await parent();
-	const [prerequisites, mine, templates, courseTemplate] = await rest;
+	const [prerequisites, mine, templates, courseTemplate, announcements] = await rest;
 
 	// Every other course in the workspace, so the author picks a prerequisite from
 	// a list rather than typing a slug and finding out later that they mistyped it.
@@ -31,7 +32,9 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 
 		// The certificate template picker. `null` template_id is the built-in default.
 		certificateTemplates: templates.data?.templates ?? [],
-		currentTemplateId: courseTemplate.data?.template_id ?? null
+		currentTemplateId: courseTemplate.data?.template_id ?? null,
+
+		announcements: announcements.data?.announcements ?? []
 	};
 };
 
@@ -290,6 +293,46 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(problem, 'Could not change that lesson.')
+			});
+		}
+	},
+
+	postAnnouncement: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const form = await request.formData();
+		const title = String(form.get('title') ?? '').trim();
+		const body = String(form.get('body') ?? '').trim();
+		if (!title || !body) {
+			return fail(400, { announcementMessage: 'An announcement needs a title and a body.' });
+		}
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/courses/{slug}/announcements',
+			{ params: { path: { slug: params.slug } }, body: { title, body } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				announcementMessage: problemMessage(problem, 'Could not post that announcement.')
+			});
+		}
+		return { announcementPosted: true };
+	},
+
+	deleteAnnouncement: async ({ request, locals, url }) => {
+		guard(locals.accessToken);
+
+		const id = String((await request.formData()).get('id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/announcements/{id}',
+			{ params: { path: { id } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				announcementMessage: problemMessage(problem, 'Could not remove that announcement.')
 			});
 		}
 	}
