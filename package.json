@@ -54,6 +54,9 @@
 		"@fontsource-variable/mona-sans": "^5.2.8",
 		"@hugeicons/core-free-icons": "^4.2.2",
 		"@hugeicons/svelte": "^1.1.4",
+		"@tanstack/ai": "^0.40.0",
+		"@tanstack/ai-anthropic": "^0.16.1",
+		"@tanstack/ai-svelte": "^0.14.3",
 		"@thisux/sveltednd": "^0.4.1",
 		"openapi-fetch": "^0.17.0"
 	}

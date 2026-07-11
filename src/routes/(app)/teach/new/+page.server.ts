@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -7,7 +8,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	// lms-api enforces course:write and answers 403 otherwise; this redirect is for
 	// the unauthenticated case, where the useful instruction is "sign in".
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
-	return {};
+	return { aiEnabled: aiEnabled() };
 };
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced', 'expert'] as const;

@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import {
+		AiField,
 		Alert,
 		Breadcrumbs,
 		Button,
@@ -14,8 +15,13 @@
 	} from '$lib/components';
 	import type { PageProps } from './$types';
 
-	let { form }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	let submitting = $state(false);
+
+	// Bound so the AI assist can read the title as context and write its drafts back.
+	// Client state survives an enhanced submit, so it needs no repopulation from `form`.
+	let title = $state('');
+	let summary = $state('');
 
 	const crumbs = [{ label: 'Teach', href: resolve('/teach') }, { label: 'New course' }];
 
@@ -57,13 +63,27 @@
 				<div class="space-y-5">
 					<Field id="title" label="Title">
 						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="title" required value={form?.title ?? ''} />
+							<Input {id} {invalid} name="title" required bind:value={title} />
+							<AiField
+								enabled={data.aiEnabled}
+								label="Suggest a title"
+								prompt={() =>
+									`Write one concise, compelling course title (max 8 words) for a course about: ${title || summary || 'this subject'}. Return only the title.`}
+								onaccept={(text) => (title = text.replace(/^["']|["']$/g, ''))}
+							/>
 						{/snippet}
 					</Field>
 
 					<Field id="summary" label="Summary">
 						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="summary" value={form?.summary ?? ''} />
+							<Input {id} {invalid} name="summary" bind:value={summary} />
+							<AiField
+								enabled={data.aiEnabled}
+								label="Draft a summary"
+								prompt={() =>
+									`Write a one-sentence course summary (max 25 words) that would make a learner want to enrol in a course titled "${title || 'this course'}". Return only the sentence.`}
+								onaccept={(text) => (summary = text)}
+							/>
 						{/snippet}
 					</Field>
 
