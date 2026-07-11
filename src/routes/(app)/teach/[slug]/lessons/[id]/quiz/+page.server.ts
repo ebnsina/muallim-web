@@ -76,11 +76,14 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	// The lesson, for its title; and the quiz, which may not exist yet. A 404 from
-	// the second is the answer "no quiz", not a failure.
-	const [lesson, quiz] = await Promise.all([
+	const category = url.searchParams.get('bank') ?? '';
+
+	// The lesson, the quiz (which may not exist yet — a 404 means "no quiz"), and
+	// the reusable question bank to add from.
+	const [lesson, quiz, bank] = await Promise.all([
 		api.GET('/v1/lessons/{id}/content', { params: { path: { id: params.id } } }),
-		api.GET('/v1/lessons/{id}/quiz/authoring', { params: { path: { id: params.id } } })
+		api.GET('/v1/lessons/{id}/quiz/authoring', { params: { path: { id: params.id } } }),
+		api.GET('/v1/quiz-bank', { params: { query: { category: category || undefined, limit: 50 } } })
 	]);
 
 	if (lesson.error || !lesson.data) {
@@ -101,7 +104,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		lessonId: params.id,
 		lessonTitle: lesson.data.lesson.title,
 		quiz: quiz.data?.quiz ?? null,
-		questions: quiz.data?.questions ?? []
+		questions: quiz.data?.questions ?? [],
+		bank: bank.data?.questions ?? [],
+		bankCategories: bank.data?.categories ?? [],
+		bankFilter: category
 	};
 };
 
@@ -224,6 +230,60 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(problem, 'That question could not be added.')
+			});
+		}
+	},
+
+	saveToBank: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const id = String(form.get('question_id') ?? '');
+		const category = String(form.get('category') ?? '').trim();
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/questions/{id}/save-to-bank',
+			{ params: { path: { id } }, body: { category } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'That question could not be saved to the bank.')
+			});
+		}
+		return { savedToBank: true };
+	},
+
+	addFromBank: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const bankQuestionId = String((await request.formData()).get('bank_question_id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/lessons/{id}/quiz/questions/from-bank',
+			{ params: { path: { id: params.id } }, body: { bank_question_id: bankQuestionId } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'That question could not be added from the bank.')
+			});
+		}
+	},
+
+	deleteBankQuestion: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const id = String((await request.formData()).get('bank_question_id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/quiz-bank/{id}',
+			{ params: { path: { id } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'That bank question could not be removed.')
 			});
 		}
 	},

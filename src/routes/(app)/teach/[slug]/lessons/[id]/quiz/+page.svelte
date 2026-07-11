@@ -198,14 +198,89 @@
 									{/if}
 								</div>
 
-								<form method="POST" action="?/deleteQuestion" use:enhance>
-									<input type="hidden" name="question_id" value={question.id} />
-									<Button type="submit" variant="secondary" size="sm">Remove</Button>
-								</form>
+								<div class="flex shrink-0 flex-col items-end gap-2">
+									<form method="POST" action="?/deleteQuestion" use:enhance>
+										<input type="hidden" name="question_id" value={question.id} />
+										<Button type="submit" variant="secondary" size="sm">Remove</Button>
+									</form>
+
+									<form
+										method="POST"
+										action="?/saveToBank"
+										class="flex items-center gap-1"
+										use:enhance
+									>
+										<input type="hidden" name="question_id" value={question.id} />
+										<Input
+											name="category"
+											placeholder="Category"
+											class="h-8 w-28"
+											aria-label="Bank category"
+										/>
+										<Button type="submit" variant="ghost" size="sm">Save to bank</Button>
+									</form>
+								</div>
 							</div>
 						</li>
 					{/each}
 				</ol>
+			{/if}
+		</section>
+
+		<!-- The reusable question bank. -->
+		<section class="mt-12">
+			<div class="flex flex-wrap items-baseline justify-between gap-3">
+				<h2 class="text-lg font-medium">Question bank</h2>
+				{#if data.bankCategories.length > 0}
+					<form method="GET" class="flex items-center gap-2">
+						<Label for="bank-filter" class="text-muted text-xs">Category</Label>
+						<Select
+							id="bank-filter"
+							name="bank"
+							value={data.bankFilter}
+							class="h-8 w-44"
+							onchange={(event) => event.currentTarget.form?.requestSubmit()}
+						>
+							<option value="">All</option>
+							{#each data.bankCategories as category (category)}
+								<option value={category}>{category}</option>
+							{/each}
+						</Select>
+					</form>
+				{/if}
+			</div>
+
+			{#if data.bank.length === 0}
+				<p class="text-muted mt-2 text-sm">
+					Nothing here yet. Save a question above to reuse it in other quizzes.
+				</p>
+			{:else}
+				<ul class="mt-4 space-y-2">
+					{#each data.bank as bankQuestion (bankQuestion.id)}
+						<li
+							class="flex items-start justify-between gap-4 rounded-control border border-border px-4 py-3"
+						>
+							<div class="min-w-0">
+								<p class="text-sm text-pretty">{bankQuestion.prompt}</p>
+								<p class="text-muted mt-1 text-xs">
+									{typeLabel(bankQuestion.type)} · {bankQuestion.points}
+									{bankQuestion.points === 1 ? 'point' : 'points'}
+									{#if bankQuestion.category}· {bankQuestion.category}{/if}
+								</p>
+							</div>
+							<div class="flex shrink-0 items-center gap-2">
+								<form method="POST" action="?/addFromBank" use:enhance>
+									<input type="hidden" name="bank_question_id" value={bankQuestion.id} />
+									<Button type="submit" size="sm">Add to this quiz</Button>
+								</form>
+								<form method="POST" action="?/deleteBankQuestion" use:enhance>
+									<input type="hidden" name="bank_question_id" value={bankQuestion.id} />
+									<Button type="submit" variant="ghost" size="sm">Remove</Button>
+								</form>
+							</div>
+						</li>
+					{/each}
+				</ul>
 			{/if}
 		</section>
 
