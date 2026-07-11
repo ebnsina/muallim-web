@@ -14,13 +14,24 @@ const PAGE_SIZE = 20;
  */
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const cursor = url.searchParams.get('cursor');
+	// The search and the filter live in the URL, so a filtered page is a place a
+	// learner can bookmark and share — the same reason the cursor does.
+	const q = url.searchParams.get('q')?.trim() ?? '';
+	const difficulty = url.searchParams.get('difficulty') ?? '';
 
 	const {
 		data,
 		error: problem,
 		response
 	} = await apiAs(url.origin, locals.accessToken).GET('/v1/courses', {
-		params: { query: { limit: PAGE_SIZE, ...(cursor ? { cursor } : {}) } }
+		params: {
+			query: {
+				limit: PAGE_SIZE,
+				...(cursor ? { cursor } : {}),
+				...(q ? { q } : {}),
+				...(difficulty ? { difficulty } : {})
+			}
+		}
 	});
 
 	if (problem || !data) {
@@ -30,6 +41,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return {
 		courses: data.courses ?? [],
 		nextCursor: data.has_more ? (data.next_cursor ?? null) : null,
-		signedIn: Boolean(locals.accessToken)
+		signedIn: Boolean(locals.accessToken),
+		q,
+		difficulty
 	};
 };
