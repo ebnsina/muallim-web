@@ -85,7 +85,7 @@ test.describe('taking a quiz', () => {
 		// The machine's five points are in; the essay's are not, and there is no pass
 		// to report while a person still has to look at it.
 		await expect(page.getByText('5 of 15')).toBeVisible();
-		await expect(page.getByText('Not marked yet.')).toBeVisible();
+		await expect(page.getByText('Not marked', { exact: false })).toBeVisible();
 
 		// And the lesson is not complete: the attempt has not passed anything yet.
 		await page.goto(`/courses/${course.slug}`);

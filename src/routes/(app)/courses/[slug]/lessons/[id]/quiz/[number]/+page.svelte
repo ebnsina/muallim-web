@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Alert, Breadcrumbs, Page, PageHeader } from '$lib/components';
+	import { CancelCircleIcon, CheckmarkCircle02Icon, Clock01Icon } from '@hugeicons/core-free-icons';
+	import { Alert, Badge, Breadcrumbs, Card, Page, PageHeader } from '$lib/components';
 	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -39,16 +40,9 @@
 		return () => clearTimeout(timer);
 	});
 
-	const outcome = $derived.by(() => {
-		switch (data.attempt.status) {
-			case 'grading':
-				return 'Grading…';
-			case 'awaiting_review':
-				return 'Waiting to be marked';
-			default:
-				return data.attempt.passed ? 'Passed' : 'Not passed';
-		}
-	});
+	// Null while a person still has to mark something — the badge says "waiting"
+	// rather than guessing a pass that has not been decided.
+	const passed = $derived(data.attempt.status === 'graded' ? data.attempt.passed : null);
 </script>
 
 <svelte:head><title>Attempt {data.attempt.number} — Quiz</title></svelte:head>
@@ -63,14 +57,26 @@
 			`role="status"` so a screen reader is told when this becomes a score, rather
 			than leaving the reader to discover it.
 		-->
-		<p class="text-muted mt-2" role="status" aria-live="polite">
+		<p class="text-muted mt-4" role="status" aria-live="polite">
 			Grading… this page will show your score when it is ready.
 		</p>
 	{:else}
-		<p class="mt-2 text-lg" role="status" aria-live="polite">
-			<span class="font-semibold">{data.attempt.points} of {data.attempt.max_points}</span>
-			<span class="text-muted">· {data.attempt.percent}% · {outcome}</span>
-		</p>
+		<div class="mt-4 flex flex-wrap items-center gap-3" role="status" aria-live="polite">
+			<p class="text-lg">
+				<span class="numeral font-semibold">{data.attempt.points}</span>
+				<span class="text-muted">of</span>
+				<span class="numeral">{data.attempt.max_points}</span>
+				<span class="text-muted numeral ml-1">· {data.attempt.percent}%</span>
+			</p>
+
+			{#if passed === null}
+				<Badge tone="neutral" icon={Clock01Icon}>Waiting to be marked</Badge>
+			{:else if passed}
+				<Badge tone="success" icon={CheckmarkCircle02Icon}>Passed</Badge>
+			{:else}
+				<Badge tone="danger" icon={CancelCircleIcon}>Not passed</Badge>
+			{/if}
+		</div>
 	{/if}
 
 	{#if data.attempt.status === 'awaiting_review'}
@@ -81,49 +87,55 @@
 	{/if}
 
 	{#if !grading}
-		<ol class="mt-10 space-y-8">
+		<ol class="mt-8 space-y-3">
 			{#each data.items as item, index (item.question_id)}
 				<li>
-					<p class="font-medium">
-						{index + 1}. {item.prompt}
-						<span class="text-muted text-sm font-normal">
-							({item.points} of {item.max_points})
-						</span>
-					</p>
+					<Card class="p-5">
+						<div class="flex items-start justify-between gap-4">
+							<p class="font-medium text-pretty">
+								{index + 1}. {item.prompt}
+							</p>
 
-					<p class="mt-1 text-sm">
-						{#if !item.graded}
-							<span class="text-muted">Not marked yet.</span>
-						{:else if item.correct}
-							<span class="text-success-text">Correct.</span>
-						{:else}
-							<span class="text-danger-text">
-								{item.points > 0 ? 'Partly right.' : 'Not right.'}
-							</span>
+							{#if !item.graded}
+								<Badge tone="neutral" icon={Clock01Icon}>Not marked</Badge>
+							{:else if item.correct}
+								<Badge tone="success" icon={CheckmarkCircle02Icon}>Correct</Badge>
+							{:else if item.points > 0}
+								<Badge tone="warning">Partly right</Badge>
+							{:else}
+								<Badge tone="danger" icon={CancelCircleIcon}>Not right</Badge>
+							{/if}
+						</div>
+
+						<p class="text-muted numeral mt-1 text-xs">
+							{item.points} of {item.max_points} points
+						</p>
+
+						{#if item.response.text}
+							<p class="mt-3 text-sm whitespace-pre-wrap">
+								<span class="text-muted">You wrote:</span>
+								{item.response.text}
+							</p>
 						{/if}
-					</p>
 
-					{#if item.response.text}
-						<p class="text-muted mt-2 text-sm whitespace-pre-wrap">
-							You wrote: {item.response.text}
-						</p>
-					{/if}
+						{#if item.feedback}
+							<div
+								class="mt-3 rounded-control border border-accent-border bg-accent-surface px-3 py-2 text-sm"
+							>
+								<span class="text-accent-text font-medium">Your instructor:</span>
+								{item.feedback}
+							</div>
+						{/if}
 
-					{#if item.feedback}
-						<p class="mt-2 rounded-control border px-3 py-2 text-sm">
-							<span class="font-medium">Your instructor:</span>
-							{item.feedback}
-						</p>
-					{/if}
-
-					<!--
-						The author's note, released only once the attempt is graded. It never
-						names the correct answer — a quiz that allows another attempt would
-						otherwise hand out the key with the first result.
-					-->
-					{#if item.explanation}
-						<p class="text-muted mt-2 text-sm">{item.explanation}</p>
-					{/if}
+						<!--
+							The author's note, released only once the attempt is graded. It never
+							names the correct answer — a quiz that allows another attempt would
+							otherwise hand out the key with the first result.
+						-->
+						{#if item.explanation}
+							<p class="text-muted mt-3 text-sm">{item.explanation}</p>
+						{/if}
+					</Card>
 				</li>
 			{/each}
 		</ol>
