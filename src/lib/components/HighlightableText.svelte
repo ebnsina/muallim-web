@@ -34,6 +34,7 @@
 	// The text cut at every mark boundary. A run covered by any mark is wrapped; one
 	// covered by several carries all their ids, and a click picks the first.
 	const segments = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- a local set built and consumed inside this derived, never reactive state
 		const points = new Set<number>([0, content.length]);
 		for (const h of anchored) {
 			points.add(h.start);

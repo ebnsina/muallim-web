@@ -30,6 +30,7 @@
 	// the same query, not a jump back to the whole catalogue.
 	const moreHref = $derived.by(() => {
 		if (!data.nextCursor) return '';
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- a throwaway builder for one URL, not reactive state
 		const params = new URLSearchParams();
 		if (data.q) params.set('q', data.q);
 		if (data.difficulty) params.set('difficulty', data.difficulty);

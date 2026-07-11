@@ -15,6 +15,7 @@
 	// Notes and marks keyed by lesson, so each lesson gathers its own.
 	const noteByLesson = $derived(new Map(data.notes.map((note) => [note.lesson_id, note.body])));
 	const highlightsByLesson = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- a lookup built inside this derived, never reactive state
 		const map = new Map<string, typeof data.highlights>();
 		for (const highlight of data.highlights) {
 			const list = map.get(highlight.lesson_id);

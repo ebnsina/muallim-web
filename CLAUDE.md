@@ -70,6 +70,8 @@ pnpm build
 
 **A metric wears an icon, not a coloured dot.** A stat or legend uses a tinted icon tile (`bg-{tone}-surface text-{tone}-text`), never a bare colour dot: a dot is a key nobody was handed.
 
+**Ratings use `Stars`.** `src/lib/components/Stars.svelte` renders a 0–5 rating. Read-only by default (an `aria-label`'d row); pass `name` to make it an accessible radio group that `bind:value` writes to — that is the review form's input. Fill comes from `text-accent [&_*]:fill-current` on the icon, because the `Icon` wrapper does not forward `fill`. Reuse it wherever a rating shows (course header, review wall, teach analytics) rather than drawing stars inline.
+
 **Pages use the width they have.** `Page width="full"` (max-w-7xl, aligned with the header) for lists, grids, and anything with a sidebar; `wide` (max-w-5xl) for forms and tables; `prose` (max-w-2xl) only for something to read. Do not leave a page stranded in a narrow column with empty gutters.
 
 **The landing page redesign is deferred** — the user asked to leave `src/routes/+page.svelte` (marketing) for later.
