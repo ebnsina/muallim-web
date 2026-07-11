@@ -286,7 +286,6 @@
 							</div>
 						</div>
 					</div>
-					tttt
 				</div>
 			</section>
 
