@@ -15,13 +15,16 @@
 		Icon,
 		LessonIcon,
 		Page,
-		PageHeader
+		PageHeader,
+		Textarea
 	} from '$lib/components';
 	import { lessonTrail } from '$lib/breadcrumbs';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	let savingNote = $state(false);
 
 	const crumbs = $derived(
 		lessonTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
@@ -238,6 +241,52 @@
 						</p>
 					{/if}
 				</div>
+			{/if}
+
+			<!--
+				A private margin. Only a signed-in reader has one — it is theirs, kept
+				against the lesson and shown to nobody else. The whole note is sent on
+				save; emptying it clears it, which is why there is nothing to delete.
+			-->
+			{#if data.signedIn}
+				<section class="mt-12 max-w-2xl">
+					<h2 class="text-sm font-medium tracking-wide uppercase">Your notes</h2>
+					<p class="text-muted mt-1 text-xs">Private to you. Nobody else can read them.</p>
+
+					<form
+						method="POST"
+						action="?/saveNote"
+						class="mt-3"
+						use:enhance={() => {
+							savingNote = true;
+							return async ({ update }) => {
+								await update({ reset: false });
+								savingNote = false;
+							};
+						}}
+					>
+						<Textarea
+							name="body"
+							rows={5}
+							maxlength={10000}
+							value={data.note}
+							aria-label="Your notes on this lesson"
+							placeholder="Jot something down as you read…"
+						/>
+
+						<div class="mt-2 flex items-center gap-3">
+							<Button type="submit" variant="secondary" size="sm" loading={savingNote}>
+								{savingNote ? 'Saving…' : 'Save note'}
+							</Button>
+
+							{#if form?.noteSaved}
+								<span class="text-xs text-success-text" role="status">Saved.</span>
+							{:else if form?.noteMessage}
+								<span class="text-xs text-danger-text" role="alert">{form.noteMessage}</span>
+							{/if}
+						</div>
+					</form>
+				</section>
 			{/if}
 
 			<!--
