@@ -7,13 +7,16 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const cursor = url.searchParams.get('cursor') ?? undefined;
-	const { data } = await authedApi(url.origin, locals.accessToken).GET('/v1/notifications', {
-		params: { query: { limit: 20, cursor } }
-	});
+	const api = authedApi(url.origin, locals.accessToken);
+	const [list, prefs] = await Promise.all([
+		api.GET('/v1/notifications', { params: { query: { limit: 20, cursor } } }),
+		api.GET('/v1/notifications/preferences')
+	]);
 
 	return {
-		notifications: data?.notifications ?? [],
-		nextCursor: data?.next_cursor ?? ''
+		notifications: list.data?.notifications ?? [],
+		nextCursor: list.data?.next_cursor ?? '',
+		emailDigest: prefs.data?.email_digest ?? true
 	};
 };
 
@@ -53,5 +56,23 @@ export const actions: Actions = {
 			});
 		}
 		return { allRead: true };
+	},
+
+	setDigest: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const emailDigest = String((await request.formData()).get('email_digest') ?? '') === 'true';
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+			'/v1/notifications/preferences',
+			{ body: { email_digest: emailDigest } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not save that setting.')
+			});
+		}
+		return { digestSaved: true };
 	}
 };

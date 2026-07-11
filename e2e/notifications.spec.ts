@@ -53,4 +53,26 @@ test.describe('notifications', () => {
 		await page.getByRole('button', { name: /New answer to your question/ }).click();
 		await expect(page).toHaveURL(new RegExp(`/courses/${course.slug}/lessons/`));
 	});
+
+	test('the email digest can be turned off and stays off', async ({ page }) => {
+		await page.goto('/notifications');
+		await ready(page);
+
+		const digest = page.getByLabel('Email me a daily digest of unread notifications');
+		await expect(digest).toBeChecked(); // on by default
+
+		await digest.uncheck();
+		// The change submits and reloads; it must come back off.
+		await expect(
+			page.getByLabel('Email me a daily digest of unread notifications')
+		).not.toBeChecked();
+		await page.reload();
+		await expect(
+			page.getByLabel('Email me a daily digest of unread notifications')
+		).not.toBeChecked();
+
+		// Put it back, so the account is left as it was found.
+		await page.getByLabel('Email me a daily digest of unread notifications').check();
+		await expect(page.getByLabel('Email me a daily digest of unread notifications')).toBeChecked();
+	});
 });

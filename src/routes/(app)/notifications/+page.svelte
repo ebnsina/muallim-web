@@ -7,7 +7,7 @@
 		Message01Icon,
 		Notification03Icon
 	} from '@hugeicons/core-free-icons';
-	import { Button, EmptyState, Icon, Page, PageHeader } from '$lib/components';
+	import { Button, Checkbox, EmptyState, Icon, Page, PageHeader } from '$lib/components';
 	import type { IconSvgElement } from '$lib/components';
 	import type { PageProps } from './$types';
 
@@ -37,6 +37,18 @@
 			{/if}
 		{/snippet}
 	</PageHeader>
+
+	<!-- The one setting: a daily email digest of whatever is still unread. -->
+	<form method="POST" action="?/setDigest" class="mt-4" use:enhance>
+		<input type="hidden" name="email_digest" value={(!data.emailDigest).toString()} />
+		<label class="text-muted flex w-fit cursor-pointer items-center gap-2 text-sm">
+			<Checkbox
+				checked={data.emailDigest}
+				onchange={(event) => event.currentTarget.closest('form')?.requestSubmit()}
+			/>
+			Email me a daily digest of unread notifications
+		</label>
+	</form>
 
 	{#if data.notifications.length === 0}
 		<div class="mt-10">
