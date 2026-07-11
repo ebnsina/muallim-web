@@ -19,13 +19,22 @@
 		LessonIcon,
 		Page,
 		PageHeader,
-		Progress
+		Progress,
+		Stars,
+		Textarea
 	} from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+
+	// The star input's live value, seeded from any review the learner already left.
+	// A writable $derived: it resettles to the loaded review, and the form writes to it.
+	let myRating = $derived(data.myReview?.rating ?? 0);
+
+	const hasReviews = $derived(data.reviewSummary.count > 0);
+	const averageLabel = $derived(data.reviewSummary.average.toFixed(1));
 
 	const enrolled = $derived(data.progress !== null);
 
@@ -126,6 +135,16 @@
 					{/if}
 
 					<Difficulty level={data.course.difficulty} />
+
+					{#if hasReviews}
+						<a href="#reviews" class="flex items-center gap-1.5">
+							<Stars value={data.reviewSummary.average} size="sm" />
+							<span class="text-muted text-xs">
+								<span class="numeral">{averageLabel}</span>
+								(<span class="numeral">{data.reviewSummary.count}</span>)
+							</span>
+						</a>
+					{/if}
 				{/snippet}
 			</PageHeader>
 
@@ -233,6 +252,89 @@
 							</li>
 						{/each}
 					</ol>
+				{/if}
+			</section>
+
+			<!-- ---------------------------------------------------------- reviews -->
+			<section id="reviews" class="mt-12 scroll-mt-24">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+					<h2 class="text-sm font-medium tracking-wide uppercase">Reviews</h2>
+					{#if hasReviews}
+						<span class="text-muted flex items-center gap-2 text-sm">
+							<Stars value={data.reviewSummary.average} size="sm" />
+							<span>
+								<span class="numeral">{averageLabel}</span> from
+								<span class="numeral">{data.reviewSummary.count}</span>
+								{data.reviewSummary.count === 1 ? 'learner' : 'learners'}
+							</span>
+						</span>
+					{/if}
+				</div>
+
+				{#if form?.reviewMessage}
+					<Alert tone="danger" class="mt-4" role="alert">{form.reviewMessage}</Alert>
+				{/if}
+
+				<!--
+					Only an enrolled learner may review, and lms-api enforces it. The form
+					shows for them; everyone else reads the wall.
+				-->
+				{#if enrolled}
+					<Card class="mt-4 p-5">
+						<form method="POST" action="?/review" use:enhance>
+							<p class="text-sm font-medium">
+								{data.myReview ? 'Your review' : 'Share what you thought'}
+							</p>
+							<div class="mt-3">
+								<Stars name="rating" bind:value={myRating} />
+							</div>
+							<Textarea
+								name="body"
+								class="mt-4"
+								rows={3}
+								maxlength={4000}
+								placeholder="What would you tell someone deciding whether to take this course? (optional)"
+								value={data.myReview?.body ?? ''}
+							/>
+							<div class="mt-4 flex items-center gap-3">
+								<Button type="submit" size="sm">
+									{data.myReview ? 'Update review' : 'Post review'}
+								</Button>
+								{#if data.myReview}
+									<Button formaction="?/unreview" type="submit" variant="ghost" size="sm">
+										Remove
+									</Button>
+								{/if}
+							</div>
+						</form>
+					</Card>
+				{/if}
+
+				{#if hasReviews}
+					<ul class="mt-6 space-y-4">
+						{#each data.reviews as review (review.created_at + review.author_name)}
+							<li>
+								<Card class="p-5">
+									<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+										<div class="flex items-center gap-2">
+											<Stars value={review.rating} size="sm" />
+											<span class="text-sm font-medium">
+												{review.author_name || 'A learner'}
+											</span>
+										</div>
+										<time class="text-muted numeral shrink-0 text-xs">
+											{announcementDate.format(new Date(review.created_at))}
+										</time>
+									</div>
+									{#if review.body}
+										<p class="text-muted mt-2 text-sm whitespace-pre-wrap">{review.body}</p>
+									{/if}
+								</Card>
+							</li>
+						{/each}
+					</ul>
+				{:else if !enrolled}
+					<p class="text-muted mt-4 text-sm">No reviews yet.</p>
 				{/if}
 			</section>
 		</div>

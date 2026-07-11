@@ -29,11 +29,16 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/announcements', {
 					params: { path: { slug: params.slug } }
 				})
+			: Promise.resolve(null),
+		locals.accessToken
+			? authedApi(url.origin, locals.accessToken).GET('/v1/courses/{slug}/reviews', {
+					params: { path: { slug: params.slug } }
+				})
 			: Promise.resolve(null)
 	]);
 
 	await parent();
-	const [progress, prerequisites, enrolments, announcements] = await rest;
+	const [progress, prerequisites, enrolments, announcements, reviews] = await rest;
 
 	// Which prerequisites this reader has finished. lms-api refuses the enrolment
 	// and names them, but a learner should see the gate before they walk into it.
@@ -63,6 +68,9 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		// answer rather than a failure of this page.
 		progress: progress?.data?.progress ?? null,
 		announcements: announcements?.data?.announcements ?? [],
+		reviews: reviews?.data?.reviews ?? [],
+		reviewSummary: reviews?.data?.summary ?? { count: 0, average: 0 },
+		myReview: reviews?.data?.mine ?? null,
 		signedIn: Boolean(locals.accessToken),
 		next: url.pathname
 	};
@@ -99,5 +107,44 @@ export const actions: Actions = {
 			});
 		}
 		return { cancelled: true };
+	},
+
+	review: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const rating = Number(form.get('rating') ?? 0);
+		const body = String(form.get('body') ?? '').trim();
+		if (!rating || rating < 1 || rating > 5) {
+			return fail(400, { reviewMessage: 'Choose a rating from 1 to 5 stars.' });
+		}
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+			'/v1/courses/{slug}/reviews',
+			{ params: { path: { slug: params.slug } }, body: { rating, body } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				reviewMessage: problemMessage(problem, 'Could not save your review.')
+			});
+		}
+		return { reviewed: true };
+	},
+
+	unreview: async ({ locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/courses/{slug}/reviews',
+			{ params: { path: { slug: params.slug } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				reviewMessage: problemMessage(problem, 'Could not remove your review.')
+			});
+		}
+		return { unreviewed: true };
 	}
 };

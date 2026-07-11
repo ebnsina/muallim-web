@@ -36,6 +36,7 @@ export { default as Radio } from './Radio.svelte';
 export { default as Row } from './Row.svelte';
 export { default as Score } from './Score.svelte';
 export { default as Select } from './Select.svelte';
+export { default as Stars } from './Stars.svelte';
 export { default as Textarea } from './Textarea.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
 export { default as Toaster } from './Toaster.svelte';
