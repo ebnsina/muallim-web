@@ -7,7 +7,7 @@
 	const home = resolve('/');
 </script>
 
-<footer class="border-t border-border">
+<footer>
 	<div class="mx-auto max-w-6xl px-6 py-16">
 		<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
 			<div class="lg:col-span-1">
