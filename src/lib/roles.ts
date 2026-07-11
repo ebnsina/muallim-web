@@ -17,3 +17,12 @@ const AUTHORS = new Set(['owner', 'admin', 'instructor']);
 export function canAuthor(user: { role?: string } | null | undefined): boolean {
 	return user?.role !== undefined && AUTHORS.has(user.role);
 }
+
+// The same roles moderate the community today. A courtesy for the "New board"
+// and pin/lock affordances; lms-api enforces forum:moderate regardless.
+const MODERATORS = new Set(['owner', 'admin', 'instructor']);
+
+/** Whether to show forum moderation controls. Absent and student deny. */
+export function canModerate(user: { role?: string } | null | undefined): boolean {
+	return user?.role !== undefined && MODERATORS.has(user.role);
+}

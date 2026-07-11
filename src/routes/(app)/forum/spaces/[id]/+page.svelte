@@ -1,0 +1,131 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
+	import { Message01Icon, PinIcon, SquareLock01Icon } from '@hugeicons/core-free-icons';
+	import {
+		Alert,
+		Badge,
+		Breadcrumbs,
+		Button,
+		Field,
+		Icon,
+		Input,
+		Page,
+		PageHeader,
+		Sheet,
+		Textarea
+	} from '$lib/components';
+	import type { PageProps } from './$types';
+
+	let { data, form }: PageProps = $props();
+
+	const activity = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+	let composing = $state(false);
+
+	const crumbs = $derived([
+		{ label: 'Community', href: resolve('/forum') },
+		{ label: data.space.title }
+	]);
+</script>
+
+<svelte:head><title>{data.space.title} — Muallim</title></svelte:head>
+
+<Page width="full">
+	<Breadcrumbs {crumbs} />
+
+	<PageHeader class="mt-4" title={data.space.title} description={data.space.description}>
+		{#snippet meta()}
+			{#if data.space.workspace}
+				<Badge tone="accent">Workspace</Badge>
+			{:else if data.space.course_title}
+				<Badge tone="neutral">{data.space.course_title}</Badge>
+			{/if}
+		{/snippet}
+		{#snippet actions()}
+			<Button size="sm" onclick={() => (composing = !composing)}>
+				{composing ? 'Close' : 'New thread'}
+			</Button>
+		{/snippet}
+	</PageHeader>
+
+	{#if form?.message}
+		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
+	{/if}
+
+	{#if composing}
+		<div class="mt-6 max-w-2xl">
+			<form method="POST" action="?/startThread" use:enhance>
+				<Sheet>
+					{#snippet header()}
+						<h2 class="font-medium">Start a thread</h2>
+					{/snippet}
+
+					<div class="space-y-4">
+						<Field id="thread-title" label="Title">
+							{#snippet children({ id })}
+								<Input {id} name="title" required maxlength={200} />
+							{/snippet}
+						</Field>
+						<Field id="thread-body" label="Message">
+							{#snippet children({ id })}
+								<Textarea {id} name="body" rows={4} required maxlength={20000} />
+							{/snippet}
+						</Field>
+					</div>
+
+					{#snippet footer()}
+						<Button type="submit" size="sm">Post thread</Button>
+					{/snippet}
+				</Sheet>
+			</form>
+		</div>
+	{/if}
+
+	{#if data.threads.length === 0}
+		<p class="text-muted mt-8 text-sm">No threads yet. Start the first one.</p>
+	{:else}
+		<ul class="mt-6 divide-y divide-border overflow-hidden rounded-card border border-border">
+			{#each data.threads as thread (thread.id)}
+				<li>
+					<a
+						href={resolve(`/forum/threads/${thread.id}`)}
+						class="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
+					>
+						<div class="min-w-0 flex-1">
+							<div class="flex flex-wrap items-center gap-2">
+								{#if thread.pinned}
+									<Icon icon={PinIcon} class="size-3.5 text-accent-text" title="Pinned" />
+								{/if}
+								{#if thread.locked}
+									<Icon icon={SquareLock01Icon} class="text-muted size-3.5" title="Locked" />
+								{/if}
+								<span class="font-medium">{thread.title}</span>
+							</div>
+							<p class="text-muted mt-1 text-xs">
+								{thread.author_name || 'A member'} · started
+								<span class="numeral">{activity.format(new Date(thread.created_at))}</span>
+							</p>
+						</div>
+
+						<span class="text-muted flex shrink-0 items-center gap-1.5 text-xs">
+							<Icon icon={Message01Icon} class="size-3.5" />
+							<span class="numeral">{thread.reply_count}</span>
+						</span>
+					</a>
+				</li>
+			{/each}
+		</ul>
+
+		{#if data.nextCursor}
+			<div class="mt-6 flex justify-center">
+				<Button
+					href={`${resolve(`/forum/spaces/${data.space.id}`)}?cursor=${encodeURIComponent(data.nextCursor)}`}
+					variant="secondary"
+					size="sm"
+				>
+					Load more
+				</Button>
+			</div>
+		{/if}
+	{/if}
+</Page>

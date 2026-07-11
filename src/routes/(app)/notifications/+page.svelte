@@ -16,7 +16,8 @@
 	const KIND_ICON: Record<string, IconSvgElement> = {
 		answer: Message01Icon,
 		announcement: Megaphone01Icon,
-		grade: Award01Icon
+		grade: Award01Icon,
+		reply: Message01Icon
 	};
 
 	const when = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });

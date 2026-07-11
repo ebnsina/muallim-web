@@ -12,6 +12,7 @@
 		Mortarboard02Icon,
 		Notification03Icon,
 		TeachingIcon,
+		UserGroupIcon,
 		DashboardSquare01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { IconSvgElement } from '@hugeicons/svelte';
@@ -43,6 +44,12 @@
 					show: Boolean(user)
 				},
 				{ href: resolve('/courses'), label: 'Courses', icon: BookOpen01Icon, show: true },
+				{
+					href: resolve('/forum'),
+					label: 'Community',
+					icon: UserGroupIcon,
+					show: Boolean(user)
+				},
 				{ href: resolve('/teach'), label: 'Teach', icon: TeachingIcon, show: canAuthor }
 			] satisfies Tab[]
 		).filter((link) => link.show)
