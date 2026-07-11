@@ -62,9 +62,14 @@
 
 	/*
 		Four numbers, each one the learner could count for themselves. No streak, no
-		hours studied, no points, no "insights": a figure nobody can check is a figure
-		nobody should be shown, and that rule is what keeps the invented widgets other
+		hours studied, no "insights": a figure nobody can check is a figure nobody
+		should be shown, and that rule is what keeps the invented widgets other
 		dashboards carry off this one.
+
+		Points earned (in their own card below) pass the same test: they are a defined
+		sum — ten a lesson, a hundred a course — that a learner can check, not a
+		fabricated engagement score. That is why they earn a place here and "hours
+		studied" does not.
 	*/
 	const STATS = $derived([
 		{ label: 'In progress', value: active.length, tone: 'accent' as const, icon: BookOpen01Icon },
@@ -272,6 +277,57 @@
 					{/each}
 				</dl>
 			</Card>
+
+			<!-- Points, rank, and badges — a nudge to keep going. -->
+			{#if data.gamification}
+				{@const g = data.gamification}
+				<Card class="p-5">
+					<div class="flex items-baseline justify-between gap-3">
+						<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
+						<a
+							class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
+							href={resolve('/leaderboard')}
+						>
+							Leaderboard
+						</a>
+					</div>
+
+					<div class="mt-4 flex items-baseline gap-3">
+						<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
+						<span class="text-muted text-sm">points</span>
+						{#if g.out_of > 0}
+							<span class="text-muted ml-auto text-sm">
+								Rank <span class="numeral">{g.rank}</span> of
+								<span class="numeral">{g.out_of}</span>
+							</span>
+						{/if}
+					</div>
+
+					<ul class="mt-5 space-y-2">
+						{#each g.badges as badge (badge.code)}
+							<li
+								class={cn(
+									'flex items-center gap-2.5 text-sm',
+									badge.earned ? 'text-text' : 'text-muted/60'
+								)}
+							>
+								<span
+									class={cn(
+										'flex size-6 shrink-0 items-center justify-center rounded-full',
+										badge.earned ? 'bg-accent-surface text-accent-text' : 'bg-surface-sunken'
+									)}
+								>
+									<Icon icon={Award01Icon} class="size-3.5" strokeWidth={2} />
+								</span>
+								<span class="min-w-0">
+									<span class="font-medium">{badge.name}</span>
+									<span class="text-muted block text-xs">{badge.description}</span>
+								</span>
+							</li>
+						{/each}
+					</ul>
+				</Card>
+			{/if}
 
 			{#if canAuthor}
 				<section>

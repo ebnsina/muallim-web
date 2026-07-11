@@ -30,9 +30,10 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 		from the role whether to ask would trade a request that costs nothing for a
 		rule that can disagree with lms-api. lms-api is the authority, and it says no.
 	*/
-	const [enrolments, teaching] = await Promise.all([
+	const [enrolments, teaching, gamification] = await Promise.all([
 		api.GET('/v1/me/enrolments'),
-		api.GET('/v1/me/courses', { params: { query: { limit: 6 } } })
+		api.GET('/v1/me/courses', { params: { query: { limit: 6 } } }),
+		api.GET('/v1/me/gamification')
 	]);
 
 	// A failure to list either is not a failure to show the profile. The section
@@ -41,7 +42,8 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 	return {
 		user,
 		enrolments: enrolments.data?.enrolments ?? [],
-		teaching: teaching.data?.courses ?? []
+		teaching: teaching.data?.courses ?? [],
+		gamification: gamification.data ?? null
 	};
 };
 
