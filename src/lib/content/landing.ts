@@ -49,7 +49,16 @@ export const LOGOS: string[] = [
 	'Al-Qarawiyyin',
 	'Nizamiyya',
 	'Maragheh Observatory',
-	'Al-Azhar'
+	'Al-Azhar',
+	'Al-Mustansiriya',
+	'House of Wisdom',
+	'Zaytuna',
+	'Al-Andalus Academy',
+	'Cordoba College',
+	'Samarkand Institute',
+	'Bukhara School',
+	'Timbuktu Sankoré',
+	'Isfahan Seminary'
 ];
 
 /** What the product does today. Every one of these is exercised by a test. */

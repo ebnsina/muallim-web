@@ -23,38 +23,52 @@
 	<MarketingHeader />
 
 	<main>
-		<div class="mx-auto max-w-6xl border-x border-border">
+		<div class="mx-auto max-w-6xl">
 			<!-- ------------------------------------------------------------- hero -->
 			<section class="relative isolate overflow-hidden">
 				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
 					<div class="grid-lines absolute inset-0"></div>
-					<div class="ribbon absolute -top-40 -right-52 size-[48rem] rounded-full opacity-90"></div>
+					<div class="ribbon absolute -top-40 -right-52 size-[48rem] rounded-full opacity-80"></div>
 					<div class="ribbon-threads absolute -top-40 -right-52 size-[48rem]"></div>
 				</div>
 
-				<div class="px-6 py-24 sm:px-10 sm:py-32">
-					<p use:inview class="inline-flex">
-						<Badge tone="accent" icon={segment.heroIcon}>{segment.eyebrow}</Badge>
-					</p>
+				<div class="grid items-center gap-12 px-6 py-20 sm:px-8 sm:py-28 lg:grid-cols-2">
+					<div>
+						<p use:inview class="inline-flex">
+							<Badge tone="accent" icon={segment.heroIcon}>{segment.eyebrow}</Badge>
+						</p>
 
-					<h1
-						use:inview={{ delay: 60 }}
-						class="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
-					>
-						{headA}
-						{#if headB}<span class="text-muted">{headB}</span>{/if}
-					</h1>
+						<h1
+							use:inview={{ delay: 60 }}
+							class="mt-6 text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
+						>
+							{headA}
+							{#if headB}<span class="text-muted">{headB}</span>{/if}
+						</h1>
 
-					<p use:inview={{ delay: 120 }} class="mt-6 max-w-xl text-lg text-pretty text-muted">
-						{segment.blurb}
-					</p>
+						<p use:inview={{ delay: 120 }} class="mt-6 max-w-xl text-lg text-pretty text-muted">
+							{segment.blurb}
+						</p>
 
-					<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
-						<Button href={resolve('/register')} size="lg">
-							Get started
-							<Icon icon={ArrowRight01Icon} class="size-4" />
-						</Button>
-						<Button href={resolve('/courses')} size="lg" variant="secondary">Browse courses</Button>
+						<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
+							<Button href={resolve('/register')} size="lg">
+								Get started
+								<Icon icon={ArrowRight01Icon} class="size-4" />
+							</Button>
+							<Button href={resolve('/courses')} size="lg" variant="secondary"
+								>Browse courses</Button
+							>
+						</div>
+					</div>
+
+					<div use:inview={{ delay: 120 }}>
+						<img
+							src={segment.image}
+							alt={segment.imageAlt}
+							width="1200"
+							height="900"
+							class="aspect-[4/3] w-full rounded-overlay border border-border object-cover"
+						/>
 					</div>
 				</div>
 			</section>

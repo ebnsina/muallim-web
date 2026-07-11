@@ -94,18 +94,18 @@
 		consumer-social rather than institutional. Blue is what is left, and it is
 		left for a reason.
 	*/
-	--b-1: oklch(0.9938 0.0028 262);
-	--b-2: oklch(0.9793 0.0088 262);
-	--b-3: oklch(0.9528 0.0242 262);
-	--b-4: oklch(0.9247 0.0417 262);
-	--b-5: oklch(0.8909 0.0596 262);
-	--b-6: oklch(0.8437 0.0789 262);
-	--b-7: oklch(0.7739 0.102 262);
-	--b-8: oklch(0.6822 0.1439 262);
-	--b-9: oklch(0.4934 0.204 260.2);
-	--b-10: oklch(0.4508 0.1957 260.2);
-	--b-11: oklch(0.4595 0.1861 262);
-	--b-12: oklch(0.2822 0.0868 262);
+	--b-1: oklch(0.9938 0.0028 243);
+	--b-2: oklch(0.9793 0.0088 243);
+	--b-3: oklch(0.9528 0.0242 243);
+	--b-4: oklch(0.9247 0.0417 243);
+	--b-5: oklch(0.8909 0.0596 243);
+	--b-6: oklch(0.8437 0.0789 243);
+	--b-7: oklch(0.7739 0.102 243);
+	--b-8: oklch(0.6822 0.1439 243);
+	--b-9: oklch(0.4934 0.204 243);
+	--b-10: oklch(0.4508 0.1957 243);
+	--b-11: oklch(0.4595 0.1861 243);
+	--b-12: oklch(0.2822 0.0868 243);
 
 	/*
 		Success. A green at the same lightness as the danger red is the same grey to
@@ -261,14 +261,14 @@
 	--n-11: oklch(0.7683 0.0161 259);
 	--n-12: oklch(0.9491 0.0064 259);
 
-	--b-1: oklch(0.1789 0.0125 260.2);
-	--b-2: oklch(0.2188 0.0324 260.2);
-	--b-3: oklch(0.2716 0.0716 260.2);
-	--b-4: oklch(0.3106 0.099 260.2);
-	--b-5: oklch(0.3506 0.1092 260.2);
-	--b-6: oklch(0.4022 0.1146 260.2);
-	--b-7: oklch(0.4693 0.1284 260.2);
-	--b-8: oklch(0.5556 0.1594 260.2);
+	--b-1: oklch(0.1789 0.0125 243);
+	--b-2: oklch(0.2188 0.0324 243);
+	--b-3: oklch(0.2716 0.0716 243);
+	--b-4: oklch(0.3106 0.099 243);
+	--b-5: oklch(0.3506 0.1092 243);
+	--b-6: oklch(0.4022 0.1146 243);
+	--b-7: oklch(0.4693 0.1284 243);
+	--b-8: oklch(0.5556 0.1594 243);
 
 	/*
 		Dark mode brightens on hover, and white-on-blue must still clear 4.5:1 —
@@ -276,10 +276,10 @@
 		the hover is where the light one lives. The contrast test is what found
 		this; hovering a button is not a moment to lose the label.
 	*/
-	--b-9: oklch(0.5164 0.1913 260.2);
-	--b-10: oklch(0.5484 0.1913 260.2);
-	--b-11: oklch(0.7461 0.1287 260.2);
-	--b-12: oklch(0.9098 0.0561 260.2);
+	--b-9: oklch(0.5164 0.1913 243);
+	--b-10: oklch(0.5484 0.1913 243);
+	--b-11: oklch(0.7461 0.1287 243);
+	--b-12: oklch(0.9098 0.0561 243);
 
 	--ok-1: oklch(0.1793 0.0086 155);
 	--ok-2: oklch(0.2141 0.0212 155);

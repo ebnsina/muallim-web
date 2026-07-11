@@ -34,6 +34,10 @@
 		{ who: 'Al-Biruni', points: 880 },
 		{ who: 'Al-Khwarizmi', points: 815 }
 	];
+
+	// Placeholder photo (Unsplash) — swap for a licensed image before launch.
+	const HERO_IMAGE =
+		'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=70';
 </script>
 
 <svelte:head>
@@ -49,9 +53,9 @@
 	not how it is built. Anything not built yet wears a "Coming soon" badge; the AI
 	section says so in its own headline. See `$lib/content/landing` for that rule.
 
-	The layout follows stripe.com by request: a left-aligned two-tone hero over the
-	spectrum ribbon, content held in a bordered column with hairline section rules,
-	two-tone section intros, and a bento of real product UI rather than screenshots.
+	The layout follows stripe.com by request: a split two-tone hero over the spectrum
+	ribbon, a marquee of names, two-tone section intros, and a bento of real product
+	UI rather than screenshots.
 -->
 
 {#snippet intro(eyebrow: string, bold: string, rest: string)}
@@ -67,65 +71,78 @@
 	<MarketingHeader />
 
 	<main>
-		<!-- The bordered column — Stripe's architectural frame. Every section is a row
-		     inside it, divided by a hairline. -->
-		<div class="mx-auto max-w-6xl border-x border-border">
+		<div class="mx-auto max-w-6xl">
 			<!-- ------------------------------------------------------------- hero -->
 			<section class="relative isolate overflow-hidden">
 				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
 					<div class="grid-lines absolute inset-0"></div>
-					<!-- Two siblings, never nested: the blur on `.ribbon` must not reach the
-					     threads. Both bleed off the right of the column. -->
-					<div class="ribbon absolute -top-40 -right-52 size-[52rem] rounded-full opacity-90"></div>
+					<!-- Two siblings, never nested: the blur on `.ribbon` must not reach the threads. -->
+					<div class="ribbon absolute -top-40 -right-52 size-[52rem] rounded-full opacity-80"></div>
 					<div class="ribbon-threads absolute -top-40 -right-52 size-[52rem]"></div>
 				</div>
 
-				<div class="px-6 py-24 sm:px-10 sm:py-32 lg:py-40">
-					<p use:inview class="inline-flex">
-						<Badge tone="accent" icon={SparklesIcon}>Quizzes that mark themselves</Badge>
-					</p>
+				<div class="grid items-center gap-12 px-6 py-20 sm:px-8 sm:py-28 lg:grid-cols-2">
+					<div>
+						<p use:inview class="inline-flex">
+							<Badge tone="accent" icon={SparklesIcon}>Quizzes that mark themselves</Badge>
+						</p>
 
-					<h1
-						use:inview={{ delay: 60 }}
-						class="mt-6 max-w-3xl text-5xl font-semibold tracking-tight text-balance sm:text-7xl"
-					>
-						Teach what you know.
-						<span class="text-muted">Let the marking take care of itself.</span>
-					</h1>
+						<h1
+							use:inview={{ delay: 60 }}
+							class="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl"
+						>
+							Teach what you know.
+							<span class="text-muted">Let the marking take care of itself.</span>
+						</h1>
 
-					<p
-						use:inview={{ delay: 120 }}
-						class="mt-7 max-w-xl text-lg text-pretty text-muted sm:text-xl"
-					>
-						Build a course, invite your students, and hand back marked work the moment it comes in —
-						quizzes graded in seconds, essays waiting in one tidy list.
-					</p>
+						<p
+							use:inview={{ delay: 120 }}
+							class="mt-7 max-w-xl text-lg text-pretty text-muted sm:text-xl"
+						>
+							Build a course, invite your students, and hand back marked work the moment it comes in
+							— quizzes graded in seconds, essays waiting in one tidy list.
+						</p>
 
-					<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
-						<Button href={resolve('/register')} size="lg">
-							Start teaching
-							<Icon icon={ArrowRight01Icon} class="size-4" />
-						</Button>
-						<Button href={resolve('/courses')} size="lg" variant="secondary">Browse courses</Button>
+						<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
+							<Button href={resolve('/register')} size="lg">
+								Start teaching
+								<Icon icon={ArrowRight01Icon} class="size-4" />
+							</Button>
+							<Button href={resolve('/courses')} size="lg" variant="secondary"
+								>Browse courses</Button
+							>
+						</div>
+					</div>
+
+					<div use:inview={{ delay: 120 }}>
+						<img
+							src={HERO_IMAGE}
+							alt="An instructor and students working together"
+							width="1200"
+							height="900"
+							class="aspect-[4/3] w-full rounded-overlay border border-border object-cover"
+						/>
 					</div>
 				</div>
 			</section>
 
 			<!-- --------------------------------------------------------- logo strip -->
 			{#if LOGOS.length > 0}
-				<section class="border-t border-border bg-surface-raised">
-					<div class="px-6 py-10 sm:px-10">
-						<p class="text-xs font-medium tracking-wide text-muted uppercase">
+				<section class="bg-surface-raised">
+					<div class="px-6 py-12 sm:px-8">
+						<p class="text-center text-xs font-medium tracking-wide text-muted uppercase">
 							Taught with Muallim
 						</p>
-						<ul
-							use:inview
-							class="fade-x mt-6 flex flex-wrap items-center gap-x-10 gap-y-4 text-lg font-semibold text-muted/70"
-						>
-							{#each LOGOS as school (school)}
-								<li>{school}</li>
-							{/each}
-						</ul>
+						<!-- Two copies of the list slide as one track, so the loop is seamless. -->
+						<div use:inview class="fade-x marquee mt-8 overflow-hidden">
+							<ul class="marquee-track items-center gap-x-12 text-lg font-semibold text-muted/70">
+								{#each [...LOGOS, ...LOGOS] as school, i (i)}
+									<li class="shrink-0 whitespace-nowrap" aria-hidden={i >= LOGOS.length}>
+										{school}
+									</li>
+								{/each}
+							</ul>
+						</div>
 					</div>
 				</section>
 			{/if}

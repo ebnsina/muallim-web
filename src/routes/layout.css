@@ -88,9 +88,9 @@
 		10px — softer than a button would be at that size, and not so round that a
 		row of them reads as a row of buttons.
 	*/
-	--radius-control: 0.625rem;
-	--radius-card: 0.75rem;
-	--radius-overlay: 1rem;
+	--radius-control: 0.75rem;
+	--radius-card: 1rem;
+	--radius-overlay: 1.25rem;
 	--radius-pill: 9999px;
 
 	/*
@@ -289,6 +289,27 @@
 	/* Fades the ends of a row, so names run off the edge rather than stopping at it. */
 	.fade-x {
 		mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+	}
+
+	/*
+		The logo marquee. The track holds two copies of the list and slides by half
+		its width, so the loop is seamless. Reduced-motion collapses the animation to
+		a frozen frame, which is simply the strip standing still.
+	*/
+	.marquee-track {
+		display: flex;
+		width: max-content;
+		animation: marquee 45s linear infinite;
+	}
+
+	.marquee:hover .marquee-track {
+		animation-play-state: paused;
+	}
+
+	@keyframes marquee {
+		to {
+			transform: translateX(-50%);
+		}
 	}
 
 	/*
