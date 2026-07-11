@@ -277,24 +277,40 @@
 	}
 
 	/*
-		A card with a soft aurora tint — two faint brand washes over the surface,
-		theme-aware because they mix the live tokens. Light gets a whisper of blue in
-		the corners; dark gets a gentle glow. Enough to separate a card by colour, so
-		it needs no heavy edge.
+		A card whose aurora tint blooms on hover, not at rest. At rest it is a plain
+		surface; pointing at it fades in two faint brand washes (theme-aware, mixed
+		from the live tokens). The tint rides a `::before` so it can cross-fade — a
+		background-image cannot animate — behind the content but over the fill.
 	*/
 	.card-aurora {
+		position: relative;
+		z-index: 0;
+		background: var(--surface-raised);
+	}
+
+	.card-aurora::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: inherit;
 		background:
 			radial-gradient(
 				120% 90% at 100% 0%,
-				color-mix(in oklab, var(--accent) 12%, transparent),
+				color-mix(in oklab, var(--accent) 16%, transparent),
 				transparent 58%
 			),
 			radial-gradient(
 				100% 90% at 0% 100%,
-				color-mix(in oklab, var(--b-7) 10%, transparent),
+				color-mix(in oklab, var(--b-7) 13%, transparent),
 				transparent 60%
-			),
-			var(--surface-raised);
+			);
+		opacity: 0;
+		transition: opacity 240ms ease;
+	}
+
+	.card-aurora:hover::before {
+		opacity: 1;
 	}
 
 	/*

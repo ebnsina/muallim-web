@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { ArrowRight01Icon, Clock01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+	import { ArrowRight01Icon, CheckmarkCircle02Icon, Clock01Icon } from '@hugeicons/core-free-icons';
 	import {
 		AuroraBackdrop,
-		Badge,
 		Button,
 		Card,
 		Icon,
@@ -99,10 +98,8 @@
 			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					<div use:inview class="max-w-3xl">
-						<p class="inline-flex">
-							<Badge tone="success" icon={Tick02Icon}>Working today</Badge>
-						</p>
-						<h2 class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+						<p class="text-sm font-semibold text-success-text">Working today</p>
+						<h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
 							What you can do now.
 						</h2>
 					</div>
@@ -122,64 +119,67 @@
 			</section>
 
 			<!-- ---------------------------------------------------------- highlight -->
-			<section class="relative overflow-hidden">
-				<div
-					aria-hidden="true"
-					class="pointer-events-none absolute inset-0 -z-10 opacity-70"
-					style="background: radial-gradient(46rem 28rem at 100% 100%, var(--accent-surface), transparent 62%);"
-				></div>
+			<!-- A rounded, tinted panel — the section shade, inset so its corners show. -->
+			<section class="px-4 sm:px-6">
+				<div class="relative overflow-hidden rounded-3xl bg-surface-sunken">
+					<div
+						aria-hidden="true"
+						class="pointer-events-none absolute inset-0 opacity-70"
+						style="background: radial-gradient(46rem 28rem at 100% 100%, var(--accent-surface), transparent 62%);"
+					></div>
 
-				<div class="grid items-center gap-12 px-6 py-24 sm:px-10 lg:grid-cols-2">
-					<div use:inview>
-						<p class="text-sm font-semibold text-accent-text">{segment.highlight.label}</p>
-						<h2 class="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-							{segment.highlight.title}
-						</h2>
-						<p class="mt-4 text-pretty text-muted">{segment.highlight.body}</p>
-					</div>
+					<div class="relative grid items-center gap-12 px-6 py-20 sm:px-10 lg:grid-cols-2">
+						<div use:inview>
+							<p class="text-sm font-semibold text-accent-text">{segment.highlight.label}</p>
+							<h2 class="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+								{segment.highlight.title}
+							</h2>
+							<p class="mt-4 text-pretty text-muted">{segment.highlight.body}</p>
+						</div>
 
-					<div use:inview={{ delay: 120 }}>
-						<Card aurora class="p-6">
-							<ul class="space-y-4">
-								{#each segment.highlight.points as point (point)}
-									<li class="flex items-start gap-3 text-sm">
-										<Icon
-											icon={Tick02Icon}
-											strokeWidth={2.5}
-											class="mt-0.5 size-4 shrink-0 text-success-text"
-										/>
-										<span>{point}</span>
-									</li>
-								{/each}
-							</ul>
-						</Card>
+						<div use:inview={{ delay: 120 }}>
+							<Card aurora class="p-6">
+								<ul class="space-y-4">
+									{#each segment.highlight.points as point (point)}
+										<li class="flex items-start gap-3 text-sm">
+											<Icon
+												icon={CheckmarkCircle02Icon}
+												class="mt-0.5 size-5 shrink-0 text-success-text"
+											/>
+											<span>{point}</span>
+										</li>
+									{/each}
+								</ul>
+							</Card>
+						</div>
 					</div>
 				</div>
 			</section>
 
 			<!-- --------------------------------------------------------- roadmap -->
-			<section class="">
-				<div class="px-6 py-24 sm:px-10">
-					<div use:inview class="max-w-3xl">
-						<p class="inline-flex">
-							<Badge tone="neutral" icon={Clock01Icon}>On the roadmap</Badge>
-						</p>
-						<h2 class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+			<!-- Split two-up: the heading anchors the left, the items stack on the right,
+			     so a segment with a single roadmap item never leaves an empty grid. -->
+			<section>
+				<div class="grid items-center gap-12 px-6 py-24 sm:px-10 lg:grid-cols-2">
+					<div use:inview>
+						<p class="text-sm font-semibold text-muted">On the roadmap</p>
+						<h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
 							What is still ahead.
 							<span class="text-muted">Named honestly, not implied by omission.</span>
 						</h2>
+						<p class="mt-5 text-pretty text-muted">
+							Every gap is written down where you can see it — nothing is promised by leaving it
+							out, and each piece is on its way.
+						</p>
 					</div>
 
-					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<div class="space-y-4">
 						{#each segment.roadmap as item, index (item.title)}
-							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card aurora class="lift flex h-full gap-4 p-6">
-									<Icon icon={item.icon} class="mt-0.5 size-6 shrink-0 text-muted" />
+							<div use:inview={{ delay: index * 80 }}>
+								<Card aurora class="lift flex gap-4 p-6">
+									<Icon icon={item.icon} class="mt-0.5 size-6 shrink-0 text-accent" />
 									<div>
-										<div class="flex flex-wrap items-center gap-2">
-											<h3 class="font-semibold">{item.title}</h3>
-											<Badge tone="neutral">Coming soon</Badge>
-										</div>
+										<h3 class="font-semibold">{item.title}</h3>
 										<p class="mt-2 text-sm text-pretty text-muted">{item.body}</p>
 									</div>
 								</Card>
@@ -190,8 +190,8 @@
 			</section>
 
 			<!-- --------------------------------------------------------- verdict -->
-			<section class="">
-				<div class="px-6 py-24 sm:px-10">
+			<section class="px-4 sm:px-6">
+				<div class="rounded-3xl bg-surface-sunken px-6 py-20 sm:px-10">
 					<div use:inview class="max-w-3xl">
 						<p class="text-sm font-semibold text-accent-text">The honest bottom line</p>
 						<h2 class="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
@@ -201,9 +201,9 @@
 
 					<div class="mt-12 grid gap-4 lg:grid-cols-2">
 						<div use:inview>
-							<Card aurora class="h-full border-success-border p-6">
+							<Card aurora class="h-full p-6">
 								<div class="flex items-center gap-2">
-									<Icon icon={Tick02Icon} strokeWidth={2.5} class="size-5 text-success-text" />
+									<Icon icon={CheckmarkCircle02Icon} class="size-5 text-success-text" />
 									<h3 class="font-semibold">Yes, for this</h3>
 								</div>
 								<p class="mt-3 text-pretty text-muted">{segment.verdict.ready}</p>

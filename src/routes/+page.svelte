@@ -193,87 +193,100 @@
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'The whole teaching loop',
-						'Everything a course needs, working today.',
+						'One screen, the whole loop.',
 						'Marking, progress, and the reasons to come back — drawn from the real product, not a screenshot.'
 					)}
 
-					<div class="mt-14 grid gap-4 lg:grid-cols-5">
-						<!-- The real marking queue, from the same components the product uses. -->
-						<div use:inview class="lg:col-span-3">
-							<Card elevation="raised" class="h-full overflow-hidden">
-								<div class="flex items-center justify-between border-b border-border px-5 py-3.5">
-									<p class="text-sm font-medium">Waiting to be marked</p>
-									<Badge tone="warning">3 to go</Badge>
-								</div>
+					<!-- One product frame, so the widgets read as a single screen, not floating cards. -->
+					<div
+						use:inview
+						class="mt-14 overflow-hidden rounded-overlay border border-border bg-surface-raised"
+					>
+						<div class="flex items-center gap-2 border-b border-border px-4 py-3">
+							<span class="size-3 rounded-full bg-danger/60"></span>
+							<span class="size-3 rounded-full bg-warning/60"></span>
+							<span class="size-3 rounded-full bg-success/60"></span>
+							<span class="numeral ml-3 text-xs text-muted">muallim.test/marking</span>
+						</div>
+						<div class="grid gap-4 bg-surface p-4 sm:p-6 lg:grid-cols-5">
+							<!-- The real marking queue, from the same components the product uses. -->
+							<div class="lg:col-span-3">
+								<Card elevation="raised" class="h-full overflow-hidden">
+									<div class="flex items-center justify-between border-b border-border px-5 py-3.5">
+										<p class="text-sm font-medium">Waiting to be marked</p>
+										<Badge tone="warning">3 to go</Badge>
+									</div>
 
-								<ul class="divide-y divide-border">
-									{#each QUEUE as row (row.who)}
+									<ul class="divide-y divide-border">
+										{#each QUEUE as row (row.who)}
+											<li class="flex items-center justify-between gap-4 px-5 py-4">
+												<div>
+													<p class="text-sm font-medium">{row.who}</p>
+													<p class="numeral mt-0.5 text-xs text-muted">{row.what}</p>
+												</div>
+												<Badge tone="warning">
+													<span class="numeral">{row.left}</span>
+													{row.left === 1 ? 'answer' : 'answers'}
+												</Badge>
+											</li>
+										{/each}
 										<li class="flex items-center justify-between gap-4 px-5 py-4">
 											<div>
-												<p class="text-sm font-medium">{row.who}</p>
-												<p class="numeral mt-0.5 text-xs text-muted">{row.what}</p>
+												<p class="text-sm font-medium">Al-Khwarizmi</p>
+												<p class="mt-1"><Verdict kind="correct" /></p>
 											</div>
-											<Badge tone="warning">
-												<span class="numeral">{row.left}</span>
-												{row.left === 1 ? 'answer' : 'answers'}
-											</Badge>
+											<Badge tone="success">Marked</Badge>
 										</li>
-									{/each}
-									<li class="flex items-center justify-between gap-4 px-5 py-4">
-										<div>
-											<p class="text-sm font-medium">Al-Khwarizmi</p>
-											<p class="mt-1"><Verdict kind="correct" /></p>
-										</div>
-										<Badge tone="success">Marked</Badge>
-									</li>
-								</ul>
+									</ul>
 
-								<div class="border-t border-border bg-surface px-5 py-4">
-									<Score points={13} maxPoints={15} passed={true} />
-								</div>
-							</Card>
-						</div>
-
-						<div class="flex flex-col gap-4 lg:col-span-2">
-							<!-- A quiz result, graded. -->
-							<div use:inview={{ delay: 80 }} class="flex-1">
-								<Card elevation="raised" class="h-full p-5">
-									<p class="text-sm font-medium">Chapter one quiz</p>
-									<p class="mt-1 text-xs text-muted">Graded a moment after it was handed in.</p>
-									<div class="mt-4">
-										<Score points={9} maxPoints={10} passed={true} />
-									</div>
-									<div class="mt-4 flex items-center gap-2">
-										<Verdict kind="correct" />
-										<span class="text-xs text-muted">9 of 10 questions</span>
+									<div class="border-t border-border bg-surface px-5 py-4">
+										<Score points={13} maxPoints={15} passed={true} />
 									</div>
 								</Card>
 							</div>
 
-							<!-- Points and a leaderboard — the reason to come back. -->
-							<div use:inview={{ delay: 160 }} class="flex-1">
-								<Card elevation="raised" class="h-full p-5">
-									<p class="text-sm font-medium">This week's leaders</p>
-									<ul class="mt-3 space-y-2.5">
-										{#each BOARD as row, i (row.who)}
-											<li class="flex items-center gap-3 text-sm">
-												<span
-													class="numeral grid size-5 shrink-0 place-items-center rounded-pill bg-accent-surface text-xs font-semibold text-accent-text"
-												>
-													{i + 1}
-												</span>
-												<span class="flex-1 truncate">{row.who}</span>
-												<span class="numeral text-xs text-muted">{row.points}</span>
-											</li>
-										{/each}
-									</ul>
-									<div class="mt-4">
-										<Progress value={72} label="Class progress this week" tone="success" />
-									</div>
-								</Card>
+							<div class="flex flex-col gap-4 lg:col-span-2">
+								<!-- A quiz result, graded. -->
+								<div class="flex-1">
+									<Card elevation="raised" class="h-full p-5">
+										<p class="text-sm font-medium">Chapter one quiz</p>
+										<p class="mt-1 text-xs text-muted">Graded a moment after it was handed in.</p>
+										<div class="mt-4">
+											<Score points={9} maxPoints={10} passed={true} />
+										</div>
+										<div class="mt-4 flex items-center gap-2">
+											<Verdict kind="correct" />
+											<span class="text-xs text-muted">9 of 10 questions</span>
+										</div>
+									</Card>
+								</div>
+
+								<!-- Points and a leaderboard — the reason to come back. -->
+								<div class="flex-1">
+									<Card elevation="raised" class="h-full p-5">
+										<p class="text-sm font-medium">This week's leaders</p>
+										<ul class="mt-3 space-y-2.5">
+											{#each BOARD as row, i (row.who)}
+												<li class="flex items-center gap-3 text-sm">
+													<span
+														class="numeral grid size-5 shrink-0 place-items-center rounded-pill bg-accent-surface text-xs font-semibold text-accent-text"
+													>
+														{i + 1}
+													</span>
+													<span class="flex-1 truncate">{row.who}</span>
+													<span class="numeral text-xs text-muted">{row.points}</span>
+												</li>
+											{/each}
+										</ul>
+										<div class="mt-4">
+											<Progress value={72} label="Class progress this week" tone="success" />
+										</div>
+									</Card>
+								</div>
 							</div>
 						</div>
 					</div>
+					tttt
 				</div>
 			</section>
 
@@ -315,8 +328,8 @@
 			</section>
 
 			<!-- ---------------------------------------------------- solutions router -->
-			<section class="">
-				<div class="px-6 py-24 sm:px-10">
+			<section class="px-4 sm:px-6">
+				<div class="rounded-3xl bg-surface-sunken px-6 py-20 sm:px-10">
 					{@render intro(
 						'Built for how you teach',
 						'Start where you are.',
@@ -417,15 +430,20 @@
 			</section>
 
 			<!-- ------------------------------------------------------- how it works -->
-			<section class="">
-				<div class="px-6 py-24 sm:px-10">
+			<section class="px-4 sm:px-6">
+				<div class="rounded-3xl bg-surface-sunken px-6 py-20 sm:px-10">
 					{@render intro('How it works', 'Three steps.', 'And the first one is free.')}
 
-					<ol class="mt-14 grid gap-8 sm:grid-cols-3">
+					<!-- A connecting rail runs behind the numbers, so the three read as one path. -->
+					<ol class="relative mt-16 grid gap-10 sm:grid-cols-3">
+						<div
+							aria-hidden="true"
+							class="absolute top-5 right-[16%] left-[16%] hidden h-px bg-border sm:block"
+						></div>
 						{#each STEPS as step, index (step.title)}
-							<li use:inview={{ delay: index * 90 }}>
+							<li use:inview={{ delay: index * 90 }} class="relative text-center sm:text-left">
 								<span
-									class="numeral flex size-10 items-center justify-center rounded-pill bg-accent text-sm font-semibold text-on-solid"
+									class="numeral relative z-10 flex size-10 items-center justify-center rounded-pill bg-accent text-sm font-semibold text-on-solid ring-4 ring-surface-sunken sm:mx-0 max-sm:mx-auto"
 								>
 									{index + 1}
 								</span>
@@ -521,7 +539,7 @@
 					<div use:inview class="mx-auto mt-12 max-w-3xl space-y-3">
 						{#each FAQS as item, i (item.question)}
 							{@const open = openFaq === i}
-							<div class="card-aurora overflow-hidden rounded-card border border-border">
+							<div class="overflow-hidden rounded-card border border-border bg-surface-raised">
 								<button
 									type="button"
 									onclick={() => (openFaq = open ? null : i)}
