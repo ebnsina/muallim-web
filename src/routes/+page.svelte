@@ -75,13 +75,18 @@
 		<!-- Full-bleed, and pulled up under the transparent header so the blue runs
 		     behind it; the top padding clears the nav. -->
 		<section class="hero-blue relative isolate -mt-16 overflow-hidden">
-			<div class="mx-auto max-w-3xl px-6 pt-36 text-center sm:pt-44">
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+				<div class="hero-grid absolute inset-0"></div>
+				<div class="grain absolute inset-0 opacity-[0.18]"></div>
+			</div>
+
+			<div class="mx-auto max-w-5xl px-6 pt-32 text-center sm:pt-40">
 				<h1
 					use:inview
-					class="text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl"
+					class="text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl"
 				>
-					Teach what you know.
-					<span class="text-white/55">Let the marking take care of itself.</span>
+					Teach what you know.<br />
+					<span class="text-white/55">The marking marks itself.</span>
 				</h1>
 
 				<p
