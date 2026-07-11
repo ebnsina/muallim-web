@@ -26,6 +26,8 @@ export type { IconSvgElement } from '@hugeicons/svelte';
 export { default as Input } from './Input.svelte';
 export { default as Label } from './Label.svelte';
 export { default as LessonIcon } from './LessonIcon.svelte';
+export { default as MarketingFooter } from './MarketingFooter.svelte';
+export { default as MarketingHeader } from './MarketingHeader.svelte';
 export { default as Numeral } from './Numeral.svelte';
 export { default as Page, type PageWidth } from './Page.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
