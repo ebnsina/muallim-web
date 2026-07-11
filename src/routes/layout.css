@@ -331,15 +331,6 @@
 			);
 	}
 
-	/* A faint square grid, brightest at the top and masked to nothing by the middle. */
-	.hero-grid {
-		background-image:
-			linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
-			linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-		background-size: 3.5rem 3.5rem;
-		mask-image: radial-gradient(62% 60% at 50% 0%, black, transparent 78%);
-	}
-
 	/* Fine film grain. Kills the banding a big dark gradient shows on cheap panels
 	   and lends the surface a little tooth. */
 	.grain {

@@ -75,8 +75,20 @@
 		<!-- Full-bleed, and pulled up under the transparent header so the blue runs
 		     behind it; the top padding clears the nav. -->
 		<section class="hero-blue relative isolate -mt-16 overflow-hidden">
-			<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-				<div class="hero-grid absolute inset-0"></div>
+			<!-- Aurora mesh: soft blue and violet blobs drifting behind the title. -->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+				<div
+					class="aurora absolute -top-24 left-[18%] size-[34rem] rounded-full blur-3xl"
+					style="background: radial-gradient(closest-side, #4f7cff, transparent 70%); opacity: 0.4;"
+				></div>
+				<div
+					class="aurora-slow absolute -top-16 right-[14%] size-[30rem] rounded-full blur-3xl"
+					style="background: radial-gradient(closest-side, #8b5cf6, transparent 70%); opacity: 0.34;"
+				></div>
+				<div
+					class="aurora absolute top-1/4 left-1/2 size-[40rem] -translate-x-1/2 rounded-full blur-3xl"
+					style="background: radial-gradient(closest-side, #22a7f0, transparent 72%); opacity: 0.28;"
+				></div>
 				<div class="grain absolute inset-0 opacity-[0.18]"></div>
 			</div>
 
