@@ -9,6 +9,7 @@
 		Button,
 		Card,
 		EmptyState,
+		Label,
 		LessonIcon,
 		Page,
 		PageHeader,
@@ -60,7 +61,7 @@
 			class="flex flex-wrap items-end gap-x-4 gap-y-3"
 		>
 			<div class="min-w-0 flex-1">
-				<label for="scale_id" class="mb-1.5 block text-sm font-medium">Grading scale</label>
+				<Label for="scale_id" class="mb-1.5">Grading scale</Label>
 				<Select id="scale_id" name="scale_id" value={current}>
 					{#each data.scales as scale (scale.id ?? 'builtin')}
 						<option value={scale.id ?? ''}>

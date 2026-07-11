@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { CancelCircleIcon, CheckmarkCircle02Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
+		Badge,
 		Breadcrumbs,
 		Button,
+		Card,
 		Input,
 		Label,
 		Page,
@@ -74,71 +77,78 @@
 		</Alert>
 	{/if}
 
-	<ol class="mt-10 space-y-10">
+	<ol class="mt-10 space-y-3">
 		{#each data.questions as question, index (question.id)}
 			{@const answer = question.answer}
 			<li>
-				<p class="font-medium">
-					{index + 1}. {question.prompt}
-					<span class="text-muted text-sm font-normal">
-						({question.points}
-						{question.points === 1 ? 'point' : 'points'})
-					</span>
-				</p>
-
-				{#if question.type === 'open_ended'}
-					<blockquote class="mt-3 rounded-control border px-4 py-3 text-sm whitespace-pre-wrap">
-						{wrote(answer?.response ?? {}) || 'They left this blank.'}
-					</blockquote>
-
-					{#if answer?.graded}
-						<p class="mt-3 text-sm">
-							Marked {answer.points} of {question.points}.
-							{#if answer.feedback}<span class="text-muted">{answer.feedback}</span>{/if}
+				<Card class="p-5 sm:p-6">
+					<div class="flex items-start justify-between gap-4">
+						<p class="font-medium text-pretty">
+							{index + 1}. {question.prompt}
+							<span class="text-muted text-sm font-normal">
+								({question.points}
+								{question.points === 1 ? 'point' : 'points'})
+							</span>
 						</p>
-					{:else}
-						<form method="POST" class="mt-4 space-y-3" use:enhance>
-							<input type="hidden" name="question_id" value={question.id} />
 
-							<div class="flex items-end gap-3">
-								<div class="space-y-2">
-									<Label for={`points-${question.id}`}>Points</Label>
-									<Input
-										id={`points-${question.id}`}
-										name="points"
-										type="number"
-										min="0"
-										max={question.points}
-										required
-										class="w-24"
-									/>
-								</div>
-								<Button type="submit">Record the mark</Button>
-							</div>
-
-							<div class="space-y-2">
-								<Label for={`feedback-${question.id}`}>Feedback</Label>
-								<Textarea id={`feedback-${question.id}`} name="feedback" rows={3} />
-							</div>
-						</form>
-					{/if}
-				{:else}
-					<!--
-						Graded by the machine, and shown only so the marker can see the whole
-						attempt. There is no form: lms-api refuses a mark on a question it
-						graded itself.
-					-->
-					<p class="mt-2 text-sm">
-						{#if answer?.correct}
-							<span class="text-success-text">Correct</span>
-						{:else}
-							<span class="text-danger-text">Not right</span>
+						{#if question.type !== 'open_ended'}
+							{#if answer?.correct}
+								<Badge tone="success" icon={CheckmarkCircle02Icon}>Correct</Badge>
+							{:else}
+								<Badge tone="danger" icon={CancelCircleIcon}>Not right</Badge>
+							{/if}
 						{/if}
-						<span class="text-muted">
-							· {answer?.points ?? 0} of {question.points} · graded automatically
-						</span>
-					</p>
-				{/if}
+					</div>
+
+					{#if question.type === 'open_ended'}
+						<blockquote
+							class="mt-3 rounded-control bg-surface-sunken px-4 py-3 text-sm whitespace-pre-wrap"
+						>
+							{wrote(answer?.response ?? {}) || 'They left this blank.'}
+						</blockquote>
+
+						{#if answer?.graded}
+							<p class="mt-3 text-sm">
+								Marked {answer.points} of {question.points}.
+								{#if answer.feedback}<span class="text-muted">{answer.feedback}</span>{/if}
+							</p>
+						{:else}
+							<form method="POST" class="mt-4 space-y-3" use:enhance>
+								<input type="hidden" name="question_id" value={question.id} />
+
+								<div class="flex items-end gap-3">
+									<div class="space-y-2">
+										<Label for={`points-${question.id}`}>Points</Label>
+										<Input
+											id={`points-${question.id}`}
+											name="points"
+											type="number"
+											min="0"
+											max={question.points}
+											required
+											class="w-24"
+										/>
+									</div>
+									<Button type="submit">Record the mark</Button>
+								</div>
+
+								<div class="space-y-2">
+									<Label for={`feedback-${question.id}`}>Feedback</Label>
+									<Textarea id={`feedback-${question.id}`} name="feedback" rows={3} />
+								</div>
+							</form>
+						{/if}
+					{:else}
+						<!--
+							Graded by the machine, and shown only so the marker can see the whole
+							attempt. There is no form: lms-api refuses a mark on a question it
+							graded itself.
+						-->
+						<p class="text-muted mt-2 text-sm">
+							{answer?.points ?? 0} of {question.points} · graded automatically
+						</p>
+					{/if}
+				</Card>
 			</li>
 		{/each}
 	</ol>

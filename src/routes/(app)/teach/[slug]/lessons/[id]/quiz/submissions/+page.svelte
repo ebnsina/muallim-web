@@ -1,8 +1,13 @@
 <script lang="ts">
-	import { Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
+	import { Badge, Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import { resolve } from '$app/paths';
-	import { Task01Icon } from '@hugeicons/core-free-icons';
+	import {
+		CancelCircleIcon,
+		CheckmarkCircle02Icon,
+		Clock01Icon,
+		Task01Icon
+	} from '@hugeicons/core-free-icons';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -68,10 +73,11 @@
 							</p>
 						</div>
 
-						<div class="shrink-0 text-right text-sm">
+						<div class="flex shrink-0 items-center gap-3 text-sm">
 							{#if submission.attempt.status === 'awaiting_review'}
+								<Badge tone="warning" icon={Clock01Icon}>Waiting</Badge>
 								<a
-									class="underline"
+									class="text-accent-text font-medium underline-offset-4 hover:underline"
 									href={resolve(
 										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
 									)}
@@ -80,19 +86,21 @@
 									{submission.unmarked === 1 ? 'answer' : 'answers'}
 								</a>
 							{:else if submission.attempt.status === 'grading'}
-								<span class="text-muted">Grading</span>
+								<Badge tone="neutral" icon={Clock01Icon}>Grading</Badge>
 							{:else}
+								{#if submission.attempt.passed}
+									<Badge tone="success" icon={CheckmarkCircle02Icon}>Passed</Badge>
+								{:else}
+									<Badge tone="danger" icon={CancelCircleIcon}>Not passed</Badge>
+								{/if}
 								<a
-									class="underline"
+									class="text-muted numeral underline-offset-4 hover:text-text hover:underline"
 									href={resolve(
 										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
 									)}
 								>
 									{submission.attempt.points} of {submission.attempt.max_points}
 								</a>
-								<p class="text-muted text-xs">
-									{submission.attempt.passed ? 'Passed' : 'Not passed'}
-								</p>
 							{/if}
 						</div>
 					</Row>

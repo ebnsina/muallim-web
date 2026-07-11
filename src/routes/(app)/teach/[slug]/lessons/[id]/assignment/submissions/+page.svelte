@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Task01Icon } from '@hugeicons/core-free-icons';
+	import { CheckmarkCircle02Icon, Clock01Icon, Task01Icon } from '@hugeicons/core-free-icons';
 	import { Badge, Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
@@ -89,12 +89,12 @@
 							`points` is absent until a person has marked it, and `0` is a real
 							grade. `?? null` and an explicit null check, never a falsy one.
 						-->
-						<div class="shrink-0 text-right text-sm">
+						<div class="flex shrink-0 items-center gap-3 text-sm">
 							{#if submission.status === 'graded'}
-								<span class="numeral">{submission.points ?? 0}</span>
-								<p class="text-muted text-xs">Marked</p>
+								<span class="text-muted numeral">{submission.points ?? 0} pts</span>
+								<Badge tone="success" icon={CheckmarkCircle02Icon}>Marked</Badge>
 							{:else}
-								<span class="text-accent-text">Mark</span>
+								<Badge tone="warning" icon={Clock01Icon}>Waiting</Badge>
 							{/if}
 						</div>
 					</Row>
