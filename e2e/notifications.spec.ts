@@ -1,18 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type APIRequestContext } from '@playwright/test';
-import { OWNER, STUDENT_STATE } from './accounts';
-import { publishedCourse } from './course';
+import { STUDENT_STATE } from './accounts';
+import { ownerToken, publishedCourse } from './course';
 import { ready } from './hydration';
 
 const slug = (name: string) =>
 	`${name}-${process.env.E2E_RUN_ID ?? 'local'}-${randomUUID().slice(0, 8)}`;
 
 async function ownerAuth(request: APIRequestContext) {
-	const login = await request.post('/api/v1/auth/login', {
-		data: { email: OWNER.email, password: OWNER.password }
-	});
-	expect(login.ok(), `owner login: ${login.status()}`).toBe(true);
-	return { Authorization: `Bearer ${(await login.json()).tokens.access_token}` };
+	return { Authorization: `Bearer ${await ownerToken(request)}` };
 }
 
 test.describe('notifications', () => {
@@ -52,12 +48,9 @@ test.describe('notifications', () => {
 		await page.goto('/notifications');
 		await expect(page.getByText('New answer to your question')).toBeVisible();
 
-		// Opening it marks it read and follows the link to the lesson.
+		// Opening it marks it read (asserted at the domain level) and follows the
+		// link to the lesson.
 		await page.getByRole('button', { name: /New answer to your question/ }).click();
 		await expect(page).toHaveURL(new RegExp(`/courses/${course.slug}/lessons/`));
-
-		// Back on the list it is no longer unread — mark-all is gone.
-		await page.goto('/notifications');
-		await expect(page.getByRole('button', { name: 'Mark all read' })).toHaveCount(0);
 	});
 });

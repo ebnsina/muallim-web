@@ -31,6 +31,16 @@ async function bearer(request: APIRequestContext): Promise<string> {
 	return cachedToken;
 }
 
+/**
+ * The owner's bearer, cached across the worker. Specs that call the API as the
+ * owner use this rather than logging in again: each Argon2id verification is slow
+ * by design and a fresh login per test trips the auth rate limiter under the full
+ * suite.
+ */
+export async function ownerToken(request: APIRequestContext): Promise<string> {
+	return bearer(request);
+}
+
 /** The student's bearer, cached for the same reason the owner's is. */
 async function studentBearer(request: APIRequestContext): Promise<string> {
 	if (cachedStudentToken) return cachedStudentToken;
