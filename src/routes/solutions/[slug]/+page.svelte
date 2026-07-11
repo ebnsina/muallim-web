@@ -28,7 +28,7 @@
 	<meta name="description" content={segment.blurb} />
 </svelte:head>
 
-<div data-theme="dark" class="relative min-h-dvh bg-surface text-text">
+<div class="relative min-h-dvh bg-surface text-text">
 	<PageAurora />
 	<MarketingHeader />
 
@@ -96,7 +96,7 @@
 
 		<div class="mx-auto max-w-6xl">
 			<!-- ------------------------------------------------- what works today -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					<div use:inview class="max-w-3xl">
 						<p class="inline-flex">
@@ -110,7 +110,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each segment.today as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
+								<Card aurora class="lift h-full p-6">
 									<Icon icon={item.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{item.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{item.body}</p>
@@ -122,7 +122,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------------- highlight -->
-			<section class="relative overflow-hidden border-t border-border">
+			<section class="relative overflow-hidden">
 				<div
 					aria-hidden="true"
 					class="pointer-events-none absolute inset-0 -z-10 opacity-70"
@@ -139,7 +139,7 @@
 					</div>
 
 					<div use:inview={{ delay: 120 }}>
-						<Card elevation="raised" class="p-6">
+						<Card aurora class="p-6">
 							<ul class="space-y-4">
 								{#each segment.highlight.points as point (point)}
 									<li class="flex items-start gap-3 text-sm">
@@ -158,7 +158,7 @@
 			</section>
 
 			<!-- --------------------------------------------------------- roadmap -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					<div use:inview class="max-w-3xl">
 						<p class="inline-flex">
@@ -173,9 +173,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each segment.roadmap as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card
-									class="lift flex h-full gap-4 border-white/10 bg-white/[0.06] p-6 backdrop-blur"
-								>
+								<Card aurora class="lift flex h-full gap-4 p-6">
 									<Icon icon={item.icon} class="mt-0.5 size-6 shrink-0 text-muted" />
 									<div>
 										<div class="flex flex-wrap items-center gap-2">
@@ -192,7 +190,7 @@
 			</section>
 
 			<!-- --------------------------------------------------------- verdict -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					<div use:inview class="max-w-3xl">
 						<p class="text-sm font-semibold text-accent-text">The honest bottom line</p>
@@ -203,7 +201,7 @@
 
 					<div class="mt-12 grid gap-4 lg:grid-cols-2">
 						<div use:inview>
-							<Card class="h-full border-success-border p-6">
+							<Card aurora class="h-full border-success-border p-6">
 								<div class="flex items-center gap-2">
 									<Icon icon={Tick02Icon} strokeWidth={2.5} class="size-5 text-success-text" />
 									<h3 class="font-semibold">Yes, for this</h3>
@@ -212,7 +210,7 @@
 							</Card>
 						</div>
 						<div use:inview={{ delay: 100 }}>
-							<Card class="h-full p-6">
+							<Card aurora class="h-full p-6">
 								<div class="flex items-center gap-2">
 									<Icon icon={Clock01Icon} class="size-5 text-muted" />
 									<h3 class="font-semibold">Wait, if you need this</h3>

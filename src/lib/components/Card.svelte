@@ -8,11 +8,13 @@
 		 * Lists of cards stay flat, or the list becomes a texture.
 		 */
 		elevation?: 'flat' | 'raised';
+		/** A soft aurora tint over the surface — the marketing look, theme-aware. */
+		aurora?: boolean;
 		class?: string;
 		children: Snippet;
 	};
 
-	let { elevation = 'flat', class: className, children }: Props = $props();
+	let { elevation = 'flat', aurora = false, class: className, children }: Props = $props();
 </script>
 
 <!--
@@ -26,8 +28,9 @@
 -->
 <div
 	class={cn(
-		'rounded-card border bg-surface-raised',
-		elevation === 'raised' ? 'border-border-strong' : 'border-border',
+		'rounded-card border',
+		aurora ? 'card-aurora border-border' : 'bg-surface-raised',
+		!aurora && elevation === 'raised' ? 'border-border-strong' : 'border-border',
 		className
 	)}
 >

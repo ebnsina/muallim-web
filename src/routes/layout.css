@@ -277,6 +277,27 @@
 	}
 
 	/*
+		A card with a soft aurora tint — two faint brand washes over the surface,
+		theme-aware because they mix the live tokens. Light gets a whisper of blue in
+		the corners; dark gets a gentle glow. Enough to separate a card by colour, so
+		it needs no heavy edge.
+	*/
+	.card-aurora {
+		background:
+			radial-gradient(
+				120% 90% at 100% 0%,
+				color-mix(in oklab, var(--accent) 12%, transparent),
+				transparent 58%
+			),
+			radial-gradient(
+				100% 90% at 0% 100%,
+				color-mix(in oklab, var(--b-7) 10%, transparent),
+				transparent 60%
+			),
+			var(--surface-raised);
+	}
+
+	/*
 		The logo marquee. The track holds two copies of the list and slides by half
 		its width, so the loop is seamless. Reduced-motion collapses the animation to
 		a frozen frame, which is simply the strip standing still.

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { fade } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import { ArrowRight01Icon, SparklesIcon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import {
 		AuroraBackdrop,
@@ -55,6 +55,9 @@
 		const id = setInterval(() => (roleIndex = (roleIndex + 1) % ROLES.length), 2400);
 		return () => clearInterval(id);
 	});
+
+	// Which FAQ is open; one at a time.
+	let openFaq = $state<number | null>(null);
 </script>
 
 <svelte:head>
@@ -85,7 +88,7 @@
 	</div>
 {/snippet}
 
-<div data-theme="dark" class="relative min-h-dvh bg-surface text-text">
+<div class="relative min-h-dvh bg-surface text-text">
 	<PageAurora />
 	<MarketingHeader />
 
@@ -180,7 +183,7 @@
 			{/if}
 
 			<!-- ------------------------------------------------------ product bento -->
-			<section class="relative overflow-hidden border-t border-border">
+			<section class="relative overflow-hidden">
 				<div
 					aria-hidden="true"
 					class="pointer-events-none absolute inset-0 -z-10 opacity-60"
@@ -234,7 +237,7 @@
 						<div class="flex flex-col gap-4 lg:col-span-2">
 							<!-- A quiz result, graded. -->
 							<div use:inview={{ delay: 80 }} class="flex-1">
-								<Card elevation="raised" class="lift h-full rotate-1 p-5">
+								<Card elevation="raised" class="h-full p-5">
 									<p class="text-sm font-medium">Chapter one quiz</p>
 									<p class="mt-1 text-xs text-muted">Graded a moment after it was handed in.</p>
 									<div class="mt-4">
@@ -249,7 +252,7 @@
 
 							<!-- Points and a leaderboard — the reason to come back. -->
 							<div use:inview={{ delay: 160 }} class="flex-1">
-								<Card elevation="raised" class="lift h-full -rotate-1 p-5">
+								<Card elevation="raised" class="h-full p-5">
 									<p class="text-sm font-medium">This week's leaders</p>
 									<ul class="mt-3 space-y-2.5">
 										{#each BOARD as row, i (row.who)}
@@ -275,7 +278,7 @@
 			</section>
 
 			<!-- ------------------------------------------------------------ features -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'Everything you need',
@@ -286,7 +289,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: index * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
+								<Card aurora class="lift h-full p-6">
 									<Icon icon={feature.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{feature.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{feature.body}</p>
@@ -295,7 +298,7 @@
 						{/each}
 						{#each MORE_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
+								<Card aurora class="lift h-full p-6">
 									<div class="flex items-start justify-between gap-3">
 										<Icon icon={feature.icon} class="size-6 text-accent" />
 										{#if feature.status === 'planned'}
@@ -312,7 +315,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------- solutions router -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'Built for how you teach',
@@ -328,8 +331,8 @@
 								class="group"
 							>
 								<Card
-									class="lift flex h-full flex-col border-white/10 bg-white/[0.06] p-6 backdrop-blur {index %
-									2
+									aurora
+									class="lift flex h-full flex-col p-6 {index % 2
 										? '-rotate-[0.6deg]'
 										: 'rotate-[0.6deg]'}"
 								>
@@ -373,7 +376,7 @@
 			</section>
 
 			<!-- ----------------------------------------------------------------- AI -->
-			<section class="relative overflow-hidden border-t border-border">
+			<section class="relative overflow-hidden">
 				<div
 					aria-hidden="true"
 					class="pointer-events-none absolute inset-0 -z-10 opacity-[0.06]"
@@ -397,9 +400,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2">
 						{#each AI_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 2) * 80 }}>
-								<Card
-									class="lift flex h-full gap-4 border-white/10 bg-white/[0.06] p-6 backdrop-blur"
-								>
+								<Card aurora class="lift flex h-full gap-4 p-6">
 									<Icon icon={feature.icon} class="mt-0.5 size-6 shrink-0 text-accent" />
 									<div>
 										<div class="flex flex-wrap items-center gap-2">
@@ -416,7 +417,7 @@
 			</section>
 
 			<!-- ------------------------------------------------------- how it works -->
-			<section class="border-t border-border">
+			<section class="">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro('How it works', 'Three steps.', 'And the first one is free.')}
 
@@ -437,7 +438,7 @@
 			</section>
 
 			<!-- ---------------------------------------------------------- pricing -->
-			<section id="pricing" class="scroll-mt-20 border-t border-border">
+			<section id="pricing" class="scroll-mt-20">
 				<div class="px-6 py-24 sm:px-10">
 					{@render intro(
 						'Pricing',
@@ -445,26 +446,27 @@
 						'Start free. Move up when you outgrow it.'
 					)}
 
-					<div class="mt-14 grid items-start gap-4 lg:grid-cols-3">
+					<!-- items-stretch equalises the three; the popular plan then scales up from
+					     its centre so it stands taller without breaking the row. -->
+					<div class="mt-16 grid items-stretch gap-4 lg:grid-cols-3">
 						{#each PLANS as plan, index (plan.name)}
-							<div use:inview={{ delay: index * 90 }}>
+							<div use:inview={{ delay: index * 90 }} class={plan.highlighted ? 'lg:z-10' : ''}>
 								<Card
+									aurora={plan.highlighted}
 									elevation={plan.highlighted ? 'raised' : 'flat'}
-									class="lift relative h-full p-8 {plan.highlighted ? 'border-accent-border' : ''}"
+									class="relative flex h-full flex-col p-8 {plan.highlighted
+										? 'origin-center border-accent-border lg:scale-[1.05]'
+										: 'lift'}"
 								>
 									{#if plan.highlighted}
+										<!-- The badge floats over the top edge. -->
 										<span
-											aria-hidden="true"
-											class="absolute inset-x-8 top-0 h-px"
-											style="background: linear-gradient(to right, transparent, var(--accent), transparent);"
-										></span>
+											class="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center rounded-pill bg-accent px-3 py-1 text-xs font-semibold text-on-solid"
+										>
+											Most popular
+										</span>
 									{/if}
-									<div class="flex items-center justify-between gap-3">
-										<h3 class="font-semibold">{plan.name}</h3>
-										{#if plan.highlighted}
-											<Badge tone="accent">Most popular</Badge>
-										{/if}
-									</div>
+									<h3 class="font-semibold">{plan.name}</h3>
 
 									<p class="mt-5 flex items-baseline gap-1.5">
 										<span class="text-4xl font-semibold {/\d/.test(plan.price) ? 'numeral' : ''}">
@@ -507,26 +509,41 @@
 			</section>
 
 			<!-- --------------------------------------------------------------- FAQ -->
-			<section class="border-t border-border">
+			<section>
 				<div class="px-6 py-24 sm:px-10">
-					{@render intro('Questions', 'Before you ask.', '')}
+					<div use:inview class="mx-auto max-w-2xl text-center">
+						<p class="text-sm font-semibold text-accent-text">Questions</p>
+						<h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+							Before you ask.
+						</h2>
+					</div>
 
-					<div use:inview class="mt-12 max-w-3xl divide-y divide-border border-y border-border">
-						{#each FAQS as item (item.question)}
-							<details class="group py-5">
-								<summary
-									class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium"
+					<div use:inview class="mx-auto mt-12 max-w-3xl space-y-3">
+						{#each FAQS as item, i (item.question)}
+							{@const open = openFaq === i}
+							<div class="card-aurora overflow-hidden rounded-card border border-border">
+								<button
+									type="button"
+									onclick={() => (openFaq = open ? null : i)}
+									aria-expanded={open}
+									class="flex w-full cursor-pointer items-center justify-between gap-4 p-5 text-left font-medium"
 								>
 									{item.question}
 									<span
 										aria-hidden="true"
-										class="grid size-6 shrink-0 place-items-center rounded-pill border border-border text-muted transition-transform group-open:rotate-45"
+										class="grid size-6 shrink-0 place-items-center rounded-pill border border-border text-muted transition-transform duration-200 {open
+											? 'rotate-45'
+											: ''}"
 									>
 										+
 									</span>
-								</summary>
-								<p class="mt-3 pr-10 text-sm text-pretty text-muted">{item.answer}</p>
-							</details>
+								</button>
+								{#if open}
+									<div transition:slide={{ duration: 220 }}>
+										<p class="px-5 pb-5 text-sm text-pretty text-muted">{item.answer}</p>
+									</div>
+								{/if}
+							</div>
 						{/each}
 					</div>
 				</div>
