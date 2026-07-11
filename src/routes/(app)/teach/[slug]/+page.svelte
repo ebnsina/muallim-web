@@ -2,6 +2,8 @@
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { flip } from 'svelte/animate';
+	import { cubicOut } from 'svelte/easing';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import {
 		CheckmarkCircle02Icon,
@@ -58,8 +60,10 @@
 	let topics = $derived(mapTopics(data.topics));
 
 	// Submit a reordered list to one of the page's actions, by hand because the drag
-	// happened in script. On success the list is confirmed; either way the load runs
-	// again, so a rejected order snaps back to the truth rather than lying on screen.
+	// happened in script. On success nothing more is done — the optimistic order the
+	// drag already applied is the order the server now holds, so reloading it would
+	// only make the list flash and jump. A rejection reverts: it surfaces the error
+	// and reloads, snapping the list back to the truth instead of lying on screen.
 	async function postOrder(action: string, entries: [string, string][]) {
 		const body = new FormData();
 		for (const [key, value] of entries) body.append(key, value);
@@ -70,8 +74,10 @@
 			headers: { 'x-sveltekit-action': 'true' }
 		});
 		const result: ActionResult = deserialize(await response.text());
-		applyAction(result);
-		await invalidateAll();
+		if (result.type !== 'success') {
+			applyAction(result);
+			await invalidateAll();
+		}
 	}
 
 	// Move the dropped item to where it landed. `dropPosition` says whether it goes
@@ -336,7 +342,7 @@
 	-->
 	<ol class="mt-8 space-y-6">
 		{#each topics as topic, topicIndex (topic.id)}
-			<li>
+			<li animate:flip={{ duration: 220, easing: cubicOut }}>
 				<Card class="p-5">
 					<!--
 						The section's drag zone is its header row, not the whole card. A card
@@ -397,6 +403,7 @@
 					<ul class="mt-4">
 						{#each topic.lessons as lesson, lessonIndex (lesson.id)}
 							<li
+								animate:flip={{ duration: 200, easing: cubicOut }}
 								use:draggable={{
 									container: `lesson-${topicIndex}-${lessonIndex}`,
 									dragData: lesson,
@@ -483,9 +490,47 @@
 </Page>
 
 <style>
-	/* The item under the pointer, while it is being dragged. sveltednd adds the
-	   class; the package ships no stylesheet, so the one rule it needs lives here. */
-	:global(.dragging) {
-		opacity: 0.5;
+	/*
+		The drag's own look. The package ships a stylesheet its exports do not let us
+		import, and its defaults are loud — a hard blue line, a dashed green box — so
+		the feedback is drawn here instead, in the accent, quietly.
+	*/
+
+	/* The row being carried: lifted out of the flow, not just faded. */
+	:global(.dragging),
+	:global(.svelte-dnd-dragging) {
+		opacity: 0.4;
+	}
+
+	/* No dashed outline around the drop zone; the insertion line says enough. */
+	:global(.svelte-dnd-drop-target),
+	:global(.svelte-dnd-invalid-target) {
+		outline: none;
+	}
+
+	/* A thin, rounded accent line where the row will land — the one indicator, in
+	   the brand colour rather than a raw blue, drawn on a pseudo-element so it adds
+	   no layout. */
+	:global(.drop-before),
+	:global(.drop-after) {
+		position: relative;
+	}
+	:global(.drop-before)::before,
+	:global(.drop-after)::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: 2px;
+		border-radius: 999px;
+		background-color: var(--accent);
+		z-index: 10;
+		pointer-events: none;
+	}
+	:global(.drop-before)::before {
+		top: -1px;
+	}
+	:global(.drop-after)::after {
+		bottom: -1px;
 	}
 </style>
