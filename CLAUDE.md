@@ -86,6 +86,15 @@ pnpm build
 - **Honesty is the voice.** Solution pages split into "works today" and "on the roadmap"; the roadmap is a two-up split with its card vertically centred so a single item never leaves an empty grid; section eyebrows are text, not `Badge`s.
 - **Placeholders are flagged.** Pricing numbers, the logo strip, and hero/segment images are Unsplash/invented placeholders marked in-code — replace before launch. Icons are verified Hugeicons only.
 
+## AI Studio
+
+Generation runs **here, in `lms-web`'s server**, never in the Go API — so provider keys stay server-side and the OpenAPI contract carries no streaming-LLM surface other clients can't honour. The pieces:
+
+- **One engine.** `src/lib/server/ai.ts` holds the provider (TanStack AI, Anthropic adapter) and reads the key + model from `$env/dynamic/private`. Provider-agnostic: swap the adapter, nothing else moves. `aiEnabled()` gates everything — **no key means the AI controls are hidden and the forms are unchanged**, never a broken button.
+- **One endpoint.** `/ai/generate` (a session-guarded `+server.ts` streaming SSE). Deliberately **not** under `/api`, which proxies to lms-api.
+- **The draft is not the record.** AI streams a draft the author edits; **saving goes through the existing permission-checked catalog/assess endpoints**, and lms-api's validator refuses a malformed generated question exactly as it would a hand-typed one. Never write generated content live.
+- **Two SSR traps.** `@tanstack/ai-svelte` ships an uncompiled `.svelte` file, so it lives in `ssr.noExternal` (alongside `@hugeicons/svelte`). And the AI components (`AiField`, `AiQuiz`, `AiOutline`) are imported **directly**, never re-exported from the `$lib/components` barrel — the barrel is on every page's import path, and the AI SDK has no business in the landing's bundle.
+
 ## Git
 
 Author every commit as `ebnsina <ebnsina.me@gmail.com>`, configured **per repo**:

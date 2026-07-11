@@ -128,7 +128,12 @@ export const SEGMENTS: Segment[] = [
 			{
 				icon: Quiz01Icon,
 				title: 'Quizzes and assignments',
-				body: 'Nine question types that mark themselves, plus essays and file uploads that come to you.'
+				body: 'Eleven question types that mark themselves, plus essays and file uploads that come to you.'
+			},
+			{
+				icon: MagicWand01Icon,
+				title: 'Draft with AI',
+				body: 'Generate a course outline, lesson copy, or a quiz from a lesson — each a draft you edit before it is saved.'
 			},
 			{
 				icon: Certificate01Icon,

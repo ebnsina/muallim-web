@@ -70,8 +70,8 @@
 
 <!--
 	This page is for someone deciding whether to teach here. It says what they get,
-	not how it is built. Anything not built yet wears a "Coming soon" badge; the AI
-	section says so in its own headline. See `$lib/content/landing` for that rule.
+	not how it is built. Anything not built yet wears a "Coming soon" badge — the
+	honest signal that it is a roadmap item, not a claim. See `$lib/content/landing`.
 
 	The layout: a full-bleed centered hero on a dark aurora wash with a rotating
 	audience in the headline and the product in a browser frame beneath it, a marquee
@@ -401,11 +401,11 @@
 							class="inline-flex items-center gap-2 rounded-pill border border-accent-border bg-accent-surface px-3 py-1 text-xs font-medium text-accent-text"
 						>
 							<Icon icon={SparklesIcon} class="size-3.5" />
-							Not built yet
+							Now with AI
 						</span>
 						<h2 class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
 							The blank page, solved.
-							<span class="text-muted">This is what we are building next.</span>
+							<span class="text-muted">Draft a course, a lesson, a quiz — then make it yours.</span>
 						</h2>
 					</div>
 
@@ -417,7 +417,9 @@
 									<div>
 										<div class="flex flex-wrap items-center gap-2">
 											<h3 class="font-semibold">{feature.title}</h3>
-											<Badge tone="neutral">Coming soon</Badge>
+											{#if feature.status === 'planned'}
+												<Badge tone="neutral">Coming soon</Badge>
+											{/if}
 										</div>
 										<p class="mt-2 text-sm text-pretty text-muted">{feature.body}</p>
 									</div>

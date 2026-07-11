@@ -66,7 +66,7 @@ export const FEATURES: Feature[] = [
 	{
 		icon: Quiz01Icon,
 		title: 'Quizzes that mark themselves',
-		body: 'Eight kinds of question, from true-or-false to matching pairs. Students hand one in and the result comes back a moment later, however long the quiz.'
+		body: 'Eleven kinds of question, from true-or-false to matching pairs and image choices. Students hand one in and the result comes back a moment later, however long the quiz.'
 	},
 	{
 		icon: UserGroup03Icon,
@@ -109,30 +109,25 @@ export const MORE_FEATURES: Feature[] = [
 	{
 		icon: Certificate01Icon,
 		title: 'Certificates on completion',
-		body: 'A signed certificate when a student finishes, that anyone can check without asking you.',
-		status: 'planned'
+		body: 'A signed certificate when a student finishes, that anyone can check without asking you.'
 	}
 ];
 
 /**
- * The AI features. Every one of these is `planned` — none of it is built.
- *
- * A landing page with an AI section and no AI is the oldest trick in this
- * industry. The badge on each card is not decoration; it is the difference
- * between a roadmap and a lie.
+ * The AI features. `status: 'planned'` still means not built — the badge on each
+ * card is the difference between a roadmap and a lie. Course and quiz generation
+ * now ship, so they carry no badge; captions and the class-insight feature do.
  */
 export const AI_FEATURES: Feature[] = [
 	{
 		icon: MagicWand01Icon,
 		title: 'A course from one sentence',
-		body: 'Describe what you want to teach. Get an outline, the lessons under it, and a quiz for each — all of it yours to edit.',
-		status: 'planned'
+		body: 'Describe what you want to teach. Get an outline, the lessons under it, and a draft for each — all of it yours to edit before anything is saved.'
 	},
 	{
 		icon: AiBrain01Icon,
 		title: 'Quizzes worth taking',
-		body: 'Turn a lesson into questions at the difficulty you choose. Change the count, change the mix, keep what works.',
-		status: 'planned'
+		body: 'Turn a lesson into questions at the count you choose. Preview them, keep what works — the same validator a hand-written question meets refuses a bad one.'
 	},
 	{
 		icon: LanguageSkillIcon,
