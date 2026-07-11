@@ -15,11 +15,12 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		api.GET('/v1/me/courses', { params: { query: { limit: 100 } } }),
 		api.GET('/v1/certificate-templates'),
 		api.GET('/v1/courses/{slug}/certificate-template', { params: { path: { slug: params.slug } } }),
-		api.GET('/v1/courses/{slug}/announcements', { params: { path: { slug: params.slug } } })
+		api.GET('/v1/courses/{slug}/announcements', { params: { path: { slug: params.slug } } }),
+		api.GET('/v1/courses/{slug}/analytics', { params: { path: { slug: params.slug } } })
 	]);
 
 	await parent();
-	const [prerequisites, mine, templates, courseTemplate, announcements] = await rest;
+	const [prerequisites, mine, templates, courseTemplate, announcements, analytics] = await rest;
 
 	// Every other course in the workspace, so the author picks a prerequisite from
 	// a list rather than typing a slug and finding out later that they mistyped it.
@@ -34,7 +35,8 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		certificateTemplates: templates.data?.templates ?? [],
 		currentTemplateId: courseTemplate.data?.template_id ?? null,
 
-		announcements: announcements.data?.announcements ?? []
+		announcements: announcements.data?.announcements ?? [],
+		analytics: analytics.data ?? null
 	};
 };
 

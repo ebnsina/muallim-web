@@ -25,6 +25,7 @@
 		PageHeader,
 		Select,
 		Sheet,
+		Stars,
 		Textarea
 	} from '$lib/components';
 	import type { PageProps } from './$types';
@@ -223,6 +224,60 @@
 		</Alert>
 	{:else if form?.templateSaved}
 		<Alert tone="success" class="mt-6" role="status">Certificate template updated.</Alert>
+	{/if}
+
+	<!-- ---------------------------------------------------------- analytics -->
+	{#if data.analytics}
+		{@const a = data.analytics}
+		<section class="mt-8">
+			<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+			<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				<Card class="p-5">
+					<p class="text-muted text-xs tracking-wide uppercase">Enrolments</p>
+					<p class="mt-2 text-2xl font-semibold">
+						<span class="numeral">{a.total_enrolments}</span>
+					</p>
+					<p class="text-muted mt-1 text-xs">
+						<span class="numeral">{a.active}</span> active ·
+						<span class="numeral">{a.completed}</span> completed
+					</p>
+				</Card>
+
+				<Card class="p-5">
+					<p class="text-muted text-xs tracking-wide uppercase">Completion</p>
+					<p class="mt-2 text-2xl font-semibold">
+						<span class="numeral">{Math.round(a.completion_rate * 100)}</span>%
+					</p>
+					<p class="text-muted mt-1 text-xs">of active and finished learners</p>
+				</Card>
+
+				<Card class="p-5">
+					<p class="text-muted text-xs tracking-wide uppercase">Avg. progress</p>
+					<p class="mt-2 text-2xl font-semibold">
+						<span class="numeral">{Math.round(a.average_progress)}</span>%
+					</p>
+					<p class="text-muted mt-1 text-xs">across the course</p>
+				</Card>
+
+				<Card class="p-5">
+					<p class="text-muted text-xs tracking-wide uppercase">Rating</p>
+					{#if a.reviews.count > 0}
+						<p class="mt-2 flex items-center gap-2">
+							<span class="text-2xl font-semibold">
+								<span class="numeral">{a.reviews.average.toFixed(1)}</span>
+							</span>
+							<Stars value={a.reviews.average} size="sm" />
+						</p>
+						<p class="text-muted mt-1 text-xs">
+							from <span class="numeral">{a.reviews.count}</span>
+							{a.reviews.count === 1 ? 'review' : 'reviews'}
+						</p>
+					{:else}
+						<p class="text-muted mt-2 text-sm">No reviews yet.</p>
+					{/if}
+				</Card>
+			</div>
+		</section>
 	{/if}
 
 	<section class="mt-8 max-w-3xl">
