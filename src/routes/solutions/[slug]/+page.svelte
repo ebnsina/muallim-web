@@ -110,7 +110,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each segment.today as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
+								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
 									<Icon icon={item.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{item.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{item.body}</p>
@@ -174,7 +174,7 @@
 						{#each segment.roadmap as item, index (item.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
 								<Card
-									class="lift flex h-full gap-4 border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+									class="lift flex h-full gap-4 border-white/10 bg-white/[0.06] p-6 backdrop-blur"
 								>
 									<Icon icon={item.icon} class="mt-0.5 size-6 shrink-0 text-muted" />
 									<div>

@@ -286,7 +286,7 @@
 					<div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: index * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
+								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
 									<Icon icon={feature.icon} class="size-6 text-accent" />
 									<h3 class="mt-4 font-semibold">{feature.title}</h3>
 									<p class="mt-2 text-sm text-pretty text-muted">{feature.body}</p>
@@ -295,7 +295,7 @@
 						{/each}
 						{#each MORE_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 3) * 80 }}>
-								<Card class="lift h-full border-white/10 bg-white/[0.04] p-6 backdrop-blur">
+								<Card class="lift h-full border-white/10 bg-white/[0.06] p-6 backdrop-blur">
 									<div class="flex items-start justify-between gap-3">
 										<Icon icon={feature.icon} class="size-6 text-accent" />
 										{#if feature.status === 'planned'}
@@ -328,7 +328,7 @@
 								class="group"
 							>
 								<Card
-									class="lift flex h-full flex-col border-white/10 bg-white/[0.04] p-6 backdrop-blur {index %
+									class="lift flex h-full flex-col border-white/10 bg-white/[0.06] p-6 backdrop-blur {index %
 									2
 										? '-rotate-[0.6deg]'
 										: 'rotate-[0.6deg]'}"
@@ -398,7 +398,7 @@
 						{#each AI_FEATURES as feature, index (feature.title)}
 							<div use:inview={{ delay: (index % 2) * 80 }}>
 								<Card
-									class="lift flex h-full gap-4 border-white/10 bg-white/[0.04] p-6 backdrop-blur"
+									class="lift flex h-full gap-4 border-white/10 bg-white/[0.06] p-6 backdrop-blur"
 								>
 									<Icon icon={feature.icon} class="mt-0.5 size-6 shrink-0 text-accent" />
 									<div>
