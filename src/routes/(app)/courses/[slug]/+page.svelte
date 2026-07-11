@@ -262,6 +262,15 @@
 							See your grades
 						</Button>
 
+						<Button
+							href={resolve(`/courses/${data.course.slug}/notes`)}
+							variant="secondary"
+							size="sm"
+							class="mt-3 w-full"
+						>
+							Your notes &amp; highlights
+						</Button>
+
 						<form method="POST" action="?/cancel" use:enhance class="mt-3">
 							<Button type="submit" variant="ghost" size="sm" class="w-full">
 								Cancel enrolment

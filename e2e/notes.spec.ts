@@ -66,4 +66,32 @@ test.describe("a learner's private lesson note", () => {
 		await page.getByRole('button', { name: 'Remove this highlight' }).click();
 		await expect(page.getByRole('heading', { name: 'Highlighted passages' })).toHaveCount(0);
 	});
+
+	test('the revision page gathers a note and a highlight under their lesson', async ({
+		page,
+		request
+	}) => {
+		const course = await publishedCourse(request, slug('rev'));
+		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
+		await ready(page);
+
+		// A whole-lesson note…
+		await page.getByLabel('Your notes on this lesson').fill('Revise the method.');
+		await page.getByRole('button', { name: 'Save note' }).click();
+		await expect(page.getByText('Saved.')).toBeVisible();
+
+		// …and a highlight with its own remark.
+		await page.getByText('The body of A free preview.').selectText();
+		await page.getByRole('button', { name: 'Add note' }).click();
+		const passageNote = page.getByLabel('Note on this passage');
+		await passageNote.fill('Key line.');
+		await passageNote.blur();
+
+		// Both turn up on the course's revision page, under the lesson.
+		await page.goto(`/courses/${course.slug}/notes`);
+		await expect(page.getByRole('heading', { name: 'Your notes' })).toBeVisible();
+		await expect(page.getByRole('link', { name: /A free preview/ })).toBeVisible();
+		await expect(page.getByText('Revise the method.')).toBeVisible();
+		await expect(page.getByText('Key line.')).toBeVisible();
+	});
 });
