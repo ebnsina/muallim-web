@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -28,6 +29,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 
 	// `course`, `topics` and `lessonCount` come from the layout.
 	return {
+		aiEnabled: aiEnabled(),
 		prerequisites: prerequisites.data?.prerequisites ?? [],
 		candidates,
 
@@ -183,6 +185,59 @@ export const actions: Actions = {
 				message: problemMessage(problem, 'Could not add that lesson.')
 			});
 		}
+	},
+
+	/**
+	 * Create a whole AI-drafted outline: each section, then its lessons, through the
+	 * same endpoints the manual editor uses — so lms-api validates every row, and a
+	 * half-created section (topic saved, a lesson rejected) leaves the rest intact.
+	 * Lessons start as empty text; the author fills each in (with AI, if they like).
+	 */
+	addOutline: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		let outline: unknown;
+		try {
+			outline = JSON.parse(String((await request.formData()).get('outline') ?? '[]'));
+		} catch {
+			return fail(400, { message: 'The outline could not be read.' });
+		}
+		if (!Array.isArray(outline) || outline.length === 0) {
+			return fail(400, { message: 'No sections to add.' });
+		}
+
+		const api = authedApi(url.origin, locals.accessToken);
+		let topics = 0;
+		let lessons = 0;
+
+		for (const section of outline as Array<{ title?: string; lessons?: unknown }>) {
+			const title = String(section.title ?? '').trim();
+			if (!title) continue;
+
+			const { data, error: topicErr } = await api.POST('/v1/courses/{slug}/topics', {
+				params: { path: { slug: params.slug } },
+				body: { title }
+			});
+			const topicId = data?.topic?.id;
+			if (topicErr || !topicId) continue;
+			topics++;
+
+			const list = Array.isArray(section.lessons) ? section.lessons : [];
+			for (const raw of list) {
+				const lessonTitle = String(
+					(typeof raw === 'string' ? raw : (raw as { title?: string })?.title) ?? ''
+				).trim();
+				if (!lessonTitle) continue;
+
+				const { error: lessonErr } = await api.POST('/v1/topics/{id}/lessons', {
+					params: { path: { id: topicId } },
+					body: { title: lessonTitle, content_type: 'text', video_source: 'none' }
+				});
+				if (!lessonErr) lessons++;
+			}
+		}
+
+		return { outlineTopics: topics, outlineLessons: lessons };
 	},
 
 	deleteLesson: async ({ request, locals, url }) => {

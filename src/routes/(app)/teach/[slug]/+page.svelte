@@ -28,6 +28,7 @@
 		Stars,
 		Textarea
 	} from '$lib/components';
+	import AiOutline from '$lib/components/AiOutline.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -606,6 +607,12 @@
 		<Input id="new-topic" name="title" placeholder="New section" class="w-64" required />
 		<Button type="submit">Add section</Button>
 	</form>
+
+	{#if data.aiEnabled}
+		<div class="mt-8">
+			<AiOutline enabled={data.aiEnabled} courseTitle={data.course.title} />
+		</div>
+	{/if}
 </Page>
 
 <style>
