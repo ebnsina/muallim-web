@@ -25,14 +25,17 @@
 	<main>
 		<div class="mx-auto max-w-6xl">
 			<!-- ------------------------------------------------------------- hero -->
-			<section class="relative isolate overflow-hidden">
+			<!-- Pulled up under the transparent header; the top padding clears the nav. -->
+			<section class="relative isolate -mt-16 overflow-hidden">
 				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
 					<div class="grid-lines absolute inset-0"></div>
 					<div class="ribbon absolute -top-40 -right-52 size-[48rem] rounded-full opacity-80"></div>
 					<div class="ribbon-threads absolute -top-40 -right-52 size-[48rem]"></div>
 				</div>
 
-				<div class="grid items-center gap-12 px-6 py-20 sm:px-8 sm:py-28 lg:grid-cols-2">
+				<div
+					class="grid items-center gap-12 px-6 pt-28 pb-20 sm:px-8 sm:pt-36 sm:pb-28 lg:grid-cols-2"
+				>
 					<div>
 						<p use:inview class="inline-flex">
 							<Badge tone="accent" icon={segment.heroIcon}>{segment.eyebrow}</Badge>

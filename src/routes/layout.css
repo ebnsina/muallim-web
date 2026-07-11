@@ -313,6 +313,22 @@
 	}
 
 	/*
+		The centered hero's backdrop: near-black at the top falling to Honolulu blue,
+		with a soft glow rising from where the product frame meets it. Fixed dark
+		values, not theme tokens, because the hero is dark in either theme.
+	*/
+	.hero-blue {
+		background:
+			radial-gradient(60% 55% at 50% 100%, oklch(0.58 0.17 243 / 0.6), transparent 72%),
+			linear-gradient(
+				178deg,
+				oklch(0.16 0.03 245) 0%,
+				oklch(0.27 0.1 244) 46%,
+				oklch(0.47 0.17 243) 100%
+			);
+	}
+
+	/*
 		The hero ribbon — Stripe's signature flowing spectrum, asked for by name, and
 		a deliberate exception to the blue-only rule above. It lives only in this
 		decorative graphic; every pixel of product UI stays on the brand ramp.

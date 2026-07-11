@@ -50,10 +50,9 @@
 		lg: 'h-12 gap-2 px-6 text-base'
 	};
 
-	// A pill. The full radius is what makes a button read as a button beside a
-	// field, now that both are soft.
+	// rounded-xl, matching the field radius so button and input read as one family.
 	const base =
-		'inline-flex shrink-0 items-center justify-center rounded-pill font-medium whitespace-nowrap ' +
+		'inline-flex shrink-0 items-center justify-center rounded-control font-medium whitespace-nowrap ' +
 		'transition-colors select-none disabled:pointer-events-none disabled:opacity-50 ' +
 		'aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4';
 

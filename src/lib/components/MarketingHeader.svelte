@@ -1,29 +1,52 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ArrowDown01Icon, Mortarboard02Icon } from '@hugeicons/core-free-icons';
+	import { cn } from '$lib/utils';
 	import { SEGMENTS } from '$lib/content/segments';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
-	import ThemeToggle from './ThemeToggle.svelte';
 
+	// `overDark` pages (the landing) sit the header over a dark hero, so at the top
+	// the nav is white; every page frosts and returns to normal text once scrolled.
+	let { overDark = false }: { overDark?: boolean } = $props();
+
+	let scrolled = $state(false);
+	$effect(() => {
+		const onScroll = () => (scrolled = window.scrollY > 8);
+		onScroll();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	});
+
+	const light = $derived(overDark && !scrolled);
 	const home = resolve('/');
+	const ghost = $derived(light ? '!text-white hover:!bg-white/10' : '');
 </script>
 
-<header class="sticky top-0 z-30 border-b border-border bg-surface/80 backdrop-blur">
+<header
+	class={cn(
+		'sticky top-0 z-50 transition-colors duration-200',
+		scrolled ? 'bg-surface/80 backdrop-blur' : 'bg-transparent'
+	)}
+>
 	<div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
-		<a href={home} class="flex shrink-0 items-center gap-2.5 font-semibold">
-			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
+		<a
+			href={home}
+			class={cn('flex shrink-0 items-center gap-2.5 font-semibold', light && 'text-white')}
+		>
+			<Icon icon={Mortarboard02Icon} class={cn('size-6', light ? 'text-white' : 'text-accent')} />
 			Muallim
 		</a>
 
 		<!-- Menu on the left, beside the logo. -->
 		<nav class="hidden items-center gap-1 text-sm sm:flex">
-			<!-- Opens on hover and on keyboard focus, so it needs no click handler and
-			     closes itself the moment focus leaves. -->
 			<div class="group relative">
 				<button
 					type="button"
-					class="inline-flex items-center gap-1 rounded-control px-3 py-1.5 font-medium text-muted transition-colors hover:text-text"
+					class={cn(
+						'inline-flex items-center gap-1 rounded-control px-3 py-1.5 font-medium transition-colors',
+						light ? 'text-white/80 hover:text-white' : 'text-muted hover:text-text'
+					)}
 				>
 					Solutions
 					<Icon icon={ArrowDown01Icon} class="size-4 transition-transform group-hover:rotate-180" />
@@ -46,14 +69,13 @@
 				</div>
 			</div>
 
-			<Button href="{home}#pricing" variant="ghost" size="sm">Pricing</Button>
-			<Button href={resolve('/courses')} variant="ghost" size="sm">Courses</Button>
+			<Button href="{home}#pricing" variant="ghost" size="sm" class={ghost}>Pricing</Button>
+			<Button href={resolve('/courses')} variant="ghost" size="sm" class={ghost}>Courses</Button>
 		</nav>
 
 		<!-- Sign in and Contact sales on the right. -->
 		<div class="ml-auto flex items-center gap-1 sm:gap-2">
-			<ThemeToggle />
-			<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
+			<Button href={resolve('/login')} variant="ghost" size="sm" class={ghost}>Sign in</Button>
 			<Button href="{home}#pricing" size="sm">Contact sales</Button>
 		</div>
 	</div>

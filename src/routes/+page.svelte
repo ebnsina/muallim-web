@@ -53,9 +53,10 @@
 	not how it is built. Anything not built yet wears a "Coming soon" badge; the AI
 	section says so in its own headline. See `$lib/content/landing` for that rule.
 
-	The layout follows stripe.com by request: a split two-tone hero over the spectrum
-	ribbon, a marquee of names, two-tone section intros, and a bento of real product
-	UI rather than screenshots.
+	The layout: a full-bleed centered hero on a dark-blue wash with the product in a
+	browser frame beneath it, a marquee of names, two-tone section intros, and a
+	bento of real product UI rather than screenshots. The header is transparent over
+	the hero and frosts on scroll.
 -->
 
 {#snippet intro(eyebrow: string, bold: string, rest: string)}
@@ -68,64 +69,70 @@
 {/snippet}
 
 <div class="min-h-dvh">
-	<MarketingHeader />
+	<MarketingHeader overDark />
 
 	<main>
+		<!-- Full-bleed, and pulled up under the transparent header so the blue runs
+		     behind it; the top padding clears the nav. -->
+		<section class="hero-blue relative isolate -mt-16 overflow-hidden">
+			<div class="mx-auto max-w-3xl px-6 pt-36 text-center sm:pt-44">
+				<h1
+					use:inview
+					class="text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl"
+				>
+					Teach what you know.
+					<span class="text-white/55">Let the marking take care of itself.</span>
+				</h1>
+
+				<p
+					use:inview={{ delay: 80 }}
+					class="mx-auto mt-6 max-w-xl text-lg text-pretty text-white/75"
+				>
+					Build a course, invite your students, and hand back marked work the moment it comes in —
+					quizzes graded in seconds, essays waiting in one tidy list.
+				</p>
+
+				<div use:inview={{ delay: 140 }} class="mt-10 flex justify-center gap-3">
+					<Button
+						href={resolve('/register')}
+						size="lg"
+						class="!border-transparent !bg-white !text-black hover:!bg-white/90"
+					>
+						Start teaching
+						<Icon icon={ArrowRight01Icon} class="size-4" />
+					</Button>
+					<Button
+						href={resolve('/courses')}
+						size="lg"
+						variant="ghost"
+						class="border border-white/25 !text-white hover:!bg-white/10"
+					>
+						Browse courses
+					</Button>
+				</div>
+			</div>
+
+			<!-- The product, in a browser frame, sitting flush at the foot of the hero. -->
+			<div use:inview={{ delay: 160 }} class="mx-auto mt-16 max-w-5xl px-6">
+				<div class="overflow-hidden rounded-t-overlay border border-white/15 bg-surface-raised">
+					<div class="flex items-center gap-2 border-b border-border px-4 py-3">
+						<span class="size-3 rounded-full bg-danger/60"></span>
+						<span class="size-3 rounded-full bg-warning/60"></span>
+						<span class="size-3 rounded-full bg-success/60"></span>
+						<span class="numeral ml-3 text-xs text-muted">muallim.test/courses</span>
+					</div>
+					<img
+						src={HERO_IMAGE}
+						alt="A course open in Muallim"
+						width="1600"
+						height="900"
+						class="aspect-[16/9] w-full object-cover"
+					/>
+				</div>
+			</div>
+		</section>
+
 		<div class="mx-auto max-w-6xl">
-			<!-- ------------------------------------------------------------- hero -->
-			<section class="relative isolate overflow-hidden">
-				<div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
-					<div class="grid-lines absolute inset-0"></div>
-					<!-- Two siblings, never nested: the blur on `.ribbon` must not reach the threads. -->
-					<div class="ribbon absolute -top-40 -right-52 size-[52rem] rounded-full opacity-80"></div>
-					<div class="ribbon-threads absolute -top-40 -right-52 size-[52rem]"></div>
-				</div>
-
-				<div class="grid items-center gap-12 px-6 py-20 sm:px-8 sm:py-28 lg:grid-cols-2">
-					<div>
-						<p use:inview class="inline-flex">
-							<Badge tone="accent" icon={SparklesIcon}>Quizzes that mark themselves</Badge>
-						</p>
-
-						<h1
-							use:inview={{ delay: 60 }}
-							class="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl"
-						>
-							Teach what you know.
-							<span class="text-muted">Let the marking take care of itself.</span>
-						</h1>
-
-						<p
-							use:inview={{ delay: 120 }}
-							class="mt-7 max-w-xl text-lg text-pretty text-muted sm:text-xl"
-						>
-							Build a course, invite your students, and hand back marked work the moment it comes in
-							— quizzes graded in seconds, essays waiting in one tidy list.
-						</p>
-
-						<div use:inview={{ delay: 180 }} class="mt-10 flex flex-wrap gap-3">
-							<Button href={resolve('/register')} size="lg">
-								Start teaching
-								<Icon icon={ArrowRight01Icon} class="size-4" />
-							</Button>
-							<Button href={resolve('/courses')} size="lg" variant="secondary"
-								>Browse courses</Button
-							>
-						</div>
-					</div>
-
-					<div use:inview={{ delay: 120 }}>
-						<img
-							src={HERO_IMAGE}
-							alt="An instructor and students working together"
-							width="1200"
-							height="900"
-							class="aspect-[4/3] w-full rounded-overlay border border-border object-cover"
-						/>
-					</div>
-				</div>
-			</section>
-
 			<!-- --------------------------------------------------------- logo strip -->
 			{#if LOGOS.length > 0}
 				<section class="bg-surface-raised">
