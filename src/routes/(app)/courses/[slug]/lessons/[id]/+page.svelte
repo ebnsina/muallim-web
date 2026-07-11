@@ -7,6 +7,7 @@
 		ArrowRight01Icon,
 		Clock01Icon,
 		Delete02Icon,
+		Message01Icon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -14,6 +15,7 @@
 		Badge,
 		Breadcrumbs,
 		Button,
+		Card,
 		HighlightableText,
 		Icon,
 		LessonIcon,
@@ -82,6 +84,11 @@
 	function minutes(seconds: number): number {
 		return Math.round(seconds / 60);
 	}
+
+	// The discussion. Which question's answer box is open, and a date formatter the
+	// threads share.
+	let answering = $state<string | null>(null);
+	const postedOn = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 	/*
 		The course flattened to one ordered run, so "the lesson before this one" and
@@ -377,6 +384,149 @@
 								{/each}
 							</ul>
 						</div>
+					{/if}
+				</section>
+			{/if}
+
+			<!--
+				The public discussion. Shared with everyone studying the course, unlike the
+				private note above. Only a signed-in reader who may read the lesson sees it —
+				the API returns an empty thread otherwise.
+			-->
+			{#if data.signedIn}
+				<section class="mt-14 max-w-2xl">
+					<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
+						<Icon icon={Message01Icon} class="size-4" />
+						Discussion
+					</h2>
+
+					<form method="POST" action="?/askQuestion" class="mt-4" use:enhance>
+						<Textarea
+							name="body"
+							rows={2}
+							maxlength={5000}
+							aria-label="Ask a question"
+							placeholder="Ask a question about this lesson…"
+						/>
+						<div class="mt-2 flex items-center gap-3">
+							<Button type="submit" size="sm">Ask</Button>
+							{#if form?.qaMessage}
+								<span class="text-xs text-danger-text" role="alert">{form.qaMessage}</span>
+							{/if}
+						</div>
+					</form>
+
+					{#if data.questions.length > 0}
+						<ul class="mt-6 space-y-4">
+							{#each data.questions as question (question.id)}
+								<li>
+									<Card class="p-5">
+										<div class="flex items-start justify-between gap-3">
+											<div class="min-w-0">
+												<p class="text-sm whitespace-pre-wrap">{question.body}</p>
+												<p class="text-muted mt-1.5 text-xs">
+													{question.author_name || 'A learner'} ·
+													<span class="numeral"
+														>{postedOn.format(new Date(question.created_at))}</span
+													>
+												</p>
+											</div>
+											{#if question.mine || data.canModerate}
+												<form method="POST" action="?/deleteQuestion" use:enhance>
+													<input type="hidden" name="id" value={question.id} />
+													<button
+														type="submit"
+														class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+														aria-label="Remove this question"
+													>
+														<Icon icon={Delete02Icon} class="size-4" />
+													</button>
+												</form>
+											{/if}
+										</div>
+
+										<!-- Answers, oldest first, an instructor's badged. -->
+										{#if (question.answers ?? []).length > 0}
+											<ul class="mt-4 space-y-3 border-l-2 border-border pl-4">
+												{#each question.answers ?? [] as answer (answer.id)}
+													<li class="flex items-start justify-between gap-3">
+														<div class="min-w-0">
+															<p class="text-sm whitespace-pre-wrap">{answer.body}</p>
+															<p class="text-muted mt-1.5 flex items-center gap-2 text-xs">
+																<span>{answer.author_name || 'A learner'}</span>
+																{#if answer.by_instructor}
+																	<Badge tone="accent">Instructor</Badge>
+																{/if}
+																<span class="numeral"
+																	>{postedOn.format(new Date(answer.created_at))}</span
+																>
+															</p>
+														</div>
+														{#if answer.mine || data.canModerate}
+															<form method="POST" action="?/deleteAnswer" use:enhance>
+																<input type="hidden" name="id" value={answer.id} />
+																<button
+																	type="submit"
+																	class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+																	aria-label="Remove this answer"
+																>
+																	<Icon icon={Delete02Icon} class="size-4" />
+																</button>
+															</form>
+														{/if}
+													</li>
+												{/each}
+											</ul>
+										{/if}
+
+										<!-- Reply. The box opens in place so the thread stays where it is. -->
+										{#if answering === question.id}
+											<form
+												method="POST"
+												action="?/answerQuestion"
+												class="mt-4"
+												use:enhance={() => {
+													return async ({ update }) => {
+														await update();
+														answering = null;
+													};
+												}}
+											>
+												<input type="hidden" name="question_id" value={question.id} />
+												<Textarea
+													name="body"
+													rows={2}
+													maxlength={5000}
+													aria-label="Write an answer"
+													placeholder="Write an answer…"
+												/>
+												<div class="mt-2 flex items-center gap-2">
+													<Button type="submit" size="sm">Post answer</Button>
+													<Button
+														type="button"
+														variant="ghost"
+														size="sm"
+														onclick={() => (answering = null)}
+													>
+														Cancel
+													</Button>
+												</div>
+											</form>
+										{:else}
+											<button
+												type="button"
+												class="text-muted hover:text-text mt-3 text-xs font-medium transition-colors"
+												onclick={() => (answering = question.id)}
+											>
+												Answer
+											</button>
+										{/if}
+									</Card>
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="text-muted mt-4 text-sm">No questions yet. Be the first to ask.</p>
 					{/if}
 				</section>
 			{/if}

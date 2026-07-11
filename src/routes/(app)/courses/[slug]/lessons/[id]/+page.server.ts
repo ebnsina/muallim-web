@@ -20,6 +20,11 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 				params: { path: { id: params.id } }
 			})
 		: null;
+	const questionsRequest = locals.accessToken
+		? authedApi(url.origin, locals.accessToken).GET('/v1/lessons/{id}/questions', {
+				params: { path: { id: params.id } }
+			})
+		: null;
 
 	const { data, error: problem, response } = await contentRequest;
 
@@ -33,15 +38,22 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	// The margin — note and marks — that fails to load is not worth failing the
 	// lesson over: the reader came to read, not to annotate. It falls back to empty,
 	// and writing still works.
-	const [noteResult, highlightsResult] = await Promise.all([noteRequest, highlightsRequest]);
+	const [noteResult, highlightsResult, questionsResult] = await Promise.all([
+		noteRequest,
+		highlightsRequest,
+		questionsRequest
+	]);
 
 	return {
 		lesson: data.lesson,
 		access: data.access,
 		slug: params.slug,
 		signedIn: Boolean(locals.accessToken),
+		// An author of the course may moderate the discussion — remove any post.
+		canModerate: data.access === 'author',
 		note: noteResult?.data?.note.body ?? '',
-		highlights: highlightsResult?.data?.highlights ?? []
+		highlights: highlightsResult?.data?.highlights ?? [],
+		questions: questionsResult?.data?.questions ?? []
 	};
 };
 
@@ -171,5 +183,81 @@ export const actions: Actions = {
 		}
 
 		return { highlightDeleted: true };
+	},
+
+	/** Ask a question on the lesson. The API refuses one you may not read. */
+	askQuestion: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const body = String((await request.formData()).get('body') ?? '').trim();
+		if (!body) return fail(400, { qaMessage: 'Write your question first.' });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/lessons/{id}/questions',
+			{ params: { path: { id: params.id } }, body: { body } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				qaMessage: problemMessage(problem, 'Could not post your question.')
+			});
+		}
+		return { asked: true };
+	},
+
+	/** Answer a question, by its id. */
+	answerQuestion: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const questionId = String(form.get('question_id') ?? '');
+		const body = String(form.get('body') ?? '').trim();
+		if (!body) return fail(400, { qaMessage: 'Write your answer first.' });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/lesson-questions/{id}/answers',
+			{ params: { path: { id: questionId } }, body: { body } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				qaMessage: problemMessage(problem, 'Could not post your answer.')
+			});
+		}
+		return { answered: true };
+	},
+
+	deleteQuestion: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const id = String((await request.formData()).get('id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/lesson-questions/{id}',
+			{ params: { path: { id } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				qaMessage: problemMessage(problem, 'Could not remove that question.')
+			});
+		}
+	},
+
+	deleteAnswer: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const id = String((await request.formData()).get('id') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/lesson-answers/{id}',
+			{ params: { path: { id } } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				qaMessage: problemMessage(problem, 'Could not remove that answer.')
+			});
+		}
 	}
 };
