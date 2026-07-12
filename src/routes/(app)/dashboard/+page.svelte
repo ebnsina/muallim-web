@@ -150,7 +150,111 @@
 		</Alert>
 	{/if}
 
-	<div class="mt-8 grid gap-8 lg:grid-cols-3">
+	<!--
+		The summary first, then the work.
+	
+		A learner arriving wants to know where they stand before they are asked to
+		pick something up — and the numbers are three lines, where the courses are
+		the rest of the page. The order was the other way round because the aside
+		happened to be an aside, which is a layout deciding an argument it should
+		not have been in.
+	-->
+	<div class="mt-8 grid gap-6 lg:grid-cols-2">
+		<!-- On the side, where a summary belongs: it is read, not worked in. -->
+		<Card surface="sunken" class="p-5">
+			<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+
+			<!--
+					What became of every course this learner started — three states of one
+					whole, so they are drawn as parts of one rather than as three tiles that
+					happen to sit together. Hovering a row lights its slice and hovering a
+					slice lights its row: one bound value, so the two cannot disagree.
+				-->
+			<div class="mt-5 flex items-center gap-5">
+				<Donut segments={courseMix} centreLabel="courses" bind:hovered size={132} />
+
+				{#if data.enrolments.length === 0}
+					<p class="text-muted min-w-0 flex-1 text-sm">
+						Nothing yet. Enrol on a course and this fills itself in.
+					</p>
+				{:else}
+					<div class="min-w-0 flex-1">
+						<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
+					</div>
+				{/if}
+			</div>
+
+			<dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-5">
+				{#each STATS as stat (stat.label)}
+					<div>
+						<dt class="text-muted flex items-center gap-2 text-xs">
+							<span
+								class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
+							>
+								<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
+							</span>
+							{stat.label}
+						</dt>
+						<dd class="numeral mt-2 text-2xl font-semibold tracking-tight">{stat.value}</dd>
+					</div>
+				{/each}
+			</dl>
+		</Card>
+
+		<!-- Points, rank, and badges — a nudge to keep going. -->
+		{#if data.gamification}
+			{@const g = data.gamification}
+			<Card surface="sunken" class="p-5">
+				<div class="flex items-baseline justify-between gap-3">
+					<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
+					<a
+						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
+						href={resolve('/leaderboard')}
+					>
+						Leaderboard
+					</a>
+				</div>
+
+				<div class="mt-4 flex items-baseline gap-3">
+					<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
+					<span class="text-muted text-sm">points</span>
+					{#if g.out_of > 0}
+						<span class="text-muted ml-auto text-sm">
+							Rank <span class="numeral">{g.rank}</span> of
+							<span class="numeral">{g.out_of}</span>
+						</span>
+					{/if}
+				</div>
+
+				<ul class="mt-5 space-y-2">
+					{#each g.badges as badge (badge.code)}
+						<li
+							class={cn(
+								'flex items-center gap-2.5 text-sm',
+								badge.earned ? 'text-text' : 'text-muted/60'
+							)}
+						>
+							<span
+								class={cn(
+									'flex size-6 shrink-0 items-center justify-center rounded-full',
+									badge.earned ? 'bg-accent-surface text-accent-text' : 'bg-surface-sunken'
+								)}
+							>
+								<Icon icon={Award01Icon} class="size-3.5" strokeWidth={2} />
+							</span>
+							<span class="min-w-0">
+								<span class="font-medium">{badge.name}</span>
+								<span class="text-muted block text-xs">{badge.description}</span>
+							</span>
+						</li>
+					{/each}
+				</ul>
+			</Card>
+		{/if}
+	</div>
+
+	<div class="mt-10 grid gap-8 lg:grid-cols-3">
+		<!-- ================================================= learning (main) -->
 		<!-- ===================================================== learning (main) -->
 		<div class="lg:col-span-2">
 			<h2 class="text-lg font-semibold">Continue learning</h2>
@@ -311,100 +415,8 @@
 			{/if}
 		</div>
 
-		<!-- =================================================== summary (aside) -->
+		<!-- =============================================== teaching (aside) -->
 		<aside class="space-y-8">
-			<!-- On the side, where a summary belongs: it is read, not worked in. -->
-			<Card surface="sunken" class="p-5">
-				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
-
-				<!--
-					What became of every course this learner started — three states of one
-					whole, so they are drawn as parts of one rather than as three tiles that
-					happen to sit together. Hovering a row lights its slice and hovering a
-					slice lights its row: one bound value, so the two cannot disagree.
-				-->
-				<div class="mt-5 flex items-center gap-5">
-					<Donut segments={courseMix} centreLabel="courses" bind:hovered size={132} />
-
-					{#if data.enrolments.length === 0}
-						<p class="text-muted min-w-0 flex-1 text-sm">
-							Nothing yet. Enrol on a course and this fills itself in.
-						</p>
-					{:else}
-						<div class="min-w-0 flex-1">
-							<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
-						</div>
-					{/if}
-				</div>
-
-				<dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-5">
-					{#each STATS as stat (stat.label)}
-						<div>
-							<dt class="text-muted flex items-center gap-2 text-xs">
-								<span
-									class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
-								>
-									<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
-								</span>
-								{stat.label}
-							</dt>
-							<dd class="numeral mt-2 text-2xl font-semibold tracking-tight">{stat.value}</dd>
-						</div>
-					{/each}
-				</dl>
-			</Card>
-
-			<!-- Points, rank, and badges — a nudge to keep going. -->
-			{#if data.gamification}
-				{@const g = data.gamification}
-				<Card surface="sunken" class="p-5">
-					<div class="flex items-baseline justify-between gap-3">
-						<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
-						<a
-							class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
-							href={resolve('/leaderboard')}
-						>
-							Leaderboard
-						</a>
-					</div>
-
-					<div class="mt-4 flex items-baseline gap-3">
-						<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
-						<span class="text-muted text-sm">points</span>
-						{#if g.out_of > 0}
-							<span class="text-muted ml-auto text-sm">
-								Rank <span class="numeral">{g.rank}</span> of
-								<span class="numeral">{g.out_of}</span>
-							</span>
-						{/if}
-					</div>
-
-					<ul class="mt-5 space-y-2">
-						{#each g.badges as badge (badge.code)}
-							<li
-								class={cn(
-									'flex items-center gap-2.5 text-sm',
-									badge.earned ? 'text-text' : 'text-muted/60'
-								)}
-							>
-								<span
-									class={cn(
-										'flex size-6 shrink-0 items-center justify-center rounded-full',
-										badge.earned ? 'bg-accent-surface text-accent-text' : 'bg-surface-sunken'
-									)}
-								>
-									<Icon icon={Award01Icon} class="size-3.5" strokeWidth={2} />
-								</span>
-								<span class="min-w-0">
-									<span class="font-medium">{badge.name}</span>
-									<span class="text-muted block text-xs">{badge.description}</span>
-								</span>
-							</li>
-						{/each}
-					</ul>
-				</Card>
-			{/if}
-
 			{#if canAuthor}
 				<section>
 					<div class="flex items-baseline justify-between gap-3">

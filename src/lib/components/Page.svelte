@@ -21,14 +21,12 @@
 		wide: 'max-w-5xl',
 
 		/*
-			`full` means full. It used to mean `max-w-7xl`, which is a fourth width
-			wearing a third one's name — and on a 1440 screen it left the board and the
-			dashboard boxed in the middle of a sheet that runs to both edges.
-
-			A page that wants a measure asks for `prose` or `wide`. This one is for the
-			pages built out of columns, which want the window.
+			`full` is the widest of the three, not the window. The sheet under it runs to
+			both edges; the page on it keeps a gutter, because text with none runs into
+			the window and a line 1400px long is a line nobody can find their way back
+			across.
 		*/
-		full: 'max-w-none'
+		full: 'max-w-7xl'
 	};
 </script>
 

@@ -5,8 +5,10 @@
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
 	import {
+		Award01Icon,
 		BookOpen01Icon,
 		Cancel01Icon,
+		ChampionIcon,
 		Menu01Icon,
 		Mortarboard02Icon,
 		Notification02Icon,
@@ -21,15 +23,28 @@
 	import Icon from './Icon.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
+	type Notice = {
+		id: string;
+		title: string;
+		body: string;
+		link: string;
+		read: boolean;
+		created_at: string;
+	};
+
 	type Props = {
 		user?: { name: string; email: string; role: string };
 		/** Shown only to somebody who may author. Hiding it is a courtesy, not a control. */
 		canAuthor?: boolean;
 		/** Unread notification count for the bell badge. */
 		unread?: number;
+		/** The few notices behind the bell. Loaded with the page; see the layout. */
+		notifications?: Notice[];
 	};
 
-	let { user, canAuthor = false, unread = 0 }: Props = $props();
+	let { user, canAuthor = false, unread = 0, notifications = [] }: Props = $props();
+
+	const noticeDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 	type Tab = { href: string; label: string; icon: IconSvgElement; show: boolean };
 
@@ -49,7 +64,19 @@
 					icon: UserGroupIcon,
 					show: Boolean(user)
 				},
-				{ href: resolve('/teach'), label: 'Teach', icon: TeachingIcon, show: canAuthor }
+				{ href: resolve('/teach'), label: 'Teach', icon: TeachingIcon, show: canAuthor },
+				{
+					href: resolve('/certificates'),
+					label: 'Certificates',
+					icon: Award01Icon,
+					show: Boolean(user)
+				},
+				{
+					href: resolve('/leaderboard'),
+					label: 'Leaderboard',
+					icon: ChampionIcon,
+					show: Boolean(user)
+				}
 			] satisfies Tab[]
 		).filter((link) => link.show)
 	);
@@ -77,6 +104,11 @@
 	let accountOpen = $state(false);
 	let accountRef = $state<HTMLElement>();
 
+	// The bell's panel. Its own flag and its own element, so opening one menu does not
+	// silently close the other and leave a reader wondering what they pressed.
+	let bellOpen = $state(false);
+	let bellRef = $state<HTMLElement>();
+
 	// A menu that opens on a click closes on a click anywhere else, and on Escape —
 	// the two ways anyone expects to dismiss one. The toggle button lives inside
 	// `accountRef`, so its own click is not counted as "outside".
@@ -84,9 +116,15 @@
 		if (accountOpen && accountRef && !accountRef.contains(event.target as Node)) {
 			accountOpen = false;
 		}
+		if (bellOpen && bellRef && !bellRef.contains(event.target as Node)) {
+			bellOpen = false;
+		}
 	}
 	function onWindowKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape') accountOpen = false;
+		if (event.key === 'Escape') {
+			accountOpen = false;
+			bellOpen = false;
+		}
 	}
 
 	/*
@@ -100,6 +138,7 @@
 	afterNavigate(() => {
 		open = false;
 		accountOpen = false;
+		bellOpen = false;
 	});
 </script>
 
@@ -153,24 +192,92 @@
 		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			{#if user}
 				<!--
-					The bell. A link to the notifications page rather than a dropdown — one
-					place notices live, reachable on a phone too. The badge caps at 9+ so a
-					busy count does not stretch the bar.
+					The bell, and the few notices behind it.
+
+					It was a link to the notifications page. A person glancing at a badge wants
+					to know what it is *for*, and making them leave the page they are on to find
+					out is the reason nobody read them. The page is still there, at the bottom of
+					the panel, for everything the panel does not hold.
 				-->
-				<a
-					href={resolve('/notifications')}
-					class="relative rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none"
-					aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
-				>
-					<Icon icon={Notification02Icon} class="size-5" />
-					{#if unread > 0}
-						<span
-							class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-surface-raised px-1 text-[0.65rem] leading-4 font-semibold text-accent-text"
+				<div class="relative" bind:this={bellRef}>
+					<button
+						type="button"
+						class="relative rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none"
+						aria-haspopup="menu"
+						aria-expanded={bellOpen}
+						aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+						onclick={() => (bellOpen = !bellOpen)}
+					>
+						<Icon icon={Notification02Icon} class="size-5" />
+						{#if unread > 0}
+							<!-- On a solid band the badge inverts: the accent that made it stand out
+							     on a white bar is the colour it is now standing on. -->
+							<span
+								class="numeral absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-surface-raised px-1 text-[0.65rem] leading-4 font-semibold text-accent-text"
+							>
+								{unread > 9 ? '9+' : unread}
+							</span>
+						{/if}
+					</button>
+
+					{#if bellOpen}
+						<div
+							role="menu"
+							aria-label="Notifications"
+							class="absolute right-0 mt-2 w-80 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 text-text shadow-card"
+							transition:popover
 						>
-							{unread > 9 ? '9+' : unread}
-						</span>
+							{#if notifications.length === 0}
+								<p class="text-muted px-3 py-6 text-center text-sm">Nothing to read.</p>
+							{:else}
+								<ul class="max-h-80 overflow-y-auto overscroll-contain">
+									{#each notifications as notice (notice.id)}
+										<li>
+											<a
+												href={notice.link || resolve('/notifications')}
+												class="block rounded-control px-2.5 py-2 transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+											>
+												<div class="flex items-start gap-2">
+													<!-- The unread dot, because "unread" is a state and a state that
+													     only bold type carries is a state a tired eye misses. -->
+													<span
+														class={cn(
+															'mt-1.5 size-1.5 shrink-0 rounded-full',
+															notice.read ? 'bg-transparent' : 'bg-accent'
+														)}
+													></span>
+
+													<div class="min-w-0">
+														<p
+															class={cn(
+																'truncate text-sm',
+																notice.read ? 'text-muted' : 'font-medium'
+															)}
+														>
+															{notice.title}
+														</p>
+														<p class="text-muted numeral mt-0.5 text-xs">
+															{noticeDate.format(new Date(notice.created_at))}
+														</p>
+													</div>
+												</div>
+											</a>
+										</li>
+									{/each}
+								</ul>
+
+								<div class="mt-1 border-t border-border pt-1">
+									<a
+										href={resolve('/notifications')}
+										class="block rounded-control px-2.5 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+									>
+										All notifications
+									</a>
+								</div>
+							{/if}
+						</div>
 					{/if}
-				</a>
+				</div>
 
 				<!--
 					The account, behind its avatar. Who you are and how you stop being them —
@@ -197,7 +304,7 @@
 						<div
 							role="menu"
 							aria-label="Account"
-							class="absolute right-0 mt-2 w-60 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 shadow-lg"
+							class="absolute right-0 mt-2 w-60 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 text-text shadow-card"
 							transition:popover
 						>
 							<div class="px-2.5 py-2">

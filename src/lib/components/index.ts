@@ -49,4 +49,3 @@ export { default as Toaster } from './Toaster.svelte';
 export { default as Verdict, type VerdictKind } from './Verdict.svelte';
 export { default as Donut, type Segment } from './Donut.svelte';
 export { default as DonutLegend } from './DonutLegend.svelte';
-export { default as AppRail } from './AppRail.svelte';

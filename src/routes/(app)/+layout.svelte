@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppHeader, AppRail } from '$lib/components';
+	import { AppHeader } from '$lib/components';
 	import { canAuthor } from '$lib/roles';
 	import type { LayoutProps } from './$types';
 
@@ -30,22 +30,19 @@
 		user={data.user ?? undefined}
 		canAuthor={canAuthor(data.user)}
 		unread={data.unread ?? 0}
+		notifications={data.notifications ?? []}
 	/>
 
 	<!--
-		The rail sits inside the sheet, beside the page rather than above it: it is a
-		shortcut, not a section, and a signed-out visitor reading the catalogue has
-		nowhere it could take them. Hidden below `lg`, where the width is the page's.
-	-->
-	<div class="flex flex-1 gap-2 rounded-t-2xl bg-surface pl-4 lg:gap-4 lg:pl-6">
-		{#if data.user}
-			<div class="hidden pt-6 lg:block">
-				<AppRail />
-			</div>
-		{/if}
+		One navigation, in the band. A rail beside the page offering the same places was
+		two navigations disagreeing about which is the way to them — so the destinations
+		went up into the band and the rail went away.
 
-		<div class="min-w-0 flex-1">
-			{@render children()}
-		</div>
+		The sheet still runs edge to edge; the page inside it does not. Text with no
+		gutter runs into the window, and a line of it 1400px long is a line nobody can
+		find their way back across.
+	-->
+	<div class="flex-1 rounded-t-2xl bg-surface">
+		{@render children()}
 	</div>
 </div>

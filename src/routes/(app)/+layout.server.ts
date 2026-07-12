@@ -16,14 +16,22 @@ import type { LayoutServerLoad } from './$types';
  * request per page for an answer that does not change between them.
  */
 export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
-	if (!locals.accessToken) return { user: null, unread: 0 };
+	if (!locals.accessToken) return { user: null, unread: 0, notifications: [] };
 
-	// The person and their unread bell count, together, for every page under this
-	// layout. Started as a pair so the count costs no extra round trip.
+	/*
+		The person, their unread count, and the few notices behind the bell — together,
+		for every page under this layout, and started as one batch so none of them costs
+		an extra round trip.
+
+		The list is loaded here rather than fetched when the bell is opened: it is six
+		rows, it arrives with the page anyway, and a dropdown that spins for a moment
+		before showing six rows is a dropdown that feels slower than the page it is on.
+	*/
 	const api = authedApi(url.origin, locals.accessToken);
-	const [me, unreadResult] = await Promise.all([
+	const [me, unreadResult, recent] = await Promise.all([
 		api.GET('/v1/me'),
-		api.GET('/v1/notifications/unread-count')
+		api.GET('/v1/notifications/unread-count'),
+		api.GET('/v1/notifications', { params: { query: { limit: 6 } } })
 	]);
 	const { data, response } = me;
 
@@ -37,8 +45,12 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	*/
 	if (response?.status === 401 || response?.status === 403) {
 		clearSession(cookies);
-		return { user: null, unread: 0 };
+		return { user: null, unread: 0, notifications: [] };
 	}
 
-	return { user: data?.user ?? null, unread: unreadResult.data?.unread ?? 0 };
+	return {
+		user: data?.user ?? null,
+		unread: unreadResult.data?.unread ?? 0,
+		notifications: recent.data?.notifications ?? []
+	};
 };
