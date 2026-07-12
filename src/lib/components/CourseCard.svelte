@@ -35,7 +35,15 @@
 	one thing the cover cannot: what the course is actually about, in prose.
 -->
 <TintCard {href} panelClass="overflow-hidden bg-surface-raised p-0">
-	<div class={cn('relative flex h-44 flex-col justify-end rounded-card p-4', cover)}>
+	<!--
+		The title at the top and the meta at the foot, with the light between them.
+
+		Bottom-aligned, the title moved: a one-line name sat where a two-line name's
+		second line went, so no two covers in a row agreed about where a course's name
+		is. It is the first thing read on every card, so it is in the same place on
+		every card, and the gradient is what fills the gap rather than the type.
+	-->
+	<div class={cn('relative flex h-56 flex-col rounded-card p-4', cover)}>
 		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
@@ -43,7 +51,7 @@
 			button on the aurora is glass: the accent is a blue chosen against white paper,
 			and on the brand's light it is a mark nobody sees.
 		-->
-		<div class="mt-2.5 flex items-center justify-between gap-3">
+		<div class="mt-auto flex items-center justify-between gap-3 pt-4">
 			<Difficulty level={difficulty} tone="inverse" />
 
 			{#if lessonCount != null}
