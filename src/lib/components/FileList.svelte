@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { slide } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import { Delete02Icon, Download01Icon, File01Icon } from '@hugeicons/core-free-icons';
-	import { DURATION } from '$lib/motion';
+	import { DURATION, easeOut } from '$lib/motion';
 	import { formatBytes } from '$lib/upload';
 	import { toast } from '$lib/toast.svelte';
 	import Icon from './Icon.svelte';
@@ -34,7 +33,7 @@
 	{#each files as file (file.id)}
 		<li
 			class="flex items-center gap-3 px-4 py-3"
-			transition:slide={{ duration: DURATION.instant, easing: cubicOut }}
+			transition:slide={{ duration: DURATION.instant, easing: easeOut }}
 		>
 			<Icon icon={File01Icon} class="size-4 shrink-0 text-muted" />
 

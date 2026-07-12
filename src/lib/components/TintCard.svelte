@@ -19,11 +19,23 @@
 
 	const lifts = $derived(interactive ?? href != null);
 
+	/*
+		`motion-safe:` on both transforms, so a reduced-motion reader gets a card that
+		simply does not move — rather than one that jumps, which is what a killed
+		transition on a live `:hover` transform leaves behind.
+
+		The press is a hair under the resting size while the hover is a hair over, so
+		clicking a raised card pushes it back *through* its own resting state. That is
+		the direction a physical thing moves when you press it, and getting the sign
+		wrong is what makes a card feel like it is fleeing the cursor.
+	*/
 	const frame = $derived(
 		cn(
 			'group flex h-full flex-col rounded-2xl border border-border/60 bg-surface-raised p-1',
 			lifts &&
-				'transition-transform duration-200 ease-out hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+				'transition-transform duration-(--duration-base) ease-out ' +
+					'motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.99] ' +
+					'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
 			className
 		)
 	);

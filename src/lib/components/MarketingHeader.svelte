@@ -38,11 +38,26 @@
 					)}
 				>
 					Solutions
-					<Icon icon={ArrowDown01Icon} class="size-4 transition-transform group-hover:rotate-180" />
+					<Icon
+						icon={ArrowDown01Icon}
+						class="size-4 transition-transform duration-(--duration-base) ease-out group-hover:rotate-180"
+					/>
 				</button>
 
+				<!--
+					The panel scales open from the corner it hangs off — `origin-top-left`, under
+					the trigger's left edge — rather than swelling from its own middle. A popover
+					that grows from its centre is a popover that came from nowhere in particular;
+					one that grows from its trigger is the trigger opening.
+
+					And it starts at 95%, not at nothing, and not at a bare opacity fade: an
+					element that only fades has no physical account of where it came from.
+				-->
 				<div
-					class="invisible absolute top-full left-0 w-80 pt-2 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100"
+					class="invisible absolute top-full left-0 w-80 origin-top-left scale-95 pt-2 opacity-0
+					       transition-[opacity,scale,visibility] duration-(--duration-base) ease-out
+					       group-hover:visible group-hover:scale-100 group-hover:opacity-100
+					       group-focus-within:visible group-focus-within:scale-100 group-focus-within:opacity-100"
 				>
 					<div class="rounded-overlay border border-border bg-surface-raised p-2 shadow-lg">
 						{#each SEGMENTS as s (s.slug)}

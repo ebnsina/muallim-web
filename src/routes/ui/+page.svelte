@@ -34,6 +34,14 @@
 		type ButtonVariant
 	} from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
+	import {
+		DURATION,
+		DURATION_USE,
+		EASE,
+		EASE_STOCK_OUT,
+		EASE_USE,
+		type EaseName
+	} from '$lib/motion';
 
 	const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger'];
 	const SIZES: ButtonSize[] = ['sm', 'md', 'lg'];
@@ -69,6 +77,52 @@
 	let toastCount = $state(0);
 
 	const TOAST_TONES = ['info', 'success', 'warning', 'danger'] as const;
+
+	/*
+		Motion, rendered from `$lib/motion` rather than restated here. The gallery is
+		only worth having if it cannot disagree with the components.
+	*/
+
+	// Longer than any real UI animation, on purpose: at 180ms two curves are the same
+	// blur. A demo is explanatory, and explanatory is allowed to take its time.
+	const DEMO_MS = 900;
+
+	const DEMOS = [
+		...(Object.keys(EASE) as EaseName[]).map((name) => ({
+			token: EASE_USE[name].token,
+			use: EASE_USE[name].use,
+			curve: EASE[name],
+			stock: false
+		})),
+		{
+			token: "Tailwind's stock ease-out",
+			use: 'replaced — decelerates politely, lands soft',
+			curve: EASE_STOCK_OUT,
+			stock: true
+		}
+	];
+
+	const DURATIONS = (Object.keys(DURATION) as (keyof typeof DURATION)[]).map((name) => ({
+		name,
+		ms: DURATION[name],
+		use: DURATION_USE[name]
+	}));
+
+	// The rail's width is measured so the dot lands on its end rather than near it.
+	let rail = $state(0);
+	let playing = $state(false);
+	let motionDemo = $state(false);
+
+	// Two frames: one to put the dot back at the start with no transition running, one
+	// to let the browser commit that before the new value retargets it.
+	function replay() {
+		playing = false;
+		requestAnimationFrame(() => requestAnimationFrame(() => (playing = true)));
+	}
+
+	$effect(() => {
+		replay();
+	});
 </script>
 
 <svelte:head><title>Design system — Muallim</title></svelte:head>
@@ -428,6 +482,112 @@
 					<span class="numeral text-muted">12 of 12 lessons · 100%</span>
 				</div>
 				<Progress value={12} max={12} tone="success" label="Course complete" />
+			</div>
+		</Card>
+	</section>
+
+	<!-- ---------------------------------------------------------------- motion -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Motion</h2>
+		<p class="mt-1 max-w-2xl text-sm text-muted">
+			Every curve and duration in the app comes from <code class="text-sm">$lib/motion</code> and
+			the matching
+			<code class="text-sm">--ease-*</code>
+			/ <code class="text-sm">--duration-*</code> tokens. This section is rendered
+			<em>from those objects</em>, not from a copy of them, so it cannot drift from what the
+			components actually use.
+		</p>
+
+		<!-- The curves. Each row animates on the token it is naming, so the difference
+		     between them is watched rather than read. -->
+		<Card class="mt-6 p-6">
+			<div class="flex flex-wrap items-baseline justify-between gap-3">
+				<h3 class="font-medium">Curves</h3>
+				<Button variant="secondary" size="sm" onclick={replay}>Replay</Button>
+			</div>
+
+			<p class="mt-1 text-sm text-muted">
+				Built-in easings are too weak to read as deliberate, so <code class="text-sm"
+					>--ease-out</code
+				>
+				overwrites Tailwind's. The last row is the one it replaced — the same
+				<span class="numeral">{DEMO_MS}ms</span>, and it lands like an apology. Never
+				<code class="text-sm">ease-in</code> on UI: it withholds the frames the eye is on.
+			</p>
+
+			<ul class="mt-5 space-y-5">
+				{#each DEMOS as demo (demo.token)}
+					<li>
+						<div class="flex flex-wrap items-baseline justify-between gap-x-3">
+							<code class="text-sm {demo.stock ? 'text-muted line-through' : 'text-accent-text'}">
+								{demo.token}
+							</code>
+							<span class="text-xs text-muted">{demo.use}</span>
+						</div>
+
+						<!-- Travel is measured, not guessed, so the dot lands exactly at the end of
+						     the rail. `translate` (not `left`) keeps it on the GPU. -->
+						<div
+							bind:clientWidth={rail}
+							class="relative mt-2 h-8 rounded-control border border-border bg-surface-sunken"
+						>
+							<span
+								class="absolute top-1/2 left-1 size-6 -translate-y-1/2 rounded-full
+								       {demo.stock ? 'bg-border-strong' : 'bg-accent'}"
+								style="translate: {playing ? Math.max(0, rail - 32) : 0}px 0;
+								       transition: translate {DEMO_MS}ms {demo.curve};"
+							></span>
+						</div>
+
+						<code class="mt-1.5 block text-xs text-muted">{demo.curve}</code>
+					</li>
+				{/each}
+			</ul>
+		</Card>
+
+		<!-- The durations, straight out of DURATION. -->
+		<Card class="mt-4 p-6">
+			<h3 class="font-medium">Durations</h3>
+			<p class="mt-1 text-sm text-muted">
+				Anything a person is waiting on stays under <span class="numeral">200ms</span>; nothing on a
+				UI surface goes past <span class="numeral">300ms</span>. In CSS these are reached as
+				<code class="text-sm">duration-(--duration-base)</code> — the
+				<code class="text-sm">--duration-*</code> namespace mints no utility of its own.
+			</p>
+
+			<dl class="mt-5 space-y-3">
+				{#each DURATIONS as d (d.name)}
+					<div
+						class="flex flex-wrap items-baseline gap-x-3 border-b border-border pb-3 last:border-0"
+					>
+						<dt class="w-40 shrink-0">
+							<code class="text-sm text-accent-text">--duration-{d.name}</code>
+						</dt>
+						<dd class="numeral w-16 shrink-0 text-sm font-medium">{d.ms}ms</dd>
+						<dd class="min-w-0 flex-1 text-sm text-muted">{d.use}</dd>
+					</div>
+				{/each}
+			</dl>
+		</Card>
+
+		<!-- Feedback. The components below are the live ones — nothing here is a mock. -->
+		<Card class="mt-4 p-6">
+			<h3 class="font-medium">Feedback</h3>
+			<p class="mt-1 text-sm text-muted">
+				Press these. A control that does not move under the pointer is a control the interface never
+				admitted to hearing. Every one of them is the real component, gated behind
+				<code class="text-sm">motion-safe</code>, so a reader who asked for less motion keeps the
+				colour and loses the movement.
+			</p>
+
+			<div class="mt-5 flex flex-wrap items-center gap-3">
+				<Button>Primary</Button>
+				<Button variant="secondary">Secondary</Button>
+				<Button loading>Working</Button>
+				<label class="ml-2 flex items-center gap-2 text-sm">
+					<Checkbox checked={motionDemo} onchange={() => (motionDemo = !motionDemo)} />
+					Tick settles in from 90%
+				</label>
 			</div>
 		</Card>
 	</section>

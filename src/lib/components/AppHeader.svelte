@@ -4,7 +4,6 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import {
 		BookOpen01Icon,
 		Cancel01Icon,
@@ -16,7 +15,7 @@
 		DashboardSquare01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { IconSvgElement } from '@hugeicons/svelte';
-	import { DURATION } from '$lib/motion';
+	import { DURATION, easeOut, popover } from '$lib/motion';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
@@ -166,7 +165,7 @@
 							role="menu"
 							aria-label="Account"
 							class="absolute right-0 mt-2 w-60 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 shadow-lg"
-							transition:slide={{ duration: DURATION.instant, easing: cubicOut }}
+							transition:popover
 						>
 							<div class="px-2.5 py-2">
 								<p class="truncate text-sm font-medium">{user.name}</p>
@@ -252,7 +251,7 @@
 		<div
 			id="mobile-nav"
 			class="border-t border-border bg-surface sm:hidden"
-			transition:slide={{ duration: DURATION.instant, easing: cubicOut }}
+			transition:slide={{ duration: DURATION.instant, easing: easeOut }}
 		>
 			<nav aria-label="Main" class="flex flex-col p-3">
 				{#each links as link (link.href)}

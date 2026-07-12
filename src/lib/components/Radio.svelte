@@ -18,7 +18,13 @@
 
 	The dot is a circle, so it is a rounded span and not an icon.
 -->
-<span class={cn('relative inline-grid size-[18px] shrink-0 place-items-center', className)}>
+<span
+	class={cn(
+		'relative inline-grid size-[18px] shrink-0 place-items-center',
+		'transition-transform duration-(--duration-press) ease-out motion-safe:active:scale-95',
+		className
+	)}
+>
 	<input
 		type="radio"
 		class="peer col-start-1 row-start-1 size-full cursor-pointer appearance-none rounded-full
@@ -27,7 +33,11 @@
 		       disabled:cursor-not-allowed disabled:opacity-50"
 		{...rest}
 	/>
+	<!-- Settles in from 90%, never from zero. The hand-written list names `scale`
+	     rather than `transform`, for the reason spelled out in Checkbox. -->
 	<span
-		class="pointer-events-none col-start-1 row-start-1 size-2 rounded-full bg-accent opacity-0 peer-checked:opacity-100"
+		class="pointer-events-none col-start-1 row-start-1 size-2 scale-90 rounded-full bg-accent
+		       opacity-0 transition-[opacity,scale] duration-(--duration-instant) ease-out
+		       peer-checked:scale-100 peer-checked:opacity-100"
 	></span>
 </span>

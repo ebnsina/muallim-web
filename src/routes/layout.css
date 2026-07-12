@@ -99,6 +99,61 @@
 		https://baymard.com/blog/line-length-readability
 	*/
 	--container-prose: 65ch;
+
+	/*
+		Motion.
+
+		`--ease-out` and `--ease-in-out` overwrite Tailwind's own, so an `ease-out`
+		written anywhere in the app resolves to the strong curve. The built-in ones
+		(`cubic-bezier(0, 0, 0.2, 1)`) are too weak to read as deliberate: they
+		decelerate politely and land soft, which is why stock Tailwind motion feels
+		like nothing in particular.
+
+		But overwriting those two is not enough on its own, and believing otherwise is
+		the trap. Tailwind compiles every `transition-*` utility to
+		`transition-timing-function: var(--tw-ease, var(--default-transition-timing-function))`
+		— and `--tw-ease` is only set when the markup carries an explicit `ease-*`
+		class. Almost nothing does: a bare `transition-colors` is the norm, and all of
+		those were still landing on Tailwind's untouched default. Re-pointing
+		`--default-transition-timing-function` is what actually moves the app, and the
+		two lines above only cover the handful that name a curve.
+
+		Never `ease-in` on a UI element. It withholds movement for the first few
+		frames — precisely the frames the eye is on — so the same 200ms *feels* slower.
+	*/
+	--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+	--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+	--default-transition-timing-function: var(--ease-out);
+}
+
+/*
+	The durations, and they are deliberately *not* in `@theme`.
+
+	`--ease-*` is a Tailwind theme namespace, so putting a curve there mints an
+	`ease-*` utility. `--duration-*` is not one — the namespace list stops at
+	`--ease-*` and `--animate-*` — so a `--duration-press` token in `@theme` mints
+	nothing, and `class="duration-press"` compiles to no CSS at all. Silently: the
+	class is simply dropped, the transition falls back to Tailwind's 150ms default,
+	and everything still looks approximately right. This was written that way once
+	and only the built stylesheet gave it away.
+
+	So they live in `:root` as plain custom properties, where nothing tree-shakes
+	them, and the markup reaches them through v4's custom-property syntax:
+	`duration-(--duration-press)`. Mirrors `DURATION` in `$lib/motion` — the same
+	numbers, one set for CSS and one for the transitions Svelte drives in JS.
+
+	Anything a person is waiting on stays under 200ms; nothing on a UI surface goes
+	past 300ms.
+*/
+:root {
+	--duration-press: 140ms;
+	--duration-instant: 120ms;
+	--duration-base: 180ms;
+	--duration-slow: 260ms;
+
+	/* The one duration allowed past 300ms, and only because it is not UI: the
+	   marketing scroll reveal is explanatory, seen once, and nobody waits on it. */
+	--duration-reveal: 600ms;
 }
 
 @layer base {
@@ -224,8 +279,8 @@
 		opacity: 1;
 		transform: none;
 		transition:
-			opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
-			transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+			opacity var(--duration-reveal) var(--ease-out),
+			transform var(--duration-reveal) var(--ease-out);
 	}
 
 	/*
@@ -256,19 +311,37 @@
 		warms towards the brand — no shadow, because the rest of this system does not
 		use them and a hover state is a poor place to introduce one.
 	*/
+	/* One duration for a card lifting, wherever the card lives — `TintCard` uses the
+	   same token. Two cards that lift at different speeds is a system with an opinion
+	   it forgot it had. */
 	.lift {
 		transition:
-			transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
-			rotate 220ms cubic-bezier(0.16, 1, 0.3, 1),
-			border-color 220ms ease;
+			transform var(--duration-base) var(--ease-out),
+			rotate var(--duration-base) var(--ease-out),
+			border-color var(--duration-base) var(--ease-out);
 	}
 
-	/* Straighten on hover — a no-op for cards that were never tilted, and the
-	   settle for the ones the marketing grid rotates a touch. */
-	.lift:hover {
-		transform: translateY(-2px);
-		rotate: 0deg;
-		border-color: var(--b-6);
+	/* The colour half of the hover, which a reduced-motion reader still gets: a
+	   warming border is information, and information is not what they turned off. */
+	@media (hover: hover) and (pointer: fine) {
+		.lift:hover {
+			border-color: var(--b-6);
+		}
+	}
+
+	/*
+		And the moving half, which they do not. Gated on `hover: hover` as well
+		because a touch device fires `:hover` on tap and sticks there — the card
+		would lift and stay lifted under the finger that just left it.
+
+		Straightening is a no-op for cards that were never tilted, and the settle for
+		the ones the marketing grid rotates a touch.
+	*/
+	@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+		.lift:hover {
+			transform: translateY(-2px);
+			rotate: 0deg;
+		}
 	}
 
 	/* Fades the ends of a row, so names run off the edge rather than stopping at it. */
@@ -306,7 +379,7 @@
 				transparent 60%
 			);
 		opacity: 0;
-		transition: opacity 240ms ease;
+		transition: opacity var(--duration-slow) ease;
 	}
 
 	.card-aurora:hover::before {
@@ -361,14 +434,56 @@
 	}
 }
 
-/* Honour the user's motion preference rather than overriding it. */
+/*
+	Honour the user's motion preference rather than overriding it.
+
+	Reduced motion is *less* motion, not none. The usual snippet — the one this file
+	used to carry — collapses every transition to 0.01ms, which also throws away the
+	colour and opacity changes that were never the problem: a button that no longer
+	shades on hover, a tick that appears with no fade, an alert that snaps in. Those
+	do not move, and vestibular disorders are triggered by movement.
+
+	So instead of flattening the duration, this narrows the *property*: the moving
+	ones (transform, translate, rotate, scale, width, height) are dropped from every
+	transition, and the ones that only change appearance are kept. Keyframed animation
+	still collapses, because a keyframe cannot be filtered this way — and the aurora
+	and the marquee are pure movement.
+
+	The duration is deliberately NOT forced. `transition-duration` starts at `0s`, so
+	an element that declared no transition has none; pinning a duration on `*` would
+	*hand* one to every element in the document and leave the reduced-motion reader
+	the only person whose whole page cross-fades. Elements that opted into a
+	transition keep the duration they asked for, and the property list above is what
+	decides they may no longer move.
+
+	Transforms declared inside `motion-safe:` (Tailwind) or a
+	`prefers-reduced-motion: no-preference` block never apply here at all, so there is
+	no un-transitioned jump left behind where a hover-scale used to be.
+*/
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
 	*::after {
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
 		scroll-behavior: auto !important;
+
+		transition-property:
+			opacity, color, background-color, border-color, outline-color, fill, stroke !important;
+	}
+
+	/*
+		The spinner is the exception, and it has to be.
+
+		It is the only sighted evidence that a submit is in flight — the button keeps
+		its label, and `aria-busy` speaks to assistive tech alone. Collapsed to 0.01ms
+		it becomes a static broken ring: not "less motion" but "no answer". A small arc
+		rotating in place is not the translating, parallaxing motion that triggers
+		vestibular symptoms, so it keeps turning — just slower than the 0.6s it runs at
+		otherwise, because nobody here is being sold a sense of speed.
+	*/
+	.animate-spin {
+		animation-duration: 1.2s !important;
+		animation-iteration-count: infinite !important;
 	}
 }

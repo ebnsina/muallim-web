@@ -17,8 +17,12 @@
 	// divided list is a ring clipped by its neighbours.
 	const base =
 		'flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-control border border-border px-4 py-3';
+
+	// The press is a shade, not a scale. A row runs the width of the page, and a
+	// full-width element that scales under the pointer reads as the page flexing —
+	// the transform that flatters a card makes a list wobble.
 	const interactive =
-		'transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none';
+		'transition-colors duration-(--duration-press) ease-out hover:border-border-strong hover:bg-surface-sunken active:bg-surface-active focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none';
 </script>
 
 <!--

@@ -21,7 +21,13 @@
 	`peer-checked`. It is `pointer-events-none`, so the whole square remains the
 	input's own hit area.
 -->
-<span class={cn('relative inline-grid size-[18px] shrink-0 place-items-center', className)}>
+<span
+	class={cn(
+		'relative inline-grid size-[18px] shrink-0 place-items-center',
+		'transition-transform duration-(--duration-press) ease-out motion-safe:active:scale-95',
+		className
+	)}
+>
 	<input
 		type="checkbox"
 		bind:checked
@@ -32,9 +38,20 @@
 		       disabled:cursor-not-allowed disabled:opacity-50"
 		{...rest}
 	/>
+	<!--
+		The tick fades and settles rather than blinking on. It starts at 90% and not at
+		nothing: an object that scales up from zero is an object that came from nowhere,
+		and the eye reads it as a glitch even when it cannot say why.
+
+		The list names `scale` because it is hand-written and therefore literal — a
+		Tailwind `scale-*` sets the standalone `scale` property, not `transform`. The
+		`transition-transform` utility handles this for you; an arbitrary list does not.
+	-->
 	<Icon
 		icon={Tick02Icon}
 		strokeWidth={3}
-		class="pointer-events-none col-start-1 row-start-1 size-3 text-on-solid opacity-0 peer-checked:opacity-100"
+		class="pointer-events-none col-start-1 row-start-1 size-3 scale-90 text-on-solid opacity-0
+		       transition-[opacity,scale] duration-(--duration-instant) ease-out
+		       peer-checked:scale-100 peer-checked:opacity-100"
 	/>
 </span>

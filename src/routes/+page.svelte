@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
+	import { DURATION, easeOut, morph } from '$lib/motion';
 	import { ArrowRight01Icon, SparklesIcon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import {
 		AuroraBackdrop,
@@ -103,13 +104,23 @@
 					class="text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl"
 				>
 					The platform built for
-					<!-- The audience cross-fades in place. A fixed row height keeps the layout
-					     steady; no overflow clip, so descenders are never cut. -->
+					<!--
+						The audience swaps in place. A fixed row height keeps the layout steady;
+						no overflow clip, so descenders are never cut.
+
+						`morph` and not `fade`: the two words are stacked on the same line, and a
+						straight cross-fade shows them both at once — two half-transparent labels
+						the eye can read against each other. Blurring the one on its way out leaves
+						nothing to read, and the pair collapse into one word changing.
+
+						The exit is shorter than the entrance. The word leaving has been read
+						already; the one arriving is the one to watch land.
+					-->
 					<span class="relative mt-1 block h-[1.3em]">
 						{#key roleIndex}
 							<span
-								in:fade={{ duration: 320 }}
-								out:fade={{ duration: 320 }}
+								in:morph
+								out:morph={{ duration: DURATION.base }}
 								class="absolute inset-x-0 top-0 text-[#3a9ae6]"
 							>
 								{ROLES[roleIndex]}
@@ -357,7 +368,7 @@
 										See what fits
 										<Icon
 											icon={ArrowRight01Icon}
-											class="size-4 transition-transform group-hover:translate-x-0.5"
+											class="size-4 transition-transform duration-(--duration-press) ease-out group-hover:translate-x-0.5"
 										/>
 									</span>
 								</Card>
@@ -550,7 +561,7 @@
 									{item.question}
 									<span
 										aria-hidden="true"
-										class="grid size-6 shrink-0 place-items-center rounded-pill border border-border text-muted transition-transform duration-200 {open
+										class="grid size-6 shrink-0 place-items-center rounded-pill border border-border text-muted transition-transform duration-(--duration-base) ease-out {open
 											? 'rotate-45'
 											: ''}"
 									>
@@ -558,7 +569,10 @@
 									</span>
 								</button>
 								{#if open}
-									<div transition:slide={{ duration: 220 }}>
+									<!-- `slide` animates height, which is layout — but an accordion has to move
+								     the content below it, and a transform would not. The tokens at least
+								     keep the feel in step with the rest. -->
+									<div transition:slide={{ duration: DURATION.slow, easing: easeOut }}>
 										<p class="px-5 pb-5 text-sm text-pretty text-muted">{item.answer}</p>
 									</div>
 								{/if}

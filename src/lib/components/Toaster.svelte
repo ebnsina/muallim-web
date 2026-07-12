@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import {
 		Alert02Icon,
 		CancelCircleIcon,
@@ -10,7 +9,7 @@
 		InformationCircleIcon
 	} from '@hugeicons/core-free-icons';
 
-	import { DURATION, prefersReducedMotion } from '$lib/motion';
+	import { DURATION, easeInOut, easeOut, prefersReducedMotion } from '$lib/motion';
 	import { toast, VISIBLE, type ToastTone } from '$lib/toast.svelte';
 	import Icon from './Icon.svelte';
 
@@ -125,14 +124,22 @@
 		style="height: {heights[0] ?? 0}px"
 	>
 		{#each toast.toasts as item, index (item.id)}
+			<!--
+				Enter at 180ms, leave at 120ms. A notice that is arriving is worth watching
+				land; one that is leaving has already been read, and holding the reader
+				there for the full entrance again is the animation charging rent.
+			-->
+			<!-- The flip is the stack closing up after a dismissal — cards that were
+			     already on screen changing places, so `easeInOut`. Arriving and leaving
+			     are entrances, so those are `easeOut`. Same list, two different jobs. -->
 			<li
-				animate:flip={{ duration: motion, easing: cubicOut }}
-				in:fly={{ y: 24, duration: DURATION.base, easing: cubicOut }}
-				out:fly={{ y: 24, duration: DURATION.instant, easing: cubicOut }}
+				animate:flip={{ duration: motion, easing: easeInOut }}
+				in:fly={{ y: 24, duration: DURATION.base, easing: easeOut }}
+				out:fly={{ y: 24, duration: DURATION.instant, easing: easeOut }}
 				bind:clientHeight={heights[index]}
 				aria-hidden={index >= VISIBLE ? 'true' : undefined}
 				class="pointer-events-auto absolute inset-x-0 bottom-0 origin-bottom
-				       transition-[transform,opacity] duration-200 ease-out"
+				       transition-[transform,opacity] duration-(--duration-base) ease-out"
 				style="{transform(index)} z-index: {toast.toasts.length - index};"
 			>
 				<!--

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { DURATION, EASE } from '$lib/motion';
+
 	type Props = {
 		/** 0–100. */
 		value: number;
@@ -42,7 +44,7 @@
 			stroke-width="2.5"
 			stroke-linecap="round"
 			stroke-dasharray="{clamped} 100"
-			style="transition: stroke-dasharray 600ms cubic-bezier(0.16, 1, 0.3, 1);"
+			style="transition: stroke-dasharray {DURATION.slow}ms {EASE.out};"
 		/>
 	</svg>
 

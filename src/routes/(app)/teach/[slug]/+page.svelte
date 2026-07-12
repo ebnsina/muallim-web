@@ -3,7 +3,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { flip } from 'svelte/animate';
-	import { cubicOut } from 'svelte/easing';
+	import { DURATION, easeInOut } from '$lib/motion';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import {
 		CheckmarkCircle02Icon,
@@ -462,7 +462,7 @@
 	-->
 	<ol class="mt-8 space-y-6">
 		{#each topics as topic, topicIndex (topic.id)}
-			<li animate:flip={{ duration: 220, easing: cubicOut }}>
+			<li animate:flip={{ duration: DURATION.base, easing: easeInOut }}>
 				<Card class="p-5">
 					<!--
 						The section's drag zone is its header row, not the whole card. A card
@@ -523,7 +523,7 @@
 					<ul class="mt-4">
 						{#each topic.lessons as lesson, lessonIndex (lesson.id)}
 							<li
-								animate:flip={{ duration: 200, easing: cubicOut }}
+								animate:flip={{ duration: DURATION.base, easing: easeInOut }}
 								use:draggable={{
 									container: `lesson-${topicIndex}-${lessonIndex}`,
 									dragData: lesson,

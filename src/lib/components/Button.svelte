@@ -53,11 +53,34 @@
 		lg: 'h-12 gap-2 px-6 text-base'
 	};
 
-	// rounded-xl, matching the field radius so button and input read as one family.
-	// The marketing site opts into a full pill via `pill`.
+	/*
+		rounded-xl, matching the field radius so button and input read as one family.
+		The marketing site opts into a full pill via `pill`.
+
+		The press is the whole point of the transform here. A button that does not
+		move under the pointer is a button the interface did not admit to hearing —
+		three percent is not visible so much as *felt*, and it is the cheapest way an
+		app has of feeling like it is listening. `scale` takes the label and the icon
+		down with the box, which is what makes it read as the button depressing rather
+		than the box resizing.
+
+		Gated on `motion-safe`, so a reader who asked for less motion keeps the colour
+		change and loses the movement — and disabled/busy buttons drop pointer events
+		before `:active` can ever fire.
+
+		The property list spells out `scale` because it is a *hand-written* list, and a
+		hand-written list is literal: Tailwind 4 compiles `scale-*` to the standalone
+		`scale` property, so a list that says `transform` would not cover it and the
+		press would jump rather than ease. (Tailwind's own `transition-transform`
+		utility expands to `transform, translate, scale, rotate` and is perfectly safe —
+		the hazard is only in arbitrary lists like this one. Which is why this one also
+		restates the colours `transition-colors` would have given us for free.)
+	*/
 	const base =
 		'inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap ' +
-		'transition-colors select-none disabled:pointer-events-none disabled:opacity-50 ' +
+		'transition-[scale,color,background-color,border-color,outline-color,text-decoration-color] ' +
+		'duration-(--duration-press) ease-out motion-safe:active:scale-[0.97] ' +
+		'select-none disabled:pointer-events-none disabled:opacity-50 ' +
 		'aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4';
 
 	const classes = $derived(
@@ -92,8 +115,10 @@
 {:else}
 	<button {type} disabled={inert} aria-busy={loading || undefined} class={classes} {...rest}>
 		{#if loading}
+			<!-- 0.6s, not Tailwind's 1s. A spinner's speed is read as the app's speed:
+			     the same wait behind a faster spinner is reported as a shorter one. -->
 			<span
-				class="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+				class="size-4 animate-spin rounded-full border-2 border-current border-t-transparent [animation-duration:0.6s]"
 				aria-hidden="true"
 			></span>
 		{/if}
