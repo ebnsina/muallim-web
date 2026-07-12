@@ -5,7 +5,7 @@ import { authedApi } from '$lib/server/api';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	// lms-api enforces course:write and answers 403 otherwise; this redirect is for
+	// muallim-api enforces course:write and answers 403 otherwise; this redirect is for
 	// the unauthenticated case, where the useful instruction is "sign in".
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 	return { aiEnabled: aiEnabled() };
@@ -16,7 +16,7 @@ type Difficulty = (typeof DIFFICULTIES)[number];
 
 /**
  * Narrows the submitted difficulty rather than asserting it. A form field is
- * user input, and `as Difficulty` would tell the compiler a lie that lms-api
+ * user input, and `as Difficulty` would tell the compiler a lie that muallim-api
  * would then reject with a 422 the page has no branch for.
  */
 function toDifficulty(value: string): Difficulty {

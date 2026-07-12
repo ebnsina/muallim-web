@@ -14,7 +14,7 @@
 	remembered, which is how this app ended up navigable only from the dashboard.
 
 	`canAuthor` decides whether "Teach" is drawn. It is a courtesy and not a
-	control: lms-api refuses a student who types the URL, and it is the one that
+	control: muallim-api refuses a student who types the URL, and it is the one that
 	knows.
 -->
 <div class="flex min-h-dvh flex-col">

@@ -138,7 +138,7 @@ export const actions: Actions = {
 	/**
 	 * The whole new order, drag-and-dropped on the page and submitted at once.
 	 *
-	 * lms-api requires every sibling named exactly once, and the client sends
+	 * muallim-api requires every sibling named exactly once, and the client sends
 	 * exactly that — the list it just rearranged. A concurrent insert elsewhere
 	 * makes the submitted list no longer name every sibling, and the API refuses it
 	 * rather than half-applying, which is the safe failure.
@@ -169,7 +169,7 @@ export const actions: Actions = {
 		const title = String(form.get('title') ?? '').trim();
 		if (!title) return fail(400, { message: 'Give the lesson a title.' });
 
-		// A new lesson starts as text with no video. lms-api defaults to exactly
+		// A new lesson starts as text with no video. muallim-api defaults to exactly
 		// this, but the generated client requires both fields, and stating them is
 		// clearer than relying on a default that lives in another repository.
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
@@ -189,7 +189,7 @@ export const actions: Actions = {
 
 	/**
 	 * Create a whole AI-drafted outline: each section, then its lessons, through the
-	 * same endpoints the manual editor uses — so lms-api validates every row, and a
+	 * same endpoints the manual editor uses — so muallim-api validates every row, and a
 	 * half-created section (topic saved, a lesson rejected) leaves the rest intact.
 	 * Lessons start as empty text; the author fills each in (with AI, if they like).
 	 */

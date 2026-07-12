@@ -21,7 +21,7 @@ export const actions: Actions = {
 
 		// The password field means one of two things, and the page cannot tell which:
 		// for an address with no account it sets a new password, and for an address
-		// that already has one it must *be* that password. lms-api decides, and
+		// that already has one it must *be* that password. muallim-api decides, and
 		// answers both failures identically.
 		if (password.length < MIN_PASSWORD_LENGTH) {
 			return fail(400, {

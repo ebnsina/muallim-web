@@ -92,7 +92,7 @@ test.describe('the signed-in header', () => {
 test.describe('what the header offers', () => {
 	test.use({ storageState: STUDENT_STATE });
 
-	// A courtesy, not a control: lms-api refuses a student who types the URL. But a
+	// A courtesy, not a control: muallim-api refuses a student who types the URL. But a
 	// link to a page that answers 403 is a link nobody should be shown.
 	test('a student is not shown Teach', async ({ page }) => {
 		await page.goto('/courses');
@@ -164,7 +164,7 @@ test.describe('breadcrumbs', () => {
 	/**
 	 * Enrol, then open the quiz.
 	 *
-	 * The lesson a quiz hangs off is gated, and lms-api answers 404 to a learner who
+	 * The lesson a quiz hangs off is gated, and muallim-api answers 404 to a learner who
 	 * may not read it — not 403, because admitting it exists would leak it. A test
 	 * that skipped this would be testing the error page.
 	 */

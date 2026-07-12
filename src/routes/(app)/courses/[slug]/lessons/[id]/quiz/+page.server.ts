@@ -7,7 +7,7 @@ import type { Actions, PageServerLoad } from './$types';
 /**
  * The quiz, and this learner's attempts at it.
  *
- * lms-api decides who may see this: whoever may read the lesson may read its
+ * muallim-api decides who may see this: whoever may read the lesson may read its
  * quiz. It also decides what is in it — there are no answers in the response, and
  * there is nowhere in its shape to put one.
  */

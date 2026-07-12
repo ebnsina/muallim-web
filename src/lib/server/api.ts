@@ -2,21 +2,21 @@ import createClient from 'openapi-fetch';
 import type { paths } from '$lib/api/schema';
 
 /**
- * lms-api is reached at `/api` on the origin of the request being served.
+ * muallim-api is reached at `/api` on the origin of the request being served.
  *
  * It resolves the workspace from the Host header — port stripped, first label
  * taken as the subdomain — so the host a request arrives on decides which
- * workspace answers it. Calling lms-api directly on an internal address would
- * send it lms-api's own hostname and resolve the wrong workspace, or none.
+ * workspace answers it. Calling muallim-api directly on an internal address would
+ * send it muallim-api's own hostname and resolve the wrong workspace, or none.
  *
  * The obvious fix, calling the internal address while overriding the Host
  * header, is not available: `Host` is a forbidden header name for `fetch`, and
  * Node's implementation silently drops it. A request routed through the edge
  * carries the right Host by construction, and needs no header we have to
- * remember to set or lms-api has to be persuaded to trust.
+ * remember to set or muallim-api has to be persuaded to trust.
  *
  * In development a Vite proxy plays the edge. In production the edge routes
- * `acme.lms.com/api/*` to lms-api and everything else here.
+ * `acme.muallim.com/api/*` to muallim-api and everything else here.
  */
 function baseUrlFor(origin: string): string {
 	return `${origin}/api`;
@@ -59,7 +59,7 @@ export function authedApi(origin: string, accessToken: string) {
  * enrolled learner sees lesson bodies; a stranger sees neither, and is told the
  * lesson does not exist rather than that they may not have it.
  *
- * lms-api makes that decision from the bearer token, so an anonymous read is a
+ * muallim-api makes that decision from the bearer token, so an anonymous read is a
  * request with no token rather than a different endpoint. Sending the token
  * whenever there is one is therefore the whole of the rule.
  */

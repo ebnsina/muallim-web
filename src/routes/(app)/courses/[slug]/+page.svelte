@@ -66,7 +66,7 @@
 	 * When a lesson opens, for this reader, or an empty string when it is already
 	 * open — or when nobody can say.
 	 *
-	 * Sequential drip is deliberately absent: only lms-api knows which lesson comes
+	 * Sequential drip is deliberately absent: only muallim-api knows which lesson comes
 	 * next, and guessing here would put a padlock on a lesson the server will hand
 	 * over. A preview is never dripped.
 	 */
@@ -86,7 +86,7 @@
 			data.enrolledAt
 		) {
 			// Constructed, not mutated, and by calendar day rather than by adding
-			// milliseconds: lms-api uses AddDate, and a span crossing a daylight-saving
+			// milliseconds: muallim-api uses AddDate, and a span crossing a daylight-saving
 			// boundary is 23 or 25 hours long, not 24.
 			const from = new Date(data.enrolledAt);
 			when = new Date(
@@ -214,7 +214,7 @@
 										<li>
 											<!--
 												Every lesson is linked. Whether its body is readable is decided
-												by lms-api from the reader's entitlement, and a lesson they may
+												by muallim-api from the reader's entitlement, and a lesson they may
 												not open answers 404 — so hiding the link would only make the
 												course look emptier than it is.
 											-->
@@ -276,7 +276,7 @@
 				{/if}
 
 				<!--
-					Only an enrolled learner may review, and lms-api enforces it. The form
+					Only an enrolled learner may review, and muallim-api enforces it. The form
 					shows for them; everyone else reads the wall.
 				-->
 				{#if enrolled}
@@ -443,7 +443,7 @@
 						</ul>
 
 						<!--
-							Disabled because lms-api will refuse. It refuses either way — a
+							Disabled because muallim-api will refuse. It refuses either way — a
 							disabled button is a courtesy, not the control — and the list above
 							names what to do about it.
 						-->

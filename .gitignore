@@ -12,7 +12,7 @@ node_modules
 /.svelte-kit
 /build
 
-# Generated from lms-api's OpenAPI spec via `pnpm gen:api`
+# Generated from muallim-api's OpenAPI spec via `pnpm gen:api`
 src/lib/api/schema.d.ts
 
 # OS

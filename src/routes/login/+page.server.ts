@@ -30,7 +30,7 @@ export const actions: Actions = {
 		});
 
 		if (error || !data) {
-			// lms-api answers a missing account, a wrong password, and a suspended
+			// muallim-api answers a missing account, a wrong password, and a suspended
 			// membership with one message, in constant time. Rendering anything more
 			// specific here would undo that.
 			return fail(response?.status ?? 401, {

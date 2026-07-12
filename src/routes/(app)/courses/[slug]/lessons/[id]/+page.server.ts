@@ -59,7 +59,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 
 export const actions: Actions = {
 	/**
-	 * One action for both directions. lms-api treats completion as a toggle and
+	 * One action for both directions. muallim-api treats completion as a toggle and
 	 * recomputes the course roll-up in the same transaction, so a reopened lesson
 	 * cannot leave a course sitting at 100%.
 	 */

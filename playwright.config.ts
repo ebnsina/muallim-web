@@ -3,7 +3,7 @@ import path from 'node:path';
 
 /**
  * Where the worker writes mail. A test reads it to follow an invitation link;
- * there is no other way to accept one, because lms-api mails the token and
+ * there is no other way to accept one, because muallim-api mails the token and
  * returns it to nobody.
  */
 export const MAIL_FILE = path.resolve('e2e/.mail/mail.jsonl');
@@ -11,42 +11,42 @@ export const MAIL_FILE = path.resolve('e2e/.mail/mail.jsonl');
 /*
 	Ports of their own, never the development ones.
 
-	`make run` puts lms-api on :8080 against `lms`, and `pnpm dev` puts this app on
-	:5173. These tests run against `lms_test`, which holds no demo accounts at all.
+	`make run` puts muallim-api on :8080 against `muallim`, and `pnpm dev` puts this app on
+	:5173. These tests run against `muallim_test`, which holds no demo accounts at all.
 	Sharing a port meant one of two failures, depending on who started first: the
 	suite quietly ran against the development database, or it left an API on :8080
-	answering for `lms_test` — where `demo@muallim.test` does not exist, so signing
+	answering for `muallim_test` — where `demo@muallim.test` does not exist, so signing
 	in with the credentials `make seed` printed said the credentials were wrong.
 
 	Neither is a thing anyone should have to diagnose. They are different servers
 	on different databases, so they get different ports.
 */
-const API_URL = process.env.LMS_API_URL ?? 'http://localhost:8081';
+const API_URL = process.env.MUALLIM_API_URL ?? 'http://localhost:8081';
 const WEB_URL = 'http://localhost:5174';
 
 /**
  * The database is the one thing these tests do not bring up. Everything else —
- * lms-api, its worker, and this app — starts here, so `pnpm test:e2e` is one
+ * muallim-api, its worker, and this app — starts here, so `pnpm test:e2e` is one
  * command against a Postgres that `make db-create && make migrate` has prepared.
  */
 /**
- * These tests run against `lms_test`, not the development database.
+ * These tests run against `muallim_test`, not the development database.
  *
  * They register the workspace's owner, which only works while the workspace is
  * unclaimed — so they need a database that starts empty and stays theirs.
  * `make seed` prepares the `localhost` workspace in both.
  */
 export const apiEnv = {
-	LMS_ENV: 'development',
-	LMS_DATABASE_URL:
-		process.env.LMS_TEST_DATABASE_URL ??
-		'postgres://lms:lms@localhost:5432/lms_test?sslmode=disable',
-	LMS_ADDR: ':8081',
-	LMS_JWT_SECRET: 'an-end-to-end-test-signing-secret-of-enough-bytes',
-	LMS_LOG_LEVEL: 'warn',
+	MUALLIM_ENV: 'development',
+	MUALLIM_DATABASE_URL:
+		process.env.MUALLIM_TEST_DATABASE_URL ??
+		'postgres://muallim:muallim@localhost:5432/muallim_test?sslmode=disable',
+	MUALLIM_ADDR: ':8081',
+	MUALLIM_JWT_SECRET: 'an-end-to-end-test-signing-secret-of-enough-bytes',
+	MUALLIM_LOG_LEVEL: 'warn',
 
 	/*
-		lms-api throttles anything that verifies a credential, because each Argon2id
+		muallim-api throttles anything that verifies a credential, because each Argon2id
 		verification allocates 64 MiB and an unlimited login endpoint is a
 		memory-exhaustion primitive. The default budget is ten attempts, and a suite
 		that signs in from one address blows through it — the symptom is a page
@@ -56,8 +56,8 @@ export const apiEnv = {
 		Raised rather than disabled: the middleware still runs, and a test that
 		wanted to assert on a 429 could still lower it.
 	*/
-	LMS_AUTH_RATE_BURST: '1000',
-	LMS_AUTH_RATE_EVERY: '10ms',
+	MUALLIM_AUTH_RATE_BURST: '1000',
+	MUALLIM_AUTH_RATE_EVERY: '10ms',
 
 	/*
 		The `embed` video source renders an author's own URL, so it is off unless a
@@ -66,21 +66,21 @@ export const apiEnv = {
 		is simply unavailable, and "refused because unconfigured" would pass a test
 		meant to prove "refused because unlisted".
 	*/
-	LMS_EMBED_ALLOWED_HOSTS: 'player.example.test',
+	MUALLIM_EMBED_ALLOWED_HOSTS: 'player.example.test',
 
 	/*
-		The object store. Without it lms-api refuses every upload with a 503, and the
+		The object store. Without it muallim-api refuses every upload with a 503, and the
 		assignment suite fails for a reason that has nothing to do with the browser.
 
 		This is the MinIO `make storage-up` starts, and the same bucket the Go tests
 		use. They do not collide: every object key begins with a workspace id.
 	*/
-	LMS_S3_ENDPOINT: process.env.LMS_TEST_S3_ENDPOINT ?? 'http://localhost:9002',
-	LMS_S3_BUCKET: 'lms-uploads',
-	LMS_S3_ACCESS_KEY: 'lms',
-	LMS_S3_SECRET_KEY: 'lms-secret-key',
-	LMS_S3_REGION: 'auto',
-	LMS_S3_PATH_STYLE: 'true'
+	MUALLIM_S3_ENDPOINT: process.env.MUALLIM_TEST_S3_ENDPOINT ?? 'http://localhost:9002',
+	MUALLIM_S3_BUCKET: 'muallim-uploads',
+	MUALLIM_S3_ACCESS_KEY: 'muallim',
+	MUALLIM_S3_SECRET_KEY: 'muallim-secret-key',
+	MUALLIM_S3_REGION: 'auto',
+	MUALLIM_S3_PATH_STYLE: 'true'
 };
 
 export default defineConfig({
@@ -97,7 +97,7 @@ export default defineConfig({
 	*/
 	globalSetup: './e2e/worker.setup.ts',
 
-	// One worker. These tests share a workspace: lms-api resolves it from the Host
+	// One worker. These tests share a workspace: muallim-api resolves it from the Host
 	// header, and there is only one host. They create uniquely named courses and
 	// accounts rather than pretending to be isolated.
 	workers: 1,
@@ -141,7 +141,7 @@ export default defineConfig({
 	webServer: [
 		{
 			command: 'go run ./cmd/api',
-			cwd: '../lms-api',
+			cwd: '../muallim-api',
 			url: `${API_URL}/v1/healthz`,
 			env: apiEnv,
 			timeout: 120_000,
@@ -150,7 +150,7 @@ export default defineConfig({
 		{
 			command: 'pnpm dev --port 5174',
 			url: WEB_URL,
-			env: { ...process.env, LMS_API_URL: API_URL },
+			env: { ...process.env, MUALLIM_API_URL: API_URL },
 			timeout: 120_000,
 			reuseExistingServer: false
 		}

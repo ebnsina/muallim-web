@@ -7,7 +7,7 @@ import type { PageServerLoad } from './$types';
  * What has been handed in.
  *
  * Waiting-to-be-marked by default, because that is the only reason to open this
- * page. `?all=1` widens it. Drafts are never here — lms-api excludes them from
+ * page. `?all=1` widens it. Drafts are never here — muallim-api excludes them from
  * this endpoint whatever is asked, and a marker has no business reading work
  * nobody has finished.
  */

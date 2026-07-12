@@ -4,7 +4,7 @@ import path from 'node:path';
 import { apiEnv, MAIL_FILE } from '../playwright.config';
 
 /**
- * Starts `lms-api`'s job worker for the duration of the run, and returns the
+ * Starts `muallim-api`'s job worker for the duration of the run, and returns the
  * function Playwright calls to stop it.
  *
  * The worker delivers the invitation email that `global.setup.ts` reads to
@@ -23,8 +23,8 @@ export default async function globalSetup() {
 	fs.writeFileSync(MAIL_FILE, '');
 
 	const worker = spawn('go', ['run', './cmd/worker'], {
-		cwd: path.resolve('../lms-api'),
-		env: { ...process.env, ...apiEnv, LMS_MAIL_FILE: MAIL_FILE },
+		cwd: path.resolve('../muallim-api'),
+		env: { ...process.env, ...apiEnv, MUALLIM_MAIL_FILE: MAIL_FILE },
 		stdio: 'ignore',
 		// Its own process group, so the kill below reaches `go run`'s child too —
 		// `go run` compiles to a temporary binary and execs it, and killing the

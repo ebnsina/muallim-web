@@ -62,7 +62,7 @@ test('a course goes from nothing to published', async ({ page }) => {
 });
 
 /**
- * lms-api rewrites every position in one statement, from an array that must name
+ * muallim-api rewrites every position in one statement, from an array that must name
  * every sibling exactly once. Moving one section is the smallest thing that can
  * get that wrong.
  */

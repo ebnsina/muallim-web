@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 
 		`/v1/me/courses` is asked for even by a student, whose answer is 403. Deciding
 		from the role whether to ask would trade a request that costs nothing for a
-		rule that can disagree with lms-api. lms-api is the authority, and it says no.
+		rule that can disagree with muallim-api. muallim-api is the authority, and it says no.
 	*/
 	const [enrolments, teaching, gamification] = await Promise.all([
 		api.GET('/v1/me/enrolments'),

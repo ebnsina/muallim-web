@@ -13,7 +13,7 @@ function deferred<T>() {
 }
 
 describe('singleFlight', () => {
-	// The property the whole refresh design rests on. lms-api rotates a refresh
+	// The property the whole refresh design rests on. muallim-api rotates a refresh
 	// token on every use and treats one presented twice as theft, revoking the
 	// session family. Two callers arriving together must spend the token once.
 	it('runs the work once for concurrent callers, and gives them all the same result', async () => {
@@ -58,7 +58,7 @@ describe('singleFlight', () => {
 	});
 
 	// A key held after the work settles would pin a spent refresh token forever,
-	// and every later request would be handed a token lms-api has already rotated
+	// and every later request would be handed a token muallim-api has already rotated
 	// away — the exact reuse this exists to prevent.
 	it('releases the key once the work settles, so a later caller runs again', async () => {
 		const inFlight = new Map<string, Promise<number>>();
@@ -79,10 +79,10 @@ describe('singleFlight', () => {
 
 		const failing = async () => {
 			runs++;
-			throw new Error('lms-api is down');
+			throw new Error('muallim-api is down');
 		};
 
-		await expect(singleFlight(inFlight, 'token', failing)).rejects.toThrow('lms-api is down');
+		await expect(singleFlight(inFlight, 'token', failing)).rejects.toThrow('muallim-api is down');
 		expect(inFlight.size).toBe(0);
 
 		// The next caller must retry rather than inherit the old rejection.

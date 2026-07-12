@@ -1,5 +1,5 @@
 {
-	"name": "lms-web",
+	"name": "muallim-web",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -18,7 +18,7 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "pnpm test:unit --run && pnpm test:e2e",
-		"gen:api": "openapi-typescript ../lms-api/bin/openapi.json -o src/lib/api/schema.d.ts",
+		"gen:api": "openapi-typescript ../muallim-api/bin/openapi.json -o src/lib/api/schema.d.ts",
 		"test:e2e": "playwright test"
 	},
 	"devDependencies": {

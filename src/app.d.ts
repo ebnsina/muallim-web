@@ -3,7 +3,7 @@
 declare global {
 	namespace App {
 		/**
-		 * The shape of `page.error`. `correlationId` is echoed by lms-api on every
+		 * The shape of `page.error`. `correlationId` is echoed by muallim-api on every
 		 * response, so a user can quote it and we can find the matching log line.
 		 */
 		interface Error {

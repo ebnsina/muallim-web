@@ -7,7 +7,7 @@ import type { PageServerLoad } from './$types';
  * One of the learner's own attempts.
  *
  * Addressed by number within the quiz, never by an id — there is nothing here to
- * increment into somebody else's result, because lms-api scopes the number to the
+ * increment into somebody else's result, because muallim-api scopes the number to the
  * caller.
  */
 export const load: PageServerLoad = async ({ locals, params, url }) => {

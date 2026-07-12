@@ -54,7 +54,7 @@
 	const isImage = $derived(type === 'image_answering' || type === 'image_matching');
 
 	// An ordering question's answer is the order the rows are in. Marking one
-	// "correct" would set an answer the grader never reads, and lms-api refuses it.
+	// "correct" would set an answer the grader never reads, and muallim-api refuses it.
 	const marksCorrect = $derived(chooses && type !== 'ordering');
 
 	function typeLabel(t: string): string {

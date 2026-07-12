@@ -1,5 +1,5 @@
 /**
- * The one shape lms-api accepts for an answer, whatever the question type.
+ * The one shape muallim-api accepts for an answer, whatever the question type.
  *
  * Exactly one field is meaningful per type. Sending the wrong one is not an
  * error: it is a wrong answer, which is also what sending nothing is.

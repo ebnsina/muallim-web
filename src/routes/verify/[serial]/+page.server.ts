@@ -7,7 +7,7 @@ import type { PageServerLoad } from './$types';
  * Verify a certificate by its serial. No session.
  *
  * Whoever holds the number may read what it says — an employer, an admissions
- * office, a stranger. lms-api serves this without a bearer token, and resolves the
+ * office, a stranger. muallim-api serves this without a bearer token, and resolves the
  * workspace from the host like every other request, so a serial from another
  * workspace is one this one has never heard of.
  *

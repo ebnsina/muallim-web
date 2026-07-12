@@ -6,7 +6,7 @@ import type { Actions, PageServerLoad } from './$types';
 const PAGE_SIZE = 20;
 
 /**
- * This page is only reachable by someone holding course:write. lms-api enforces
+ * This page is only reachable by someone holding course:write. muallim-api enforces
  * that and answers 403 otherwise; the redirect below is for the unauthenticated
  * case, where the useful instruction is "sign in" rather than "you may not".
  */

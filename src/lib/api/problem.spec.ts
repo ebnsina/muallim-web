@@ -10,7 +10,7 @@ const problem = {
 };
 
 describe('isProblem', () => {
-	it('accepts a document from lms-api', () => {
+	it('accepts a document from muallim-api', () => {
 		expect(isProblem(problem)).toBe(true);
 	});
 

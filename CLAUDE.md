@@ -1,10 +1,10 @@
-# CLAUDE.md — `lms-web`
+# CLAUDE.md — `muallim-web`
 
 SvelteKit frontend for a multi-tenant LMS. Read `GUIDELINES.md` before writing code; it is the authoritative engineering contract. This file is the short version plus the things that are easy to get wrong.
 
 ## What this repo is
 
-The first client of `lms-api` (sibling repo at `../lms-api`). It owns presentation; the API owns the domain. The seam between them is the API's generated OpenAPI 3.1 spec.
+The first client of `muallim-api` (sibling repo at `../muallim-api`). It owns presentation; the API owns the domain. The seam between them is the API's generated OpenAPI 3.1 spec.
 
 ## Stack
 
@@ -15,7 +15,7 @@ Svelte 5.56 (runes) · SvelteKit 2.69 · TypeScript strict · Tailwind 4.3 (`@ta
 ```bash
 pnpm install
 pnpm dev
-pnpm gen:api        # regenerate src/lib/api/schema.d.ts from lms-api's OpenAPI spec
+pnpm gen:api        # regenerate src/lib/api/schema.d.ts from muallim-api's OpenAPI spec
 pnpm check          # svelte-check + tsc
 pnpm lint
 pnpm test
@@ -32,9 +32,9 @@ pnpm build
 
 **Runes only.** No `export let`, no `$:`. `$derived` for anything computable; `$effect` only for genuine side effects, never to sync one piece of state into another.
 
-**All API access goes through the typed client** in `src/lib/server/api.ts`, from the server, always. A raw `fetch()` to `lms-api` from a component is a rejection, and there is no browser-side client to reach for. `schema.d.ts` is generated and gitignored — never hand-edit it.
+**All API access goes through the typed client** in `src/lib/server/api.ts`, from the server, always. A raw `fetch()` to `muallim-api` from a component is a rejection, and there is no browser-side client to reach for. `schema.d.ts` is generated and gitignored — never hand-edit it.
 
-**`lms-api` is same-origin at `/api`,** routed there by the edge (a Vite proxy in dev) with `Host` preserved, because `Host` is what selects the workspace. Never call `lms-api` on a direct address: `Host` is a forbidden header for `fetch` and Node drops it, so the request quietly resolves the wrong workspace.
+**`muallim-api` is same-origin at `/api`,** routed there by the edge (a Vite proxy in dev) with `Host` preserved, because `Host` is what selects the workspace. Never call `muallim-api` on a direct address: `Host` is a forbidden header for `fetch` and Node drops it, so the request quietly resolves the wrong workspace.
 
 **Fetch in `load`, never in `onMount`.** Use the `fetch` passed to `load`. Mutations are form actions with `use:enhance`, not `onclick` + `fetch`.
 
@@ -88,11 +88,11 @@ pnpm build
 
 ## AI Studio
 
-Generation runs **here, in `lms-web`'s server**, never in the Go API — so provider keys stay server-side and the OpenAPI contract carries no streaming-LLM surface other clients can't honour. The pieces:
+Generation runs **here, in `muallim-web`'s server**, never in the Go API — so provider keys stay server-side and the OpenAPI contract carries no streaming-LLM surface other clients can't honour. The pieces:
 
 - **One engine.** `src/lib/server/ai.ts` holds the provider (TanStack AI, Anthropic adapter) and reads the key + model from `$env/dynamic/private`. Provider-agnostic: swap the adapter, nothing else moves. `aiEnabled()` gates everything — **no key means the AI controls are hidden and the forms are unchanged**, never a broken button.
-- **One endpoint.** `/ai/generate` (a session-guarded `+server.ts` streaming SSE). Deliberately **not** under `/api`, which proxies to lms-api.
-- **The draft is not the record.** AI streams a draft the author edits; **saving goes through the existing permission-checked catalog/assess endpoints**, and lms-api's validator refuses a malformed generated question exactly as it would a hand-typed one. Never write generated content live.
+- **One endpoint.** `/ai/generate` (a session-guarded `+server.ts` streaming SSE). Deliberately **not** under `/api`, which proxies to muallim-api.
+- **The draft is not the record.** AI streams a draft the author edits; **saving goes through the existing permission-checked catalog/assess endpoints**, and muallim-api's validator refuses a malformed generated question exactly as it would a hand-typed one. Never write generated content live.
 - **Two SSR traps.** `@tanstack/ai-svelte` ships an uncompiled `.svelte` file, so it lives in `ssr.noExternal` (alongside `@hugeicons/svelte`). And the AI components (`AiField`, `AiQuiz`, `AiOutline`) are imported **directly**, never re-exported from the `$lib/components` barrel — the barrel is on every page's import path, and the AI SDK has no business in the landing's bundle.
 
 ## Git
@@ -103,7 +103,7 @@ Author every commit as `ebnsina <ebnsina.me@gmail.com>`, configured **per repo**
 git config user.name "ebnsina" && git config user.email "ebnsina.me@gmail.com"
 ```
 
-Do **not** add a `Co-Authored-By: Claude` trailer, or any other identity. Remote uses the `github-es` SSH host alias (`git@github-es:ebnsina/lms-web.git`).
+Do **not** add a `Co-Authored-By: Claude` trailer, or any other identity. Remote uses the `github-es` SSH host alias (`git@github-es:ebnsina/muallim-web.git`).
 
 `docs/` and `data/` are gitignored and must never be committed — no plans, no roadmap, no secrets in the public repo.
 

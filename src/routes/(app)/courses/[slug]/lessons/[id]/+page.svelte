@@ -250,7 +250,7 @@
 
 			<!--
 				A quiz lesson's body is its quiz. The link is shown to anyone who can read
-				the lesson; whether they may *take* it is lms-api's decision, made on entry.
+				the lesson; whether they may *take* it is muallim-api's decision, made on entry.
 			-->
 			{#if data.lesson.content_type === 'quiz'}
 				<div class="mt-8">

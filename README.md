@@ -1,67 +1,67 @@
-# lms-web
+# muallim-web
 
 SvelteKit frontend for a multi-tenant learning management system.
 
-It owns presentation. [`lms-api`](../lms-api) owns the domain. The seam between them is that API's generated OpenAPI 3.1 document, from which this app generates a fully typed client — so a breaking change upstream fails `pnpm check` here rather than in production.
+It owns presentation. [`muallim-api`](../muallim-api) owns the domain. The seam between them is that API's generated OpenAPI 3.1 document, from which this app generates a fully typed client — so a breaking change upstream fails `pnpm check` here rather than in production.
 
 ## Requirements
 
-Node 24, pnpm 11. A running `lms-api` on `http://localhost:8080`, which `vite.config.ts` proxies to `/api`. Override with `LMS_API_URL`.
+Node 24, pnpm 11. A running `muallim-api` on `http://localhost:8080`, which `vite.config.ts` proxies to `/api`. Override with `MUALLIM_API_URL`.
 
 ## Getting started
 
 ```bash
 pnpm install
-pnpm gen:api        # generate the typed client from ../lms-api's spec
+pnpm gen:api        # generate the typed client from ../muallim-api's spec
 pnpm dev
 ```
 
-The home page renders the live state of `lms-api`. With the API stopped it reports _unreachable_ and still returns HTTP 200 — the API going down degrades the page, it does not crash it.
+The home page renders the live state of `muallim-api`. With the API stopped it reports _unreachable_ and still returns HTTP 200 — the API going down degrades the page, it does not crash it.
 
 ## The typed API client
 
 ```bash
-cd ../lms-api && make spec    # writes bin/openapi.json
-cd ../lms-web  && pnpm gen:api
+cd ../muallim-api && make spec    # writes bin/openapi.json
+cd ../muallim-web  && pnpm gen:api
 ```
 
-`src/lib/api/schema.d.ts` is generated and gitignored; never hand-edit it. Everything reaching `lms-api` goes through `src/lib/server/api.ts`. A raw `fetch()` to the API from a component is a rejection.
+`src/lib/api/schema.d.ts` is generated and gitignored; never hand-edit it. Everything reaching `muallim-api` goes through `src/lib/server/api.ts`. A raw `fetch()` to the API from a component is a rejection.
 
-Every call is made from the server. Authenticated reads have no choice — the access token lives in an httpOnly cookie so that no script in the page can read it — and the anonymous reads follow, because what `lms-api` returns depends on whether a token accompanied the request. There is no browser-side API client.
+Every call is made from the server. Authenticated reads have no choice — the access token lives in an httpOnly cookie so that no script in the page can read it — and the anonymous reads follow, because what `muallim-api` returns depends on whether a token accompanied the request. There is no browser-side API client.
 
 ## How a workspace is addressed
 
-`lms-api` resolves the workspace from the `Host` header: it strips the port and takes the first label as the subdomain, or matches a custom domain. The host a request arrives on decides which workspace answers it.
+`muallim-api` resolves the workspace from the `Host` header: it strips the port and takes the first label as the subdomain, or matches a custom domain. The host a request arrives on decides which workspace answers it.
 
 So this app and the API share an origin, and the edge routes between them:
 
 ```
-acme.lms.com/            → lms-web
-acme.lms.com/api/v1/*    → lms-api   (strip /api, keep Host)
-school.edu/api/v1/*      → lms-api   (a custom domain, same rule)
+acme.muallim.com/            → muallim-web
+acme.muallim.com/api/v1/*    → muallim-api   (strip /api, keep Host)
+school.edu/api/v1/*      → muallim-api   (a custom domain, same rule)
 ```
 
-Three things follow. There is no cross-origin request, so no CORS and no preflight. `Host` arrives correct without anyone forwarding a header `lms-api` would have to be persuaded to trust. And a custom domain works the moment its DNS points at us.
+Three things follow. There is no cross-origin request, so no CORS and no preflight. `Host` arrives correct without anyone forwarding a header `muallim-api` would have to be persuaded to trust. And a custom domain works the moment its DNS points at us.
 
-`vite.config.ts` proxies `/api` to `http://localhost:8080` in development so the two environments differ in nothing that matters. It sets `changeOrigin: false` deliberately: rewriting `Host` to the target would make every request resolve the workspace named after `lms-api`'s own address.
+`vite.config.ts` proxies `/api` to `http://localhost:8080` in development so the two environments differ in nothing that matters. It sets `changeOrigin: false` deliberately: rewriting `Host` to the target would make every request resolve the workspace named after `muallim-api`'s own address.
 
-Calling `lms-api` on an internal address instead, while overriding `Host`, is not an option — `Host` is a forbidden header name for `fetch`, and Node drops it silently. A request that went that way would resolve the wrong workspace, or none, and nothing would say so.
+Calling `muallim-api` on an internal address instead, while overriding `Host`, is not an option — `Host` is a forbidden header name for `fetch`, and Node drops it silently. A request that went that way would resolve the wrong workspace, or none, and nothing would say so.
 
 Behind a TLS-terminating edge, set `ORIGIN` (or `PROTOCOL_HEADER`/`HOST_HEADER`) for `adapter-node`, or `url.origin` will be `http://` and every API call this app makes will address the wrong scheme.
 
 ## Sessions must be sticky
 
-**Running more than one replica requires the edge to route a browser to one of them, by hashing the `lms_rt` cookie.** This is a correctness requirement, not a performance one.
+**Running more than one replica requires the edge to route a browser to one of them, by hashing the `muallim_rt` cookie.** This is a correctness requirement, not a performance one.
 
-`lms-api` rotates a refresh token on every use, and treats a token presented twice as theft: it revokes the whole session family and logs the user out of every device. Two requests arriving together with the same expired access cookie — two tabs, a prefetch, a page and its subresource — each try to spend the same refresh token, and the second looks exactly like a stolen one.
+`muallim-api` rotates a refresh token on every use, and treats a token presented twice as theft: it revokes the whole session family and logs the user out of every device. Two requests arriving together with the same expired access cookie — two tabs, a prefetch, a page and its subresource — each try to spend the same refresh token, and the second looks exactly like a stolen one.
 
 `hooks.server.ts` is the only place a refresh happens, and it collapses concurrent attempts onto a single in-flight promise (`src/lib/server/single-flight.ts`, unit-tested). That map lives in one process. Spread the two requests across two replicas and the collapse never happens.
 
 ```
-edge: hash(lms_rt cookie) → replica N
+edge: hash(muallim_rt cookie) → replica N
 ```
 
-With nginx that is `hash $cookie_lms_rt consistent;` in the `upstream` block. Any load balancer that hashes on that specific cookie will do — but check what yours actually keys on. Hashing the whole `Cookie` header does not work: it also carries `lms_at`, which changes on every refresh, so a browser would hop replicas at exactly the moment it must not.
+With nginx that is `hash $cookie_muallim_rt consistent;` in the `upstream` block. Any load balancer that hashes on that specific cookie will do — but check what yours actually keys on. Hashing the whole `Cookie` header does not work: it also carries `muallim_at`, which changes on every refresh, so a browser would hop replicas at exactly the moment it must not.
 
 The residual: a replica restart moves a browser to a process with an empty map, so a refresh in flight at that moment can still race. It resolves by re-authenticating, which is the right outcome of losing a session. The alternative — a shared lock — means a database in the presentation tier, and this app deliberately has none.
 
@@ -78,29 +78,29 @@ pnpm build
 
 ## CI
 
-`.github/workflows/ci.yml` checks out both repos side by side, because that is how they sit on a developer's disk: the typed client is generated from `lms-api`'s spec, and the end-to-end suite starts `lms-api` and its worker from `../lms-api`.
+`.github/workflows/ci.yml` checks out both repos side by side, because that is how they sit on a developer's disk: the typed client is generated from `muallim-api`'s spec, and the end-to-end suite starts `muallim-api` and its worker from `../muallim-api`.
 
-It then runs `pnpm lint`, `pnpm check`, the unit tests, and the full Playwright suite against a real Postgres 17 — whose `lms` role is `NOSUPERUSER NOBYPASSRLS`, so the tenant isolation those tests rely on is actually enforced.
+It then runs `pnpm lint`, `pnpm check`, the unit tests, and the full Playwright suite against a real Postgres 17 — whose `muallim` role is `NOSUPERUSER NOBYPASSRLS`, so the tenant isolation those tests rely on is actually enforced.
 
 ## End-to-end tests
 
 ```bash
-cd ../lms-api && make db-create && make migrate && make seed && make storage-up
-cd ../lms-web && pnpm exec playwright install chromium
+cd ../muallim-api && make db-create && make migrate && make seed && make storage-up
+cd ../muallim-web && pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Playwright starts `lms-api`, its job worker, and this app. Postgres and MinIO are the two things it does not bring up — `make storage-up` starts MinIO on `:9002`, and without it every assignment upload fails.
+Playwright starts `muallim-api`, its job worker, and this app. Postgres and MinIO are the two things it does not bring up — `make storage-up` starts MinIO on `:9002`, and without it every assignment upload fails.
 
-It runs on `:8081` and `:5174`, not the development ports, and it never reuses a server that is already listening. `lms_test` holds no demo accounts, so an end-to-end API left answering on `:8080` would tell you the credentials `make seed` printed were wrong. Development and the suite can run side by side.
+It runs on `:8081` and `:5174`, not the development ports, and it never reuses a server that is already listening. `muallim_test` holds no demo accounts, so an end-to-end API left answering on `:8080` would tell you the credentials `make seed` printed were wrong. Development and the suite can run side by side.
 
-They run against `lms_test`, not the development database, because they register the workspace's owner — which only works while the workspace is unclaimed. The first run claims it; every run after signs in.
+They run against `muallim_test`, not the development database, because they register the workspace's owner — which only works while the workspace is unclaimed. The first run claims it; every run after signs in.
 
-A student is provisioned by invitation, because that is the only way to join a workspace. `lms-api` mails the link and returns it to nobody, so the worker runs with `LMS_MAIL_FILE` set and the setup reads the link out of that file. It is the same path a real student walks.
+A student is provisioned by invitation, because that is the only way to join a workspace. `muallim-api` mails the link and returns it to nobody, so the worker runs with `MUALLIM_MAIL_FILE` set and the setup reads the link out of that file. It is the same path a real student walks.
 
 The suite covers the boundaries that are expensive to get wrong: a draft is invisible to strangers and 404 by its own address; a preview lesson is readable and a gated one is 404, never 403; the authoring pages are forbidden to a student rather than merely ineffective; enrolling opens the gated lesson and completing every lesson reaches 100%; and `forgot-password` says the same thing about an address that exists and one that does not.
 
-`assignment.spec.ts` covers the one leg nothing else can. A learner's browser PUTs the file straight to the object store, on another origin, with a URL `lms-api` signed and a `Content-Length` the browser fills in itself — a header a script is forbidden to set, which is exactly what makes the signed size a limit rather than a suggestion. No unit test can see that, and neither can a Go test.
+`assignment.spec.ts` covers the one leg nothing else can. A learner's browser PUTs the file straight to the object store, on another origin, with a URL `muallim-api` signed and a `Content-Length` the browser fills in itself — a header a script is forbidden to set, which is exactly what makes the signed size a limit rather than a suggestion. No unit test can see that, and neither can a Go test.
 
 ## Stack
 

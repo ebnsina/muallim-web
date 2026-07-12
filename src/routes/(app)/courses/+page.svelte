@@ -119,7 +119,7 @@
 		</div>
 	{:else}
 		<!--
-			Every course here is published. lms-api's listing filters on status in SQL
+			Every course here is published. muallim-api's listing filters on status in SQL
 			and takes no reader into account, so an author does not find their own
 			drafts here either — there is no "my courses" endpoint behind this page.
 		-->

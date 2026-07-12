@@ -178,7 +178,7 @@ export const actions: Actions = {
 	/**
 	 * Append a question.
 	 *
-	 * Almost nothing is checked here. lms-api refuses a question nobody could
+	 * Almost nothing is checked here. muallim-api refuses a question nobody could
 	 * answer correctly — single choice with no correct option or two, an ordering
 	 * question with a "correct" item — and it is the only place that can, because
 	 * it is the only place that grades. Restating those rules here would give an
@@ -224,7 +224,7 @@ export const actions: Actions = {
 					case_sensitive: form.get('case_sensitive') === 'on',
 
 					// Sent only for the types that read them. An `accepted` array on a
-					// choice question is an answer nothing reads, and lms-api says so.
+					// choice question is an answer nothing reads, and muallim-api says so.
 					...(typed ? { accepted: acceptedAnswers(String(form.get('accepted') ?? '')) } : {}),
 					...(range ? { accepted: range } : {}),
 					...(chooses ? { options: options(form) } : {})
@@ -241,7 +241,7 @@ export const actions: Actions = {
 
 	/**
 	 * Add a batch of AI-generated questions. Each is mapped to the same body a hand
-	 * authored one would send and POSTed individually, so lms-api's validator — the
+	 * authored one would send and POSTed individually, so muallim-api's validator — the
 	 * one a human submission hits — refuses a malformed question rather than trusting
 	 * the model. Returns how many landed and how many were rejected.
 	 */

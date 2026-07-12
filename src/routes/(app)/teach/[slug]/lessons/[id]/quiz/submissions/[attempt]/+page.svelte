@@ -141,7 +141,7 @@
 					{:else}
 						<!--
 							Graded by the machine, and shown only so the marker can see the whole
-							attempt. There is no form: lms-api refuses a mark on a question it
+							attempt. There is no form: muallim-api refuses a mark on a question it
 							graded itself.
 						-->
 						<p class="text-muted mt-2 text-sm">

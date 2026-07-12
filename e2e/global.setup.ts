@@ -2,11 +2,11 @@ import { expect, test as setup, type APIRequestContext } from '@playwright/test'
 import { OWNER, OWNER_STATE, STUDENT, STUDENT_STATE, tokenOf, waitForLink } from './accounts';
 
 /**
- * Signs the owner in against lms-api, registering them if the workspace is still
+ * Signs the owner in against muallim-api, registering them if the workspace is still
  * unclaimed, and returns a bearer token.
  *
  * Registration claims an unclaimed workspace and nothing else, so this succeeds
- * once against a fresh `lms_test` and signs in on every run after. The API is
+ * once against a fresh `muallim_test` and signs in on every run after. The API is
  * reached at `/api` on this app's origin, exactly as the app reaches it, so the
  * Host header names the workspace.
  */
@@ -35,7 +35,7 @@ setup('provision the owner', async ({ page, request }) => {
 	await ownerToken(request);
 
 	// Signed in through the browser, so the cookies saved are the ones a browser
-	// holds: httpOnly, and set by this app rather than by lms-api.
+	// holds: httpOnly, and set by this app rather than by muallim-api.
 	await page.goto('/login');
 	await page.getByLabel('Email').fill(OWNER.email);
 	await page.getByLabel('Password').fill(OWNER.password);
@@ -46,7 +46,7 @@ setup('provision the owner', async ({ page, request }) => {
 });
 
 /**
- * Joining is by invitation, and lms-api mails the link rather than returning it.
+ * Joining is by invitation, and muallim-api mails the link rather than returning it.
  * Reading the worker's mail file is therefore the only route to a student — and
  * it walks the same path a real one walks.
  */

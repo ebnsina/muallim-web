@@ -458,7 +458,7 @@
 		Sections and their lessons reorder by dragging the grip; only the handle
 		starts a drag, so the rename field and every button stay usable. The order
 		you drop is the order that is sent — the whole list at once, which is what
-		lms-api wants.
+		muallim-api wants.
 	-->
 	<ol class="mt-8 space-y-6">
 		{#each topics as topic, topicIndex (topic.id)}

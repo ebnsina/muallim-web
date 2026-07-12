@@ -29,7 +29,7 @@
 
 	let { data, form }: PageProps = $props();
 
-	// Hiding the link is a courtesy, not a control: /teach is guarded by lms-api,
+	// Hiding the link is a courtesy, not a control: /teach is guarded by muallim-api,
 	// which answers 403 to a student who types the address.
 	const canAuthor = $derived(canAuthorRole(data.user));
 

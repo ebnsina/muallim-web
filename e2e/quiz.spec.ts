@@ -107,7 +107,7 @@ test.describe('authoring and marking a quiz', () => {
 		await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
 
 		// A single-choice question with no correct option is one nobody can answer.
-		// lms-api refuses it, and this page is where the author finds out.
+		// muallim-api refuses it, and this page is where the author finds out.
 		// `getByLabel('Option 1')` would also match the "is correct" checkbox beside
 		// it, which shares the name. The role separates them.
 		const option = (n: number) => page.getByRole('textbox', { name: `Option ${n}` });

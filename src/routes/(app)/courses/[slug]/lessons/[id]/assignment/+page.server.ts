@@ -6,7 +6,7 @@ import type { Actions, PageServerLoad } from './$types';
 /**
  * The assignment, and this learner's own work on it.
  *
- * lms-api decides who may see this: whoever may read the lesson may read its
+ * muallim-api decides who may see this: whoever may read the lesson may read its
  * assignment. A submission comes back only for somebody who has one.
  */
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -36,7 +36,7 @@ export const actions: Actions = {
 	 * Sign a URL for one file.
 	 *
 	 * The browser calls this, then PUTs the bytes to the URL it gets back. It has
-	 * to come through here rather than from a script talking to lms-api directly:
+	 * to come through here rather than from a script talking to muallim-api directly:
 	 * the access token lives in an httpOnly cookie so that no script in the page
 	 * can read it, and the signature is what the store trusts instead.
 	 *
@@ -78,7 +78,7 @@ export const actions: Actions = {
 	/**
 	 * Record a file that is now in the bucket.
 	 *
-	 * lms-api asks the store what is really at that key before it writes anything,
+	 * muallim-api asks the store what is really at that key before it writes anything,
 	 * so a client that skips the PUT and calls this gets a 409 and no row. There is
 	 * no version of this the browser can lie its way through.
 	 */

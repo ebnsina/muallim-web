@@ -40,7 +40,7 @@ test('a rejected password is never rendered back into the page', async ({ reques
 });
 
 /**
- * lms-api answers 202 whether or not the address belongs to a member here, and
+ * muallim-api answers 202 whether or not the address belongs to a member here, and
  * this page must not undo that by rendering two different outcomes. If it did,
  * a stranger could read off which addresses belong to the workspace — on a
  * school's, that is a roster.

@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 /**
  * A learner's own grades in a course.
  *
- * lms-api reads the learner from the token. There is no path here — and none
+ * muallim-api reads the learner from the token. There is no path here — and none
  * there — that takes a user id from a request, so this page cannot be pointed at
  * somebody else by changing a query string.
  *

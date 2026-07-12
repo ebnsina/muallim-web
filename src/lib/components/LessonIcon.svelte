@@ -22,7 +22,7 @@
 
 		A lesson type this list has not heard of gets the page icon rather than
 		nothing: a row with a hole where its icon should be reads as a broken row, and
-		lms-api will add a type here before this file hears about it.
+		muallim-api will add a type here before this file hears about it.
 	*/
 	const ICONS: Record<string, IconSvgElement> = {
 		text: File01Icon,

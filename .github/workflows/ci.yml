@@ -29,7 +29,7 @@ jobs:
           --health-retries 5
 
       # A real S3 API, for the assignment suite. A learner's browser uploads
-      # straight to it, on another origin, with a URL lms-api signed — and there
+      # straight to it, on another origin, with a URL muallim-api signed — and there
       # is no other test anywhere that exercises that leg.
       #
       # Port 9002 because that is where docker-compose puts it, so the config
@@ -37,55 +37,55 @@ jobs:
       minio:
         image: bitnami/minio:latest
         env:
-          MINIO_ROOT_USER: lms
-          MINIO_ROOT_PASSWORD: lms-secret-key
-          MINIO_DEFAULT_BUCKETS: lms-uploads
+          MINIO_ROOT_USER: muallim
+          MINIO_ROOT_PASSWORD: muallim-secret-key
+          MINIO_DEFAULT_BUCKETS: muallim-uploads
         ports: ['9002:9000']
 
     defaults:
       run:
-        working-directory: lms-web
+        working-directory: muallim-web
 
     steps:
       # Both repos are checked out side by side, because that is how they sit on a
-      # developer's disk: the typed client is generated from lms-api's spec, and
-      # the end-to-end suite starts lms-api and its worker from `../lms-api`.
+      # developer's disk: the typed client is generated from muallim-api's spec, and
+      # the end-to-end suite starts muallim-api and its worker from `../muallim-api`.
       - uses: actions/checkout@v4
         with:
-          path: lms-web
+          path: muallim-web
 
       - uses: actions/checkout@v4
         with:
-          repository: ebnsina/lms-api
-          path: lms-api
+          repository: ebnsina/muallim-api
+          path: muallim-api
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: lms-api/go.mod
-          cache-dependency-path: lms-api/go.sum
+          go-version-file: muallim-api/go.mod
+          cache-dependency-path: muallim-api/go.sum
 
-      # Reads the pnpm version from lms-web/package.json's `packageManager`.
+      # Reads the pnpm version from muallim-web/package.json's `packageManager`.
       - uses: pnpm/action-setup@v4
         with:
-          package_json_file: lms-web/package.json
+          package_json_file: muallim-web/package.json
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: lms-web/pnpm-lock.yaml
+          cache-dependency-path: muallim-web/pnpm-lock.yaml
 
-      # NOSUPERUSER for the same reason lms-api's own CI insists on it: a
+      # NOSUPERUSER for the same reason muallim-api's own CI insists on it: a
       # superuser bypasses row level security, and the end-to-end tests would then
       # exercise tenant isolation that the database is not enforcing.
-      - name: Create the lms role and databases
-        working-directory: lms-api
+      - name: Create the muallim role and databases
+        working-directory: muallim-api
         env:
           PGPASSWORD: postgres
         run: |
-          psql -h localhost -U postgres -c "CREATE ROLE lms LOGIN PASSWORD 'lms' NOSUPERUSER NOBYPASSRLS"
-          psql -h localhost -U postgres -c "CREATE DATABASE lms OWNER lms"
-          psql -h localhost -U postgres -c "CREATE DATABASE lms_test OWNER lms"
+          psql -h localhost -U postgres -c "CREATE ROLE muallim LOGIN PASSWORD 'muallim' NOSUPERUSER NOBYPASSRLS"
+          psql -h localhost -U postgres -c "CREATE DATABASE muallim OWNER muallim"
+          psql -h localhost -U postgres -c "CREATE DATABASE muallim_test OWNER muallim"
 
       # The service container reports healthy before MinIO has created the bucket,
       # and an upload into a bucket that is not there yet fails for a reason that
@@ -100,7 +100,7 @@ jobs:
           exit 1
 
       - name: Migrate and seed the workspace
-        working-directory: lms-api
+        working-directory: muallim-api
         run: |
           make migrate
           make seed
@@ -108,7 +108,7 @@ jobs:
       # The contract. `pnpm gen:api` reads it, and a breaking change upstream
       # fails `pnpm check` below rather than production.
       - name: Generate the OpenAPI spec
-        working-directory: lms-api
+        working-directory: muallim-api
         run: make spec
 
       - run: pnpm install --frozen-lockfile
@@ -121,7 +121,7 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      # Starts lms-api, its job worker, and this app. Postgres is the only thing
+      # Starts muallim-api, its job worker, and this app. Postgres is the only thing
       # it does not bring up.
       - run: pnpm test:e2e
 
@@ -129,5 +129,5 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: lms-web/playwright-report/
+          path: muallim-web/playwright-report/
           retention-days: 7

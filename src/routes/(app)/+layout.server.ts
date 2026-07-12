@@ -29,7 +29,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 
 	/*
 		The token verified when `handle` ran and no longer does: the membership was
-		revoked, or the role changed and lms-api swept the sessions.
+		revoked, or the role changed and muallim-api swept the sessions.
 
 		Drop the cookies and carry on as a stranger. Redirecting to /login from a
 		layout would do it from every page at once, including the ones a stranger is

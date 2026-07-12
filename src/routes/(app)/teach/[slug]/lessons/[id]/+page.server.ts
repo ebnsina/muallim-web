@@ -16,7 +16,7 @@ function oneOf<T extends string>(allowed: readonly T[], value: string, fallback:
 }
 
 /**
- * The author reads the lesson through the same endpoint a learner does. lms-api
+ * The author reads the lesson through the same endpoint a learner does. muallim-api
  * answers with `access: "author"` and the full body, because entitlement is
  * decided there and not here.
  */

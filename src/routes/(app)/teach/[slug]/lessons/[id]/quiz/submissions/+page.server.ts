@@ -7,7 +7,7 @@ import type { PageServerLoad } from './$types';
  * The marking queue.
  *
  * `submission:grade` is what opens this, not `course:write` — a teaching
- * assistant marks work without being able to rewrite the course. lms-api decides
+ * assistant marks work without being able to rewrite the course. muallim-api decides
  * that; a student who follows this link gets 403 rather than an empty page.
  *
  * This is also the only place an attempt's id appears. A learner reaches their own

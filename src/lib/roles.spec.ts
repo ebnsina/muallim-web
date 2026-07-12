@@ -20,7 +20,7 @@ describe('canAuthor', () => {
 		The reason this is a list and not `role !== 'student'`.
 
 		A role nobody has taught this file about is a role that gets the link, under
-		the old test — and the link goes to a page lms-api answers 403 to. Denying by
+		the old test — and the link goes to a page muallim-api answers 403 to. Denying by
 		default means a new role starts invisible and is added deliberately.
 	*/
 	it('an unknown role may not', () => {
@@ -29,7 +29,7 @@ describe('canAuthor', () => {
 		expect(canAuthor({ role: '' })).toBe(false);
 	});
 
-	// Case matters. lms-api sends lowercase, and a match that ignored case would be
+	// Case matters. muallim-api sends lowercase, and a match that ignored case would be
 	// a rule that quietly disagreed with the one enforcing it.
 	it('does not guess at capitalisation', () => {
 		expect(canAuthor({ role: 'Owner' })).toBe(false);

@@ -14,7 +14,7 @@ export const actions: Actions = {
 			body: { email }
 		});
 
-		// lms-api answers 202 whether or not the address belongs to a member here,
+		// muallim-api answers 202 whether or not the address belongs to a member here,
 		// and this page must not undo that by rendering two different outcomes. A
 		// 429 is reported, because being throttled is a fact about the requester
 		// rather than about the address. Anything else is reported as a failure of

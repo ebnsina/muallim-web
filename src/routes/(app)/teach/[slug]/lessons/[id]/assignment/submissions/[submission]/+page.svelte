@@ -100,7 +100,7 @@
 
 	<!--
 		Re-marking is allowed: a marker who mistyped a grade should not have to ask a
-		learner to hand in again. lms-api records it in the same transaction as the
+		learner to hand in again. muallim-api records it in the same transaction as the
 		lesson completion, so a corrected fail reopens the lesson it had closed.
 	-->
 	<form method="POST" action="?/mark" use:enhance class="mt-10 space-y-6">

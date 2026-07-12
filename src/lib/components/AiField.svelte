@@ -17,7 +17,7 @@
 
 	let { prompt, onaccept, enabled = false, label = 'Draft with AI' }: Props = $props();
 
-	// The endpoint is a lms-web server route, not `/api` (which proxies to lms-api).
+	// The endpoint is a muallim-web server route, not `/api` (which proxies to muallim-api).
 	const chat = createChat({ connection: fetchServerSentEvents('/ai/generate') });
 	// No auto-cleanup in Svelte; stop a stream still running when we unmount.
 	onDestroy(() => chat.stop());

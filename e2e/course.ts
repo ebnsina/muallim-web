@@ -62,7 +62,7 @@ async function studentBearer(request: APIRequestContext): Promise<string> {
  * through the API, and returns the ids a test needs to address them.
  *
  * Each spec makes its own, under a slug nobody else uses. These tests share a
- * workspace — lms-api resolves it from the Host header, and there is one host —
+ * workspace — muallim-api resolves it from the Host header, and there is one host —
  * so isolation is a naming discipline rather than a transaction.
  */
 export async function publishedCourse(request: APIRequestContext, slug: string): Promise<Course> {

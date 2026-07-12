@@ -1,7 +1,7 @@
 /**
  * Uploading a file to the object store, from the browser.
  *
- * The bytes never pass through lms-api and never pass through this server. The
+ * The bytes never pass through muallim-api and never pass through this server. The
  * API signs a URL that accepts exactly one object of exactly one size; the
  * browser PUTs to it; then the API is told the key, checks with the store what
  * is really there, and only then writes a row.

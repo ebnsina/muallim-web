@@ -54,7 +54,7 @@ test.describe('handing in an assignment', () => {
 		await ready(page);
 		await page.getByLabel('Add files').setInputFiles(essay());
 
-		// The row appears only after lms-api has asked the store what is really at
+		// The row appears only after muallim-api has asked the store what is really at
 		// that key. Its size is the store's answer, not the browser's claim.
 		await expect(attached(page, 'essay.txt')).toBeVisible();
 		await expect(page.getByRole('main').getByText('32 B')).toBeVisible();

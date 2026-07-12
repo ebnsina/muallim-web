@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	await parent();
 	const [progress, prerequisites, enrolments, announcements, reviews] = await rest;
 
-	// Which prerequisites this reader has finished. lms-api refuses the enrolment
+	// Which prerequisites this reader has finished. muallim-api refuses the enrolment
 	// and names them, but a learner should see the gate before they walk into it.
 	const finished = new Set(
 		(enrolments?.data?.enrolments ?? [])
@@ -59,7 +59,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 
 		// After-enrolment drip counts from this learner's own enrolment, so the page
 		// cannot compute an unlock date without it. Sequential drip has no date at
-		// all, and lms-api is the only thing that knows which lesson comes next.
+		// all, and muallim-api is the only thing that knows which lesson comes next.
 		enrolledAt:
 			(enrolments?.data?.enrolments ?? []).find((e) => e.course_slug === params.slug)
 				?.enrolled_at ?? null,

@@ -30,7 +30,7 @@ export const load: LayoutServerLoad = async ({ locals, params, setHeaders, url }
 
 	if (problem || !data) {
 		// 404 for a draft, and for a course that never existed. Which one it is is not
-		// a stranger's business, and lms-api has already declined to say.
+		// a stranger's business, and muallim-api has already declined to say.
 		error(response?.status ?? 500, problemMessage(problem, 'That course could not be loaded.'));
 	}
 

@@ -1,5 +1,5 @@
 /**
- * RFC 9457 Problem Details, as rendered by lms-api. Every error response from
+ * RFC 9457 Problem Details, as rendered by muallim-api. Every error response from
  * the API has this shape, whichever layer produced it.
  */
 export interface Problem {

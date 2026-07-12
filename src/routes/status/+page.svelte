@@ -49,7 +49,7 @@
 					<p class="font-medium">Nothing is answering</p>
 					<p class="mt-1 text-sm text-muted">
 						Start the API with <code>make run</code> in the
-						<code>lms-api</code> repository.
+						<code>muallim-api</code> repository.
 					</p>
 				</div>
 			</div>

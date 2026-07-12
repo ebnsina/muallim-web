@@ -4,10 +4,10 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 /**
- * The address of lms-api as reached from this machine during development.
+ * The address of muallim-api as reached from this machine during development.
  * In production nothing points here: the edge routes /api itself.
  */
-const apiTarget = process.env.LMS_API_URL ?? 'http://localhost:8080';
+const apiTarget = process.env.MUALLIM_API_URL ?? 'http://localhost:8080';
 
 export default defineConfig({
 	/*
@@ -32,13 +32,13 @@ export default defineConfig({
 	server: {
 		/*
 			Stands in for the production edge, which serves this app at
-			acme.lms.com/ and routes acme.lms.com/api/* to lms-api with the Host
+			acme.muallim.com/ and routes acme.muallim.com/api/* to muallim-api with the Host
 			header intact. Reproducing that here means development and production
-			differ in no way that matters: one origin, no CORS, and lms-api resolves
+			differ in no way that matters: one origin, no CORS, and muallim-api resolves
 			the workspace from a Host it can trust because we set it.
 
 			`changeOrigin` stays false on purpose. Rewriting Host to the target would
-			make every request resolve the workspace named after lms-api's own
+			make every request resolve the workspace named after muallim-api's own
 			address, which is the bug this whole arrangement exists to avoid.
 		*/
 		proxy: {

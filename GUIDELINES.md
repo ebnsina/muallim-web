@@ -1,4 +1,4 @@
-# Engineering Guidelines — `lms-web`
+# Engineering Guidelines — `muallim-web`
 
 These are rules, not suggestions. A change that violates one should not merge.
 
@@ -19,27 +19,27 @@ If a doc and the compiler disagree, the compiler is right.
 
 ## 2. The API contract
 
-`lms-api` (sibling repo, `../lms-api`) owns the domain. This app owns presentation. The seam is the generated OpenAPI 3.1 spec.
+`muallim-api` (sibling repo, `../muallim-api`) owns the domain. This app owns presentation. The seam is the generated OpenAPI 3.1 spec.
 
 ```bash
-pnpm gen:api      # regenerates src/lib/api/schema.d.ts from lms-api's spec
+pnpm gen:api      # regenerates src/lib/api/schema.d.ts from muallim-api's spec
 ```
 
 `schema.d.ts` is **generated and gitignored**. Never hand-edit it. All API access goes through the typed `openapi-fetch` client in `src/lib/server/api.ts`; a raw `fetch()` to the API from a component is a rejection.
 
-The consequence, which is the point: a breaking change in `lms-api` fails `pnpm check` here, at build time, rather than in production.
+The consequence, which is the point: a breaking change in `muallim-api` fails `pnpm check` here, at build time, rather than in production.
 
 Do not duplicate backend domain rules in the client. Validate for _user experience_ (immediate feedback); the server validates for _correctness_. When they disagree, the server wins.
 
-### `lms-api` is same-origin, at `/api`
+### `muallim-api` is same-origin, at `/api`
 
-The edge serves this app at `acme.lms.com/` and routes `acme.lms.com/api/*` to `lms-api`, preserving `Host`. A Vite proxy does the same in development. Nothing here is cross-origin, so there is no CORS, no preflight, and no `Origin` header to forge during SSR.
+The edge serves this app at `acme.muallim.com/` and routes `acme.muallim.com/api/*` to `muallim-api`, preserving `Host`. A Vite proxy does the same in development. Nothing here is cross-origin, so there is no CORS, no preflight, and no `Origin` header to forge during SSR.
 
-**`Host` decides the workspace.** `lms-api` strips the port and takes the first label as the subdomain, so a request must reach it carrying the host the _browser_ addressed. Calling `lms-api` on an internal address while overriding `Host` does not work: `Host` is a forbidden header name for `fetch`, and Node drops it silently — the request succeeds, against the wrong workspace, and nothing says so. Never introduce a second, direct route to `lms-api`. The dev proxy sets `changeOrigin: false` for the same reason.
+**`Host` decides the workspace.** `muallim-api` strips the port and takes the first label as the subdomain, so a request must reach it carrying the host the _browser_ addressed. Calling `muallim-api` on an internal address while overriding `Host` does not work: `Host` is a forbidden header name for `fetch`, and Node drops it silently — the request succeeds, against the wrong workspace, and nothing says so. Never introduce a second, direct route to `muallim-api`. The dev proxy sets `changeOrigin: false` for the same reason.
 
-**Every call to `lms-api` is made from the server**, through `src/lib/server/api.ts`, which takes `url.origin` from the request being served. Authenticated reads have no choice: the access token is in an httpOnly cookie so that no script in the page can read it. Anonymous reads follow, because what `lms-api` returns depends on whether a token accompanied the request — an author sees drafts, an enrolled learner sees lesson bodies. There is no browser-side API client, and a relative `/api` URL in a universal `load` would not reach the proxy during SSR anyway.
+**Every call to `muallim-api` is made from the server**, through `src/lib/server/api.ts`, which takes `url.origin` from the request being served. Authenticated reads have no choice: the access token is in an httpOnly cookie so that no script in the page can read it. Anonymous reads follow, because what `muallim-api` returns depends on whether a token accompanied the request — an author sees drafts, an enrolled learner sees lesson bodies. There is no browser-side API client, and a relative `/api` URL in a universal `load` would not reach the proxy during SSR anyway.
 
-**Refreshing happens in exactly one place, and sessions are sticky.** `lms-api` rotates a refresh token on every use and treats one presented twice as theft — it revokes the whole session family. `hooks.server.ts` is the only place a refresh occurs, and it collapses concurrent attempts onto one in-flight promise. That map is per process, so **the edge must route a browser to one replica by hashing the `lms_rt` cookie.** Adding a second place that refreshes, or load-balancing round-robin, logs users out of every device through a race that reproduces rarely and never while you are watching.
+**Refreshing happens in exactly one place, and sessions are sticky.** `muallim-api` rotates a refresh token on every use and treats one presented twice as theft — it revokes the whole session family. `hooks.server.ts` is the only place a refresh occurs, and it collapses concurrent attempts onto one in-flight promise. That map is per process, so **the edge must route a browser to one replica by hashing the `muallim_rt` cookie.** Adding a second place that refreshes, or load-balancing round-robin, logs users out of every device through a race that reproduces rarely and never while you are watching.
 
 **Only whitelisted response headers survive SSR serialization.** SvelteKit embeds SSR `fetch` responses in the HTML for hydration and hides every header not named by `filterSerializedResponseHeaders`; reading a hidden one throws. `openapi-fetch` reads `content-length` to decide whether a response has a body, so `handle` in `hooks.server.ts` permits `content-length` and `content-type` — and nothing else, because whatever is listed there ends up in the page source. Never add `set-cookie` or `authorization` to that list.
 
@@ -75,7 +75,7 @@ src/
     components/   presentational, no data fetching, no direct API calls
     features/     feature-scoped composites (course-builder/, quiz-player/, ...)
     server/       server-only code, incl. api.ts — the ONLY place fetch touches
-                  lms-api. NEVER importable from a component.
+                  muallim-api. NEVER importable from a component.
     state/        *.svelte.ts shared runes
     utils/
   routes/
@@ -88,7 +88,7 @@ src/
 ## 5. Data loading
 
 - Use `load` in `+page.server.ts`. Fetching in `onMount` for initial page data is a rejection — it breaks SSR, and it breaks the loading and error boundaries you get for free.
-- Anything that calls `lms-api`, holds a secret, or reads the session belongs in `+page.server.ts` or `+layout.server.ts`. That is nearly everything: see §2.
+- Anything that calls `muallim-api`, holds a secret, or reads the session belongs in `+page.server.ts` or `+layout.server.ts`. That is nearly everything: see §2.
 - In a universal `load`, use the `fetch` it provides. It carries cookies and dedupes against SSR.
 - Mutations are **form actions** with progressive enhancement (`use:enhance`), not `onclick` handlers firing `fetch`. Forms work before JavaScript loads; that is not nostalgia, it is the accessibility and reliability baseline.
 
@@ -196,7 +196,7 @@ git config user.email "ebnsina.me@gmail.com"
 
 Set **per repo**, never globally. Do **not** add a `Co-Authored-By` trailer or any other identity.
 
-Remote uses the `github-es` SSH host alias: `git@github-es:ebnsina/lms-web.git`.
+Remote uses the `github-es` SSH host alias: `git@github-es:ebnsina/muallim-web.git`.
 
 `docs/` and `data/` are gitignored and never committed.
 

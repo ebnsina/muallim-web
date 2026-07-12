@@ -1,7 +1,7 @@
 /**
  * What a role lets somebody see in the navigation.
  *
- * None of this is a control. lms-api decides what a request may do, from the
+ * None of this is a control. muallim-api decides what a request may do, from the
  * bearer token, and it refuses a student who types `/teach` whether or not this
  * file agrees. What lives here is a courtesy: a link to a page that will answer
  * 403 is a link nobody should be shown.
@@ -19,7 +19,7 @@ export function canAuthor(user: { role?: string } | null | undefined): boolean {
 }
 
 // The same roles moderate the community today. A courtesy for the "New board"
-// and pin/lock affordances; lms-api enforces forum:moderate regardless.
+// and pin/lock affordances; muallim-api enforces forum:moderate regardless.
 const MODERATORS = new Set(['owner', 'admin', 'instructor']);
 
 /** Whether to show forum moderation controls. Absent and student deny. */

@@ -5,20 +5,20 @@ import { singleFlight } from './single-flight';
 
 /**
  * The session lives in two httpOnly cookies, written by this server and never
- * readable by a script in the page. lms-api returns its tokens in a response
+ * readable by a script in the page. muallim-api returns its tokens in a response
  * body because it also serves a mobile app and a WordPress plugin; a browser
  * client should not keep them anywhere JavaScript can reach.
  */
-const ACCESS_COOKIE = 'lms_at';
-const REFRESH_COOKIE = 'lms_rt';
+const ACCESS_COOKIE = 'muallim_at';
+const REFRESH_COOKIE = 'muallim_rt';
 
-/** Matches lms-api's RefreshTokenTTL. */
+/** Matches muallim-api's RefreshTokenTTL. */
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 30;
 
 /**
  * Shaved off the access cookie's lifetime so the cookie expires slightly before
  * the token it holds. Otherwise a request lands in the window where we still
- * believe the token is good and lms-api has already stopped accepting it, which
+ * believe the token is good and muallim-api has already stopped accepting it, which
  * surfaces as a spurious 401 rather than a refresh.
  */
 const EXPIRY_SKEW_SECONDS = 30;
@@ -61,7 +61,7 @@ export function clearSession(cookies: Cookies): void {
 /**
  * In-flight refreshes, keyed by the refresh token being spent.
  *
- * This is not an optimisation. lms-api rotates a refresh token on every use and
+ * This is not an optimisation. muallim-api rotates a refresh token on every use and
  * treats a token presented twice as theft — it revokes the entire session
  * family, logging the user out of every device. Two requests arriving together
  * with the same expired access cookie would each try to spend the same refresh
@@ -72,7 +72,7 @@ export function clearSession(cookies: Cookies): void {
  *
  * The map is per process, so it only holds if both requests reach the same
  * process. **The edge must route a browser to one replica by hashing the
- * `lms_rt` cookie.** That is a deployment requirement, not a preference, and it
+ * `muallim_rt` cookie.** That is a deployment requirement, not a preference, and it
  * is written down in the README beside the `/api` routing it sits next to.
  * Without it, a user with two tabs is logged out of every device by a race that
  * looks exactly like theft — and reproduces about as often as one would expect
@@ -104,7 +104,7 @@ async function exchangeRefreshToken(origin: string, refreshToken: string): Promi
 		});
 		return data ? (data as Tokens) : null;
 	} catch {
-		// lms-api is unreachable. Treat it as no session rather than a crash: the
+		// muallim-api is unreachable. Treat it as no session rather than a crash: the
 		// visitor sees a login page instead of a 500.
 		return null;
 	}

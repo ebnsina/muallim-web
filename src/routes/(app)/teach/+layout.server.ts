@@ -12,7 +12,7 @@ import type { LayoutServerLoad } from './$types';
  * be damaged — but a student was shown an editor, and being told "no" once per
  * button is not the same as not being offered the button.
  *
- * The check asks lms-api rather than deciding here. `/v1/me/courses` requires
+ * The check asks muallim-api rather than deciding here. `/v1/me/courses` requires
  * `course:write` and answers 403 without it, so the authorisation rule stays in
  * the one place that owns it; mapping roles to permissions in this repo would be
  * a copy that silently rots. `limit=1` keeps it to a single indexed row.

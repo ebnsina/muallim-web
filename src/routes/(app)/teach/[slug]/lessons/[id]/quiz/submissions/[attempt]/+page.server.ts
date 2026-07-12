@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		attemptId: params.attempt,
 		attempt: submission.data.attempt,
 
-		// Only the essays are markable. The rest are shown for context, and lms-api
+		// Only the essays are markable. The rest are shown for context, and muallim-api
 		// refuses a mark on them — an instructor who could overwrite the machine's
 		// verdict on a multiple-choice question could quietly make a wrong answer right.
 		questions: (submission.data.questions ?? []).map((question) => ({

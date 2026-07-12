@@ -7,7 +7,7 @@ const PAGE_SIZE = 20;
 
 /**
  * The cursor is opaque and lives in the URL, so a page of results is a place a
- * learner can bookmark, share, and return to. lms-api pages by keyset rather
+ * learner can bookmark, share, and return to. muallim-api pages by keyset rather
  * than OFFSET, which is why there is a `next_cursor` and no page number: there
  * is no "page 7" to link to, and asking for one would read and discard the six
  * pages in front of it.

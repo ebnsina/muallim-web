@@ -36,7 +36,7 @@ export const handle: Handle = async ({ event, resolve }) => {
  * attacker could use. The real error is logged against a correlation ID; the
  * user gets only the ID.
  *
- * We reuse the `x-request-id` lms-api echoes when the failing request came from
+ * We reuse the `x-request-id` muallim-api echoes when the failing request came from
  * the API, so one identifier spans both services.
  */
 export const handleError: HandleServerError = ({ error, event, status, message }) => {

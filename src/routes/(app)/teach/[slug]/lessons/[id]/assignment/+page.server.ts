@@ -42,7 +42,7 @@ function toLocalInput(iso: string | null | undefined): string {
  * A lesson's assignment, as its author sees it.
  *
  * A lesson may not have one, and that is not an error — it is the empty form.
- * lms-api answers 404 for both "no assignment" and "no lesson you may edit", and
+ * muallim-api answers 404 for both "no assignment" and "no lesson you may edit", and
  * `teach` has already established the second, so a 404 here means the first.
  */
 export const load: PageServerLoad = async ({ locals, params, url }) => {

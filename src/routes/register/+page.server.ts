@@ -4,7 +4,7 @@ import { serverApi } from '$lib/server/api';
 import { setSession } from '$lib/server/session';
 import type { Actions, PageServerLoad } from './$types';
 
-/** Mirrors lms-api's MinPasswordLength. Length beats composition rules. */
+/** Mirrors muallim-api's MinPasswordLength. Length beats composition rules. */
 const MIN_PASSWORD_LENGTH = 12;
 
 export const load: PageServerLoad = ({ locals }) => {

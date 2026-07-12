@@ -25,7 +25,7 @@
 
 <!--
 	Every file here is one somebody uploaded, and its name is a string they chose.
-	Svelte escapes it, and lms-api has already stripped the characters that end a
+	Svelte escapes it, and muallim-api has already stripped the characters that end a
 	`Content-Disposition` header early — but the name is a label and nothing more.
 	The file is addressed by its id, and fetched through a URL the server signs.
 -->
