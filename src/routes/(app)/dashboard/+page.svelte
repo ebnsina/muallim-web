@@ -20,6 +20,7 @@
 		DonutLegend,
 		EmptyState,
 		Icon,
+		MiniCalendar,
 		Page,
 		Progress,
 		RadialProgress
@@ -175,126 +176,166 @@
 		happened to be an aside, which is a layout deciding an argument it should
 		not have been in.
 	-->
-	<div class="mt-8 grid gap-6 lg:grid-cols-2">
-		<!--
-			White and floating, like every other card on the page. It was sunken because it
-			was an aside; it is not an aside any more, and a grey box at the top of a page
-			reads as something switched off.
-		-->
-		<Card float class="p-5 sm:p-6">
-			<h2 class="flex items-center gap-2.5 text-sm font-medium">
-				<span
-					class="flex size-7 items-center justify-center rounded-control bg-accent-surface text-accent-text"
-				>
-					<Icon icon={ChartAverageIcon} class="size-4" strokeWidth={2} />
-				</span>
-				At a glance
-			</h2>
+	<!-- ==================================================== at a glance (section) -->
+	<!--
+		Its own section, running the width of the page. It was half of a two-up row with
+		points beside it, and the two were never the same kind of thing: this is what
+		became of the courses you started, and that is a game you are playing. Sharing a
+		row made them look like one statement in two halves.
+	-->
+	<section class="mt-8">
+		<h2 class="flex items-center gap-2.5 text-lg font-semibold">
+			<span
+				class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent-text"
+			>
+				<Icon icon={ChartAverageIcon} class="size-4.5" strokeWidth={2} />
+			</span>
+			At a glance
+		</h2>
 
-			<!--
+		<Card float class="mt-4 p-5 sm:p-6">
+			<div class="flex flex-col gap-8 lg:flex-row lg:items-stretch">
+				<!--
 					What became of every course this learner started — three states of one
 					whole, so they are drawn as parts of one rather than as three tiles that
 					happen to sit together. Hovering a row lights its slice and hovering a
 					slice lights its row: one bound value, so the two cannot disagree.
 				-->
-			<div class="mt-5 flex items-center gap-5">
-				<Donut segments={courseMix} centreLabel="courses" bind:hovered size={132} />
+				<div class="flex items-center gap-6 lg:w-80 lg:shrink-0">
+					<Donut segments={courseMix} centreLabel="courses" bind:hovered size={150} />
 
-				{#if data.enrolments.length === 0}
-					<p class="text-muted min-w-0 flex-1 text-sm">
-						Nothing yet. Enrol on a course and this fills itself in.
-					</p>
-				{:else}
-					<div class="min-w-0 flex-1">
-						<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
-					</div>
-				{/if}
-			</div>
-
-			<!--
-				The figure wears the colour of its own tile. Colour here is not decoration:
-				it is the thread tying the number to the mark beside it, and a page where
-				every number is the same ink is a page you have to read rather than scan.
-			-->
-			<dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-5">
-				{#each STATS as stat (stat.label)}
-					<div>
-						<dt class="text-muted flex items-center gap-2 text-xs">
-							<span
-								class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
-							>
-								<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
-							</span>
-							{stat.label}
-						</dt>
-						<dd class={cn('numeral mt-2 text-2xl font-semibold tracking-tight', INK[stat.tone])}>
-							{stat.value}
-						</dd>
-					</div>
-				{/each}
-			</dl>
-		</Card>
-
-		<!-- Points, rank, and badges — a nudge to keep going. -->
-		{#if data.gamification}
-			{@const g = data.gamification}
-			<Card float class="p-5 sm:p-6">
-				<div class="flex items-baseline justify-between gap-3">
-					<h2 class="flex items-center gap-2.5 text-sm font-medium">
-						<span
-							class="flex size-7 items-center justify-center rounded-control bg-warning-surface text-warning-text"
-						>
-							<Icon icon={Award01Icon} class="size-4" strokeWidth={2} />
-						</span>
-						Progress points
-					</h2>
-					<a
-						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
-						href={resolve('/leaderboard')}
-					>
-						Leaderboard
-					</a>
-				</div>
-
-				<div class="mt-5 flex items-baseline gap-3">
-					<span class="text-accent-text numeral text-3xl font-semibold tracking-tight">
-						{g.points}
-					</span>
-					<span class="text-muted text-sm">points</span>
-					{#if g.out_of > 0}
-						<span class="text-muted ml-auto text-sm">
-							Rank <span class="numeral">{g.rank}</span> of
-							<span class="numeral">{g.out_of}</span>
-						</span>
+					{#if data.enrolments.length === 0}
+						<p class="text-muted min-w-44 text-sm">
+							Nothing yet. Enrol on a course and this fills itself in.
+						</p>
+					{:else}
+						<div class="min-w-44">
+							<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
+						</div>
 					{/if}
 				</div>
 
-				<ul class="mt-5 space-y-2">
-					{#each g.badges as badge (badge.code)}
-						<li
-							class={cn(
-								'flex items-center gap-2.5 text-sm',
-								badge.earned ? 'text-text' : 'text-muted/60'
-							)}
-						>
-							<span
+				<!--
+					The figure wears the colour of its own tile. Colour here is not decoration:
+					it is the thread tying the number to the mark beside it, and a page where
+					every number is the same ink is a page you have to read rather than scan.
+				-->
+				<dl
+					class="grid flex-1 grid-cols-2 content-center gap-6 lg:border-l lg:border-border lg:pl-8"
+				>
+					{#each STATS as stat (stat.label)}
+						<div>
+							<dt class="text-muted flex items-center gap-2 text-xs">
+								<span
+									class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
+								>
+									<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
+								</span>
+								{stat.label}
+							</dt>
+							<dd class={cn('numeral mt-2 text-3xl font-semibold tracking-tight', INK[stat.tone])}>
+								{stat.value}
+							</dd>
+						</div>
+					{/each}
+				</dl>
+
+				<!--
+					What is owed, and when. The right of this card was empty, and a learner's
+					next question after "how am I doing" is "what is due" — the calendar is
+					the one thing on this page with a date on it, so it earns the space.
+
+					Every date on it is real: muallim-api answers /v1/me/deadlines with the
+					assignments this learner has not handed in, and decides what is overdue
+					against its own clock.
+				-->
+				<div class="lg:w-72 lg:shrink-0 lg:border-l lg:border-border lg:pl-8">
+					<MiniCalendar deadlines={data.deadlines} />
+				</div>
+			</div>
+		</Card>
+	</section>
+
+	<!-- ================================================= progress points (section) -->
+	{#if data.gamification}
+		{@const g = data.gamification}
+		{@const badges = g.badges ?? []}
+		{@const earned = badges.filter((badge) => badge.earned).length}
+		<section class="mt-10">
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<h2 class="flex items-center gap-2.5 text-lg font-semibold">
+					<span
+						class="flex size-8 items-center justify-center rounded-control bg-warning-surface text-warning-text"
+					>
+						<Icon icon={Award01Icon} class="size-4.5" strokeWidth={2} />
+					</span>
+					Progress points
+				</h2>
+
+				<a
+					class="text-accent-text text-sm underline-offset-4 hover:underline"
+					href={resolve('/leaderboard')}
+				>
+					See the leaderboard
+				</a>
+			</div>
+
+			<!--
+				Three tiles, because these are three separate facts and a paragraph of them
+				is a paragraph nobody reads. Points is what you have, rank is where that
+				puts you, badges is what is left.
+			-->
+			<dl class="mt-4 grid gap-4 sm:grid-cols-3">
+				<Card float class="p-5">
+					<dt class="text-muted text-xs tracking-wide uppercase">Points earned</dt>
+					<dd class="text-accent-text numeral mt-2 text-3xl font-semibold tracking-tight">
+						{g.points}
+					</dd>
+					<p class="text-muted mt-1 text-xs">Ten a lesson, a hundred a course.</p>
+				</Card>
+
+				<Card float class="p-5">
+					<dt class="text-muted text-xs tracking-wide uppercase">Rank</dt>
+					<dd class="mt-2 flex items-baseline gap-1.5">
+						<span class="numeral text-3xl font-semibold tracking-tight">{g.rank}</span>
+						{#if g.out_of > 0}
+							<span class="text-muted numeral text-sm">of {g.out_of}</span>
+						{/if}
+					</dd>
+					<p class="text-muted mt-1 text-xs">Across everybody in this workspace.</p>
+				</Card>
+
+				<Card float class="p-5">
+					<dt class="text-muted text-xs tracking-wide uppercase">Badges</dt>
+					<dd class="mt-2 flex items-baseline gap-1.5">
+						<span class="text-warning-text numeral text-3xl font-semibold tracking-tight">
+							{earned}
+						</span>
+						<span class="text-muted numeral text-sm">of {badges.length}</span>
+					</dd>
+
+					<!-- Each badge, earned or not: what is left to earn is the reason for
+					     showing the ones already earned. -->
+					<ul class="mt-3 flex flex-wrap gap-1.5">
+						{#each badges as badge (badge.code)}
+							<li
+								title="{badge.name} — {badge.description}"
 								class={cn(
-									'flex size-6 shrink-0 items-center justify-center rounded-full',
-									badge.earned ? 'bg-accent-surface text-accent-text' : 'bg-surface-sunken'
+									'flex items-center gap-1.5 rounded-pill px-2 py-1 text-xs font-medium',
+									badge.earned
+										? 'bg-warning-surface text-warning-text'
+										: 'bg-surface-sunken text-muted/70'
 								)}
 							>
-								<Icon icon={Award01Icon} class="size-3.5" strokeWidth={2} />
-							</span>
-							<span class="min-w-0">
-								<span class="font-medium">{badge.name}</span>
-								<span class="text-muted block text-xs">{badge.description}</span>
-							</span>
-						</li>
-					{/each}
-				</ul>
-			</Card>
-		{/if}
-	</div>
+								<Icon icon={Award01Icon} class="size-3" strokeWidth={2} />
+								{badge.name}
+							</li>
+						{/each}
+					</ul>
+				</Card>
+			</dl>
+		</section>
+	{/if}
 
 	<div class="mt-10 grid gap-8 lg:grid-cols-3">
 		<!-- ================================================= learning (main) -->

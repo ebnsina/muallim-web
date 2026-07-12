@@ -30,10 +30,11 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 		from the role whether to ask would trade a request that costs nothing for a
 		rule that can disagree with muallim-api. muallim-api is the authority, and it says no.
 	*/
-	const [enrolments, teaching, gamification] = await Promise.all([
+	const [enrolments, teaching, gamification, deadlines] = await Promise.all([
 		api.GET('/v1/me/enrolments'),
 		api.GET('/v1/me/courses', { params: { query: { limit: 6 } } }),
-		api.GET('/v1/me/gamification')
+		api.GET('/v1/me/gamification'),
+		api.GET('/v1/me/deadlines', { params: { query: { limit: 10 } } })
 	]);
 
 	// A failure to list either is not a failure to show the profile. The section
@@ -43,7 +44,11 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 		user,
 		enrolments: enrolments.data?.enrolments ?? [],
 		teaching: teaching.data?.courses ?? [],
-		gamification: gamification.data ?? null
+		gamification: gamification.data ?? null,
+
+		// muallim-api decides what is overdue, from its own clock. Nothing here
+		// recomputes it: a browser's "now" is whatever its owner set it to.
+		deadlines: deadlines.data?.deadlines ?? []
 	};
 };
 
