@@ -8,11 +8,21 @@
 		label: string;
 		/** The pixel size of the ring. The number inside scales with it. */
 		size?: number;
-		tone?: 'accent' | 'success';
+		/** The enrolment states wear the chart palette, so a ring agrees with the
+		 *  donut slice describing the same course. See `Progress`. */
+		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed';
 		class?: string;
 	};
 
 	let { value, label, size = 80, tone = 'accent', class: className }: Props = $props();
+
+	const STROKE: Record<string, string> = {
+		accent: 'stroke-accent',
+		success: 'stroke-success',
+		active: 'stroke-chart-1',
+		completed: 'stroke-chart-2',
+		lapsed: 'stroke-chart-3'
+	};
 
 	const clamped = $derived(Math.min(100, Math.max(0, Math.round(value))));
 
@@ -40,7 +50,7 @@
 			cy="18"
 			r={R}
 			fill="none"
-			class={tone === 'success' ? 'stroke-success' : 'stroke-accent'}
+			class={STROKE[tone] ?? STROKE.accent}
 			stroke-width="2.5"
 			stroke-linecap="round"
 			stroke-dasharray="{clamped} 100"

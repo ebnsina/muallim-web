@@ -82,8 +82,17 @@
 			</p>
 		</div>
 
+		<!--
+			The bar turns the colour of the state it reached. A finished course is green
+			here and green in the donut on the learner's dashboard: one palette, so the
+			colour means the same thing wherever they meet it.
+		-->
 		<div class="mt-3">
-			<ProgressBar value={progress?.percent ?? 0} label="Course progress" />
+			<ProgressBar
+				value={progress?.percent ?? 0}
+				tone={(progress?.percent ?? 0) === 100 ? 'completed' : 'active'}
+				label="Course progress"
+			/>
 		</div>
 
 		<p class="text-muted mt-2 text-sm">

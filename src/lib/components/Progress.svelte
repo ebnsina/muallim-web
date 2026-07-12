@@ -9,11 +9,28 @@
 		 * a picture of a number is not readable by anyone who cannot see it.
 		 */
 		label: string;
-		tone?: 'accent' | 'success';
+		/**
+		 * `active`, `completed` and `lapsed` are the three states of an enrolment, and
+		 * they wear the chart palette — the same hues the donut gives those slices. A
+		 * bar and a slice describing the same course must agree, or the reader has two
+		 * colour systems to learn instead of one.
+		 *
+		 * `accent` and `success` remain for bars that are not an enrolment: a score, a
+		 * quota, anything whose full is not a finished course.
+		 */
+		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed';
 		class?: string;
 	};
 
 	let { value, max = 100, label, tone = 'accent', class: className }: Props = $props();
+
+	const FILL: Record<string, string> = {
+		accent: 'bg-accent',
+		success: 'bg-success',
+		active: 'bg-chart-1',
+		completed: 'bg-chart-2',
+		lapsed: 'bg-chart-3'
+	};
 
 	// A bar that renders 130% of itself is a layout bug, not a celebration.
 	const percent = $derived(max <= 0 ? 0 : Math.min(100, Math.max(0, (value / max) * 100)));
@@ -41,7 +58,7 @@
 	<div
 		class={cn(
 			'h-full w-full rounded-full transition-transform duration-(--duration-slow) ease-out',
-			tone === 'success' ? 'bg-success' : 'bg-accent'
+			FILL[tone] ?? FILL.accent
 		)}
 		style="transform: translateX({percent - 100}%)"
 	></div>

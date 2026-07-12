@@ -193,7 +193,12 @@
 								<div class="flex items-start gap-5">
 									{#if index === 0}
 										<div class="hidden shrink-0 sm:block">
-											<RadialProgress value={percent} label="{percent}% complete" size={84} />
+											<RadialProgress
+												value={percent}
+												tone="active"
+												label="{percent}% complete"
+												size={84}
+											/>
 										</div>
 									{/if}
 
@@ -231,9 +236,15 @@
 											</span>
 										</div>
 										<div class="mt-2">
+											<!--
+												In the state's own colour, which is the donut's colour for that
+												slice. Every course on this page now says what became of it in the
+												same hue whether it is a bar, a ring, or an arc.
+											-->
 											<Progress
 												value={progress?.lessons_completed ?? 0}
 												max={progress?.lessons_total ?? 1}
+												tone="active"
 												label="{percent}% of {enrolment.course_title} complete"
 											/>
 										</div>
