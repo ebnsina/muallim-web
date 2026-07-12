@@ -343,8 +343,22 @@
 	*/
 	/* The flat colour behind the sheet: the band's own base, or a sliver of the
 	   wrong blue shows wherever the sheet does not reach. Follows the band — teal. */
-	.bg-aurora-base {
-		background-color: #0f3a1c;
+	/*
+		The frame: the band, and the strip of it the sheet's rounded corners cut back
+		into.
+
+		`background-attachment: fixed` on both, so each gradient is computed against the
+		viewport rather than against its own box — which makes them the same paint, and
+		the corner arc reveals exactly the colour that is directly above it. Before this
+		the strip was a flat colour under a gradient band, and the mismatch showed as a
+		dark notch in the corner: the one place on the page the two ever meet.
+
+		Only the frame gets this. A card with a fixed background would show a slice of
+		the *window's* gradient rather than its own, and it would slide as the page
+		scrolled underneath it.
+	*/
+	.aurora-frame {
+		background-attachment: fixed;
 	}
 
 	.aurora-1 {

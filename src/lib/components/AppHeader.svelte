@@ -155,7 +155,7 @@
 	stacking order it covers the account menu that hangs out of the band — and a menu
 	you cannot press is worse than no menu at all.
 -->
-<header class="aurora aurora-6 sticky top-0 z-30 text-on-solid">
+<header class="aurora aurora-6 aurora-frame sticky top-0 z-30 text-on-solid">
 	<!-- Taller than a bar needs to be, deliberately: the band is a surface, and a surface
 	     has to be big enough for its light to read as light. -->
 	<div class="flex h-20 items-center gap-3 px-4 sm:h-24 sm:gap-6 sm:px-6 lg:px-8">
