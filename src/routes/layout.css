@@ -344,7 +344,7 @@
 	/* The flat colour behind the sheet: the band's own base, or a sliver of the
 	   wrong blue shows wherever the sheet does not reach. Follows the band — teal. */
 	.bg-aurora-base {
-		background-color: #0b3a4a;
+		background-color: #0f3a1c;
 	}
 
 	.aurora-1 {
