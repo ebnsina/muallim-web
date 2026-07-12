@@ -331,6 +331,23 @@
 		color: var(--text-on-solid);
 	}
 
+	/*
+		The aurora never prints. It is ink an inkjet would spend a cartridge on, it turns
+		a certificate into a dark rectangle with white type nobody can read on paper, and
+		the browser drops backgrounds by default anyway — so this says out loud what it
+		would otherwise do silently, and puts the ink back.
+	*/
+	@media print {
+		.aurora {
+			background: none;
+			color: var(--text);
+		}
+
+		.aurora::after {
+			display: none;
+		}
+	}
+
 	/* The dither. A fractal-noise tile at a whisper, over the fill and under the
 	   content — it is texture, so it never intercepts a pointer. */
 	.aurora::after {

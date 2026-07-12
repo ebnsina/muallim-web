@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ArrowRight01Icon, Mortarboard02Icon } from '@hugeicons/core-free-icons';
-	import { Badge, EmptyState, Icon, Page, PageHeader, Row } from '$lib/components';
+	import { Badge, Card, EmptyState, Icon, Page, Row } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -12,10 +12,31 @@
 <svelte:head><title>Certificates — Muallim</title></svelte:head>
 
 <Page width="wide">
-	<PageHeader
-		title="Your certificates"
-		description="Earned by finishing a course. Each has a number anybody can verify."
-	/>
+	<!--
+		The aurora, spent here for the same reason it is spent on the course you are
+		part-way through: this is the page that is *about* having finished something. An
+		award that looks like a filing cabinet is an award nobody frames.
+	-->
+	<Card surface="aurora" class="flex items-center gap-5 p-6 sm:p-8">
+		<span
+			class="hidden size-14 shrink-0 items-center justify-center rounded-full bg-on-solid/15 sm:flex"
+		>
+			<Icon icon={Mortarboard02Icon} class="size-7" />
+		</span>
+
+		<div class="min-w-0">
+			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Your certificates</h1>
+			<p class="mt-1.5 text-sm text-on-solid/80">
+				{#if data.certificates.length === 0}
+					Earned by finishing a course. Each has a number anybody can verify.
+				{:else}
+					<span class="numeral">{data.certificates.length}</span>
+					{data.certificates.length === 1 ? 'certificate' : 'certificates'}, each with a number
+					anybody can verify.
+				{/if}
+			</p>
+		</div>
+	</Card>
 
 	{#if data.certificates.length === 0}
 		<div class="mt-10">

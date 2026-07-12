@@ -62,16 +62,24 @@
 		</Button>
 	</div>
 
-	<Certificate
-		title={certificate.title}
-		learnerName={certificate.learner_name}
-		courseTitle={certificate.course_title}
-		{issuedAt}
-		body={certificate.body}
-		signatory={certificate.signatory}
-		serial={certificate.serial}
-		revoked={certificate.revoked}
-	/>
+	<!--
+		The mat. A certificate on a page is a sheet of paper lying on a desk; on a mat it
+		is a thing that was awarded. It does not print — see the print rule in layout.css
+		— because a dark gradient behind a document is an inkjet's whole cartridge and a
+		document nobody can read on paper.
+	-->
+	<div class="aurora rounded-card p-4 sm:p-8 print:p-0">
+		<Certificate
+			title={certificate.title}
+			learnerName={certificate.learner_name}
+			courseTitle={certificate.course_title}
+			{issuedAt}
+			body={certificate.body}
+			signatory={certificate.signatory}
+			serial={certificate.serial}
+			revoked={certificate.revoked}
+		/>
+	</div>
 
 	<p class="text-muted mx-auto mt-8 max-w-2xl text-center text-sm print:hidden">
 		Anybody can verify this certificate at
