@@ -61,7 +61,21 @@
 	stars, a course nobody has enrolled on shows no count, and a course whose author
 	has been erased shows no name.
 -->
-<TintCard {href} panelClass="overflow-hidden bg-surface-raised p-0">
+<!--
+	`p-0` on the frame, not TintCard's usual `p-1`.
+
+	The shell insets its panel by a hair, which is right for a tinted box sitting on
+	a card. It is wrong for a cover that *is* the card: the inset leaves a four-pixel
+	ring of paper around the light, and the cover's own radius then fights the
+	frame's — same arc, four pixels apart, which is exactly the wobble you see at the
+	top-left corner and nowhere else. The cover runs to the card's edge instead, and
+	`overflow-hidden` on the frame is what rounds it.
+-->
+<TintCard
+	{href}
+	class="overflow-hidden p-0"
+	panelClass="flex flex-col rounded-none bg-surface-raised p-0"
+>
 	<!--
 		The title at the top and the meta at the foot, with the light between them.
 
@@ -76,7 +90,7 @@
 		the paper below now carries a rating and a byline, the card's height is the sum
 		of both, and the cover is the half that could afford to give.
 	-->
-	<div class={cn('relative flex aspect-square flex-col rounded-card p-4', cover)}>
+	<div class={cn('relative flex aspect-square flex-col p-4', cover)}>
 		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
