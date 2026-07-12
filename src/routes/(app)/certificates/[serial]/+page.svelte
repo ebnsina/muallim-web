@@ -63,12 +63,11 @@
 	</div>
 
 	<!--
-		The mat. A certificate on a page is a sheet of paper lying on a desk; on a mat it
-		is a thing that was awarded. It does not print — see the print rule in layout.css
-		— because a dark gradient behind a document is an inkjet's whole cartridge and a
-		document nobody can read on paper.
+		No mat. The certificate carries the light itself now — its emblem panel is the
+		aurora — and a coloured surround behind a coloured panel was two of the same
+		idea arguing about which one is the object.
 	-->
-	<div class="aurora rounded-card p-4 sm:p-8 print:p-0">
+	<div class="print:p-0">
 		<Certificate
 			title={certificate.title}
 			learnerName={certificate.learner_name}

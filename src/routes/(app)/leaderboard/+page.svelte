@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Award01Icon, ChampionIcon } from '@hugeicons/core-free-icons';
 	import { Card, EmptyState, Icon, Page, PageHeader, Progress } from '$lib/components';
-	import { cn } from '$lib/utils';
+	import { auroraFor, cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -83,7 +83,10 @@
 	-->
 	{#if data.me && data.me.out_of > 0}
 		{@const me = data.me}
-		<Card surface="aurora" class="mt-8 p-6 sm:p-8">
+		<!-- Its own light, drawn from the workspace's own name — the same hash a course
+			     card uses, so this page's colour is *a* colour of the product rather than the
+			     one every aurora surface defaults to. -->
+		<Card surface="aurora" class={cn('mt-8 p-6 sm:p-8', auroraFor('leaderboard'))}>
 			<div class="flex flex-wrap items-center gap-6">
 				<span class="flex size-16 shrink-0 items-center justify-center rounded-full bg-on-solid/15">
 					<Icon icon={ChampionIcon} class="size-8" />

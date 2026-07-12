@@ -1,22 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
 	import { UserGroupIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
-		Badge,
 		Button,
-		Card,
 		EmptyState,
 		Field,
-		Icon,
 		Input,
 		Page,
 		PageHeader,
 		Sheet,
 		Textarea
 	} from '$lib/components';
+	import { BoardRow } from '$lib/features/forum';
 	import { DURATION, easeOut } from '$lib/motion';
 	import { canModerate } from '$lib/roles';
 	import type { PageProps } from './$types';
@@ -113,33 +110,13 @@
 			/>
 		</div>
 	{:else}
-		<ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<!-- One bordered, divided list rather than a grid of floating cards: a board index is
+		     read down, and the border here is the divider between rows, not a box around each. -->
+		<ul
+			class="mt-6 max-w-4xl divide-y divide-border overflow-hidden rounded-card border border-border"
+		>
 			{#each data.spaces as space (space.id)}
-				<li>
-					<a
-						href={resolve(`/forum/spaces/${space.id}`)}
-						class="lift block h-full rounded-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-					>
-						<Card float class="h-full p-5">
-							<div class="flex items-start justify-between gap-3">
-								<h2 class="font-medium text-pretty">{space.title}</h2>
-								{#if space.workspace}
-									<Badge tone="accent">Workspace</Badge>
-								{:else}
-									<Badge tone="neutral">Course</Badge>
-								{/if}
-							</div>
-							{#if space.description}
-								<p class="text-muted mt-2 line-clamp-2 text-sm">{space.description}</p>
-							{/if}
-							<p class="text-muted mt-4 flex items-center gap-1.5 text-xs">
-								<Icon icon={UserGroupIcon} class="size-3.5" />
-								<span class="numeral">{space.thread_count}</span>
-								{space.thread_count === 1 ? 'thread' : 'threads'}
-							</p>
-						</Card>
-					</a>
-				</li>
+				<li><BoardRow {space} /></li>
 			{/each}
 		</ul>
 	{/if}

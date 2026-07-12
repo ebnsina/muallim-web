@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Cancel01Icon, Mortarboard02Icon } from '@hugeicons/core-free-icons';
+	import { auroraFor, cn } from '$lib/utils';
 	import Icon from './Icon.svelte';
 
 	type Props = {
@@ -74,14 +75,6 @@
 	class="relative mx-auto grid max-w-4xl overflow-hidden rounded-card border border-border bg-surface-raised [print-color-adjust:exact] sm:grid-cols-[1fr_auto]"
 	class:opacity-70={revoked}
 >
-	<!-- A faint constellation, on the reading side only. Masked to fade at the
-	     edges so it reads as texture, not as dots someone forgot to remove. -->
-	<div
-		class="pointer-events-none absolute inset-0 opacity-[0.5] [mask-image:radial-gradient(120%_120%_at_20%_20%,black,transparent)]"
-		style="background-image: radial-gradient(var(--accent-border) 1px, transparent 1px); background-size: 22px 22px;"
-		aria-hidden="true"
-	></div>
-
 	<!-- ------------------------------------------------------ content (left) -->
 	<div class="relative px-8 py-10 sm:px-12 sm:py-14">
 		{#if revoked}
@@ -150,10 +143,10 @@
 		it would be a sliver nobody could read; the seal below carries the mark there.
 	-->
 	<div
-		class="relative hidden w-56 overflow-hidden text-white sm:block"
-		style="background:
-			radial-gradient(120% 80% at 70% 15%, oklch(0.44 0.055 265), transparent 60%),
-			linear-gradient(160deg, oklch(0.32 0.04 268), oklch(0.18 0.025 265) 75%);"
+		class={cn(
+			'aurora aurora-ink relative hidden w-56 overflow-hidden text-on-solid [print-color-adjust:exact] sm:block',
+			auroraFor(serial)
+		)}
 		aria-hidden="true"
 	>
 		<!-- The emblem, glowing. A blurred disc of light behind a crisp mark. -->

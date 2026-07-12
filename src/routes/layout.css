@@ -503,12 +503,21 @@
 		would otherwise do silently, and puts the ink back.
 	*/
 	@media print {
-		.aurora {
+		/*
+			An aurora is a screen surface: on paper it is a page of ink nobody asked for,
+			behind text that stops being readable the moment a printer runs light.
+
+			`.aurora-ink` opts back in, and exactly one thing uses it — the certificate's
+			emblem panel, which is a printed object whose whole job is to look like an
+			award. It carries `print-color-adjust: exact`, so the printer is told to keep
+			the colour rather than "helpfully" dropping it.
+		*/
+		.aurora:not(.aurora-ink) {
 			background: none;
 			color: var(--text);
 		}
 
-		.aurora::after {
+		.aurora:not(.aurora-ink)::after {
 			display: none;
 		}
 	}

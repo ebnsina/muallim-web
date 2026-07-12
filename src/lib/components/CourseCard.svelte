@@ -1,5 +1,8 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+	import { CheckmarkCircle02Icon, PencilEdit02Icon } from '@hugeicons/core-free-icons';
 	import { auroraFor, cn } from '$lib/utils';
+	import Badge from './Badge.svelte';
 	import Difficulty from './Difficulty.svelte';
 	import Stars from './Stars.svelte';
 	import TintCard from './TintCard.svelte';
@@ -18,6 +21,18 @@
 		/** The mean rating, and how many gave it. No reviews draws no stars. */
 		ratingAverage?: number;
 		ratingCount?: number;
+		/**
+		 * `draft` or `published`, for an author looking at their own shelf. A learner
+		 * never sees an unpublished course, so a listing that omits this is a listing
+		 * where every course is live and the badge would say nothing.
+		 */
+		status?: string;
+		/**
+		 * What an author can do to the course from here — an edit link, a publish form.
+		 * Rendered above the card's own link, which is a stretched overlay: a button
+		 * inside an anchor is not a thing HTML has an answer for.
+		 */
+		actions?: Snippet;
 		href: string;
 		/**
 		 * What the card's cover light is drawn from — the slug, so a course wears the
@@ -36,6 +51,8 @@
 		learnerCount,
 		ratingAverage,
 		ratingCount,
+		status,
+		actions,
 		href,
 		seed
 	}: Props = $props();
@@ -111,7 +128,19 @@
 		of both, and the cover is the half that could afford to give.
 	-->
 	<div class={cn('relative flex aspect-square flex-col rounded-[14px] p-4', cover)}>
-		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
+		{#if status && status !== 'published'}
+			<!-- A draft says so on its cover, where the eye already is. It is the one thing
+			     about an unpublished course that matters more than its name. -->
+			<span class="absolute top-4 right-4 z-20">
+				<Badge tone="warning" icon={PencilEdit02Icon}>{status}</Badge>
+			</span>
+		{:else if status === 'published'}
+			<span class="absolute top-4 right-4 z-20">
+				<Badge tone="success" icon={CheckmarkCircle02Icon}>Live</Badge>
+			</span>
+		{/if}
+
+		<h2 class="line-clamp-2 pr-20 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
 			The meta, in the cover's own ink. `inverse` on the bars for the same reason the
@@ -181,6 +210,15 @@
 					</span>
 				{/if}
 			</p>
+		{/if}
+
+		{#if actions}
+			<!-- Above the overlay, or the card's own link swallows every press. -->
+			<div
+				class="relative z-20 mt-4 flex items-center justify-between gap-3 border-t border-border pt-3"
+			>
+				{@render actions()}
+			</div>
 		{/if}
 	</div>
 </TintCard>

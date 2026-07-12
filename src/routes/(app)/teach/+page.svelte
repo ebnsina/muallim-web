@@ -1,22 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import {
-		BookOpen01Icon,
-		CheckmarkCircle02Icon,
-		PencilEdit02Icon,
-		PlusSignIcon
-	} from '@hugeicons/core-free-icons';
+	import { BookOpen01Icon, PencilEdit02Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
 		ActionLink,
 		Alert,
-		Badge,
 		Button,
+		CourseCard,
 		EmptyState,
 		Icon,
 		Page,
-		PageHeader,
-		TintCard
+		PageHeader
 	} from '$lib/components';
 	import type { PageProps } from './$types';
 
@@ -65,36 +59,25 @@
 			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<!--
-						The same tinted shell as the catalogue, tinted by the same difficulty,
-						filled with what an author needs instead: the draft/live state, and the
-						one action that changes it. Not a whole-card link — a publish button
-						cannot live inside an anchor — so the title carries the link and the
-						footer carries the button.
+						The catalogue's card, and the same one on purpose: an author looking at their
+						own shelf should see what a learner sees, plus the two things a learner has no
+						business with — whether it is live, and the button that changes that. It was a
+						different card with a different shape, which made the same course look like
+						two things depending on which page you were on.
 					-->
-					<TintCard>
-						<!--
-							A badge, not `text-xs uppercase`. `draft` and `published` are the same
-							word in two states, and the tone is what says which.
-						-->
-						<Badge
-							tone={course.status === 'published' ? 'success' : 'neutral'}
-							icon={course.status === 'published' ? CheckmarkCircle02Icon : PencilEdit02Icon}
-						>
-							{course.status}
-						</Badge>
-
-						<h2 class="mt-4 text-lg font-semibold text-pretty">
-							<a class="underline-grow" href={resolve(`/teach/${course.slug}`)}>
-								{course.title}
-							</a>
-						</h2>
-
-						<p class="text-muted mt-1.5 text-sm">
-							<span class="numeral">{course.lesson_count}</span>
-							{course.lesson_count === 1 ? 'lesson' : 'lessons'}
-						</p>
-
-						{#snippet footer()}
+					<CourseCard
+						title={course.title}
+						summary={course.summary}
+						difficulty={course.difficulty}
+						lessonCount={course.lesson_count}
+						ratingAverage={course.rating_average}
+						ratingCount={course.rating_count}
+						learnerCount={course.learner_count}
+						status={course.status}
+						seed={course.slug}
+						href={resolve(`/teach/${course.slug}`)}
+					>
+						{#snippet actions()}
 							<ActionLink href={resolve(`/teach/${course.slug}`)} tone="muted">Edit</ActionLink>
 
 							<form
@@ -108,7 +91,7 @@
 								</Button>
 							</form>
 						{/snippet}
-					</TintCard>
+					</CourseCard>
 				</li>
 			{/each}
 		</ul>
