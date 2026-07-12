@@ -23,15 +23,36 @@
 	const podium = $derived(data.entries.slice(0, 3));
 	const rest = $derived(data.entries.slice(3));
 
-	// Gold, silver, bronze — and rank is the only thing on this page worth colouring.
-	const MEDAL: Record<number, { ring: string; tile: string; label: string }> = {
+	/*
+		Gold, silver, bronze — and the card *is* the medal.
+
+		A white card with a coloured ring says "here is a card, and by the way it is
+		first". A tinted one says "this is first" before a word is read, which is the
+		whole job of a podium. The tints are the ramps' step 3, which is what that step
+		is for: a fill a page's own ink still reads on.
+	*/
+	const MEDAL: Record<
+		number,
+		{ card: string; tile: string; label: string; bar: 'active' | 'completed' | 'lapsed' }
+	> = {
 		1: {
-			ring: 'ring-warning-border',
-			tile: 'bg-warning-surface text-warning-text',
-			label: 'First'
+			card: 'border-warning-border bg-warning-surface',
+			tile: 'bg-warning text-on-solid',
+			label: 'First',
+			bar: 'lapsed'
 		},
-		2: { ring: 'ring-border-strong', tile: 'bg-surface-sunken text-muted', label: 'Second' },
-		3: { ring: 'ring-accent-border', tile: 'bg-accent-surface text-accent-text', label: 'Third' }
+		2: {
+			card: 'border-border-strong bg-surface-sunken',
+			tile: 'bg-border-strong text-text',
+			label: 'Second',
+			bar: 'active'
+		},
+		3: {
+			card: 'border-accent-border bg-accent-surface',
+			tile: 'bg-accent text-on-solid',
+			label: 'Third',
+			bar: 'active'
+		}
 	};
 
 	// The board does not say which row is you. Your own rank does.
@@ -111,10 +132,7 @@
 			{#each podium as entry (entry.rank)}
 				{@const medal = MEDAL[entry.rank]}
 				<li>
-					<Card
-						float
-						class={cn('h-full p-5 ring-2', medal.ring, entry.rank === myRank && 'ring-accent')}
-					>
+					<Card class={cn('h-full p-5', medal.card, entry.rank === myRank && 'ring-2 ring-accent')}>
 						<div class="flex items-center gap-3">
 							<span
 								class={cn(
@@ -142,7 +160,7 @@
 						<div class="mt-3">
 							<Progress
 								value={share(entry.points)}
-								tone={entry.rank === 1 ? 'completed' : 'active'}
+								tone={medal.bar}
 								class="h-1.5"
 								label="{share(entry.points)}% of the leader's points"
 							/>
