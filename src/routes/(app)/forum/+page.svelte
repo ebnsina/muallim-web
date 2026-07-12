@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import { UserGroupIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
 		Button,
+		Card,
 		EmptyState,
 		Field,
 		Icon,
@@ -15,6 +17,7 @@
 		Sheet,
 		Textarea
 	} from '$lib/components';
+	import { DURATION, easeOut } from '$lib/motion';
 	import { canModerate } from '$lib/roles';
 	import type { PageProps } from './$types';
 
@@ -44,8 +47,9 @@
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{/if}
 
+	<!-- The composer pushes the board list down, so it grows rather than appears. -->
 	{#if moderator && composing}
-		<div class="mt-6 max-w-2xl">
+		<div class="mt-6 max-w-2xl" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
 			<form
 				method="POST"
 				action="?/createSpace"
@@ -114,24 +118,26 @@
 				<li>
 					<a
 						href={resolve(`/forum/spaces/${space.id}`)}
-						class="lift block h-full rounded-card border border-border p-5 transition-colors hover:bg-surface-sunken focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+						class="lift block h-full rounded-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
 					>
-						<div class="flex items-start justify-between gap-3">
-							<h2 class="font-medium text-pretty">{space.title}</h2>
-							{#if space.workspace}
-								<Badge tone="accent">Workspace</Badge>
-							{:else}
-								<Badge tone="neutral">Course</Badge>
+						<Card float class="h-full p-5">
+							<div class="flex items-start justify-between gap-3">
+								<h2 class="font-medium text-pretty">{space.title}</h2>
+								{#if space.workspace}
+									<Badge tone="accent">Workspace</Badge>
+								{:else}
+									<Badge tone="neutral">Course</Badge>
+								{/if}
+							</div>
+							{#if space.description}
+								<p class="text-muted mt-2 line-clamp-2 text-sm">{space.description}</p>
 							{/if}
-						</div>
-						{#if space.description}
-							<p class="text-muted mt-2 line-clamp-2 text-sm">{space.description}</p>
-						{/if}
-						<p class="text-muted mt-4 flex items-center gap-1.5 text-xs">
-							<Icon icon={UserGroupIcon} class="size-3.5" />
-							<span class="numeral">{space.thread_count}</span>
-							{space.thread_count === 1 ? 'thread' : 'threads'}
-						</p>
+							<p class="text-muted mt-4 flex items-center gap-1.5 text-xs">
+								<Icon icon={UserGroupIcon} class="size-3.5" />
+								<span class="numeral">{space.thread_count}</span>
+								{space.thread_count === 1 ? 'thread' : 'threads'}
+							</p>
+						</Card>
 					</a>
 				</li>
 			{/each}

@@ -177,7 +177,7 @@
 	-->
 	{#if form?.url}
 		<Alert class="mt-6" role="status">
-			<a class="underline" href={form.url} rel="noreferrer">Your download is ready.</a>
+			<a class="underline-grow" href={form.url} rel="noreferrer">Your download is ready.</a>
 			It expires in five minutes.
 		</Alert>
 	{/if}
@@ -189,7 +189,7 @@
 	{#if !data.signedIn}
 		<Alert class="mt-10">Sign in and enrol on this course to hand work in.</Alert>
 	{:else if graded}
-		<Card class="mt-10 p-6">
+		<Card float class="mt-10 p-6">
 			<Score
 				points={submission?.points ?? 0}
 				maxPoints={assignment.points}

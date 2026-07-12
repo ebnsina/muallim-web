@@ -80,7 +80,7 @@
 			<ul class="mt-4 space-y-3">
 				{#each data.posts as post (post.id)}
 					<li>
-						<Card class="p-5">
+						<Card float class="p-5">
 							<div class="flex items-start justify-between gap-3">
 								<div class="min-w-0">
 									<p class="text-pretty whitespace-pre-wrap">{post.body}</p>

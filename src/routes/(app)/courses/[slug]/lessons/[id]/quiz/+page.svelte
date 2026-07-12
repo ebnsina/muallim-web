@@ -92,32 +92,34 @@
 				{#each finished as attempt (attempt.number)}
 					<li>
 						<a
-							class="lift focus-visible:ring-ring flex items-center justify-between gap-3 rounded-card border border-border bg-surface-raised px-4 py-3 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+							class="lift block rounded-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
 							href={resolve(
 								`/courses/${data.slug}/lessons/${data.lessonId}/quiz/${attempt.number}`
 							)}
 						>
-							<span class="flex items-center gap-3">
-								<span class="text-sm font-medium">Attempt {attempt.number}</span>
-								{#if attempt.status === 'grading'}
-									<Badge tone="neutral" icon={Clock01Icon}>Grading</Badge>
-								{:else if attempt.status === 'awaiting_review'}
-									<Badge tone="warning" icon={Clock01Icon}>Waiting to be marked</Badge>
-								{:else if attempt.passed}
-									<Badge tone="success" icon={CheckmarkCircle02Icon}>Passed</Badge>
-								{:else}
-									<Badge tone="danger" icon={CancelCircleIcon}>Not passed</Badge>
-								{/if}
-							</span>
+							<Card float class="flex items-center justify-between gap-3 px-4 py-3">
+								<span class="flex items-center gap-3">
+									<span class="text-sm font-medium">Attempt {attempt.number}</span>
+									{#if attempt.status === 'grading'}
+										<Badge tone="neutral" icon={Clock01Icon}>Grading</Badge>
+									{:else if attempt.status === 'awaiting_review'}
+										<Badge tone="warning" icon={Clock01Icon}>Waiting to be marked</Badge>
+									{:else if attempt.passed}
+										<Badge tone="success" icon={CheckmarkCircle02Icon}>Passed</Badge>
+									{:else}
+										<Badge tone="danger" icon={CancelCircleIcon}>Not passed</Badge>
+									{/if}
+								</span>
 
-							<span class="flex items-center gap-3">
-								{#if attempt.status !== 'grading' && attempt.status !== 'awaiting_review'}
-									<span class="text-muted numeral text-sm">
-										{attempt.points} of {attempt.max_points}
-									</span>
-								{/if}
-								<Icon icon={ArrowRight01Icon} class="text-muted size-4" />
-							</span>
+								<span class="flex items-center gap-3">
+									{#if attempt.status !== 'grading' && attempt.status !== 'awaiting_review'}
+										<span class="text-muted numeral text-sm">
+											{attempt.points} of {attempt.max_points}
+										</span>
+									{/if}
+									<Icon icon={ArrowRight01Icon} class="text-muted size-4" />
+								</span>
+							</Card>
 						</a>
 					</li>
 				{/each}
@@ -127,7 +129,7 @@
 
 	{#if !data.signedIn}
 		<Alert class="mt-8">
-			<a class="underline" href={resolve('/login')}>Sign in</a> and enrol to take this quiz.
+			<a class="underline-grow" href={resolve('/login')}>Sign in</a> and enrol to take this quiz.
 		</Alert>
 	{:else if !data.open}
 		<form method="POST" action="?/start" class="mt-8" use:enhance>

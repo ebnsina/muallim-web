@@ -83,10 +83,7 @@
 
 	<p class="text-muted mx-auto mt-8 max-w-2xl text-center text-sm print:hidden">
 		Anybody can verify this certificate at
-		<a
-			class="break-all underline underline-offset-4"
-			href={resolve(`/verify/${certificate.serial}`)}
-		>
+		<a class="underline-grow break-all" href={resolve(`/verify/${certificate.serial}`)}>
 			{verifyUrl}
 		</a>
 	</p>

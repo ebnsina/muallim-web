@@ -56,8 +56,10 @@ test('a course goes from nothing to published', async ({ page }) => {
 		.click();
 	await expect(page.getByRole('alert')).toHaveCount(0);
 
-	// A stranger can now find it.
-	await page.goto('/courses');
+	// A stranger can now find it — by searching, because the catalogue is one keyset
+	// page of the newest courses and this workspace has accumulated more than a page
+	// of them. Asserting it is on page one was asserting nobody else had run a test.
+	await page.goto(`/courses?q=${encodeURIComponent(title)}`);
 	await expect(page.getByRole('link', { name: title })).toBeVisible();
 });
 

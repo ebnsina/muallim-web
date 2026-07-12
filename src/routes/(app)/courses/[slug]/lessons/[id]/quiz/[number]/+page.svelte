@@ -2,7 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { CancelCircleIcon, CheckmarkCircle02Icon, Clock01Icon } from '@hugeicons/core-free-icons';
-	import { Alert, Badge, Breadcrumbs, Card, Page, PageHeader } from '$lib/components';
+	import { Alert, Badge, Breadcrumbs, Card, Numeral, Page, PageHeader } from '$lib/components';
 	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -61,12 +61,23 @@
 			Grading… this page will show your score when it is ready.
 		</p>
 	{:else}
+		<!--
+			The score rolls up, and it is the only figure here that does. Its readable copy
+			is the settled number from the first frame, so the live region announces the
+			result once rather than narrating the roll.
+		-->
 		<div class="mt-4 flex flex-wrap items-center gap-3" role="status" aria-live="polite">
-			<p class="text-lg">
-				<span class="numeral font-semibold">{data.attempt.points}</span>
+			<!--
+				Plain numerals, not a rolling column. A Numeral keeps all ten digits of every
+				place in the DOM and hides them from assistive tech — which is right for a
+				headline figure and wrong here: this line is a sentence, "3 of 5 · 60%", and
+				a sentence has to survive being read, selected, and searched for as text.
+			-->
+			<p class="numeral flex items-center gap-1.5 text-lg">
+				<span class="font-semibold">{data.attempt.points}</span>
 				<span class="text-muted">of</span>
-				<span class="numeral">{data.attempt.max_points}</span>
-				<span class="text-muted numeral ml-1">· {data.attempt.percent}%</span>
+				<span>{data.attempt.max_points}</span>
+				<span class="text-muted ml-1">· {data.attempt.percent}%</span>
 			</p>
 
 			{#if passed === null}
@@ -90,7 +101,7 @@
 		<ol class="mt-8 space-y-3">
 			{#each data.items as item, index (item.question_id)}
 				<li>
-					<Card class="p-5">
+					<Card float class="p-5">
 						<div class="flex items-start justify-between gap-4">
 							<p class="font-medium text-pretty">
 								{index + 1}. {item.prompt}

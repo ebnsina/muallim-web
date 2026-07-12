@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import {
+		ActionLink,
 		Alert,
 		Breadcrumbs,
 		Button,
@@ -199,12 +200,13 @@
 			<Button type="submit">{exists ? 'Save changes' : 'Add assignment'}</Button>
 
 			{#if exists}
-				<Button
-					variant="ghost"
+				<!-- A link out of the form, not a second button beside the submit: the queue is
+				     somewhere else, and only the arrow says so. -->
+				<ActionLink
 					href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/assignment/submissions`)}
 				>
 					Marking queue
-				</Button>
+				</ActionLink>
 			{/if}
 		</div>
 	</form>

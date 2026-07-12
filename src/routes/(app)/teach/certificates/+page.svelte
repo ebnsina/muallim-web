@@ -64,7 +64,9 @@
 		<ul class="mt-4 space-y-2">
 			{#each data.templates as template (template.id ?? 'builtin')}
 				<li>
-					<Card class="flex flex-wrap items-start justify-between gap-4 p-4">
+					<!-- Float: a list of templates sitting on the page, not a panel in it. The
+					     form below is where an author works, and it keeps its border. -->
+					<Card float class="flex flex-wrap items-start justify-between gap-4 p-4">
 						<div class="min-w-0">
 							<p class="flex items-center gap-2 font-medium">
 								{template.name}

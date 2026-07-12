@@ -17,7 +17,9 @@
 
 <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
 	<p class="flex items-center gap-1.5 text-lg">
-		<Numeral value={points} class="font-semibold" />
+		<!-- The mark is the figure the page is about, so it rolls up on arrival. The
+		     denominator does not: it was never in doubt. -->
+		<Numeral countUp value={points} class="font-semibold" />
 		<span class="text-muted">of</span>
 		<Numeral value={maxPoints} />
 		<span class="ml-1 flex items-center text-muted">

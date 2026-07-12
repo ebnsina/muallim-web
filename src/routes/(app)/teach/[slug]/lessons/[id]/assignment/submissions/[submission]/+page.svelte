@@ -89,7 +89,9 @@
 	{/if}
 
 	{#if assignment.instructions}
-		<Card class="mt-8 p-6">
+		<!-- Float: the brief is read, not worked in — it sits on the page above the
+		     marking form, which keeps its own plane. -->
+		<Card float class="mt-8 p-6">
 			<h2 class="text-sm font-medium">What was asked for</h2>
 			<p class="text-muted mt-2 text-sm whitespace-pre-wrap">{assignment.instructions}</p>
 		</Card>

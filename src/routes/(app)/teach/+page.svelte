@@ -84,7 +84,7 @@
 						</Badge>
 
 						<h2 class="mt-4 text-lg font-semibold text-pretty">
-							<a class="underline-offset-4 hover:underline" href={resolve(`/teach/${course.slug}`)}>
+							<a class="underline-grow" href={resolve(`/teach/${course.slug}`)}>
 								{course.title}
 							</a>
 						</h2>

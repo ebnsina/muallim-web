@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import {
+		ActionLink,
 		Alert,
 		Breadcrumbs,
 		Button,
@@ -15,6 +17,7 @@
 	} from '$lib/components';
 	import AiQuiz from '$lib/components/AiQuiz.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
+	import { DURATION, easeOut } from '$lib/motion';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -85,13 +88,10 @@
 			<Button type="submit">Create the quiz</Button>
 		</form>
 	{:else}
-		<div class="mt-8 flex gap-4 text-sm">
-			<a
-				class="underline"
-				href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)}
-			>
+		<div class="mt-8 flex gap-4">
+			<ActionLink href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)}>
 				Marking queue
-			</a>
+			</ActionLink>
 		</div>
 
 		<section class="mt-8">
@@ -336,8 +336,16 @@
 					<Input id="points" name="points" type="number" min="0" value="1" class="w-32" />
 				</div>
 
+				<!--
+					The type select decides which of the next three blocks exists, and each of
+					them is taller than the select that summoned it. They grow rather than
+					appear, or every field under them jumps while the author is looking at it.
+				-->
 				{#if chooses}
-					<fieldset class="space-y-2">
+					<fieldset
+						class="space-y-2"
+						transition:slide={{ duration: DURATION.base, easing: easeOut }}
+					>
 						<legend class="text-sm font-medium">
 							{#if matches}
 								Pairs
@@ -397,7 +405,7 @@
 				{/if}
 
 				{#if isRange}
-					<div class="space-y-2">
+					<div class="space-y-2" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
 						<Label for="range_low">Accepted range</Label>
 						<div class="flex items-center gap-2">
 							<Input
@@ -418,24 +426,28 @@
 				{/if}
 
 				{#if typed}
-					<div class="space-y-2">
-						<Label for="accepted">Accepted answers</Label>
-						<Textarea
-							id="accepted"
-							name="accepted"
-							rows={3}
-							placeholder="4 | four&#10;Paris"
-							aria-describedby="accepted-hint"
-						/>
-						<p id="accepted-hint" class="text-muted text-xs">
-							One line per blank; alternatives separated by <code>|</code>. A short answer has
-							exactly one blank.
-						</p>
-					</div>
+					<!-- The two fields grow as one: sliding them separately would run two
+					     animations over the same stretch of page. -->
+					<div class="space-y-4" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+						<div class="space-y-2">
+							<Label for="accepted">Accepted answers</Label>
+							<Textarea
+								id="accepted"
+								name="accepted"
+								rows={3}
+								placeholder="4 | four&#10;Paris"
+								aria-describedby="accepted-hint"
+							/>
+							<p id="accepted-hint" class="text-muted text-xs">
+								One line per blank; alternatives separated by <code>|</code>. A short answer has
+								exactly one blank.
+							</p>
+						</div>
 
-					<div class="flex items-center gap-2">
-						<Checkbox id="case_sensitive" name="case_sensitive" />
-						<Label for="case_sensitive">Case must match</Label>
+						<div class="flex items-center gap-2">
+							<Checkbox id="case_sensitive" name="case_sensitive" />
+							<Label for="case_sensitive">Case must match</Label>
+						</div>
 					</div>
 				{/if}
 

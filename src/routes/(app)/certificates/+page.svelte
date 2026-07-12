@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { ArrowRight01Icon, Mortarboard02Icon } from '@hugeicons/core-free-icons';
-	import { Badge, Card, EmptyState, Icon, Page, Row } from '$lib/components';
+	import { Badge, Card, EmptyState, Icon, Numeral, Page, Row } from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -30,7 +30,7 @@
 				{#if data.certificates.length === 0}
 					Earned by finishing a course. Each has a number anybody can verify.
 				{:else}
-					<span class="numeral">{data.certificates.length}</span>
+					<Numeral countUp value={data.certificates.length} />
 					{data.certificates.length === 1 ? 'certificate' : 'certificates'}, each with a number
 					anybody can verify.
 				{/if}
@@ -47,10 +47,15 @@
 			/>
 		</div>
 	{:else}
+		<!--
+			The anchor is outside the card so the whole certificate is the target, and the
+			focus ring is drawn on it — a ring on the card inside would be a ring around
+			something that is not what the keyboard is on.
+		-->
 		<ul class="mt-8 space-y-2">
 			{#each data.certificates as certificate (certificate.serial)}
 				<li>
-					<Row href={resolve(`/certificates/${certificate.serial}`)}>
+					<Row float href={resolve(`/certificates/${certificate.serial}`)} class="lift">
 						<div class="min-w-0">
 							<p class="flex items-center gap-2 font-medium">
 								<span class="truncate">{certificate.course_title}</span>

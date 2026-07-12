@@ -7,6 +7,7 @@
 		Card,
 		EmptyState,
 		LessonIcon,
+		Numeral,
 		Page,
 		PageHeader,
 		Progress,
@@ -62,13 +63,18 @@
 			100% of what they have handed in, and `graded of item_count` is what stops
 			that reading as "you have finished the course".
 		-->
-		<Card elevation="raised" class="mt-8 p-6">
+		<Card float class="mt-8 p-6">
 			{#if graded}
 				<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
 					<div class="flex items-baseline gap-3">
-						<p class="text-3xl font-semibold">
-							<span class="numeral">{result.percent}</span>%
-						</p>
+						<!-- The one figure this page is about, so it rolls up into place. -->
+						<Numeral
+							countUp
+							value={result.percent}
+							suffix="%"
+							class="text-3xl font-semibold"
+							label="{result.percent} percent"
+						/>
 						{#if result.band}
 							<Badge tone={bandTone(result.band)}>{result.band.label}</Badge>
 						{/if}
@@ -123,11 +129,12 @@
 
 		<h2 class="mt-10 text-sm font-medium tracking-wide uppercase">Assessments</h2>
 
+		<!-- The marks stay plain numerals: forty figures rolling at once is a slot machine. -->
 		<ul class="mt-4 space-y-2">
 			{#each data.items as item (item.id)}
 				{@const mark = marks.get(item.id)}
 				<li>
-					<Row href={resolve(`/courses/${data.slug}/lessons/${item.lesson_id}`)}>
+					<Row float href={resolve(`/courses/${data.slug}/lessons/${item.lesson_id}`)} class="lift">
 						<div class="flex min-w-0 items-center gap-3">
 							<span class="text-muted shrink-0">
 								<LessonIcon contentType={item.source} />

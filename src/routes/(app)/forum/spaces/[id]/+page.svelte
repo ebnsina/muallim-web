@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import { Message01Icon, PinIcon, SquareLock01Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
@@ -15,6 +16,7 @@
 		Sheet,
 		Textarea
 	} from '$lib/components';
+	import { DURATION, easeOut } from '$lib/motion';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -52,8 +54,9 @@
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{/if}
 
+	<!-- The composer pushes the thread list down, so it grows rather than appears. -->
 	{#if composing}
-		<div class="mt-6 max-w-2xl">
+		<div class="mt-6 max-w-2xl" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
 			<form method="POST" action="?/startThread" use:enhance>
 				<Sheet>
 					{#snippet header()}

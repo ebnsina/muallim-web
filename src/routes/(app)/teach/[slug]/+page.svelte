@@ -23,6 +23,7 @@
 		Icon,
 		Input,
 		Label,
+		Numeral,
 		Page,
 		PageHeader,
 		Select,
@@ -283,16 +284,29 @@
 						>
 							<div>
 								<dt class="text-muted text-xs tracking-wide uppercase">Completion</dt>
-								<dd class="mt-1.5 text-2xl font-semibold">
-									<span class="numeral">{Math.round(a.completion_rate * 100)}</span>%
+								<dd class="mt-1.5">
+									<!-- The figure this tile is about, so it rolls up on arrival. The rating
+									     beside it does not: it is printed to one decimal, and a roll would
+									     have to renumber the place after the point to say the same thing. -->
+									<Numeral
+										countUp
+										value={Math.round(a.completion_rate * 100)}
+										suffix="%"
+										class="text-2xl font-semibold"
+									/>
 								</dd>
 								<p class="text-muted mt-1 text-xs">of everyone who started</p>
 							</div>
 
 							<div>
 								<dt class="text-muted text-xs tracking-wide uppercase">Avg. progress</dt>
-								<dd class="mt-1.5 text-2xl font-semibold">
-									<span class="numeral">{Math.round(a.average_progress)}</span>%
+								<dd class="mt-1.5">
+									<Numeral
+										countUp
+										value={Math.round(a.average_progress)}
+										suffix="%"
+										class="text-2xl font-semibold"
+									/>
 								</dd>
 								<p class="text-muted mt-1 text-xs">across the course</p>
 							</div>
@@ -465,7 +479,9 @@
 			<ul class="mt-6 space-y-3">
 				{#each data.announcements as announcement (announcement.id)}
 					<li>
-						<Card class="p-4">
+						<!-- Float: a notice already posted is a loose card on the page, not part of
+						     the form above it. -->
+						<Card float class="p-4">
 							<div class="flex items-start justify-between gap-3">
 								<div class="min-w-0">
 									<p class="font-medium text-pretty">{announcement.title}</p>
@@ -594,7 +610,7 @@
 										<Icon icon={DragDropVerticalIcon} class="size-4" />
 									</button>
 									<a
-										class="truncate underline-offset-4 hover:underline"
+										class="underline-grow truncate"
 										href={resolve(`/teach/${data.course.slug}/lessons/${lesson.id}`)}
 									>
 										{lesson.title}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import {
 		Alert,
 		Breadcrumbs,
@@ -16,6 +17,7 @@
 	} from '$lib/components';
 	import AiField from '$lib/components/AiField.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
+	import { DURATION, easeOut } from '$lib/motion';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -155,7 +157,9 @@
 				</div>
 
 				{#if contentType === 'video'}
-					<div class="space-y-2">
+					<!-- The type select adds fields under itself, and a field that appears in one
+					     frame throws everything below it down the page. It grows instead. -->
+					<div class="space-y-2" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
 						<Label for="video_source">Video source</Label>
 						<Select
 							id="video_source"
@@ -170,7 +174,7 @@
 					</div>
 
 					{#if videoSource !== 'none'}
-						<div class="space-y-2">
+						<div class="space-y-2" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
 							<Label for="video_url">{videoSource === 'hosted' ? 'Video ID' : 'Video URL'}</Label>
 							<!--
 						Deliberately not `type="url"`: a Cloudflare Stream reference is a bare id,

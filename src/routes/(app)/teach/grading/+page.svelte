@@ -75,7 +75,9 @@
 		<ul class="mt-4 space-y-2">
 			{#each data.scales as scale (scale.id ?? 'builtin')}
 				<li>
-					<Card class="flex flex-wrap items-center justify-between gap-4 p-4">
+					<!-- Float: these sit *on* the page as a scatter of scales. The editor below is
+					     a working surface, and it keeps its border. -->
+					<Card float class="flex flex-wrap items-center justify-between gap-4 p-4">
 						<div class="min-w-0">
 							<p class="flex items-center gap-2 font-medium">
 								{scale.name}

@@ -77,7 +77,7 @@
 							{#if submission.attempt.status === 'awaiting_review'}
 								<Badge tone="warning" icon={Clock01Icon}>Waiting</Badge>
 								<a
-									class="text-accent-text font-medium underline-offset-4 hover:underline"
+									class="underline-grow text-accent-text font-medium"
 									href={resolve(
 										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
 									)}
@@ -94,7 +94,7 @@
 									<Badge tone="danger" icon={CancelCircleIcon}>Not passed</Badge>
 								{/if}
 								<a
-									class="text-muted numeral underline-offset-4 hover:text-text hover:underline"
+									class="underline-grow text-muted numeral hover:text-text"
 									href={resolve(
 										`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions/${submission.id}`
 									)}

@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { ArrowRight01Icon, PencilEdit02Icon } from '@hugeicons/core-free-icons';
-	import { Breadcrumbs, Button, Card, EmptyState, Icon, Page, PageHeader } from '$lib/components';
+	import { PencilEdit02Icon } from '@hugeicons/core-free-icons';
+	import {
+		ActionLink,
+		Breadcrumbs,
+		Button,
+		Card,
+		EmptyState,
+		Page,
+		PageHeader
+	} from '$lib/components';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -81,17 +89,14 @@
 	{:else}
 		<div class="mt-8 space-y-6">
 			{#each lessons as lesson (lesson.id)}
-				<Card class="p-5 sm:p-6">
-					<a
-						class="group flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
+				<Card float class="p-5 sm:p-6">
+					<!-- The lesson this was kept against, and the way back into it. -->
+					<ActionLink
 						href={resolve(`/courses/${data.course.slug}/lessons/${lesson.id}`)}
+						class="font-semibold"
 					>
 						{lesson.title}
-						<Icon
-							icon={ArrowRight01Icon}
-							class="text-muted size-4 transition-transform group-hover:translate-x-0.5"
-						/>
-					</a>
+					</ActionLink>
 
 					{#if lesson.note}
 						<p class="mt-4 text-sm whitespace-pre-wrap">{lesson.note}</p>

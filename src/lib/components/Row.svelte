@@ -7,22 +7,36 @@
 		 * title inside it is a row people click and miss.
 		 */
 		href?: string;
+		/**
+		 * Held up by a shadow instead of outlined by a border — for a list of rows lying
+		 * *on* the page rather than in it. Same exception, and same reasoning, as
+		 * `Card float`: a dozen loose rows each drawn with a box is a dozen boxes.
+		 */
+		float?: boolean;
 		class?: string;
 		children: Snippet;
 	};
 
-	let { href, class: className, children }: Props = $props();
+	let { href, float = false, class: className, children }: Props = $props();
 
 	// `focus-visible:ring-inset`, because a ring drawn outside a bordered row in a
 	// divided list is a ring clipped by its neighbours.
-	const base =
-		'flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-control border border-border px-4 py-3';
+	const base = $derived([
+		'flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-control border px-4 py-3',
+		float ? 'border-transparent bg-surface-raised shadow-card' : 'border-border'
+	]);
 
 	// The press is a shade, not a scale. A row runs the width of the page, and a
 	// full-width element that scales under the pointer reads as the page flexing —
 	// the transform that flatters a card makes a list wobble.
-	const interactive =
-		'transition-colors duration-(--duration-press) ease-out hover:border-border-strong hover:bg-surface-sunken active:bg-surface-active focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none';
+	// A floating row deepens its shadow where a bordered one darkens its edge: the
+	// hover has to answer the thing that is actually holding the row up.
+	const interactive = $derived([
+		'duration-(--duration-press) ease-out focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+		float
+			? 'transition-shadow hover:shadow-card-hover'
+			: 'transition-colors hover:border-border-strong hover:bg-surface-sunken active:bg-surface-active'
+	]);
 </script>
 
 <!--
