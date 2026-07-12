@@ -70,13 +70,13 @@
 		is. It is the first thing read on every card, so it is in the same place on
 		every card, and the gradient is what fills the gap rather than the type.
 
-		A portrait, not a banner — `aspect-[4/5]` rather than a pixel height, so the
-		cover is a proportion of the card and stays a poster at every column count
-		instead of a letterbox at four and a square at two. Shorter than 3:4, because
-		the paper below now carries a rating and a byline: the card's height is the sum
-		of both, and it was the cover that could afford to give.
+		A portrait, not a banner — `aspect-square` rather than a pixel height, so the
+		cover is a proportion of the card and holds its shape at every column count
+		instead of being a letterbox at four and a tower at two. It was 3:4, then 4:5:
+		the paper below now carries a rating and a byline, the card's height is the sum
+		of both, and the cover is the half that could afford to give.
 	-->
-	<div class={cn('relative flex aspect-[4/5] flex-col rounded-card p-4', cover)}>
+	<div class={cn('relative flex aspect-square flex-col rounded-card p-4', cover)}>
 		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
