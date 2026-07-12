@@ -19,7 +19,16 @@
 	const WIDTHS: Record<PageWidth, string> = {
 		prose: 'max-w-2xl',
 		wide: 'max-w-5xl',
-		full: 'max-w-7xl'
+
+		/*
+			`full` means full. It used to mean `max-w-7xl`, which is a fourth width
+			wearing a third one's name — and on a 1440 screen it left the board and the
+			dashboard boxed in the middle of a sheet that runs to both edges.
+
+			A page that wants a measure asks for `prose` or `wide`. This one is for the
+			pages built out of columns, which want the window.
+		*/
+		full: 'max-w-none'
 	};
 </script>
 

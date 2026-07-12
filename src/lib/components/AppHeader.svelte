@@ -105,17 +105,50 @@
 
 <svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} />
 
-<header class="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
-	<!-- ------------------------------------------------------ identity bar -->
-	<div class="mx-auto flex h-14 max-w-7xl items-center gap-4 px-6">
+<!--
+	A band, not a bar. It runs the width of the window and the page lies on it as a
+	sheet with its top corners rounded off, so the brand colour is the surface the
+	product rests on rather than a stripe drawn across it. The sections sit in the
+	band itself — one row, not a bar with a tab strip under it.
+-->
+<!--
+	Sticky, and above the sheet. The sheet is painted after the band, so without a
+	stacking order it covers the account menu that hangs out of the band — and a menu
+	you cannot press is worse than no menu at all.
+-->
+<header class="sticky top-0 z-30 bg-accent text-on-solid">
+	<div class="flex h-16 items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
-			<span
-				class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent"
-			>
+			<span class="flex size-8 items-center justify-center rounded-control bg-on-solid/15">
 				<Icon icon={Mortarboard02Icon} class="size-5" />
 			</span>
 			<span class="hidden text-[0.95rem] tracking-tight sm:inline">Muallim</span>
 		</a>
+
+		<!-- ------------------------------------------------------------ sections -->
+		<!--
+			In the band, where they read as the product's own sections. The current one is
+			a filled pill rather than an underline: on a solid colour an underline is a
+			scratch, and the fill is the only mark that survives.
+		-->
+		<nav aria-label="Main" class="hidden items-center gap-1 sm:flex">
+			{#each links as link (link.href)}
+				{@const active = current(link.href)}
+				<a
+					href={link.href}
+					aria-current={active ? 'page' : undefined}
+					class={cn(
+						'flex items-center gap-2 rounded-pill px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none',
+						active
+							? 'bg-on-solid/15 text-on-solid'
+							: 'text-on-solid/75 hover:bg-on-solid/10 hover:text-on-solid'
+					)}
+				>
+					<Icon icon={link.icon} class="size-4" />
+					{link.label}
+				</a>
+			{/each}
+		</nav>
 
 		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			{#if user}
@@ -126,13 +159,13 @@
 				-->
 				<a
 					href={resolve('/notifications')}
-					class="relative rounded-control p-2 text-muted transition-colors hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+					class="relative rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none"
 					aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
 				>
 					<Icon icon={Notification02Icon} class="size-5" />
 					{#if unread > 0}
 						<span
-							class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.65rem] leading-4 font-semibold text-on-solid"
+							class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-surface-raised px-1 text-[0.65rem] leading-4 font-semibold text-accent-text"
 						>
 							{unread > 9 ? '9+' : unread}
 						</span>
@@ -154,7 +187,7 @@
 						onclick={() => (accountOpen = !accountOpen)}
 					>
 						<span
-							class="flex size-9 items-center justify-center rounded-full bg-accent-surface text-sm font-semibold text-accent-text"
+							class="flex size-9 items-center justify-center rounded-full bg-on-solid/15 text-sm font-semibold text-on-solid"
 						>
 							{initials}
 						</span>
@@ -210,7 +243,7 @@
 			-->
 			<button
 				type="button"
-				class="rounded-control p-2 text-muted transition-colors hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:hidden"
+				class="rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none sm:hidden"
 				aria-expanded={open}
 				aria-controls="mobile-nav"
 				aria-label={open ? 'Close menu' : 'Open menu'}
@@ -220,32 +253,6 @@
 			</button>
 		</div>
 	</div>
-
-	<!-- --------------------------------------------------------- tab row -->
-	<!--
-		A row of tabs with an underline under the current one, the shape every
-		application header has converged on: the sections are always visible, and
-		where you are is a mark under a word rather than a colour you have to know to
-		read. Hidden on a phone, where the menu button opens the same links stacked.
-	-->
-	<nav aria-label="Main" class="mx-auto hidden max-w-7xl items-center gap-1 px-4 sm:flex">
-		{#each links as link (link.href)}
-			{@const active = current(link.href)}
-			<a
-				href={link.href}
-				aria-current={active ? 'page' : undefined}
-				class={cn(
-					'-mb-px flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors',
-					active
-						? 'border-accent text-text'
-						: 'border-transparent text-muted hover:border-border-strong hover:text-text'
-				)}
-			>
-				<Icon icon={link.icon} class="size-4" />
-				{link.label}
-			</a>
-		{/each}
-	</nav>
 
 	{#if open}
 		<div

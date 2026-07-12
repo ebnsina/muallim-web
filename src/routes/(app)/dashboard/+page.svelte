@@ -119,23 +119,18 @@
 
 <Page width="full">
 	<!--
-		A horizon. The page used to open on a heading floating in grey, which gives the
-		eye nothing to start from; a band with a wash of the accent says where the page
-		begins. Built from tokens, so it themes — a hardcoded gradient reads as premium
-		light on white and as grime on a dark surface.
+		No horizon of its own any more: the band above the sheet is the horizon, for
+		every page in the app rather than for this one. What is left here is the
+		greeting, which is a page heading and reads as one.
 	-->
-	<div
-		class="rounded-card bg-gradient-to-br from-accent-surface via-surface-sunken to-surface-sunken p-6 sm:p-8"
-	>
-		<div class="flex flex-wrap items-end justify-between gap-4">
-			<div>
-				<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-					Welcome back, {firstName}.
-				</h1>
-				<p class="text-muted mt-1 text-sm">{data.user.email}</p>
-			</div>
-			<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
+	<div class="flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+				Welcome back, {firstName}.
+			</h1>
+			<p class="text-muted mt-1 text-sm">{data.user.email}</p>
 		</div>
+		<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
 	</div>
 
 	{#if form?.resent}
@@ -190,6 +185,7 @@
 								air do the work here, not another colour.
 							-->
 							<Card
+								float={index !== 0}
 								class={cn(
 									'lift',
 									index === 0
@@ -287,7 +283,7 @@
 				<ul class="mt-4 space-y-2">
 					{#each finished as enrolment (enrolment.course_slug)}
 						<li>
-							<Card class="flex items-center justify-between gap-4 px-5 py-3.5">
+							<Card float class="flex items-center justify-between gap-4 px-5 py-3.5">
 								<div class="flex min-w-0 items-center gap-3">
 									<span
 										class="flex size-9 shrink-0 items-center justify-center rounded-card bg-success-surface text-success-text"
