@@ -25,7 +25,7 @@
 	moment the guess is off by a pixel, and it is off on every screen where the nav
 	wraps.
 -->
-<div class="aurora aurora-6 aurora-frame flex min-h-dvh flex-col">
+<div class="aurora aurora-frame flex min-h-dvh flex-col">
 	<AppHeader
 		user={data.user ?? undefined}
 		canAuthor={canAuthor(data.user)}

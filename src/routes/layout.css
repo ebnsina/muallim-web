@@ -305,44 +305,32 @@
 		isolation: isolate;
 
 		/*
-			The aurora, and the one place in this system that names a colour outside the
-			ramps.
+			The aurora, and the one place in this system that names colours outside the
+			ramps. That is deliberate and it is bounded: an aurora is a *picture*, not a
+			semantic colour — nothing on it is a button that means "primary" or a badge that
+			means "danger".
 
-			That is deliberate and it is bounded: an aurora is a *picture*, not a semantic
-			colour — nothing on it is a button that means "primary" or a badge that means
-			"danger", and tying it to the brand blue only produced a flat blue rectangle
-			with a lighter corner. Five lights, four hues, mixed the way the reference does
-			it: periwinkle, violet, cobalt, a deep navy, and one warm ember so the whole
-			thing is not cold.
+			Green, and the colours are lifted off a leaf: lime, spring green, a forest floor.
+			The construction is ours — radial blooms and grain, not a photograph's specular
+			streaks, because a gradient trying to be a photo lands as neither.
 
-			What is *not* free: it carries white type. The base stays dark and the lights
-			stay under half strength, because a surface with text on it has to clear 4.5:1
-			at its lightest point, not on average — the first version was a pale lavender
-			wash with white text swimming in it.
+			What is not free: it carries white type. The base stays dark and the bright lime
+			stays away from where the words go — blended at full strength it lands near
+			#7cae4a, and white on that is 2.6:1, which fails. So the lime blooms bottom right
+			and along the foot, where a card carries a bar rather than a sentence, and the
+			top-left quarter — where every card here puts its label and its title — stays a
+			deep leaf-green white clears comfortably.
 		*/
-		background-color: #0e1a6b;
+		background-color: #0f3a1c;
 		background-image:
-			radial-gradient(58% 74% at 8% 6%, rgb(135 153 255 / 0.55), transparent 62%),
-			radial-gradient(52% 66% at 88% 12%, rgb(88 0 107 / 0.72), transparent 64%),
-			radial-gradient(72% 88% at 68% 96%, rgb(12 39 191 / 0.78), transparent 66%),
-			radial-gradient(46% 60% at 34% 82%, rgb(120 60 200 / 0.5), transparent 68%),
-			radial-gradient(30% 40% at 96% 88%, rgb(255 138 110 / 0.28), transparent 70%),
-			radial-gradient(90% 120% at 50% 50%, rgb(8 27 134 / 0.55), transparent 72%);
+			radial-gradient(58% 72% at 4% 2%, rgb(34 197 94 / 0.3), transparent 58%),
+			radial-gradient(56% 70% at 96% 8%, rgb(6 46 26 / 0.75), transparent 62%),
+			radial-gradient(70% 86% at 96% 96%, rgb(190 242 100 / 0.55), transparent 62%),
+			radial-gradient(64% 78% at 58% 104%, rgb(74 222 128 / 0.45), transparent 60%),
+			radial-gradient(40% 50% at 30% 70%, rgb(22 101 52 / 0.5), transparent 68%);
 		color: var(--text-on-solid);
 	}
 
-	/*
-		Five auroras, and a card picks one from its own slug — so a course wears the same
-		light on every screen, on every reload, and after a server render. `Math.random()`
-		here would give a card one colour on the server and another in the browser, which
-		is a hydration mismatch you can see.
-
-		Each is the same recipe as the default — a dark base, lights under half strength —
-		in a different quarter of the wheel. They carry white type, so none of them is
-		allowed to be pale.
-	*/
-	/* The flat colour behind the sheet: the band's own base, or a sliver of the
-	   wrong blue shows wherever the sheet does not reach. Follows the band — teal. */
 	/*
 		The frame: the band, and the strip of it the sheet's rounded corners cut back
 		into.
@@ -423,28 +411,6 @@
 		Dark base, lights under half strength, like every other one here: it carries white
 		type.
 	*/
-	/*
-		Green, with the colours lifted off the leaf: lime, spring green, a forest floor.
-		The construction is ours — radial blooms and grain, not the photograph's specular
-		streaks, because a gradient trying to be a photo lands as neither.
-
-		The bright lime is deliberately *not* over the text. Blended at full strength it
-		lands around #7cae4a, and white on that is 2.6:1 — it fails, and no amount of
-		liking the colour makes the words readable. So the lime blooms bottom-right and
-		across the foot, where a card carries a bar and not a sentence, and the top-left
-		quarter — where every card on this system puts its label and its title — stays a
-		deep leaf-green that white clears comfortably.
-	*/
-	.aurora-6 {
-		background-color: #0f3a1c;
-		background-image:
-			radial-gradient(58% 72% at 4% 2%, rgb(34 197 94 / 0.3), transparent 58%),
-			radial-gradient(56% 70% at 96% 8%, rgb(6 46 26 / 0.75), transparent 62%),
-			radial-gradient(70% 86% at 96% 96%, rgb(190 242 100 / 0.55), transparent 62%),
-			radial-gradient(64% 78% at 58% 104%, rgb(74 222 128 / 0.45), transparent 60%),
-			radial-gradient(40% 50% at 30% 70%, rgb(22 101 52 / 0.5), transparent 68%);
-	}
-
 	/*
 		The aurora never prints. It is ink an inkjet would spend a cartridge on, it turns
 		a certificate into a dark rectangle with white type nobody can read on paper, and
