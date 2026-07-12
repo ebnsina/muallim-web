@@ -113,6 +113,14 @@
 		success: 'bg-success-surface text-success-text',
 		warning: 'bg-warning-surface text-warning-text'
 	};
+
+	// And the figure itself, in the tile's own ink. The tile and the number are one
+	// statement; two colours would make them two.
+	const INK: Record<string, string> = {
+		accent: 'text-accent-text',
+		success: 'text-success-text',
+		warning: 'text-warning-text'
+	};
 </script>
 
 <svelte:head><title>Dashboard — Muallim</title></svelte:head>
@@ -160,9 +168,20 @@
 		not have been in.
 	-->
 	<div class="mt-8 grid gap-6 lg:grid-cols-2">
-		<!-- On the side, where a summary belongs: it is read, not worked in. -->
-		<Card surface="sunken" class="p-5">
-			<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+		<!--
+			White and floating, like every other card on the page. It was sunken because it
+			was an aside; it is not an aside any more, and a grey box at the top of a page
+			reads as something switched off.
+		-->
+		<Card float class="p-5 sm:p-6">
+			<h2 class="flex items-center gap-2.5 text-sm font-medium">
+				<span
+					class="flex size-7 items-center justify-center rounded-control bg-accent-surface text-accent-text"
+				>
+					<Icon icon={ChartAverageIcon} class="size-4" strokeWidth={2} />
+				</span>
+				At a glance
+			</h2>
 
 			<!--
 					What became of every course this learner started — three states of one
@@ -184,6 +203,11 @@
 				{/if}
 			</div>
 
+			<!--
+				The figure wears the colour of its own tile. Colour here is not decoration:
+				it is the thread tying the number to the mark beside it, and a page where
+				every number is the same ink is a page you have to read rather than scan.
+			-->
 			<dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-5">
 				{#each STATS as stat (stat.label)}
 					<div>
@@ -195,7 +219,9 @@
 							</span>
 							{stat.label}
 						</dt>
-						<dd class="numeral mt-2 text-2xl font-semibold tracking-tight">{stat.value}</dd>
+						<dd class={cn('numeral mt-2 text-2xl font-semibold tracking-tight', INK[stat.tone])}>
+							{stat.value}
+						</dd>
 					</div>
 				{/each}
 			</dl>
@@ -204,9 +230,16 @@
 		<!-- Points, rank, and badges — a nudge to keep going. -->
 		{#if data.gamification}
 			{@const g = data.gamification}
-			<Card surface="sunken" class="p-5">
+			<Card float class="p-5 sm:p-6">
 				<div class="flex items-baseline justify-between gap-3">
-					<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
+					<h2 class="flex items-center gap-2.5 text-sm font-medium">
+						<span
+							class="flex size-7 items-center justify-center rounded-control bg-warning-surface text-warning-text"
+						>
+							<Icon icon={Award01Icon} class="size-4" strokeWidth={2} />
+						</span>
+						Progress points
+					</h2>
 					<a
 						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
 						href={resolve('/leaderboard')}
@@ -215,8 +248,10 @@
 					</a>
 				</div>
 
-				<div class="mt-4 flex items-baseline gap-3">
-					<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
+				<div class="mt-5 flex items-baseline gap-3">
+					<span class="text-accent-text numeral text-3xl font-semibold tracking-tight">
+						{g.points}
+					</span>
 					<span class="text-muted text-sm">points</span>
 					{#if g.out_of > 0}
 						<span class="text-muted ml-auto text-sm">
