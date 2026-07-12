@@ -562,7 +562,10 @@
 						<ul class="mt-4 space-y-2">
 							{#each data.teaching as course (course.slug)}
 								<li>
-									<Card class="lift px-5 py-3.5">
+									<!-- Float, like every other loose card on this page: a column of six
+								     bordered boxes is six boxes, and the shadow says "on the page" where
+								     the box only says "here is an edge". -->
+									<Card float class="lift px-5 py-3.5">
 										<div class="flex items-start justify-between gap-3">
 											<a
 												class="text-sm font-medium underline-offset-4 hover:underline"
@@ -581,7 +584,10 @@
 							{/each}
 						</ul>
 
-						<Button href={resolve('/teach')} variant="secondary" size="sm" class="mt-4 w-full">
+						<!-- The one thing to *do* in this column, so it wears the accent. It was a
+					     secondary button, which is the styling for a button beside a primary one —
+					     and there is no primary one here. -->
+						<Button href={resolve('/teach')} class="mt-5 w-full">
 							<Icon icon={PlusSignIcon} class="size-4" />
 							New course
 						</Button>
