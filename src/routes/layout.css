@@ -83,6 +83,11 @@
 	--color-info-surface: var(--info-surface);
 	--color-info-border: var(--info-border);
 
+	/* The chart series. `text-chart-1`, `bg-chart-2`, and nothing else. */
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+
 	/*
 		Shape. Buttons and badges are pills; cards and sections are 12px. A field is
 		10px — softer than a button would be at that size, and not so round that a

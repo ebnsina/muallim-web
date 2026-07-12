@@ -222,6 +222,20 @@
 	--info-border: var(--b-6);
 
 	/*
+		The chart series, in a fixed order and assigned by entity rather than by rank —
+		a filter that drops one must never repaint the survivors.
+
+		Not eyeballed. Each step was fed to a palette validator and passes four checks
+		against the surface behind it: the lightness band, the chroma floor (a step
+		below it reads as a gridline rather than as a series), adjacent-pair separation
+		under protanopia and deuteranopia, and 3:1 contrast. Dark mode picks its own
+		steps below and is validated separately — flipping these would fail the band.
+	*/
+	--chart-1: var(--b-9);
+	--chart-2: var(--ok-9);
+	--chart-3: var(--wa-10);
+
+	/*
 		There are no shadow tokens, and that is the point.
 
 		Separation in this system is a border's job. A shadow is a blurred grey
@@ -357,6 +371,16 @@
 		they inherit :root's already-resolved light values. Redundant for :root dark
 		mode, essential for the nested marketing wrapper.
 	*/
+	/*
+		The chart series again, and re-picked rather than inherited. The dark band is
+		narrower (L 0.48–0.67), and the amber that passes on paper sits above it on a
+		dark surface — so this one steps down the ramp to wa-8. Validated against the
+		dark surface, not flipped from the light one.
+	*/
+	--chart-1: var(--b-9);
+	--chart-2: var(--ok-9);
+	--chart-3: var(--wa-8);
+
 	--text: var(--n-12);
 	--text-muted: var(--n-11);
 	--surface-hover: var(--n-3);

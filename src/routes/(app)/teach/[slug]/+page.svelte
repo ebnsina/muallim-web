@@ -17,6 +17,9 @@
 		Breadcrumbs,
 		Button,
 		Card,
+		CollapsibleCard,
+		Donut,
+		DonutLegend,
 		Field,
 		Icon,
 		Input,
@@ -34,6 +37,11 @@
 	let { data, form }: PageProps = $props();
 
 	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+
+	// The analytics card, and which slice the pointer or keyboard is on. The donut and
+	// its legend share this one value, which is what links their highlighting.
+	let glanceOpen = $state(true);
+	let hovered = $state<string | null>(null);
 
 	/*
 		Drag-and-drop reordering.
@@ -230,54 +238,81 @@
 	<!-- ---------------------------------------------------------- analytics -->
 	{#if data.analytics}
 		{@const a = data.analytics}
+		{@const segments = [
+			{ key: 'active', label: 'Active', value: a.active, tone: 'text-chart-1' },
+			{ key: 'completed', label: 'Completed', value: a.completed, tone: 'text-chart-2' },
+			{ key: 'inactive', label: 'Lapsed', value: a.inactive, tone: 'text-chart-3' }
+		]}
 		<section class="mt-8">
-			<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
-			<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				<Card class="p-5">
-					<p class="text-muted text-xs tracking-wide uppercase">Enrolments</p>
-					<p class="mt-2 text-2xl font-semibold">
-						<span class="numeral">{a.total_enrolments}</span>
+			<CollapsibleCard
+				title="At a glance"
+				summary="{a.total_enrolments} enrolled · {Math.round(a.completion_rate * 100)}% complete"
+				bind:open={glanceOpen}
+			>
+				{#if a.total_enrolments === 0}
+					<!-- A donut of nothing is a grey ring and a zero. Say the thing instead. -->
+					<p class="text-muted text-sm">
+						Nobody has enrolled yet. The numbers arrive with the first learner.
 					</p>
-					<p class="text-muted mt-1 text-xs">
-						<span class="numeral">{a.active}</span> active ·
-						<span class="numeral">{a.completed}</span> completed
-					</p>
-				</Card>
+				{:else}
+					<div class="flex flex-col gap-8 lg:flex-row lg:items-center">
+						<!--
+							The mix is a part-to-whole, so it is drawn as one: three states of an
+							enrolment, summing to everybody who ever started. Hovering a slice lights
+							its row and hovering a row lights its slice — one bound value, so the two
+							cannot disagree about what is highlighted.
+						-->
+						<div class="flex items-center gap-6">
+							<Donut {segments} centreLabel="enrolled" bind:hovered />
+							<div class="min-w-40">
+								<DonutLegend {segments} bind:hovered caption="Enrolments by status" />
+							</div>
+						</div>
 
-				<Card class="p-5">
-					<p class="text-muted text-xs tracking-wide uppercase">Completion</p>
-					<p class="mt-2 text-2xl font-semibold">
-						<span class="numeral">{Math.round(a.completion_rate * 100)}</span>%
-					</p>
-					<p class="text-muted mt-1 text-xs">of active and finished learners</p>
-				</Card>
+						<!--
+							The three numbers a donut cannot carry: they are not parts of that whole.
+							A stat tile is the right form for a lone headline figure.
+						-->
+						<dl
+							class="grid flex-1 grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:border-l lg:border-border lg:pl-8"
+						>
+							<div>
+								<dt class="text-muted text-xs tracking-wide uppercase">Completion</dt>
+								<dd class="mt-1.5 text-2xl font-semibold">
+									<span class="numeral">{Math.round(a.completion_rate * 100)}</span>%
+								</dd>
+								<p class="text-muted mt-1 text-xs">of everyone who started</p>
+							</div>
 
-				<Card class="p-5">
-					<p class="text-muted text-xs tracking-wide uppercase">Avg. progress</p>
-					<p class="mt-2 text-2xl font-semibold">
-						<span class="numeral">{Math.round(a.average_progress)}</span>%
-					</p>
-					<p class="text-muted mt-1 text-xs">across the course</p>
-				</Card>
+							<div>
+								<dt class="text-muted text-xs tracking-wide uppercase">Avg. progress</dt>
+								<dd class="mt-1.5 text-2xl font-semibold">
+									<span class="numeral">{Math.round(a.average_progress)}</span>%
+								</dd>
+								<p class="text-muted mt-1 text-xs">across the course</p>
+							</div>
 
-				<Card class="p-5">
-					<p class="text-muted text-xs tracking-wide uppercase">Rating</p>
-					{#if a.reviews.count > 0}
-						<p class="mt-2 flex items-center gap-2">
-							<span class="text-2xl font-semibold">
-								<span class="numeral">{a.reviews.average.toFixed(1)}</span>
-							</span>
-							<Stars value={a.reviews.average} size="sm" />
-						</p>
-						<p class="text-muted mt-1 text-xs">
-							from <span class="numeral">{a.reviews.count}</span>
-							{a.reviews.count === 1 ? 'review' : 'reviews'}
-						</p>
-					{:else}
-						<p class="text-muted mt-2 text-sm">No reviews yet.</p>
-					{/if}
-				</Card>
-			</div>
+							<div>
+								<dt class="text-muted text-xs tracking-wide uppercase">Rating</dt>
+								{#if a.reviews.count > 0}
+									<dd class="mt-1.5 flex items-center gap-2">
+										<span class="text-2xl font-semibold">
+											<span class="numeral">{a.reviews.average.toFixed(1)}</span>
+										</span>
+										<Stars value={a.reviews.average} size="sm" />
+									</dd>
+									<p class="text-muted mt-1 text-xs">
+										from <span class="numeral">{a.reviews.count}</span>
+										{a.reviews.count === 1 ? 'review' : 'reviews'}
+									</p>
+								{:else}
+									<dd class="text-muted mt-1.5 text-sm">No reviews yet.</dd>
+								{/if}
+							</div>
+						</dl>
+					</div>
+				{/if}
+			</CollapsibleCard>
 		</section>
 	{/if}
 
