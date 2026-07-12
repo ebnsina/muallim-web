@@ -90,7 +90,7 @@
 		the paper below now carries a rating and a byline, the card's height is the sum
 		of both, and the cover is the half that could afford to give.
 	-->
-	<div class={cn('relative flex aspect-square flex-col p-4', cover)}>
+	<div class={cn('relative flex aspect-square flex-col rounded-[14px] p-4', cover)}>
 		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
