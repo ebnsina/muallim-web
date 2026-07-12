@@ -173,31 +173,38 @@
 					</EmptyState>
 				</div>
 			{:else}
-				<ul class="mt-4 space-y-4">
+				<!-- The hero stands apart; the list below it closes up. -->
+				<ul class="mt-4 space-y-3">
 					{#each active as enrolment, index (enrolment.course_slug)}
 						{@const progress = enrolment.progress}
 						{@const percent = progress?.percent ?? 0}
 						<li>
 							<!--
-								The furthest-along course is the one to resume, so it wears a colour
-								the others do not — a tinted wash and its border in the accent — and
-								carries the ring. The rest are plain cards. One highlight, not five.
+								One hero, and the rest are a list.
+
+								The furthest-along course is the one to resume, so it is the only thing
+								on this page set large: a tinted wash, the accent border, the ring, and
+								a title at the size of a heading. Everything under it gets quieter and
+								denser — smaller type, tighter rows, a thinner bar — because a page
+								where five cards all shout is a page with no hero at all. Weight and
+								air do the work here, not another colour.
 							-->
 							<Card
 								class={cn(
-									'lift p-5 sm:p-6',
-									index === 0 &&
-										'border-accent-border bg-gradient-to-br from-accent-surface to-surface-raised'
+									'lift',
+									index === 0
+										? 'border-accent-border bg-gradient-to-br from-accent-surface to-surface-raised p-6 sm:p-7'
+										: 'px-5 py-4'
 								)}
 							>
-								<div class="flex items-start gap-5">
+								<div class={cn('flex items-start', index === 0 ? 'gap-6' : 'gap-4')}>
 									{#if index === 0}
 										<div class="hidden shrink-0 sm:block">
 											<RadialProgress
 												value={percent}
 												tone="active"
 												label="{percent}% complete"
-												size={84}
+												size={96}
 											/>
 										</div>
 									{/if}
@@ -211,7 +218,12 @@
 													</p>
 												{/if}
 												<a
-													class="mt-1 block font-semibold text-pretty underline-offset-4 hover:underline"
+													class={cn(
+														'block text-pretty underline-offset-4 hover:underline',
+														index === 0
+															? 'mt-1.5 text-xl font-semibold tracking-tight sm:text-2xl'
+															: 'text-sm font-medium'
+													)}
 													href={resolve(`/courses/${enrolment.course_slug}`)}
 												>
 													{enrolment.course_title}
@@ -220,7 +232,7 @@
 
 											<Button
 												href={resolve(`/courses/${enrolment.course_slug}`)}
-												variant={index === 0 ? 'primary' : 'secondary'}
+												variant={index === 0 ? 'primary' : 'ghost'}
 												size="sm"
 											>
 												Continue
@@ -228,14 +240,19 @@
 											</Button>
 										</div>
 
-										<div class="mt-4 flex items-center justify-between gap-3 text-sm">
+										<div
+											class={cn(
+												'flex items-center justify-between gap-3',
+												index === 0 ? 'mt-4 text-sm' : 'mt-2.5 text-xs'
+											)}
+										>
 											<span class="numeral font-medium">{percent}% done</span>
 											<span class="text-muted numeral text-xs">
 												{lessonsLeft(progress)}
 												{lessonsLeft(progress) === 1 ? 'lesson' : 'lessons'} left
 											</span>
 										</div>
-										<div class="mt-2">
+										<div class={index === 0 ? 'mt-2' : 'mt-1.5'}>
 											<!--
 												In the state's own colour, which is the donut's colour for that
 												slice. Every course on this page now says what became of it in the
@@ -245,6 +262,7 @@
 												value={progress?.lessons_completed ?? 0}
 												max={progress?.lessons_total ?? 1}
 												tone="active"
+												class={index === 0 ? undefined : 'h-1.5'}
 												label="{percent}% of {enrolment.course_title} complete"
 											/>
 										</div>
