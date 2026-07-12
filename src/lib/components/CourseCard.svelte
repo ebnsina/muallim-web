@@ -62,19 +62,19 @@
 	has been erased shows no name.
 -->
 <!--
-	`p-0` on the frame, not TintCard's usual `p-1`.
+	The inset stays; the numbers behind it are what were wrong.
 
-	The shell insets its panel by a hair, which is right for a tinted box sitting on
-	a card. It is wrong for a cover that *is* the card: the inset leaves a four-pixel
-	ring of paper around the light, and the cover's own radius then fights the
-	frame's — same arc, four pixels apart, which is exactly the wobble you see at the
-	top-left corner and nowhere else. The cover runs to the card's edge instead, and
-	`overflow-hidden` on the frame is what rounds it.
+	TintCard's ring of paper around the panel is the shell's own idea and it belongs
+	here — it is what makes the cover read as something laid *on* the card. But it
+	was four pixels wide with the panel drawn at the frame's own radius, so the two
+	arcs were the same curve four pixels apart, and they wobbled at the corner. A
+	radius is only concentric with the one outside it when it is smaller by exactly
+	the gap: 2px in, 14px against the frame's 16.
 -->
 <TintCard
 	{href}
-	class="overflow-hidden p-0"
-	panelClass="flex flex-col rounded-none bg-surface-raised p-0"
+	class="p-0.5"
+	panelClass="flex flex-col overflow-hidden rounded-[14px] bg-surface-raised p-0"
 >
 	<!--
 		The title at the top and the meta at the foot, with the light between them.
