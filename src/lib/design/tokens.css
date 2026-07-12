@@ -240,18 +240,20 @@
 		deliberately, on the board, where a dozen loose cards float on one surface and a
 		border around each draws a dozen boxes.
 
-		Layered, tinted with the neutral's own hue rather than pure black (a grey shadow
-		on a warm-neutral page reads as dirt), and shallow: the near layer says the card
-		is off the page, the far one says how far. On a dark surface a shadow is invisible
-		— so dark mode does not fake one, it goes back to a hairline ring, which is the
-		only thing that separates there.
+		Soft, not prominent. A shadow's job here is to lift the card off the page by a
+		millimetre, not to draw a dark rectangle under it: the near layer is barely
+		there, and the far one is wide and very faint, so the card blends into the page
+		rather than sitting on top of it. Tinted with the neutral's own hue rather than
+		pure black — a grey shadow on a page that is faintly blue reads as dirt.
+
+		On a dark surface a shadow is invisible, so dark mode does not fake one: it goes
+		back to a hairline ring, the only thing that separates there.
 	*/
 	--card-shadow:
-		0 1px 2px oklch(0.2434 0.0135 259 / 0.05), 0 4px 8px -2px oklch(0.2434 0.0135 259 / 0.06),
-		0 12px 24px -6px oklch(0.2434 0.0135 259 / 0.08);
+		0 1px 2px -1px oklch(0.2434 0.0135 259 / 0.04), 0 6px 16px -6px oklch(0.2434 0.0135 259 / 0.05);
 	--card-shadow-hover:
-		0 2px 4px oklch(0.2434 0.0135 259 / 0.06), 0 10px 20px -4px oklch(0.2434 0.0135 259 / 0.1),
-		0 28px 48px -12px oklch(0.2434 0.0135 259 / 0.14);
+		0 2px 4px -2px oklch(0.2434 0.0135 259 / 0.05),
+		0 12px 28px -10px oklch(0.2434 0.0135 259 / 0.08);
 
 	/*
 		There are no shadow tokens, and that is the point.
