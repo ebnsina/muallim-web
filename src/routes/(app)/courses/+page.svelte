@@ -131,6 +131,11 @@
 						summary={course.summary}
 						difficulty={course.difficulty}
 						lessonCount={course.lesson_count}
+						instructor={course.instructor}
+						learnerCount={course.learner_count}
+						ratingAverage={course.rating_average}
+						ratingCount={course.rating_count}
+						seed={course.slug}
 						href={resolve(`/courses/${course.slug}`)}
 					/>
 				</li>

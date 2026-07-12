@@ -62,10 +62,10 @@
 		</a>
 	{/if}
 
-	{#if course.learner_count > 0}
+	{#if (course.learner_count ?? 0) > 0}
 		<span class="text-muted flex items-center gap-1.5">
 			<Icon icon={UserGroupIcon} class="size-4" />
-			<span class="numeral">{groupedNumber.format(course.learner_count)}</span>
+			<span class="numeral">{groupedNumber.format(course.learner_count ?? 0)}</span>
 			{course.learner_count === 1 ? 'learner' : 'learners'}
 		</span>
 	{/if}
