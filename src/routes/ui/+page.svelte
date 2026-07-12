@@ -9,6 +9,7 @@
 	} from '@hugeicons/core-free-icons';
 
 	import {
+		ActionLink,
 		Alert,
 		Badge,
 		Breadcrumbs,
@@ -43,7 +44,7 @@
 		type EaseName
 	} from '$lib/motion';
 
-	const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger'];
+	const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger', 'glass'];
 	const SIZES: ButtonSize[] = ['sm', 'md', 'lg'];
 
 	/** The twelve steps, so a designer can see what each one is for. */
@@ -718,6 +719,53 @@
 				{/snippet}
 			</PageHeader>
 		</Card>
+	</section>
+
+	<!-- ------------------------------------------------------------- surfaces -->
+	<section class="mt-16">
+		<h2 class="text-xl font-semibold">Shape, and the link that leaves</h2>
+		<p class="text-muted mt-1 text-sm">
+			A border separates and mostly nothing else does — except a card lying <em>on</em> the page
+			rather than in it, which floats. Corners are squircles where the browser has
+			<code>corner-shape</code>, and a rounded rectangle where it does not.
+		</p>
+
+		<div class="mt-6 grid gap-4 sm:grid-cols-3">
+			<Card class="p-5">
+				<p class="text-sm font-medium">border</p>
+				<p class="text-muted mt-1 text-xs">In the page: a form, a table, a panel of rows.</p>
+			</Card>
+
+			<Card float class="p-5">
+				<p class="text-sm font-medium">float</p>
+				<p class="text-muted mt-1 text-xs">
+					On the page: one of a scatter of cards. A hairline ring in dark mode, where a shadow is
+					nothing.
+				</p>
+			</Card>
+
+			<Card surface="aurora" class="p-5">
+				<p class="text-sm font-medium">aurora</p>
+				<p class="text-xs text-on-solid/80 mt-1">
+					The brand's own light. Everything on it inverts — a glass button, inverse stars.
+				</p>
+			</Card>
+		</div>
+
+		<Card class="mt-4 flex flex-wrap items-center gap-6 p-5">
+			<span class="squircle bg-surface-sunken px-4 py-2 text-sm">squircle · 1rem</span>
+			<span class="squircle-sm bg-surface-sunken px-3 py-1.5 text-sm">squircle-sm · 0.75rem</span>
+			<ActionLink href={resolve('/ui')}>A link that leaves</ActionLink>
+			<ActionLink href={resolve('/ui')} tone="muted">The one beside a heading</ActionLink>
+			<a class="underline-grow text-sm font-medium text-accent-text" href={resolve('/ui')}>
+				underline-grow
+			</a>
+		</Card>
+
+		<p class="text-muted mt-3 text-xs">
+			The inner radius is smaller than the outer by exactly the gap between them, or the two curves
+			do not nest — which is the wobble you see at one corner and nowhere else.
+		</p>
 	</section>
 
 	<footer class="mt-20 border-t border-border pt-6 text-xs text-muted">

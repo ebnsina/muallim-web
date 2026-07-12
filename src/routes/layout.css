@@ -363,6 +363,39 @@
 		a rounded rectangle, which is what these were before. Nothing to detect and
 		nothing to fall back to.
 	*/
+	/*
+		`lift` — a card that rises a little under the cursor.
+
+		Seven files asked for this class and no stylesheet defined it: it was lost in a
+		refactor and nothing failed, because a class that does not exist is a class that
+		does nothing, silently. This is the hover the system means: two pixels up and
+		the card shadow deepening, which reads as the thing coming toward you rather
+		than growing.
+
+		Inside `no-preference`, because a transform whose transition is stripped by
+		reduced-motion does not stop moving — it starts jumping. A reader who asked for
+		less motion gets the deeper shadow and no movement at all.
+	*/
+	.lift {
+		transition: box-shadow var(--duration-base) var(--ease-out);
+	}
+
+	.lift:hover {
+		box-shadow: var(--card-shadow-hover);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.lift {
+			transition:
+				transform var(--duration-base) var(--ease-out),
+				box-shadow var(--duration-base) var(--ease-out);
+		}
+
+		.lift:hover {
+			transform: translateY(-2px);
+		}
+	}
+
 	.squircle {
 		border-radius: 1rem;
 		corner-shape: squircle;
