@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Button, Textarea } from '$lib/components';
+	import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
+	import { Button, Icon, Textarea } from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
 
 	type Props = {
@@ -79,6 +80,7 @@
 				a reader who had changed nothing, which is a lie told politely.
 			-->
 			<Button type="submit" variant="secondary" size="sm" loading={saving} disabled={!changed}>
+				<Icon icon={FloppyDiskIcon} class="size-4" />
 				{saving ? 'Saving…' : draft.trim() === '' && savedNote ? 'Clear note' : 'Save note'}
 			</Button>
 		</div>

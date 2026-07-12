@@ -2,7 +2,12 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { Clock01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+	import {
+		ArrowRight01Icon,
+		Clock01Icon,
+		Refresh01Icon,
+		Tick02Icon
+	} from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -242,12 +247,14 @@
 			{#if data.lesson.content_type === 'quiz'}
 				<div class="mt-8">
 					<Button href={resolve(`/courses/${data.slug}/lessons/${data.lesson.id}/quiz`)}>
+						<Icon icon={ArrowRight01Icon} class="size-4" />
 						Go to the quiz
 					</Button>
 				</div>
 			{:else if data.lesson.content_type === 'assignment'}
 				<div class="mt-8">
 					<Button href={resolve(`/courses/${data.slug}/lessons/${data.lesson.id}/assignment`)}>
+						<Icon icon={ArrowRight01Icon} class="size-4" />
 						Go to the assignment
 					</Button>
 				</div>
@@ -262,9 +269,7 @@
 					<form method="POST" action="?/complete" use:enhance>
 						<input type="hidden" name="complete" value={completed ? 'false' : 'true'} />
 						<Button type="submit" variant={completed ? 'secondary' : 'primary'}>
-							{#if !completed}
-								<Icon icon={Tick02Icon} class="size-4" />
-							{/if}
+							<Icon icon={completed ? Refresh01Icon : Tick02Icon} class="size-4" />
 							{completed ? 'Reopen lesson' : 'Mark as complete'}
 						</Button>
 					</form>

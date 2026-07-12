@@ -1,7 +1,21 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { CheckmarkCircle02Icon, Clock01Icon, Task01Icon } from '@hugeicons/core-free-icons';
-	import { Badge, Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
+	import {
+		CheckmarkCircle02Icon,
+		Clock01Icon,
+		FilterIcon,
+		Task01Icon
+	} from '@hugeicons/core-free-icons';
+	import {
+		Badge,
+		Breadcrumbs,
+		Button,
+		EmptyState,
+		Icon,
+		Page,
+		PageHeader,
+		Row
+	} from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import type { PageProps } from './$types';
 
@@ -47,9 +61,15 @@
 	>
 		{#if data.awaiting}
 			<input type="hidden" name="all" value="1" />
-			<Button type="submit" variant="ghost" size="sm">Show everything handed in</Button>
+			<Button type="submit" variant="ghost" size="sm">
+				<Icon icon={FilterIcon} class="size-4" />
+				Show everything handed in
+			</Button>
 		{:else}
-			<Button type="submit" variant="ghost" size="sm">Show only what is waiting</Button>
+			<Button type="submit" variant="ghost" size="sm">
+				<Icon icon={FilterIcon} class="size-4" />
+				Show only what is waiting
+			</Button>
 		{/if}
 	</form>
 

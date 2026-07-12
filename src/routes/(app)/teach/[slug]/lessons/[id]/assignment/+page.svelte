@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { Cancel01Icon, Delete02Icon, FloppyDiskIcon } from '@hugeicons/core-free-icons';
 	import {
 		ActionLink,
 		Alert,
@@ -8,6 +9,7 @@
 		Button,
 		Checkbox,
 		Field,
+		Icon,
 		Input,
 		Page,
 		PageHeader,
@@ -196,9 +198,7 @@
 			</label>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-4 pt-2">
-			<Button type="submit">{exists ? 'Save changes' : 'Add assignment'}</Button>
-
+		<div class="flex flex-wrap items-center justify-end gap-4 pt-2">
 			{#if exists}
 				<!-- A link out of the form, not a second button beside the submit: the queue is
 				     somewhere else, and only the arrow says so. -->
@@ -208,6 +208,11 @@
 					Marking queue
 				</ActionLink>
 			{/if}
+
+			<Button type="submit">
+				<Icon icon={FloppyDiskIcon} class="size-4" />
+				{exists ? 'Save changes' : 'Add assignment'}
+			</Button>
 		</div>
 	</form>
 
@@ -226,11 +231,20 @@
 			<div class="mt-4">
 				{#if confirming}
 					<form method="POST" action="?/delete" use:enhance class="flex items-center gap-3">
-						<Button type="submit" variant="danger">Delete it and every submission</Button>
-						<Button variant="ghost" onclick={() => (confirming = false)}>Keep it</Button>
+						<Button variant="ghost" onclick={() => (confirming = false)}>
+							<Icon icon={Cancel01Icon} class="size-4" />
+							Keep it
+						</Button>
+						<Button type="submit" variant="danger">
+							<Icon icon={Delete02Icon} class="size-4" />
+							Delete it and every submission
+						</Button>
 					</form>
 				{:else}
-					<Button variant="secondary" onclick={() => (confirming = true)}>Remove assignment</Button>
+					<Button variant="secondary" onclick={() => (confirming = true)}>
+						<Icon icon={Delete02Icon} class="size-4" />
+						Remove assignment
+					</Button>
 				{/if}
 			</div>
 		</section>

@@ -85,6 +85,8 @@ test.describe('certificate templates', () => {
 		await page.goto(`/teach/${course.slug}`);
 		await ready(page);
 
+		await page.getByRole('tab', { name: /Settings/ }).click();
+
 		await page.getByLabel('Certificate template').selectOption({ label: templateName });
 		await page.getByRole('button', { name: 'Apply' }).click();
 		await expect(page.getByText('Certificate template updated.')).toBeVisible();

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { PencilEdit02Icon } from '@hugeicons/core-free-icons';
+	import { ArrowLeft01Icon, PencilEdit02Icon } from '@hugeicons/core-free-icons';
 	import {
 		ActionLink,
 		Breadcrumbs,
 		Button,
 		Card,
 		EmptyState,
+		Icon,
 		Page,
 		PageHeader
 	} from '$lib/components';
@@ -80,9 +81,10 @@
 				description="Open a lesson, jot a note or highlight a passage, and it gathers here."
 			>
 				{#snippet action()}
-					<Button href={resolve(`/courses/${data.course.slug}`)} size="sm"
-						>Back to the course</Button
-					>
+					<Button href={resolve(`/courses/${data.course.slug}`)} size="sm">
+						<Icon icon={ArrowLeft01Icon} class="size-4" />
+						Back to the course
+					</Button>
 				{/snippet}
 			</EmptyState>
 		</div>

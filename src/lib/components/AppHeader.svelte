@@ -11,8 +11,12 @@
 		ChampionIcon,
 		Menu01Icon,
 		Mortarboard02Icon,
+		Logout01Icon,
 		Notification02Icon,
+		PaintBoardIcon,
+		Settings02Icon,
 		TeachingIcon,
+		UserIcon,
 		UserGroupIcon,
 		DashboardSquare01Icon
 	} from '@hugeicons/core-free-icons';
@@ -20,6 +24,7 @@
 	import { DURATION, easeOut, popover } from '$lib/motion';
 	import { Pill } from '$lib/pill.svelte';
 	import { cn } from '$lib/utils';
+	import Badge from './Badge.svelte';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
@@ -363,30 +368,71 @@
 						<div
 							role="menu"
 							aria-label="Account"
-							class="absolute right-0 mt-2 w-60 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 text-text shadow-card"
+							class="absolute right-0 mt-2 w-64 origin-top-right rounded-card border border-border bg-surface-raised p-1.5 text-text shadow-card"
 							transition:popover
 						>
-							<div class="px-2.5 py-2">
-								<p class="truncate text-sm font-medium">{user.name}</p>
-								<p class="text-muted truncate text-xs">{user.email}</p>
-								<p class="text-muted mt-1 text-xs capitalize">{user.role}</p>
+							<!-- Who you are, on the menu that acts as you. A workspace with two people
+						     called Ahmed is a workspace where the name alone is not an answer. -->
+							<div class="flex items-center gap-3 px-2.5 py-2.5">
+								<span
+									class="bg-accent-surface text-accent-text flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+								>
+									{initials}
+								</span>
+
+								<div class="min-w-0">
+									<p class="truncate text-sm font-medium">{user.name}</p>
+									<p class="text-muted truncate text-xs">{user.email}</p>
+								</div>
+							</div>
+
+							<div class="px-2.5 pb-2">
+								<Badge tone="neutral" class="capitalize">{user.role}</Badge>
 							</div>
 
 							<div class="my-1 border-t border-border"></div>
 
+							<!-- The places, then the switch, then the way out — the order every account
+						     menu on the web uses, because it is the order people reach for them. -->
+							<a
+								role="menuitem"
+								href={resolve('/profile')}
+								class="hover:bg-surface-hover flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+							>
+								<Icon icon={UserIcon} class="text-muted size-4" />
+								Your profile
+							</a>
+
+							<a
+								role="menuitem"
+								href={resolve('/settings')}
+								class="hover:bg-surface-hover flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+							>
+								<Icon icon={Settings02Icon} class="text-muted size-4" />
+								Settings
+							</a>
+
+							<div class="my-1 border-t border-border"></div>
+
 							<div class="flex items-center justify-between gap-3 px-2.5 py-1.5">
-								<span class="text-sm">Theme</span>
+								<span class="text-muted flex items-center gap-2.5 text-sm">
+									<Icon icon={PaintBoardIcon} class="size-4" />
+									Theme
+								</span>
 								<ThemeToggle />
 							</div>
 
 							<div class="my-1 border-t border-border"></div>
 
 							<!--
-								Its own route, not `/dashboard?/logout`. Signing out from the lesson
-								you were reading should not deposit you on the dashboard on the way.
-							-->
+							Its own route, not `/dashboard?/logout`. Signing out from the lesson
+							you were reading should not deposit you on the dashboard on the way.
+						-->
 							<form method="POST" action="/logout" use:enhance class="p-0.5">
-								<Button type="submit" variant="ghost" size="sm" class="w-full">Sign out</Button>
+								<Button type="submit" variant="ghost" size="sm" class="w-full justify-start">
+									<Icon icon={Logout01Icon} class="size-4" />
+									Sign out
+								</Button>
 							</form>
 						</div>
 					{/if}

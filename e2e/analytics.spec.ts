@@ -16,6 +16,9 @@ test.describe('instructor analytics', () => {
 		await page.goto(`/teach/${course.slug}`);
 		await ready(page);
 
+		// The editor is four tools behind a tablist now, and the summary is one of them.
+		await page.getByRole('tab', { name: /Insights/ }).click();
+
 		await expect(page.getByRole('heading', { name: 'At a glance' })).toBeVisible();
 		await expect(page.getByText('Completion', { exact: true })).toBeVisible();
 

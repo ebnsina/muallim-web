@@ -20,6 +20,9 @@ test.describe('course announcements', () => {
 		// Posted from the course editor…
 		await page.goto(`/teach/${course.slug}`);
 		await ready(page);
+		await page.getByRole('tab', { name: /Announcements/ }).click();
+		await page.getByRole('button', { name: 'New announcement' }).click();
+
 		await page.getByLabel('Title', { exact: true }).fill(headline);
 		await page.getByLabel('Message').fill('The exam is next Friday.');
 		await page.getByRole('button', { name: 'Post announcement' }).click();
@@ -33,8 +36,10 @@ test.describe('course announcements', () => {
 		await page.getByRole('button', { name: headline }).click();
 		await expect(page.getByText('The exam is next Friday.')).toBeVisible();
 
-		// Removing it takes it off both.
+		// Removing it takes it off both. The editor opens on the curriculum, so the
+		// notices have to be asked for again.
 		await page.goto(`/teach/${course.slug}`);
+		await page.getByRole('tab', { name: /Announcements/ }).click();
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: headline })

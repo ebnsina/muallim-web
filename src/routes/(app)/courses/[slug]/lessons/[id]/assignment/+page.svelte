@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { Alert02Icon, Clock01Icon, Upload01Icon } from '@hugeicons/core-free-icons';
+	import { Alert02Icon, Clock01Icon, SentIcon, Upload01Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -270,6 +270,7 @@
 
 					<form method="POST" action="?/submit" use:enhance>
 						<Button type="submit" disabled={files.length === 0 || uploading}>
+							<Icon icon={SentIcon} class="size-4" />
 							{deadline === 'late' ? 'Hand in late' : 'Hand in'}
 						</Button>
 					</form>

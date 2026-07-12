@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Delete02Icon } from '@hugeicons/core-free-icons';
+	import { Cancel01Icon, Delete02Icon, SentIcon } from '@hugeicons/core-free-icons';
 	import { Badge, Button, Card, Icon, Textarea } from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
 	import { cn } from '$lib/utils';
@@ -60,7 +60,10 @@
 		/>
 		<div class="mt-2 flex items-center justify-end gap-3">
 			<!-- An empty question is not a question. The server refuses it too. -->
-			<Button type="submit" size="sm" disabled={questionDraft.trim() === ''}>Ask</Button>
+			<Button type="submit" size="sm" disabled={questionDraft.trim() === ''}>
+				<Icon icon={SentIcon} class="size-4" />
+				Ask
+			</Button>
 		</div>
 	</form>
 
@@ -164,9 +167,11 @@
 										size="sm"
 										onclick={() => (answering = null)}
 									>
+										<Icon icon={Cancel01Icon} class="size-4" />
 										Cancel
 									</Button>
 									<Button type="submit" size="sm" disabled={answerDraft.trim() === ''}>
+										<Icon icon={SentIcon} class="size-4" />
 										Post answer
 									</Button>
 								</div>

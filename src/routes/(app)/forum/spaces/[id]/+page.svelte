@@ -2,12 +2,14 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
+	import { Cancel01Icon, PlusSignIcon, SentIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
 		Breadcrumbs,
 		Button,
 		Field,
+		Icon,
 		Input,
 		Page,
 		PageHeader,
@@ -43,6 +45,7 @@
 		{/snippet}
 		{#snippet actions()}
 			<Button size="sm" onclick={() => (composing = !composing)}>
+				<Icon icon={composing ? Cancel01Icon : PlusSignIcon} class="size-4" />
 				{composing ? 'Close' : 'New thread'}
 			</Button>
 		{/snippet}
@@ -75,7 +78,10 @@
 					</div>
 
 					{#snippet footer()}
-						<Button type="submit" size="sm">Post thread</Button>
+						<Button type="submit" size="sm">
+							<Icon icon={SentIcon} class="size-4" />
+							Post thread
+						</Button>
 					{/snippet}
 				</Sheet>
 			</form>

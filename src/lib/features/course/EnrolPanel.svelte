@@ -3,11 +3,14 @@
 	import { resolve } from '$app/paths';
 	import {
 		Award01Icon,
+		Cancel01Icon,
 		File01Icon,
 		PlayCircleIcon,
 		PlayIcon,
+		StickyNote02Icon,
 		Task01Icon,
-		Tick02Icon
+		Tick02Icon,
+		UserAdd01Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button, Card, Icon, Numeral, Progress as ProgressBar } from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
@@ -178,7 +181,10 @@
 					You have finished this course.
 				</p>
 
-				<Button href={resolve('/certificates')} class="mt-5 w-full">View your certificate</Button>
+				<Button href={resolve('/certificates')} class="mt-5 w-full">
+					<Icon icon={Award01Icon} class="size-4" />
+					View your certificate
+				</Button>
 			{/if}
 
 			<Button
@@ -187,6 +193,7 @@
 				size="sm"
 				class="mt-3 w-full"
 			>
+				<Icon icon={Task01Icon} class="size-4" />
 				See your grades
 			</Button>
 
@@ -196,6 +203,7 @@
 				size="sm"
 				class="mt-3 w-full"
 			>
+				<Icon icon={StickyNote02Icon} class="size-4" />
 				Your notes &amp; highlights
 			</Button>
 
@@ -224,6 +232,7 @@
 					loading={cancelling}
 					disabled={cancelling}
 				>
+					<Icon icon={Cancel01Icon} class="size-4" />
 					{cancelling ? 'Cancelling…' : 'Cancel enrolment'}
 				</Button>
 			</form>
@@ -234,6 +243,7 @@
 			</p>
 
 			<Button href={`${resolve('/login')}?next=${encodeURIComponent(next)}`} class="mt-5 w-full">
+				<Icon icon={UserAdd01Icon} class="size-4" />
 				Sign in to enrol
 			</Button>
 		{:else if openPrerequisites.length > 0}
@@ -261,7 +271,10 @@
 			button is a courtesy, not the control — and the list above names what to do
 			about it.
 		-->
-			<Button disabled class="mt-5 w-full">Enrol</Button>
+			<Button disabled class="mt-5 w-full">
+				<Icon icon={UserAdd01Icon} class="size-4" />
+				Enrol
+			</Button>
 		{:else}
 			<p class="font-medium">Ready to start?</p>
 			<p class="text-muted mt-1 text-sm">
@@ -289,6 +302,7 @@
 				}}
 			>
 				<Button type="submit" class="w-full" loading={enrolling}>
+					<Icon icon={UserAdd01Icon} class="size-4" />
 					{enrolling ? 'Enrolling…' : 'Enrol'}
 				</Button>
 			</form>

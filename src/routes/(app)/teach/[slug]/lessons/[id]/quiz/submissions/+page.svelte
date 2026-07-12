@@ -1,11 +1,21 @@
 <script lang="ts">
-	import { Badge, Breadcrumbs, Button, EmptyState, Page, PageHeader, Row } from '$lib/components';
+	import {
+		Badge,
+		Breadcrumbs,
+		Button,
+		EmptyState,
+		Icon,
+		Page,
+		PageHeader,
+		Row
+	} from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import { resolve } from '$app/paths';
 	import {
 		CancelCircleIcon,
 		CheckmarkCircle02Icon,
 		Clock01Icon,
+		FilterIcon,
 		Task01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageProps } from './$types';
@@ -44,9 +54,15 @@
 	>
 		{#if data.awaiting}
 			<input type="hidden" name="all" value="1" />
-			<Button type="submit" variant="ghost" size="sm">Show every attempt</Button>
+			<Button type="submit" variant="ghost" size="sm">
+				<Icon icon={FilterIcon} class="size-4" />
+				Show every attempt
+			</Button>
 		{:else}
-			<Button type="submit" variant="ghost" size="sm">Show only what is waiting</Button>
+			<Button type="submit" variant="ghost" size="sm">
+				<Icon icon={FilterIcon} class="size-4" />
+				Show only what is waiting
+			</Button>
 		{/if}
 	</form>
 

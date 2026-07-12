@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { CancelCircleIcon, CheckmarkCircle02Icon } from '@hugeicons/core-free-icons';
+	import { CancelCircleIcon, CheckmarkCircle02Icon, Task01Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
 		Breadcrumbs,
 		Button,
 		Card,
+		Icon,
 		Input,
 		Label,
 		Page,
@@ -116,25 +117,29 @@
 							<form method="POST" class="mt-4 space-y-3" use:enhance>
 								<input type="hidden" name="question_id" value={question.id} />
 
-								<div class="flex items-end gap-3">
-									<div class="space-y-2">
-										<Label for={`points-${question.id}`}>Points</Label>
-										<Input
-											id={`points-${question.id}`}
-											name="points"
-											type="number"
-											min="0"
-											max={question.points}
-											required
-											class="w-24"
-										/>
-									</div>
-									<Button type="submit">Record the mark</Button>
+								<div class="space-y-2">
+									<Label for={`points-${question.id}`}>Points</Label>
+									<Input
+										id={`points-${question.id}`}
+										name="points"
+										type="number"
+										min="0"
+										max={question.points}
+										required
+										class="w-24"
+									/>
 								</div>
 
 								<div class="space-y-2">
 									<Label for={`feedback-${question.id}`}>Feedback</Label>
 									<Textarea id={`feedback-${question.id}`} name="feedback" rows={3} />
+								</div>
+
+								<div class="flex items-center justify-end gap-3">
+									<Button type="submit">
+										<Icon icon={Task01Icon} class="size-4" />
+										Record the mark
+									</Button>
 								</div>
 							</form>
 						{/if}

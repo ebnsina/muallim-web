@@ -30,17 +30,31 @@ export class Pill {
 	 */
 	pos = $state({ x: 0, w: 0, measured: false });
 
-	/** Point it at the current item. Call it when the selection or the layout changes. */
+	/**
+	 * Point it at the current item. Call it when the selection or the layout changes.
+	 *
+	 * It writes only when the answer has changed, and that is not a micro-optimisation:
+	 * this runs inside an effect that *reads* `pos` to draw the fill, so an
+	 * unconditional assignment is an effect writing the state it depends on — which
+	 * Svelte rightly kills as an infinite loop. It took a page with no current item at
+	 * all (Notifications is in no nav) to expose it, because there the "nothing to
+	 * measure" branch re-assigned on every pass, forever.
+	 */
 	measure(key: string | null | undefined) {
 		const el = key ? this.items[key] : undefined;
+
 		if (!el || !this.track) {
-			this.pos = { ...this.pos, measured: false };
+			if (this.pos.measured) this.pos = { ...this.pos, measured: false };
 			return;
 		}
 
 		// `offsetLeft` is relative to the track, which is the offset parent — the pill
 		// is absolutely positioned inside it, so that number *is* the translation.
-		this.pos = { x: el.offsetLeft, w: el.offsetWidth, measured: true };
+		const x = el.offsetLeft;
+		const w = el.offsetWidth;
+		if (this.pos.measured && this.pos.x === x && this.pos.w === w) return;
+
+		this.pos = { x, w, measured: true };
 	}
 
 	/** The inline style for the fill. */

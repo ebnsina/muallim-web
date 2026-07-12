@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { Task01Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -9,6 +10,7 @@
 		Card,
 		Field,
 		FileList,
+		Icon,
 		Input,
 		Page,
 		PageHeader,
@@ -149,6 +151,11 @@
 			{/snippet}
 		</Field>
 
-		<Button type="submit">{remarking ? 'Change the grade' : 'Record grade'}</Button>
+		<div class="flex items-center justify-end gap-3">
+			<Button type="submit">
+				<Icon icon={Task01Icon} class="size-4" />
+				{remarking ? 'Change the grade' : 'Record grade'}
+			</Button>
+		</div>
 	</form>
 </Page>

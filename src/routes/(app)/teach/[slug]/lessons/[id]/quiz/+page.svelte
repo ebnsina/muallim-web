@@ -3,11 +3,18 @@
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
 	import {
+		Add01Icon,
+		Delete02Icon,
+		FloppyDiskIcon,
+		PlusSignIcon
+	} from '@hugeicons/core-free-icons';
+	import {
 		ActionLink,
 		Alert,
 		Breadcrumbs,
 		Button,
 		Checkbox,
+		Icon,
 		Input,
 		Label,
 		Page,
@@ -85,7 +92,12 @@
 				<Label for="title">Title</Label>
 				<Input id="title" name="title" required />
 			</div>
-			<Button type="submit">Create the quiz</Button>
+			<div class="flex items-center justify-end gap-3">
+				<Button type="submit">
+					<Icon icon={PlusSignIcon} class="size-4" />
+					Create the quiz
+				</Button>
+			</div>
 		</form>
 	{:else}
 		<div class="mt-8 flex gap-4">
@@ -151,7 +163,12 @@
 					</div>
 				</div>
 
-				<Button type="submit">Save settings</Button>
+				<div class="flex items-center justify-end gap-3">
+					<Button type="submit">
+						<Icon icon={FloppyDiskIcon} class="size-4" />
+						Save settings
+					</Button>
+				</div>
 			</form>
 		</section>
 
@@ -206,7 +223,10 @@
 								<div class="flex shrink-0 flex-col items-end gap-2">
 									<form method="POST" action="?/deleteQuestion" use:enhance>
 										<input type="hidden" name="question_id" value={question.id} />
-										<Button type="submit" variant="secondary" size="sm">Remove</Button>
+										<Button type="submit" variant="secondary" size="sm">
+											<Icon icon={Delete02Icon} class="size-4" />
+											Remove
+										</Button>
 									</form>
 
 									<form
@@ -222,7 +242,10 @@
 											class="h-8 w-28"
 											aria-label="Bank category"
 										/>
-										<Button type="submit" variant="ghost" size="sm">Save to bank</Button>
+										<Button type="submit" variant="ghost" size="sm">
+											<Icon icon={FloppyDiskIcon} class="size-4" />
+											Save to bank
+										</Button>
 									</form>
 								</div>
 							</div>
@@ -276,11 +299,17 @@
 							<div class="flex shrink-0 items-center gap-2">
 								<form method="POST" action="?/addFromBank" use:enhance>
 									<input type="hidden" name="bank_question_id" value={bankQuestion.id} />
-									<Button type="submit" size="sm">Add to this quiz</Button>
+									<Button type="submit" size="sm">
+										<Icon icon={PlusSignIcon} class="size-4" />
+										Add to this quiz
+									</Button>
 								</form>
 								<form method="POST" action="?/deleteBankQuestion" use:enhance>
 									<input type="hidden" name="bank_question_id" value={bankQuestion.id} />
-									<Button type="submit" variant="ghost" size="sm">Remove</Button>
+									<Button type="submit" variant="ghost" size="sm">
+										<Icon icon={Delete02Icon} class="size-4" />
+										Remove
+									</Button>
 								</form>
 							</div>
 						</li>
@@ -399,6 +428,7 @@
 							size="sm"
 							onclick={() => (rows = [...rows, { content: '', match: '' }])}
 						>
+							<Icon icon={Add01Icon} class="size-4" />
 							Add an option
 						</Button>
 					</fieldset>
@@ -464,13 +494,21 @@
 					</p>
 				</div>
 
-				<Button type="submit">Add the question</Button>
+				<div class="flex items-center justify-end gap-3">
+					<Button type="submit">
+						<Icon icon={PlusSignIcon} class="size-4" />
+						Add the question
+					</Button>
+				</div>
 			</form>
 		</section>
 
 		<section class="mt-16 border-t pt-6">
 			<form method="POST" action="?/deleteQuiz" use:enhance>
-				<Button type="submit" variant="secondary" size="sm">Remove the quiz</Button>
+				<Button type="submit" variant="secondary" size="sm">
+					<Icon icon={Delete02Icon} class="size-4" />
+					Remove the quiz
+				</Button>
 				<p class="text-muted mt-2 text-xs">Deletes every question, and every attempt at it.</p>
 			</form>
 		</section>

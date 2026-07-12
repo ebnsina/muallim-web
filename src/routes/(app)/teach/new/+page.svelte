@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { Cancel01Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Breadcrumbs,
 		Button,
 		Field,
+		Icon,
 		Input,
 		Page,
 		PageHeader,
@@ -99,8 +101,12 @@
 				</div>
 
 				{#snippet footer()}
-					<Button href={resolve('/teach')} variant="ghost">Cancel</Button>
+					<Button href={resolve('/teach')} variant="ghost">
+						<Icon icon={Cancel01Icon} class="size-4" />
+						Cancel
+					</Button>
 					<Button type="submit" loading={submitting}>
+						<Icon icon={PlusSignIcon} class="size-4" />
 						{submitting ? 'Creating…' : 'Create course'}
 					</Button>
 				{/snippet}

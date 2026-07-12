@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { BookOpen01Icon, Search01Icon } from '@hugeicons/core-free-icons';
+	import { BookOpen01Icon, Cancel01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 	import {
 		ActionLink,
 		Button,
@@ -112,10 +112,16 @@
 			</Select>
 		</div>
 
-		<Button type="submit" variant="secondary">Search</Button>
+		<Button type="submit" variant="secondary">
+			<Icon icon={Search01Icon} class="size-4" />
+			Search
+		</Button>
 
 		{#if filtered}
-			<Button href={resolve('/courses')} variant="ghost">Clear</Button>
+			<Button href={resolve('/courses')} variant="ghost">
+				<Icon icon={Cancel01Icon} class="size-4" />
+				Clear
+			</Button>
 		{/if}
 	</form>
 
@@ -129,7 +135,10 @@
 					description="Nothing here fits that search. Try fewer words, or a different level."
 				>
 					{#snippet action()}
-						<Button href={resolve('/courses')} size="sm">Clear the filters</Button>
+						<Button href={resolve('/courses')} size="sm">
+							<Icon icon={Cancel01Icon} class="size-4" />
+							Clear the filters
+						</Button>
 					{/snippet}
 				</EmptyState>
 			{:else}

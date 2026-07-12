@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { PinIcon, SquareLock01Icon } from '@hugeicons/core-free-icons';
+	import {
+		Delete02Icon,
+		PinIcon,
+		PinOffIcon,
+		SentIcon,
+		SquareLock01Icon,
+		SquareUnlock01Icon
+	} from '@hugeicons/core-free-icons';
 	import { Alert, Badge, Breadcrumbs, Button, Card, Icon, Page, Textarea } from '$lib/components';
 	import { exactTime, relativeTime, ReplyRow } from '$lib/features/forum';
 	import { canModerate } from '$lib/roles';
@@ -66,19 +73,27 @@
 						<form method="POST" action="?/moderate" use:enhance>
 							<input type="hidden" name="pinned" value={(!data.thread.pinned).toString()} />
 							<Button type="submit" variant="ghost" size="sm">
+								<Icon icon={data.thread.pinned ? PinOffIcon : PinIcon} class="size-4" />
 								{data.thread.pinned ? 'Unpin' : 'Pin'}
 							</Button>
 						</form>
 						<form method="POST" action="?/moderate" use:enhance>
 							<input type="hidden" name="locked" value={(!data.thread.locked).toString()} />
 							<Button type="submit" variant="ghost" size="sm">
+								<Icon
+									icon={data.thread.locked ? SquareUnlock01Icon : SquareLock01Icon}
+									class="size-4"
+								/>
 								{data.thread.locked ? 'Unlock' : 'Lock'}
 							</Button>
 						</form>
 					{/if}
 					<form method="POST" action="?/deleteThread" use:enhance>
 						<input type="hidden" name="space_id" value={data.thread.space_id} />
-						<Button type="submit" variant="ghost" size="sm">Delete thread</Button>
+						<Button type="submit" variant="ghost" size="sm">
+							<Icon icon={Delete02Icon} class="size-4" />
+							Delete thread
+						</Button>
 					</form>
 				</div>
 			{/if}
@@ -128,8 +143,13 @@
 					aria-label="Write a reply"
 					placeholder="Write a reply…"
 				/>
-				<div class="mt-2">
-					<Button type="submit" size="sm">Reply</Button>
+				<!-- The submit sits at the right end of the field it submits: the eye finishes a
+				     form at its bottom-right corner, and every other form in the app agrees. -->
+				<div class="mt-2 flex justify-end">
+					<Button type="submit" size="sm">
+						<Icon icon={SentIcon} class="size-4" />
+						Reply
+					</Button>
 				</div>
 			</form>
 		{:else}

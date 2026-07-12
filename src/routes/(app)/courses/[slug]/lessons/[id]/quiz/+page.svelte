@@ -5,7 +5,10 @@
 		ArrowRight01Icon,
 		CancelCircleIcon,
 		CheckmarkCircle02Icon,
-		Clock01Icon
+		Clock01Icon,
+		FloppyDiskIcon,
+		PlayIcon,
+		SentIcon
 	} from '@hugeicons/core-free-icons';
 	import {
 		Alert,
@@ -134,6 +137,7 @@
 	{:else if !data.open}
 		<form method="POST" action="?/start" class="mt-8" use:enhance>
 			<Button type="submit">
+				<Icon icon={PlayIcon} class="size-4" />
 				{data.attempts.length === 0 ? 'Start the quiz' : 'Try again'}
 			</Button>
 		</form>
@@ -278,11 +282,14 @@
 				</Card>
 			{/each}
 
-			<div class="flex gap-3">
+			<!-- Grading first in the source, so Enter in a field still submits rather than saves. -->
+			<div class="flex items-center justify-end gap-3">
 				<Button type="submit" name="intent" value="submit" disabled={submitting}>
+					<Icon icon={SentIcon} class="size-4" />
 					{submitting ? 'Submitting…' : 'Submit for grading'}
 				</Button>
 				<Button type="submit" name="intent" value="save" variant="secondary" disabled={submitting}>
+					<Icon icon={FloppyDiskIcon} class="size-4" />
 					Save and finish later
 				</Button>
 			</div>

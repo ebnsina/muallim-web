@@ -5,7 +5,8 @@
 		Award01Icon,
 		Megaphone01Icon,
 		Message01Icon,
-		Notification03Icon
+		Notification03Icon,
+		Tick02Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button, Checkbox, EmptyState, Icon, Page, PageHeader } from '$lib/components';
 	import type { IconSvgElement } from '$lib/components';
@@ -32,7 +33,10 @@
 		{#snippet actions()}
 			{#if hasUnread}
 				<form method="POST" action="?/readAll" use:enhance>
-					<Button type="submit" variant="secondary" size="sm">Mark all read</Button>
+					<Button type="submit" variant="secondary" size="sm">
+						<Icon icon={Tick02Icon} class="size-4" />
+						Mark all read
+					</Button>
 				</form>
 			{/if}
 		{/snippet}

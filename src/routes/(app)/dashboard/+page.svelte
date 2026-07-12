@@ -9,6 +9,7 @@
 		CheckmarkCircle02Icon,
 		PencilEdit02Icon,
 		PlusSignIcon,
+		SentIcon,
 		TaskDone01Icon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -180,7 +181,10 @@
 			<div class="flex flex-wrap items-center gap-3">
 				<span>Your email address is not confirmed yet.</span>
 				<form method="POST" action="?/resendVerification" use:enhance>
-					<Button type="submit" variant="secondary" size="sm">Resend the link</Button>
+					<Button type="submit" variant="secondary" size="sm">
+						<Icon icon={SentIcon} class="size-4" />
+						Resend the link
+					</Button>
 				</form>
 			</div>
 		</Alert>
@@ -408,7 +412,10 @@
 						description="Enrol on a course and it will show up here, with how far through it you are."
 					>
 						{#snippet action()}
-							<Button href={resolve('/courses')} size="sm">Browse the catalogue</Button>
+							<Button href={resolve('/courses')} size="sm">
+								<Icon icon={BookOpen01Icon} class="size-4" />
+								Browse the catalogue
+							</Button>
 						{/snippet}
 					</EmptyState>
 				</div>

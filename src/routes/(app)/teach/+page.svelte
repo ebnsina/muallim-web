@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { BookOpen01Icon, PencilEdit02Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
+	import {
+		BookOpen01Icon,
+		CheckmarkCircle02Icon,
+		PencilEdit02Icon,
+		PlusSignIcon
+	} from '@hugeicons/core-free-icons';
 	import {
 		ActionLink,
 		Alert,
@@ -87,6 +92,10 @@
 							>
 								<input type="hidden" name="slug" value={course.slug} />
 								<Button type="submit" variant="secondary" size="sm">
+									<Icon
+										icon={course.status === 'published' ? PencilEdit02Icon : CheckmarkCircle02Icon}
+										class="size-4"
+									/>
 									{course.status === 'published' ? 'Unpublish' : 'Publish'}
 								</Button>
 							</form>

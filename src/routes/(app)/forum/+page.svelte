@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { slide } from 'svelte/transition';
-	import { UserGroupIcon } from '@hugeicons/core-free-icons';
+	import { Cancel01Icon, PlusSignIcon, UserGroupIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Button,
 		EmptyState,
 		Field,
+		Icon,
 		Input,
 		Page,
 		PageHeader,
@@ -34,6 +35,7 @@
 		{#snippet actions()}
 			{#if moderator}
 				<Button size="sm" onclick={() => (composing = !composing)}>
+					<Icon icon={composing ? Cancel01Icon : PlusSignIcon} class="size-4" />
 					{composing ? 'Close' : 'New board'}
 				</Button>
 			{/if}
@@ -94,7 +96,10 @@
 					</div>
 
 					{#snippet footer()}
-						<Button type="submit" size="sm">Create board</Button>
+						<Button type="submit" size="sm">
+							<Icon icon={PlusSignIcon} class="size-4" />
+							Create board
+						</Button>
 					{/snippet}
 				</Sheet>
 			</form>

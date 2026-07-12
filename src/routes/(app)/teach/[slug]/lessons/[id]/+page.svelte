@@ -2,11 +2,13 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { slide } from 'svelte/transition';
+	import { FloppyDiskIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Breadcrumbs,
 		Button,
 		Checkbox,
+		Icon,
 		Input,
 		Label,
 		Page,
@@ -269,6 +271,7 @@
 
 			{#snippet footer()}
 				<Button type="submit" disabled={submitting}>
+					<Icon icon={FloppyDiskIcon} class="size-4" />
 					{submitting ? 'Saving…' : 'Save lesson'}
 				</Button>
 			{/snippet}

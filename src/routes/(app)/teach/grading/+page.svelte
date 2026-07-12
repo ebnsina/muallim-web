@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Add01Icon, Delete02Icon } from '@hugeicons/core-free-icons';
+	import { Add01Icon, Delete02Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -194,7 +194,10 @@
 				{/if}
 
 				{#snippet footer()}
-					<Button type="submit" disabled={!canSave}>Create scale</Button>
+					<Button type="submit" disabled={!canSave}>
+						<Icon icon={PlusSignIcon} class="size-4" />
+						Create scale
+					</Button>
 				{/snippet}
 			</Sheet>
 

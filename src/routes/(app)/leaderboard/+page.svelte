@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Award01Icon, ChampionIcon } from '@hugeicons/core-free-icons';
-	import { Card, EmptyState, Icon, Page, PageHeader, Progress } from '$lib/components';
+	import { Card, EmptyState, Icon, Numeral, Page, PageHeader, Progress } from '$lib/components';
 	import { auroraFor, cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
@@ -31,28 +31,18 @@
 		whole job of a podium. The tints are the ramps' step 3, which is what that step
 		is for: a fill a page's own ink still reads on.
 	*/
-	const MEDAL: Record<
-		number,
-		{ card: string; tile: string; label: string; bar: 'active' | 'completed' | 'lapsed' }
-	> = {
-		1: {
-			card: 'border-warning-border bg-warning-surface',
-			tile: 'bg-warning text-on-solid',
-			label: 'First',
-			bar: 'lapsed'
-		},
-		2: {
-			card: 'border-border-strong bg-surface-sunken',
-			tile: 'bg-border-strong text-text',
-			label: 'Second',
-			bar: 'active'
-		},
-		3: {
-			card: 'border-accent-border bg-accent-surface',
-			tile: 'bg-accent text-on-solid',
-			label: 'Third',
-			bar: 'active'
-		}
+	/*
+		Gold, silver, bronze — and each place is its own light.
+
+		They were three flat tints, which is a legend: you had to be told amber meant
+		first. An aurora each says "these are the three" before a word is read, and the
+		rank inside it does the telling. The variants are the product's own five, picked
+		by name so the same place is the same colour on every visit.
+	*/
+	const MEDAL: Record<number, { cover: string; label: string; bar: 'inverse' }> = {
+		1: { cover: auroraFor('first'), label: 'First', bar: 'inverse' },
+		2: { cover: auroraFor('second'), label: 'Second', bar: 'inverse' },
+		3: { cover: auroraFor('third'), label: 'Third', bar: 'inverse' }
 	};
 
 	// The board does not say which row is you. Your own rank does.
@@ -143,31 +133,28 @@
 				{@const medal = MEDAL[entry.rank]}
 				<li>
 					<Card
-						float
-						class={cn('h-full p-5', medal.card, entry.rank === myRank && 'ring-2 ring-accent')}
+						surface="aurora"
+						class={cn('h-full p-5', medal.cover, entry.rank === myRank && 'ring-2 ring-accent')}
 					>
 						<div class="flex items-center gap-3">
 							<span
-								class={cn(
-									'numeral flex size-9 items-center justify-center rounded-full text-sm font-semibold',
-									medal.tile
-								)}
+								class="numeral flex size-9 items-center justify-center rounded-full bg-on-solid/20 text-sm font-semibold"
 							>
 								{entry.rank}
 							</span>
-							<span class="text-muted text-xs font-medium tracking-wide uppercase">
+							<span class="text-xs font-medium tracking-wide text-on-solid/75 uppercase">
 								{medal.label}
 							</span>
 							{#if entry.rank === myRank}
-								<span class="text-accent-text ml-auto text-xs font-medium">You</span>
+								<span class="ml-auto text-xs font-medium">You</span>
 							{/if}
 						</div>
 
 						<p class="mt-4 truncate font-semibold">{entry.name || 'A learner'}</p>
 
 						<p class="mt-1 flex items-baseline gap-1.5">
-							<span class="numeral text-2xl font-semibold tracking-tight">{entry.points}</span>
-							<span class="text-muted text-sm">points</span>
+							<Numeral countUp value={entry.points} class="text-2xl font-semibold tracking-tight" />
+							<span class="text-sm text-on-solid/80">points</span>
 						</p>
 
 						<div class="mt-3">

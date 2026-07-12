@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Delete02Icon } from '@hugeicons/core-free-icons';
+	import { Delete02Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -165,7 +165,10 @@
 					</div>
 
 					{#snippet footer()}
-						<Button type="submit">Create template</Button>
+						<Button type="submit">
+							<Icon icon={PlusSignIcon} class="size-4" />
+							Create template
+						</Button>
 					{/snippet}
 				</Sheet>
 			</form>

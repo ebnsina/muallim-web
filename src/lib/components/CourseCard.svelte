@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { CheckmarkCircle02Icon, PencilEdit02Icon } from '@hugeicons/core-free-icons';
 	import { auroraFor, cn } from '$lib/utils';
-	import Badge from './Badge.svelte';
+	import Icon from './Icon.svelte';
 	import Difficulty from './Difficulty.svelte';
 	import Stars from './Stars.svelte';
 	import TintCard from './TintCard.svelte';
@@ -128,15 +128,22 @@
 		of both, and the cover is the half that could afford to give.
 	-->
 	<div class={cn('relative flex aspect-square flex-col rounded-[14px] p-4', cover)}>
-		{#if status && status !== 'published'}
-			<!-- A draft says so on its cover, where the eye already is. It is the one thing
-			     about an unpublished course that matters more than its name. -->
-			<span class="absolute top-4 right-4 z-20">
-				<Badge tone="warning" icon={PencilEdit02Icon}>{status}</Badge>
-			</span>
-		{:else if status === 'published'}
-			<span class="absolute top-4 right-4 z-20">
-				<Badge tone="success" icon={CheckmarkCircle02Icon}>Live</Badge>
+		{#if status}
+			<!--
+				Glass, not a filled badge. A solid amber lozenge on the cover is a sticker
+				somebody put on the picture; the state is said in ink, on the light the card
+				already has, and the two states differ by their colour and their word alone.
+			-->
+			{@const live = status === 'published'}
+			<span
+				class="absolute top-4 right-4 z-20 flex items-center gap-1.5 rounded-pill bg-on-solid/15 px-2.5 py-1 text-xs font-medium capitalize backdrop-blur-sm"
+			>
+				<Icon
+					icon={live ? CheckmarkCircle02Icon : PencilEdit02Icon}
+					class={cn('size-3.5', live ? 'text-success' : 'text-warning')}
+					strokeWidth={2}
+				/>
+				<span class={live ? 'text-success' : 'text-warning'}>{live ? 'Live' : status}</span>
 			</span>
 		{/if}
 

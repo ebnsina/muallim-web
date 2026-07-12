@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Alert, Button, Card, Stars, Textarea } from '$lib/components';
+	import { Delete02Icon, SentIcon } from '@hugeicons/core-free-icons';
+	import { Alert, Button, Card, Icon, Stars, Textarea } from '$lib/components';
 	import type { Review, ReviewSummary } from './types';
 
 	type Props = {
@@ -66,9 +67,13 @@
 				<!-- The commit sits at the end of the form, where the eye leaves it. -->
 				<div class="mt-4 flex items-center justify-end gap-3">
 					{#if mine}
-						<Button formaction="?/unreview" type="submit" variant="ghost" size="sm">Remove</Button>
+						<Button formaction="?/unreview" type="submit" variant="ghost" size="sm">
+							<Icon icon={Delete02Icon} class="size-4" />
+							Remove
+						</Button>
 					{/if}
 					<Button type="submit" size="sm">
+						<Icon icon={SentIcon} class="size-4" />
 						{mine ? 'Update review' : 'Post review'}
 					</Button>
 				</div>

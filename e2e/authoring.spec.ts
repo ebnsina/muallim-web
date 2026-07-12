@@ -119,6 +119,18 @@ test('sections reorder by dragging, and the new order sticks', async ({ page }) 
 
 	await expect.poll(titles).toEqual(['First', 'Second', 'Third']);
 
+	/*
+		Hydration, again, and it is not superfluous.
+
+		`ready` was awaited on load — but each "Add section" re-renders the list, and the
+		drag handlers are attached by an action on the rows. Under a loaded machine the
+		mouse-down can land before the last row's action has run, and a drag nothing is
+		listening to is a drag that does nothing. Waiting for the handle to be actionable
+		is waiting for the thing the drag actually needs.
+	*/
+	await expect(page.getByRole('button', { name: 'Reorder section Third' })).toBeEnabled();
+	await page.waitForTimeout(150);
+
 	// Drag the last section up above the first.
 	await dragHandleOnto(
 		page,
@@ -188,8 +200,12 @@ test('toggling a preview does not erase the lesson body', async ({ page }) => {
 	await page.getByLabel('Content').fill('A body worth keeping.');
 	await page.getByRole('button', { name: 'Save lesson' }).click();
 
-	await page.getByRole('button', { name: 'Make preview' }).click();
-	await expect(page.getByRole('button', { name: 'Preview', exact: true })).toBeVisible();
+	// The row's actions are icons now: the label lives in the accessible name, which is
+	// exactly what a screen reader — and this test — reads.
+	await page.getByRole('button', { name: /Offer Has a body as a free preview/ }).click();
+	await expect(
+		page.getByRole('button', { name: /Stop offering Has a body as a free preview/ })
+	).toBeVisible();
 
 	await page.getByRole('link', { name: 'Has a body' }).click();
 	await expect(page.getByLabel('Content')).toHaveValue('A body worth keeping.');

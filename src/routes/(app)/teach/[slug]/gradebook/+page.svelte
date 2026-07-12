@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Task01Icon } from '@hugeicons/core-free-icons';
+	import { Task01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import {
 		Alert,
 		Badge,
@@ -9,6 +9,7 @@
 		Button,
 		Card,
 		EmptyState,
+		Icon,
 		Label,
 		LessonIcon,
 		Page,
@@ -71,7 +72,10 @@
 				</Select>
 			</div>
 
-			<Button type="submit" variant="secondary">Apply</Button>
+			<Button type="submit" variant="secondary">
+				<Icon icon={Tick02Icon} class="size-4" />
+				Apply
+			</Button>
 		</form>
 
 		<!--
