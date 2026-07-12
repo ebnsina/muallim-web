@@ -35,7 +35,7 @@
 <a
 	{href}
 	class={cn(
-		'group inline-flex items-center gap-1 text-sm font-medium underline-offset-4 hover:underline',
+		'underline-grow group inline-flex items-center gap-1 pb-0.5 text-sm font-medium',
 		tone === 'accent' ? 'text-accent-text' : 'text-muted hover:text-text',
 		className
 	)}

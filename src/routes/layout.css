@@ -364,6 +364,31 @@
 		corner-shape: squircle;
 	}
 
+	/*
+		An underline that grows out of the word rather than appearing under it.
+
+		A painted background rather than `text-decoration`, because only the background
+		can be animated: `text-decoration` has no interpolable size. It sits on the
+		text's baseline box and grows from the left in the time a link takes to feel
+		pressed.
+
+		Under `prefers-reduced-motion` the transition property is not on the global
+		whitelist, so it snaps to full width instead — still an underline, still the
+		same signal, arriving in no time at all.
+	*/
+	.underline-grow {
+		background-image: linear-gradient(currentColor, currentColor);
+		background-repeat: no-repeat;
+		background-position: 0 100%;
+		background-size: 0% 1px;
+		transition: background-size var(--duration-base, 180ms) var(--ease-out);
+	}
+
+	.underline-grow:hover,
+	.underline-grow:focus-visible {
+		background-size: 100% 1px;
+	}
+
 	.aurora-1 {
 		background-color: #0e1a6b;
 		background-image:

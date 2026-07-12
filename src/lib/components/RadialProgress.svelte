@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { DURATION, EASE } from '$lib/motion';
+	import Counter from './Counter.svelte';
 
 	type Props = {
 		/** 0–100. */
@@ -26,6 +27,21 @@
 	};
 
 	const clamped = $derived(Math.min(100, Math.max(0, Math.round(value))));
+
+	/*
+		The ring draws itself. It renders empty and fills to the value on the frame
+		after mount, so the arc sweeps round rather than being there already — the one
+		motion on this page that says "this is a proportion" before the number is read.
+
+		A plain `$state` set from an effect, because the transition is CSS: the browser
+		interpolates the dash array between the two paints. Under reduced motion the
+		global stylesheet drops `stroke-dasharray` from the transitionable properties
+		and the arc is simply drawn, complete, in one frame.
+	*/
+	let drawn = $state(0);
+	$effect(() => {
+		drawn = clamped;
+	});
 
 	// The circle's radius is chosen so its circumference is ~100, which lets the
 	// dash array be the percentage itself — no arithmetic, and it reads at a glance.
@@ -61,12 +77,20 @@
 			class={STROKE[tone] ?? STROKE.accent}
 			stroke-width="2.5"
 			stroke-linecap="round"
-			stroke-dasharray="{clamped} 100"
-			style="transition: stroke-dasharray {DURATION.slow}ms {EASE.out};"
+			stroke-dasharray="{drawn} 100"
+			style="transition: stroke-dasharray {DURATION.reveal}ms {EASE.out};"
 		/>
 	</svg>
 
+	<!--
+		The sign is the number's own ink at 70%, not `text-muted`. Muted is a grey
+		chosen against white paper, and this ring is drawn on an aurora as often as on
+		a card — there the sign faded into the gradient and read as a smudge. Opacity
+		recedes against whatever it is standing on.
+	-->
+	<!-- The figure counts up while the arc sweeps — one motion, said twice, so the
+	     ring and the number arrive together rather than one after the other. -->
 	<span class="numeral absolute text-sm font-semibold" style="font-size: {size / 5}px;">
-		{clamped}<span class="text-muted" style="font-size: {size / 8}px;">%</span>
+		<Counter value={clamped} /><span class="opacity-70" style="font-size: {size / 6.5}px;">%</span>
 	</span>
 </div>

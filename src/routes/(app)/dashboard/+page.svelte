@@ -14,6 +14,7 @@
 	import {
 		ActionLink,
 		Alert,
+		Counter,
 		Badge,
 		Button,
 		Card,
@@ -108,7 +109,8 @@
 	const STATS = $derived([
 		{
 			label: 'Lessons completed',
-			value: `${lessonsDone}`,
+			value: lessonsDone,
+			suffix: '',
 			// The number against what it is a number *of*, and a bar of the same fraction:
 			// the empty half of the bar is the part of this dashboard that is the point.
 			of: lessonsAll > 0 ? `of ${lessonsAll}` : '',
@@ -119,7 +121,8 @@
 		},
 		{
 			label: 'Average progress',
-			value: `${averagePercent}%`,
+			value: averagePercent,
+			suffix: '%',
 			of: data.enrolments.length > 0 ? `across ${data.enrolments.length} courses` : '',
 			percent: averagePercent,
 			bar: 'lapsed' as const,
@@ -216,6 +219,11 @@
 			read as three things that had been pushed apart rather than three that belong.
 		-->
 		<Card float class="mt-4 p-5 sm:p-6">
+			<!--
+				The rules between the thirds are dashed. A solid rule reads as a wall — the
+				edge of one card butted against another — and these three are one statement
+				in three parts. A dashed one separates without dividing.
+			-->
 			<div class="grid gap-8 lg:grid-cols-3 lg:gap-0">
 				<!--
 					What became of every course this learner started — three states of one
@@ -243,7 +251,7 @@
 					every number is the same ink is a page you have to read rather than scan.
 				-->
 				<dl
-					class="grid content-center gap-6 border-border max-lg:border-t max-lg:pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 lg:border-l lg:border-r lg:px-8"
+					class="grid content-center gap-6 border-dashed border-border max-lg:border-t max-lg:pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 lg:border-l lg:border-r lg:px-8"
 				>
 					{#each STATS as stat (stat.label)}
 						<!--
@@ -266,9 +274,11 @@
 							</dt>
 
 							<dd class="order-1 flex items-baseline gap-2">
-								<span class={cn('numeral text-4xl font-semibold tracking-tight', INK[stat.tone])}>
-									{stat.value}
-								</span>
+								<Counter
+									value={stat.value}
+									suffix={stat.suffix}
+									class={cn('text-4xl font-semibold tracking-tight', INK[stat.tone])}
+								/>
 								{#if stat.of}
 									<span class="text-muted numeral text-sm">{stat.of}</span>
 								{/if}
@@ -294,7 +304,7 @@
 					assignments this learner has not handed in, and decides what is overdue
 					against its own clock.
 				-->
-				<div class="border-border max-lg:border-t max-lg:pt-8 lg:pl-8">
+				<div class="border-dashed border-border max-lg:border-t max-lg:pt-8 lg:pl-8">
 					<MiniCalendar deadlines={data.deadlines} />
 				</div>
 			</div>
@@ -328,8 +338,11 @@
 			<dl class="mt-4 grid gap-4 sm:grid-cols-3">
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Points earned</dt>
-					<dd class="text-accent-text numeral mt-2 text-3xl font-semibold tracking-tight">
-						{g.points}
+					<dd class="mt-2">
+						<Counter
+							value={g.points}
+							class="text-accent-text text-3xl font-semibold tracking-tight"
+						/>
 					</dd>
 					<p class="text-muted mt-1 text-xs">Ten a lesson, a hundred a course.</p>
 				</Card>
@@ -337,7 +350,7 @@
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Rank</dt>
 					<dd class="mt-2 flex items-baseline gap-1.5">
-						<span class="numeral text-3xl font-semibold tracking-tight">{g.rank}</span>
+						<Counter value={g.rank} class="text-3xl font-semibold tracking-tight" />
 						{#if g.out_of > 0}
 							<span class="text-muted numeral text-sm">of {g.out_of}</span>
 						{/if}
@@ -348,9 +361,10 @@
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Badges</dt>
 					<dd class="mt-2 flex items-baseline gap-1.5">
-						<span class="text-warning-text numeral text-3xl font-semibold tracking-tight">
-							{earned}
-						</span>
+						<Counter
+							value={earned}
+							class="text-warning-text text-3xl font-semibold tracking-tight"
+						/>
 						<span class="text-muted numeral text-sm">of {badges.length}</span>
 					</dd>
 
