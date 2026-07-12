@@ -13,7 +13,7 @@
 	A real `<input type="checkbox">`, drawn by us.
 
 	`appearance-none` removes the platform's box and nothing else: the element keeps
-	its role, its label association, its keyboard behaviour, and its participation
+	its role, its label association, its keyboard behavior, and its participation
 	in the form. Replacing it with a `<div role="checkbox">` would mean
 	reimplementing all four, and getting one of them subtly wrong.
 

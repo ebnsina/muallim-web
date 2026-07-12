@@ -22,7 +22,7 @@ test.describe('instructor analytics', () => {
 		await expect(page.getByRole('heading', { name: 'At a glance' })).toBeVisible();
 		await expect(page.getByText('Completion', { exact: true })).toBeVisible();
 
-		// The enrolment mix is a donut with its legend beside it. A brand-new course has
+		// The enrollment mix is a donut with its legend beside it. A brand-new course has
 		// nobody in it, so the ring is empty and says why rather than showing a zero and
 		// leaving the instructor to guess.
 		await expect(page.getByText('Nobody has enrolled yet.')).toBeVisible();

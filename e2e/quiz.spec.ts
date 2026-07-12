@@ -28,7 +28,7 @@ test.describe('taking a quiz', () => {
 		const course = await quizCourse(request, slug('take'));
 
 		await page.goto(`/courses/${course.slug}`);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('0 of 1 lessons')).toBeVisible();
 
 		await page.goto(`/courses/${course.slug}/lessons/${course.lessonId}/quiz`);
@@ -69,7 +69,7 @@ test.describe('taking a quiz', () => {
 		const course = await quizCourse(request, slug('essay'), { essay: true });
 
 		await page.goto(`/courses/${course.slug}`);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('0 of 1 lessons')).toBeVisible();
 
 		await page.goto(`/courses/${course.slug}/lessons/${course.lessonId}/quiz`);

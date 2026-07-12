@@ -10,7 +10,7 @@
 
 	type Props = {
 		tone?: BadgeTone;
-		/** Optional, but a status badge without one leans on colour alone. */
+		/** Optional, but a status badge without one leans on color alone. */
 		icon?: IconSvgElement;
 		class?: string;
 		children: Snippet;

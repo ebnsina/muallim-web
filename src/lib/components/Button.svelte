@@ -36,7 +36,7 @@
 
 	/*
 		Hover and active are steps 10 and 5 of the ramp rather than an opacity
-		change. `bg-accent/80` is a colour nobody chose, whose contrast nobody
+		change. `bg-accent/80` is a color nobody chose, whose contrast nobody
 		checked, and which lands somewhere different over every background.
 	*/
 	const VARIANTS: Record<ButtonVariant, string> = {
@@ -55,7 +55,7 @@
 			the card instead of sitting on top of it. It is what the pills in the band are,
 			and for the same reason.
 
-			Alpha rather than a chosen colour, deliberately: the aurora is five gradients
+			Alpha rather than a chosen color, deliberately: the aurora is five gradients
 			and there is no one hex it is. A translucent white is correct over all of them.
 		*/
 		glass:
@@ -79,7 +79,7 @@
 		down with the box, which is what makes it read as the button depressing rather
 		than the box resizing.
 
-		Gated on `motion-safe`, so a reader who asked for less motion keeps the colour
+		Gated on `motion-safe`, so a reader who asked for less motion keeps the color
 		change and loses the movement — and disabled/busy buttons drop pointer events
 		before `:active` can ever fire.
 
@@ -89,7 +89,7 @@
 		press would jump rather than ease. (Tailwind's own `transition-transform`
 		utility expands to `transform, translate, scale, rotate` and is perfectly safe —
 		the hazard is only in arbitrary lists like this one. Which is why this one also
-		restates the colours `transition-colors` would have given us for free.)
+		restates the colors `transition-colors` would have given us for free.)
 	*/
 	const base =
 		'inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap ' +

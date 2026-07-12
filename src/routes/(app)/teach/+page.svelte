@@ -64,7 +64,7 @@
 			{#each data.courses as course (course.id)}
 				<li class="contents">
 					<!--
-						The catalogue's card, and the same one on purpose: an author looking at their
+						The catalog's card, and the same one on purpose: an author looking at their
 						own shelf should see what a learner sees, plus the two things a learner has no
 						business with — whether it is live, and the button that changes that. It was a
 						different card with a different shape, which made the same course look like

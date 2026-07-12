@@ -9,7 +9,7 @@
 
 	type Props = {
 		crumbs: Crumb[];
-		/** `inverse` for a trail standing on an aurora, where the page's greys vanish. */
+		/** `inverse` for a trail standing on an aurora, where the page's grays vanish. */
 		tone?: 'default' | 'inverse';
 		class?: string;
 	};

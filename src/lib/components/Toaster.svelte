@@ -41,7 +41,7 @@
 	 *
 	 * A stack of four notices in a corner is four things to read. Collapsed, it is
 	 * one thing with a hint that there are more behind it; hovering or tabbing into
-	 * it fans them out. This is the behaviour every good toast library converged on
+	 * it fans them out. This is the behavior every good toast library converged on
 	 * independently, which is usually a sign it is the right one.
 	 */
 	let expanded = $state(false);
@@ -144,7 +144,7 @@
 			>
 				<!--
 					A toast is the one thing here that genuinely floats, and it still gets no
-					shadow. Its tinted fill against the page, and its own coloured border, are
+					shadow. Its tinted fill against the page, and its own colored border, are
 					what lift it — and unlike a shadow, both of them theme.
 				-->
 				<div

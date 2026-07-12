@@ -132,7 +132,7 @@
 		}
 	]);
 
-	// A tinted tile behind each stat's icon — the mark that replaced the coloured
+	// A tinted tile behind each stat's icon — the mark that replaced the colored
 	// dot, because a dot is a legend nobody was given the key to.
 	const TILE: Record<string, string> = {
 		accent: 'bg-accent-surface text-accent-text',
@@ -141,7 +141,7 @@
 	};
 
 	// And the figure itself, in the tile's own ink. The tile and the number are one
-	// statement; two colours would make them two.
+	// statement; two colors would make them two.
 	const INK: Record<string, string> = {
 		accent: 'text-accent-text',
 		success: 'text-success-text',
@@ -160,7 +160,7 @@
 	<!--
 		The date, not the address. A person knows their own email; what they do not know,
 		arriving, is what day it is against the deadlines they are carrying. And no
-		"Browse the catalogue" button: Courses is in the band on every page, and a button
+		"Browse the catalog" button: Courses is in the band on every page, and a button
 		that repeats a menu item is a button in the way.
 	-->
 	<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
@@ -240,7 +240,7 @@
 
 					{#if data.enrolments.length === 0}
 						<p class="text-muted min-w-40 text-sm">
-							Nothing yet. Enrol on a course and this fills itself in.
+							Nothing yet. Enroll on a course and this fills itself in.
 						</p>
 					{:else}
 						<div class="min-w-40">
@@ -250,7 +250,7 @@
 				</div>
 
 				<!--
-					The figure wears the colour of its own tile. Colour here is not decoration:
+					The figure wears the color of its own tile. Color here is not decoration:
 					it is the thread tying the number to the mark beside it, and a page where
 					every number is the same ink is a page you have to read rather than scan.
 				-->
@@ -409,12 +409,12 @@
 					<EmptyState
 						icon={BookOpen01Icon}
 						title="Nothing on the go"
-						description="Enrol on a course and it will show up here, with how far through it you are."
+						description="Enroll on a course and it will show up here, with how far through it you are."
 					>
 						{#snippet action()}
 							<Button href={resolve('/courses')} size="sm">
 								<Icon icon={BookOpen01Icon} class="size-4" />
-								Browse the catalogue
+								Browse the catalog
 							</Button>
 						{/snippet}
 					</EmptyState>
@@ -434,7 +434,7 @@
 								a title at the size of a heading. Everything under it gets quieter and
 								denser — smaller type, tighter rows, a thinner bar — because a page
 								where five cards all shout is a page with no hero at all. Weight and
-								air do the work here, not another colour.
+								air do the work here, not another color.
 							-->
 							<Card
 								surface={index === 0 ? 'aurora' : 'raised'}
@@ -507,7 +507,7 @@
 										</div>
 										<div class={index === 0 ? 'mt-2' : 'mt-1.5'}>
 											<!--
-												In the state's own colour, which is the donut's colour for that
+												In the state's own color, which is the donut's color for that
 												slice. Every course on this page now says what became of it in the
 												same hue whether it is a bar, a ring, or an arc.
 											-->

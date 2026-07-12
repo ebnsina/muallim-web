@@ -3,10 +3,10 @@
 
 	Two layers, and the separation is the whole point:
 
-	  * PRIMITIVES (--n-1 … --n-12, --b-9, --ok-9 …) are raw steps on a colour
+	  * PRIMITIVES (--n-1 … --n-12, --b-9, --ok-9 …) are raw steps on a color
 	    ramp. Nothing outside this file may name one.
 	  * SEMANTICS (--color-text, --color-border, --color-accent …) say what a
-	    colour is *for*. Components use only these.
+	    color is *for*. Components use only these.
 
 	A component that reaches for a primitive — or worse, a hex — is a component
 	that cannot be themed, and every tenant will want to theme. Primer enforces
@@ -48,9 +48,9 @@
 	color-scheme: light;
 
 	/*
-		Neutral. Not a pure grey: the brand hue bleeds through at very low chroma,
-		which is what makes a UI's greys look considered rather than default.
-		Coursera does the same thing by overlaying its blue on mid-grey at 8%.
+		Neutral. Not a pure gray: the brand hue bleeds through at very low chroma,
+		which is what makes a UI's grays look considered rather than default.
+		Coursera does the same thing by overlaying its blue on mid-gray at 8%.
 	*/
 	--n-1: oklch(0.9938 0.0015 259);
 	--n-2: oklch(0.9812 0.0028 259);
@@ -74,7 +74,7 @@
 		rather than eyeballed. Three reasons, in order of how much they should count.
 
 		First, hue distance. The primary has to be told apart from the three status
-		colours by people who cannot see hue the way you do. At 262° it sits 200°
+		colors by people who cannot see hue the way you do. At 262° it sits 200°
 		from success (155°), 240° from danger (22°) and 196° from warning (66°) —
 		about as far from all three as a single hue can get.
 
@@ -87,10 +87,10 @@
 		https://pubmed.ncbi.nlm.nih.gov/17324089/
 		https://link.springer.com/article/10.3758/s13423-020-01772-1
 
-		Third, what the alternatives cost. Green is the success colour and cannot
+		Third, what the alternatives cost. Green is the success color and cannot
 		also mean "primary action" — a green Submit beside a green Correct is a
 		sentence with two verbs. Teal drifts toward the same collision. Orange and
-		red are the warning and danger colours. Violet past ~285° starts to read as
+		red are the warning and danger colors. Violet past ~285° starts to read as
 		consumer-social rather than institutional. Blue is what is left, and it is
 		left for a reason.
 	*/
@@ -108,7 +108,7 @@
 	--b-12: oklch(0.2822 0.0868 243);
 
 	/*
-		Success. A green at the same lightness as the danger red is the same grey to
+		Success. A green at the same lightness as the danger red is the same gray to
 		a camera and to a monochrome print, so this one is deliberately darker than
 		the eye asks for: green's luminance coefficient is 0.72 against red's 0.21,
 		and matching them by *appearance* would match them by luminance too.
@@ -158,7 +158,7 @@
 	/* ---- Semantics. Everything above this line is invisible to components. ---- */
 
 	/*
-		The page is a faint grey and a card is white. That inversion is what lets a
+		The page is a faint gray and a card is white. That inversion is what lets a
 		field carry a hairline border and still read unmistakably as a field: at
 		rest it is identified by its own fill against the page, not by its edge.
 		A white page with white fields needs a 3:1 border to be legal, and a 3:1
@@ -184,7 +184,7 @@
 
 	/*
 		The resting edge of a field. A hairline, because the field's white fill
-		against the grey page is what marks it as a field; the border only sharpens
+		against the gray page is what marks it as a field; the border only sharpens
 		it. WCAG 1.4.11's 3:1 is satisfied by the *focus* indicator and by the
 		fill-against-page contrast, both of which contrast.spec.ts asserts.
 	*/
@@ -244,7 +244,7 @@
 		millimetre, not to draw a dark rectangle under it: the near layer is barely
 		there, and the far one is wide and very faint, so the card blends into the page
 		rather than sitting on top of it. Tinted with the neutral's own hue rather than
-		pure black — a grey shadow on a page that is faintly blue reads as dirt.
+		pure black — a gray shadow on a page that is faintly blue reads as dirt.
 
 		On a dark surface a shadow is invisible, so dark mode does not fake one: it goes
 		back to a hairline ring, the only thing that separates there.
@@ -258,7 +258,7 @@
 	/*
 		There are no shadow tokens, and that is the point.
 
-		Separation in this system is a border's job. A shadow is a blurred grey
+		Separation in this system is a border's job. A shadow is a blurred gray
 		rectangle drawn under an element: it does not theme (the same blur that reads
 		as depth on white reads as grime on a dark surface), it does not survive a
 		high-contrast mode, and forty of them stacked down a marking queue is a queue
@@ -283,7 +283,7 @@
 	color-scheme: dark;
 
 	/*
-		Base is a dark grey, never pure black: black against bright content
+		Base is a dark gray, never pure black: black against bright content
 		causes halation, and there is nowhere left to go for a sunken surface.
 		Elevation in dark is a *lighter* surface, not a heavier shadow.
 	*/
@@ -369,7 +369,7 @@
 
 		Elevation in dark mode is a lighter surface, not a heavier shadow, and the
 		field's border does more work here: a step-2 fill on a step-1 page is a
-		weaker signal than white on grey.
+		weaker signal than white on gray.
 	*/
 	--surface: var(--n-1);
 	--surface-raised: var(--n-2);

@@ -113,7 +113,7 @@
 	});
 
 	// A monogram, from the first letters of the name. A face nobody uploaded is a
-	// grey silhouette; two initials in the accent are a person.
+	// gray silhouette; two initials in the accent are a person.
 	const initials = $derived(
 		(user?.name ?? '')
 			.split(/\s+/)
@@ -176,7 +176,7 @@
 
 <!--
 	A band, not a bar. It runs the width of the window and the page lies on it as a
-	sheet with its top corners rounded off, so the brand colour is the surface the
+	sheet with its top corners rounded off, so the brand color is the surface the
 	product rests on rather than a stripe drawn across it. The sections sit in the
 	band itself — one row, not a bar with a tab strip under it.
 -->
@@ -199,7 +199,7 @@
 		<!-- ------------------------------------------------------------ sections -->
 		<!--
 			In the band, where they read as the product's own sections. The current one is
-			a filled pill rather than an underline: on a solid colour an underline is a
+			a filled pill rather than an underline: on a solid color an underline is a
 			scratch, and the fill is the only mark that survives.
 		-->
 		<nav
@@ -275,7 +275,7 @@
 						<Icon icon={Notification02Icon} class="size-5" />
 						{#if unread > 0}
 							<!-- On a solid band the badge inverts: the accent that made it stand out
-							     on a white bar is the colour it is now standing on. -->
+							     on a white bar is the color it is now standing on. -->
 							<span
 								class="numeral absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-surface-raised px-1 text-[0.65rem] leading-4 font-semibold text-accent-text"
 							>

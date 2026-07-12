@@ -28,7 +28,7 @@
 
 	const dripNotice: Record<string, string> = {
 		scheduled: 'Lessons in this course open on their own dates.',
-		after_enrolment: 'Lessons open a few days apart, counted from the day you enrol.',
+		after_enrolment: 'Lessons open a few days apart, counted from the day you enroll.',
 		sequential: 'Lessons open one at a time, as you finish the one before.'
 	};
 </script>
@@ -41,14 +41,14 @@
 		full-bleed band. A band that runs to the viewport's edge fights the page frame
 		on every scroll, and the frame is what says where the content starts.
 
-		The panel that asks you to enrol sits beside it and follows you down. On one
+		The panel that asks you to enroll sits beside it and follows you down. On one
 		column it comes first: on a phone the fold lands above the first heading.
 	-->
 	<div class="relative">
 		<!--
-			The course's own light, from the same seed its card in the catalogue uses — so
-			a course is one colour wherever you meet it, and arriving here from the
-			catalogue is arriving at the thing you clicked rather than at a grey page
+			The course's own light, from the same seed its card in the catalog uses — so
+			a course is one color wherever you meet it, and arriving here from the
+			catalog is arriving at the thing you clicked rather than at a gray page
 			about it.
 
 			It replaced a wash of accent-surface into surface-sunken, which was the same

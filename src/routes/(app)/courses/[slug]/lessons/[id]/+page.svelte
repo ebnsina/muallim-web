@@ -105,7 +105,7 @@
 		form && 'completed' in form ? Boolean(form.completed) : Boolean(data.lesson.completed_at)
 	);
 
-	// Completing a lesson requires an enrolment, so a previewer is shown the content
+	// Completing a lesson requires an enrollment, so a previewer is shown the content
 	// and nothing to press. `access` is the API's word on that, not a guess made from
 	// the presence of a session.
 	const canComplete = $derived(data.access === 'enrolled');
@@ -202,7 +202,7 @@
 
 			<!--
 				`video_embed_url`, never `video_url`. The first is a player the API built from
-				a video id it recognised, on a host it allows, over https. The second is a
+				a video id it recognized, on a host it allows, over https. The second is a
 				string an author typed, and framing it would run their page on this origin for
 				every reader of the lesson.
 			-->
@@ -262,7 +262,7 @@
 
 			{#if data.access === 'preview'}
 				<Alert class="mt-10 max-w-2xl">
-					This is a free preview. Enrol on the course to read the rest and to track your progress.
+					This is a free preview. Enroll on the course to read the rest and to track your progress.
 				</Alert>
 			{:else if canComplete}
 				<div class="mt-10 flex items-center gap-4">

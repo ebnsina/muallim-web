@@ -13,10 +13,10 @@ test.describe('gamification', () => {
 	test('finishing a lesson earns points and the first-steps badge', async ({ page, request }) => {
 		const course = await publishedCourse(request, slug('game'));
 
-		// Enrol, then complete a lesson through the browser.
+		// Enroll, then complete a lesson through the browser.
 		await page.goto(`/courses/${course.slug}`);
 		await ready(page);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('Your progress')).toBeVisible();
 
 		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);

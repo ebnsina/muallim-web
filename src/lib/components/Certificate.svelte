@@ -166,7 +166,7 @@
 	<!-- ------------------------------------------------------------- the seal -->
 	<!--
 		Overlapping the seam between the sheet and the panel, the way a wax seal sits
-		half on the ribbon. Centred on the join on desktop; on a phone it tucks into
+		half on the ribbon. Centered on the join on desktop; on a phone it tucks into
 		the top-right of the sheet.
 	-->
 	<div

@@ -34,7 +34,7 @@ test.describe('what a stranger may see', () => {
 		await page.goto(`/courses/${course.slug}`);
 		await expect(page.getByRole('heading', { name: `Course ${course.slug}` })).toBeVisible();
 		// `Button href=` renders an anchor, so this is a link, not a button.
-		await expect(page.getByRole('link', { name: 'Sign in to enrol' })).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Sign in to enroll' })).toBeVisible();
 
 		const preview = await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
 		expect(preview?.status()).toBe(200);
@@ -77,11 +77,11 @@ test.describe('what a student may see', () => {
 		expect(before?.status()).toBe(404);
 
 		await page.goto(`/courses/${course.slug}`);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
 
 		// Both lessons, including the preview: completing a course requires an
-		// enrolment, so an enrolled learner completes the preview too. Were it
+		// enrollment, so an enrolled learner completes the preview too. Were it
 		// otherwise, a course with a preview lesson could never reach 100%.
 		for (const id of [course.previewLessonId, course.gatedLessonId]) {
 			await page.goto(`/courses/${course.slug}/lessons/${id}`);
@@ -113,21 +113,21 @@ test.describe('gates a learner meets', () => {
 
 	// The refusal names the course. A 404 here would hide the reason along with
 	// the button.
-	test('a prerequisite blocks enrolment until it is finished', async ({ page, request }) => {
+	test('a prerequisite blocks enrollment until it is finished', async ({ page, request }) => {
 		const basics = await publishedCourse(request, slug('basics'));
 		const advanced = await publishedCourse(request, slug('advanced'));
 		await requirePrerequisite(request, advanced.slug, basics.slug);
 
 		await page.goto(`/courses/${advanced.slug}`);
-		await expect(page.getByRole('heading', { name: 'Before you enrol' })).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Before you enroll' })).toBeVisible();
 		await expect(page.getByText('not finished yet')).toBeVisible();
-		await expect(page.getByRole('button', { name: 'Enrol', exact: true })).toBeDisabled();
+		await expect(page.getByRole('button', { name: 'Enroll', exact: true })).toBeDisabled();
 
-		// Finish the prerequisite. Wait for the enrolment to land: `click()` returns
+		// Finish the prerequisite. Wait for the enrollment to land: `click()` returns
 		// once the event is dispatched and `use:enhance` posts afterwards, so
 		// navigating away here abandons the request.
 		await page.goto(`/courses/${basics.slug}`);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
 
 		for (const id of [basics.previewLessonId, basics.gatedLessonId]) {
@@ -139,7 +139,7 @@ test.describe('gates a learner meets', () => {
 		// The gate opens. `finished` alone would also match "not finished yet", so
 		// the button's state is what this asserts.
 		await page.goto(`/courses/${advanced.slug}`);
-		const enrol = page.getByRole('button', { name: 'Enrol', exact: true });
+		const enrol = page.getByRole('button', { name: 'Enroll', exact: true });
 		await expect(enrol).toBeEnabled();
 
 		await enrol.click();
@@ -157,7 +157,7 @@ test.describe('gates a learner meets', () => {
 
 		await page.goto(`/courses/${course.slug}`);
 		await expect(page.getByText('Lessons open one at a time')).toBeVisible();
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('0 of 2 lessons')).toBeVisible();
 
 		// The preview is never dripped.

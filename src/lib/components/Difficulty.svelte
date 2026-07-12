@@ -25,9 +25,9 @@
 	Four bars, filled to the level.
 
 	Not a Badge. The tones this system ships mean things — `success` is a pass,
-	`danger` is a failure — and colouring "expert" red says a hard course is a
+	`danger` is a failure — and coloring "expert" red says a hard course is a
 	broken one. Difficulty is a magnitude, so it is drawn as one, in the accent
-	colour that means nothing but "this".
+	color that means nothing but "this".
 
 	The bars are decoration. The label carries the meaning, and when it is hidden
 	the `title` and the `aria-label` still do.

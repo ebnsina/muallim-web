@@ -107,10 +107,10 @@ test.describe('a stranger', () => {
 	test.use({ storageState: { cookies: [], origins: [] } });
 
 	/**
-	 * The catalogue is readable without a session — that is what a published course
+	 * The catalog is readable without a session — that is what a published course
 	 * is for — so the layout offers a way in rather than redirecting.
 	 */
-	test('browses the catalogue and is offered a way in', async ({ page }) => {
+	test('browses the catalog and is offered a way in', async ({ page }) => {
 		await page.goto('/courses');
 
 		await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
@@ -162,7 +162,7 @@ test.describe('breadcrumbs', () => {
 	test.use({ storageState: STUDENT_STATE });
 
 	/**
-	 * Enrol, then open the quiz.
+	 * Enroll, then open the quiz.
 	 *
 	 * The lesson a quiz hangs off is gated, and muallim-api answers 404 to a learner who
 	 * may not read it — not 403, because admitting it exists would leak it. A test
@@ -170,7 +170,7 @@ test.describe('breadcrumbs', () => {
 	 */
 	async function enrolled(page: Page, slug: string) {
 		await page.goto(`/courses/${slug}`);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('Your progress')).toBeVisible();
 	}
 

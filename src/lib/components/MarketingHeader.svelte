@@ -47,7 +47,7 @@
 				<!--
 					The panel scales open from the corner it hangs off — `origin-top-left`, under
 					the trigger's left edge — rather than swelling from its own middle. A popover
-					that grows from its centre is a popover that came from nowhere in particular;
+					that grows from its center is a popover that came from nowhere in particular;
 					one that grows from its trigger is the trigger opening.
 
 					And it starts at 95%, not at nothing, and not at a bare opacity fade: an

@@ -26,7 +26,7 @@
 	/*
 		Gold, silver, bronze — and the card *is* the medal.
 
-		A white card with a coloured ring says "here is a card, and by the way it is
+		A white card with a colored ring says "here is a card, and by the way it is
 		first". A tinted one says "this is first" before a word is read, which is the
 		whole job of a podium. The tints are the ramps' step 3, which is what that step
 		is for: a fill a page's own ink still reads on.
@@ -37,7 +37,7 @@
 		They were three flat tints, which is a legend: you had to be told amber meant
 		first. An aurora each says "these are the three" before a word is read, and the
 		rank inside it does the telling. The variants are the product's own five, picked
-		by name so the same place is the same colour on every visit.
+		by name so the same place is the same color on every visit.
 	*/
 	const MEDAL: Record<number, { cover: string; label: string; bar: 'inverse' }> = {
 		1: { cover: auroraFor('first'), label: 'First', bar: 'inverse' },
@@ -74,7 +74,7 @@
 	{#if data.me && data.me.out_of > 0}
 		{@const me = data.me}
 		<!-- Its own light, drawn from the workspace's own name — the same hash a course
-			     card uses, so this page's colour is *a* colour of the product rather than the
+			     card uses, so this page's color is *a* color of the product rather than the
 			     one every aurora surface defaults to. -->
 		<Card surface="aurora" class={cn('mt-8 p-6 sm:p-8', auroraFor('leaderboard'))}>
 			<div class="flex flex-wrap items-center gap-6">
@@ -184,7 +184,7 @@
 						>
 							<span class="text-muted numeral w-6 shrink-0 text-sm font-medium">{entry.rank}</span>
 
-							<!-- A monogram, not a silhouette: a face nobody uploaded is a grey blob,
+							<!-- A monogram, not a silhouette: a face nobody uploaded is a gray blob,
 							     and two letters are a person. -->
 							<span
 								class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-xs font-semibold"

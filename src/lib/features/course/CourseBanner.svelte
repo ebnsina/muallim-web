@@ -34,8 +34,8 @@
 
 <!--
 	The banner stands on the course's own light — the same aurora its card wears in
-	the catalogue, drawn from the same seed, so a course is one colour wherever you
-	meet it. Everything here is inverted ink: the page's greys were chosen against
+	the catalog, drawn from the same seed, so a course is one color wherever you
+	meet it. Everything here is inverted ink: the page's grays were chosen against
 	white paper and simply vanish on it.
 -->
 <Breadcrumbs {crumbs} tone="inverse" />
@@ -79,7 +79,7 @@
 </div>
 
 {#if course.instructor}
-	<!-- The byline goes where the catalogue's does: everything this person wrote. -->
+	<!-- The byline goes where the catalog's does: everything this person wrote. -->
 	<p class="mt-4 text-sm text-on-solid/85">
 		Created by
 		{#if course.instructor_id}

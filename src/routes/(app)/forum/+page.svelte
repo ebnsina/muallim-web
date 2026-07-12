@@ -111,7 +111,7 @@
 			<EmptyState
 				icon={UserGroupIcon}
 				title="No boards yet"
-				description="When a board is opened, or you enrol in a course that has one, it appears here."
+				description="When a board is opened, or you enroll in a course that has one, it appears here."
 			/>
 		</div>
 	{:else}

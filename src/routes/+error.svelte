@@ -22,7 +22,7 @@
 </svelte:head>
 
 <!--
-	An error page that only apologises is a dead end. Both branches offer a way
+	An error page that only apologizes is a dead end. Both branches offer a way
 	out: a route home always, and a retry when retrying could plausibly work.
 -->
 <main class="flex min-h-dvh items-center justify-center px-6 py-16">

@@ -241,7 +241,7 @@
 							aria-describedby="after-days-hint"
 						/>
 						<p id="after-days-hint" class="text-muted text-xs">
-							Counted from each learner's own enrolment, so they see different dates.
+							Counted from each learner's own enrollment, so they see different dates.
 						</p>
 					</div>
 				{:else if data.dripMode === 'sequential'}

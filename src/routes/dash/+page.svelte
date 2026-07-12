@@ -21,7 +21,7 @@
 
 	/*
 		The board's three columns are not invented states: they are what the API already
-		says about an enrolment. Active with nothing done is a course on the shelf,
+		says about an enrollment. Active with nothing done is a course on the shelf,
 		active with something done is a course underway, completed is done. A column for
 		a state the server does not have would be a column that never fills.
 	*/
@@ -52,7 +52,7 @@
 		}
 	];
 
-	// A filter over what is already on screen — no request, because every enrolment
+	// A filter over what is already on screen — no request, because every enrollment
 	// this learner has is here.
 	let query = $state('');
 
@@ -105,7 +105,7 @@
 <svelte:head><title>Board — Muallim</title></svelte:head>
 
 <!--
-	A column, so the sheet takes whatever height the band leaves and the band's colour
+	A column, so the sheet takes whatever height the band leaves and the band's color
 	cannot show below it. `100vh minus a guessed header height` was the wrong shape of
 	answer: it left a sliver of blue at the bottom the moment the guess was off by a
 	pixel, and it would be off on every screen where the nav wraps.
@@ -286,7 +286,7 @@
 													class="block rounded-2xl bg-surface-raised p-4 shadow-card transition-shadow duration-(--duration-base) hover:shadow-card-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 												>
 													<div class="flex items-start gap-3">
-														<!-- The tinted tile, in the state's own colour. -->
+														<!-- The tinted tile, in the state's own color. -->
 														<span
 															class={cn(
 																'flex size-9 shrink-0 items-center justify-center rounded-control',

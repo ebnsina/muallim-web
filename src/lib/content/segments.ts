@@ -64,14 +64,14 @@ export const SEGMENTS: Segment[] = [
 		eyebrow: 'For nonprofits & community builders',
 		headline: 'Everything you need is already here.',
 		blurb:
-			'Free courses, open enrolment, and a community layer that keeps people coming back — with no dependency on the paid pieces still being built.',
+			'Free courses, open enrollment, and a community layer that keeps people coming back — with no dependency on the paid pieces still being built.',
 		image:
 			'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=70',
 		imageAlt: 'Volunteers gathered around a table, learning together',
 		today: [
 			{
 				icon: Award01Icon,
-				title: 'Free courses, open enrolment',
+				title: 'Free courses, open enrollment',
 				body: 'Publish a course and let anyone you invite join it. No checkout stands between a learner and the material.'
 			},
 			{
@@ -103,7 +103,7 @@ export const SEGMENTS: Segment[] = [
 			}
 		],
 		verdict: {
-			ready: 'You can run a full community learning programme today, end to end, at no cost.',
+			ready: 'You can run a full community learning program today, end to end, at no cost.',
 			wait: 'If taking donations or membership fees in-platform is essential, that piece is still ahead.'
 		}
 	},
@@ -123,7 +123,7 @@ export const SEGMENTS: Segment[] = [
 			{
 				icon: TeachingIcon,
 				title: 'Author and publish',
-				body: 'Write lessons, structure a curriculum, and put it in a catalogue learners can browse.'
+				body: 'Write lessons, structure a curriculum, and put it in a catalog learners can browse.'
 			},
 			{
 				icon: Quiz01Icon,
@@ -151,7 +151,7 @@ export const SEGMENTS: Segment[] = [
 			title: 'Every part of building and running a course is here.',
 			body: 'From the first lesson to the certificate at the end, the whole teaching loop is built and tested. The only thing you cannot do yet is charge for it.',
 			points: [
-				'Curriculum authoring and a public catalogue',
+				'Curriculum authoring and a public catalog',
 				'Self-marking quizzes, hand-marked essays, a gradebook',
 				'Certificates and a points leaderboard'
 			]
@@ -200,7 +200,7 @@ export const SEGMENTS: Segment[] = [
 		highlight: {
 			label: 'Operations',
 			title: 'The day-to-day of running a school already works.',
-			body: 'Roles, enrolment, marking, and isolation are the operational core, and they are built and tested. What is missing is not how you teach — it is what a procurement office checks off.',
+			body: 'Roles, enrollment, marking, and isolation are the operational core, and they are built and tested. What is missing is not how you teach — it is what a procurement office checks off.',
 			points: [
 				'Multi-role RBAC with least privilege',
 				'Invitations and member management',
@@ -260,7 +260,7 @@ export const SEGMENTS: Segment[] = [
 			},
 			{
 				icon: Quiz01Icon,
-				title: 'Structured programmes',
+				title: 'Structured programs',
 				body: 'Turn a coaching arc into lessons and quizzes, with a gradebook to see who is keeping up.'
 			}
 		],
@@ -271,7 +271,7 @@ export const SEGMENTS: Segment[] = [
 			points: [
 				'A forum and Q&A scoped to your cohort',
 				'Announcements delivered in-app and by email',
-				'Courses and quizzes to structure the programme'
+				'Courses and quizzes to structure the program'
 			]
 		},
 		roadmap: [
@@ -283,7 +283,7 @@ export const SEGMENTS: Segment[] = [
 			{
 				icon: Clock01Icon,
 				title: 'Scheduling & cohorts',
-				body: 'Booking sessions and moving an intake through a programme together are still to come.'
+				body: 'Booking sessions and moving an intake through a program together are still to come.'
 			},
 			{
 				icon: Package01Icon,

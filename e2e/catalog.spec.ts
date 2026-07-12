@@ -7,7 +7,7 @@ import { ready } from './hydration';
 const slug = (name: string) =>
 	`${name}-${process.env.E2E_RUN_ID ?? 'local'}-${randomUUID().slice(0, 8)}`;
 
-test.describe('the catalogue', () => {
+test.describe('the catalog', () => {
 	test.use({ storageState: STUDENT_STATE });
 
 	test('searches by title, and says so when nothing matches', async ({ page, request }) => {
@@ -17,7 +17,7 @@ test.describe('the catalogue', () => {
 		await page.goto('/courses');
 		await ready(page);
 
-		// The whole catalogue is here; a search narrows it to the one course.
+		// The whole catalog is here; a search narrows it to the one course.
 		await page.getByPlaceholder('Search by title…').fill(marker);
 		await page.getByRole('button', { name: 'Search', exact: true }).click();
 		await expect(page.getByText(`Course ${marker}`)).toBeVisible();

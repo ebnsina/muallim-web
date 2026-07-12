@@ -17,10 +17,10 @@ test.describe('course reviews', () => {
 		const course = await publishedCourse(request, slug('rev'));
 		const body = `Genuinely useful ${randomUUID().slice(0, 6)}`;
 
-		// You must be enrolled to review, so enrol first from the course page.
+		// You must be enrolled to review, so enroll first from the course page.
 		await page.goto(`/courses/${course.slug}`);
 		await ready(page);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 
 		// The review form appears for an enrolled learner.
 		await page.getByTitle('4 of 5').click();

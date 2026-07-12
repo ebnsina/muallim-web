@@ -134,9 +134,9 @@
 		<p class="text-sm font-medium text-accent-text">Design system</p>
 		<h1 class="mt-1 text-4xl font-semibold">Components</h1>
 		<p class="mt-3 max-w-2xl text-muted">
-			Every colour here is a semantic token, never a hex. Every pair that carries text or marks the
+			Every color here is a semantic token, never a hex. Every pair that carries text or marks the
 			edge of a control is checked against WCAG 2.2 AA by
-			<code class="text-sm">contrast.spec.ts</code>, in both colour schemes. Change your system
+			<code class="text-sm">contrast.spec.ts</code>, in both color schemes. Change your system
 			appearance to see the dark ramp.
 		</p>
 	</header>
@@ -201,9 +201,9 @@
 		</Card>
 	</section>
 
-	<!-- ---------------------------------------------------------------- colour -->
+	<!-- ---------------------------------------------------------------- color -->
 	<section class="mt-16">
-		<h2 class="text-xl font-semibold">Colour</h2>
+		<h2 class="text-xl font-semibold">Color</h2>
 		<p class="mt-1 text-sm text-muted">
 			Twelve steps per ramp, each with one assigned job. Hover and active are steps in the palette,
 			not an opacity guess.
@@ -282,7 +282,7 @@
 		</p>
 
 		<Card class="mt-6 space-y-6 p-6">
-			<Field id="demo-title" label="Course title" hint="Shown in the catalogue.">
+			<Field id="demo-title" label="Course title" hint="Shown in the catalog.">
 				{#snippet children({ id, describedBy, invalid })}
 					<Input {id} aria-describedby={describedBy} {invalid} placeholder="Introduction to Go" />
 				{/snippet}
@@ -342,8 +342,8 @@
 	<section class="mt-16">
 		<h2 class="text-xl font-semibold">Alert</h2>
 		<p class="mt-1 text-sm text-muted">
-			Icon, colour, and a visually-hidden word. A screen reader hears “Error:” before the message;
-			colour is never the only signal.
+			Icon, color, and a visually-hidden word. A screen reader hears “Error:” before the message;
+			color is never the only signal.
 		</p>
 
 		<div class="mt-6 space-y-3">
@@ -578,7 +578,7 @@
 				Press these. A control that does not move under the pointer is a control the interface never
 				admitted to hearing. Every one of them is the real component, gated behind
 				<code class="text-sm">motion-safe</code>, so a reader who asked for less motion keeps the
-				colour and loses the movement.
+				color and loses the movement.
 			</p>
 
 			<div class="mt-5 flex flex-wrap items-center gap-3">
@@ -670,7 +670,7 @@
 		<h2 class="text-xl font-semibold">Difficulty</h2>
 		<p class="text-muted mt-1 text-sm">
 			A magnitude, drawn as one. Not a Badge: <code>success</code> and <code>danger</code> mean a pass
-			and a failure everywhere else, and colouring "expert" red says a hard course is a broken one.
+			and a failure everywhere else, and coloring "expert" red says a hard course is a broken one.
 		</p>
 
 		<Card class="mt-6 flex flex-wrap gap-8 p-5">

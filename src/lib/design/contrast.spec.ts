@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 	This reads tokens.css, resolves the semantic tokens through to their oklch
 	primitives, converts them to sRGB, and computes the WCAG 2.2 contrast ratio for
 	every pair the components actually rely on. Change a token and this test says
-	which pair it broke, in both colour schemes.
+	which pair it broke, in both color schemes.
 
 	WCAG 2.2 AA: 4.5:1 for body text, 3:1 for large text (>=18.66px bold or 24px)
 	and for the boundary of a user-interface component (1.4.11).
@@ -112,7 +112,7 @@ function resolve(tokens: Map<string, string>, name: string): Oklch {
 	}
 
 	const colour = parseOklch(value!);
-	expect(colour, `${name} resolves to ${value}, which is not an oklch colour`).not.toBeNull();
+	expect(colour, `${name} resolves to ${value}, which is not an oklch color`).not.toBeNull();
 	return colour!;
 }
 
@@ -218,7 +218,7 @@ describe('design tokens', () => {
 	describe.each(SCHEMES)('%s: a field is visible at rest', (_scheme, tokens) => {
 		it('its fill differs from the page it sits on', () => {
 			const ratio = contrast(resolve(tokens, '--surface-raised'), resolve(tokens, '--surface'));
-			expect(ratio, 'a field the same colour as the page has only its border').toBeGreaterThan(
+			expect(ratio, 'a field the same color as the page has only its border').toBeGreaterThan(
 				1.04
 			);
 		});
@@ -226,15 +226,15 @@ describe('design tokens', () => {
 
 	// The success and danger hues must be told apart by something other than hue,
 	// because roughly one man in twelve cannot tell them apart by hue. They always
-	// ship with an icon and a word; this asserts the colours are *also* distinct in
-	// lightness, so the distinction survives a greyscale print.
-	describe.each(SCHEMES)('%s: status colours differ in lightness', (_scheme, tokens) => {
-		it('success and danger are not the same grey', () => {
+	// ship with an icon and a word; this asserts the colors are *also* distinct in
+	// lightness, so the distinction survives a grayscale print.
+	describe.each(SCHEMES)('%s: status colors differ in lightness', (_scheme, tokens) => {
+		it('success and danger are not the same gray', () => {
 			const success = luminance(resolve(tokens, '--success'));
 			const danger = luminance(resolve(tokens, '--danger'));
 
 			const ratio = (Math.max(success, danger) + 0.05) / (Math.min(success, danger) + 0.05);
-			expect(ratio, 'success and danger are indistinguishable without colour').toBeGreaterThan(
+			expect(ratio, 'success and danger are indistinguishable without color').toBeGreaterThan(
 				1.15
 			);
 		});
@@ -244,7 +244,7 @@ describe('design tokens', () => {
 		Every ramp is twelve steps, and every step exists.
 
 		The gallery at /ui renders all twelve of each, and a hole in a ramp draws as
-		nothing at all — a transparent stripe where a colour should be. Three ramps
+		nothing at all — a transparent stripe where a color should be. Three ramps
 		shipped with six holes each before this test existed, because every *token*
 		that resolved happened to point at a step that was defined.
 	*/
@@ -253,7 +253,7 @@ describe('design tokens', () => {
 			for (let step = 1; step <= 12; step++) {
 				const name = `${prefix}${step}`;
 				expect(tokens.has(name), `${name} is missing from the ramp`).toBe(true);
-				expect(parseOklch(tokens.get(name)!), `${name} is not an oklch colour`).not.toBeNull();
+				expect(parseOklch(tokens.get(name)!), `${name} is not an oklch color`).not.toBeNull();
 			}
 		});
 

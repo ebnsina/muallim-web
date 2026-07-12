@@ -1,6 +1,6 @@
 <!--
 	A faint, fixed aurora wash for the whole marketing page — behind every section,
-	so the body carries a touch of the hero's colour in either theme. Kept subtle so
+	so the body carries a touch of the hero's color in either theme. Kept subtle so
 	it reads as premium light, not decoration; the hero layers a stronger one on top.
 -->
 <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

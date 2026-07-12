@@ -64,7 +64,7 @@
 
 	<!--
 		No mat. The certificate carries the light itself now — its emblem panel is the
-		aurora — and a coloured surround behind a coloured panel was two of the same
+		aurora — and a colored surround behind a colored panel was two of the same
 		idea arguing about which one is the object.
 	-->
 	<div class="print:p-0">

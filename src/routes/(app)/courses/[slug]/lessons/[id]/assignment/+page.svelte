@@ -187,7 +187,7 @@
 	{/if}
 
 	{#if !data.signedIn}
-		<Alert class="mt-10">Sign in and enrol on this course to hand work in.</Alert>
+		<Alert class="mt-10">Sign in and enroll on this course to hand work in.</Alert>
 	{:else if graded}
 		<Card float class="mt-10 p-6">
 			<Score

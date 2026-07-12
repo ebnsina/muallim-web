@@ -18,7 +18,7 @@ export function cn(...inputs: ClassValue[]) {
  * Which of the five auroras a thing wears, from its own id.
  *
  * Stable by construction: the same slug picks the same light on the server and in
- * the browser, on every reload. `Math.random()` here would hand a card one colour
+ * the browser, on every reload. `Math.random()` here would hand a card one color
  * during the server render and another during hydration — a mismatch you can see.
  */
 export function auroraFor(seed: string): string {

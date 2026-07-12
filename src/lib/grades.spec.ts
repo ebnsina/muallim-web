@@ -55,13 +55,13 @@ describe('bandTone', () => {
 		matched on letters would be wrong for every workspace that grades its own way,
 		and right only for the one it was written against.
 	*/
-	it('colours a pass green and a fail red, whatever it is called', () => {
+	it('colors a pass green and a fail red, whatever it is called', () => {
 		expect(bandTone({ label: 'D', is_pass: true })).toBe('success');
 		expect(bandTone({ label: 'A', is_pass: false })).toBe('danger');
 		expect(bandTone({ label: 'Merit', is_pass: true })).toBe('success');
 	});
 
-	// Nothing marked is not a failure. It has no band at all, and no colour.
+	// Nothing marked is not a failure. It has no band at all, and no color.
 	it('is neutral when there is no band', () => {
 		expect(bandTone(undefined)).toBe('neutral');
 		expect(bandTone(null)).toBe('neutral');

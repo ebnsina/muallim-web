@@ -51,7 +51,7 @@
 </script>
 
 <!--
-	A border separates, and mostly nothing else does: a blurred grey rectangle under
+	A border separates, and mostly nothing else does: a blurred gray rectangle under
 	an element does not theme — the same blur that reads as depth on white reads as
 	grime on a dark surface — and forty of them down a marking queue is a queue
 	nobody can read. So `raised` is a heavier border, not a drop shadow, and `flat`

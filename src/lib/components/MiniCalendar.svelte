@@ -215,8 +215,8 @@
 	</table>
 
 	<!--
-		What is owed on the chosen day, and never a number alone: colour says overdue,
-		and so do the words, because colour on its own says nothing to a reader who
+		What is owed on the chosen day, and never a number alone: color says overdue,
+		and so do the words, because color on its own says nothing to a reader who
 		cannot see it.
 	-->
 	<div class="mt-3 border-t border-border pt-3">

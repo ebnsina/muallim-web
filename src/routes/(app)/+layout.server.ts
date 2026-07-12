@@ -5,11 +5,11 @@ import type { LayoutServerLoad } from './$types';
 /**
  * Who is signed in, for every page under this layout.
  *
- * Not a guard. The catalogue is readable by a stranger — that is what a published
+ * Not a guard. The catalog is readable by a stranger — that is what a published
  * course and a preview lesson are for — so an anonymous visitor gets `user: null`
  * and a header offering to sign them in. Pages that do need a session say so
  * themselves, because the rule differs page by page and a layout that redirected
- * would take the catalogue down with it.
+ * would take the catalog down with it.
  *
  * Loaded once here rather than in each page. Every signed-in page draws the
  * person's name in the header, and asking `/v1/me` from all of them would be one

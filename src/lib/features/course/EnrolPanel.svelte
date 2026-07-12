@@ -100,8 +100,8 @@
      plainly separate; the shadow is what says it is lifted off. -->
 <Card float class="mt-6 overflow-hidden p-0 lg:mt-0">
 	<!--
-		The preview, at the top of the card that asks you to enrol — the shape every
-		catalogue on the web has settled on, because a person decides with their eyes
+		The preview, at the top of the card that asks you to enroll — the shape every
+		catalog on the web has settled on, because a person decides with their eyes
 		before they read a word of the syllabus.
 
 		⚠️ PLACEHOLDER. `static/stock/course-preview.mp4` is a generated gradient with
@@ -157,9 +157,9 @@
 			</div>
 
 			<!--
-			The bar turns the colour of the state it reached. A finished course is green
+			The bar turns the color of the state it reached. A finished course is green
 			here and green in the donut on the learner's dashboard: one palette, so the
-			colour means the same thing wherever they meet it.
+			color means the same thing wherever they meet it.
 		-->
 			<div class="mt-3">
 				<ProgressBar
@@ -220,7 +220,7 @@
 						if (result.type === 'failure' || result.type === 'error') return;
 						// Progress survives a cancellation, and a learner about to lose access is
 						// the person who most needs telling that it does.
-						toast.info('Enrolment cancelled. Your progress is kept if you come back.');
+						toast.info('Enrollment cancelled. Your progress is kept if you come back.');
 					};
 				}}
 			>
@@ -233,21 +233,21 @@
 					disabled={cancelling}
 				>
 					<Icon icon={Cancel01Icon} class="size-4" />
-					{cancelling ? 'Cancelling…' : 'Cancel enrolment'}
+					{cancelling ? 'Cancelling…' : 'Cancel enrollment'}
 				</Button>
 			</form>
 		{:else if !signedIn}
 			<p class="font-medium">Ready to start?</p>
 			<p class="text-muted mt-1 text-sm">
-				Sign in to enrol and keep track of what you have finished.
+				Sign in to enroll and keep track of what you have finished.
 			</p>
 
 			<Button href={`${resolve('/login')}?next=${encodeURIComponent(next)}`} class="mt-5 w-full">
 				<Icon icon={UserAdd01Icon} class="size-4" />
-				Sign in to enrol
+				Sign in to enroll
 			</Button>
 		{:else if openPrerequisites.length > 0}
-			<h2 class="font-medium">Before you enrol</h2>
+			<h2 class="font-medium">Before you enroll</h2>
 
 			<!--
 			Every prerequisite, with its state — not only the unfinished ones. A learner
@@ -273,12 +273,12 @@
 		-->
 			<Button disabled class="mt-5 w-full">
 				<Icon icon={UserAdd01Icon} class="size-4" />
-				Enrol
+				Enroll
 			</Button>
 		{:else}
 			<p class="font-medium">Ready to start?</p>
 			<p class="text-muted mt-1 text-sm">
-				Enrol to open every lesson and track what you have finished.
+				Enroll to open every lesson and track what you have finished.
 			</p>
 
 			<!--
@@ -303,7 +303,7 @@
 			>
 				<Button type="submit" class="w-full" loading={enrolling}>
 					<Icon icon={UserAdd01Icon} class="size-4" />
-					{enrolling ? 'Enrolling…' : 'Enrol'}
+					{enrolling ? 'Enrolling…' : 'Enroll'}
 				</Button>
 			</form>
 		{/if}

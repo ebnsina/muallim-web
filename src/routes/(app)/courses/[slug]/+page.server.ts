@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	await parent();
 	const [progress, prerequisites, enrolments, announcements, reviews] = await rest;
 
-	// Which prerequisites this reader has finished. muallim-api refuses the enrolment
+	// Which prerequisites this reader has finished. muallim-api refuses the enrollment
 	// and names them, but a learner should see the gate before they walk into it.
 	const finished = new Set(
 		(enrolments?.data?.enrolments ?? [])
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			done: finished.has(c.slug)
 		})),
 
-		// After-enrolment drip counts from this learner's own enrolment, so the page
+		// After-enrollment drip counts from this learner's own enrollment, so the page
 		// cannot compute an unlock date without it. Sequential drip has no date at
 		// all, and muallim-api is the only thing that knows which lesson comes next.
 		enrolledAt:
@@ -87,7 +87,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not enrol you on that course.')
+				message: problemMessage(problem, 'Could not enroll you on that course.')
 			});
 		}
 		return { enrolled: true };
@@ -103,7 +103,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not cancel your enrolment.')
+				message: problemMessage(problem, 'Could not cancel your enrollment.')
 			});
 		}
 		return { cancelled: true };

@@ -12,7 +12,7 @@ export const controlClass =
 	'w-full min-w-0 rounded-control border border-border-control bg-surface-raised px-3 text-base ' +
 	'text-text transition-colors placeholder:text-muted ' +
 	'hover:border-border-strong ' +
-	// Two pixels of the brand colour, offset by two. The offset is what keeps the
+	// Two pixels of the brand color, offset by two. The offset is what keeps the
 	// ring off the border, where it would read as a thicker border and not a ring.
 	'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ' +
 	'disabled:cursor-not-allowed disabled:bg-surface-sunken disabled:opacity-60 ' +

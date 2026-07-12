@@ -9,7 +9,7 @@
 		label: string;
 		/** The pixel size of the ring. The number inside scales with it. */
 		size?: number;
-		/** The enrolment states wear the chart palette, so a ring agrees with the
+		/** The enrollment states wear the chart palette, so a ring agrees with the
 		 *  donut slice describing the same course. See `Progress`. */
 		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed' | 'inverse';
 		class?: string;
@@ -83,7 +83,7 @@
 	</svg>
 
 	<!--
-		The sign is the number's own ink at 70%, not `text-muted`. Muted is a grey
+		The sign is the number's own ink at 70%, not `text-muted`. Muted is a gray
 		chosen against white paper, and this ring is drawn on an aurora as often as on
 		a card — there the sign faded into the gradient and read as a smudge. Opacity
 		recedes against whatever it is standing on.

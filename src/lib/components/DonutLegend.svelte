@@ -18,10 +18,10 @@
 </script>
 
 <!--
-	A table, not a list of coloured dots.
+	A table, not a list of colored dots.
 
 	It is the legend and the table view at once: identity is carried by the label and
-	the number, never by the colour alone, so this reads correctly to somebody who
+	the number, never by the color alone, so this reads correctly to somebody who
 	cannot tell the swatches apart and to a screen reader, which gets figures instead
 	of a description of a picture of them.
 

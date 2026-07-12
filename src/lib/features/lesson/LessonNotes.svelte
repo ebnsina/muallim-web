@@ -33,7 +33,7 @@
 		class="mt-3"
 		use:enhance={() => {
 			/*
-				The outcome is a toast, not a word beside the button. "Saved." in grey text
+				The outcome is a toast, not a word beside the button. "Saved." in gray text
 				under a form is a thing you have to be looking at to see, and a reader who
 				just pressed the button is looking at the button.
 			*/

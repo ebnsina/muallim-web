@@ -162,7 +162,7 @@ export interface QuizCourse {
 	 * how many times its prompt appears counted every previous run's copies too.
 	 */
 	choicePrompt: string;
-	/** Has the student enrol, take the quiz, and submit it. */
+	/** Has the student enroll, take the quiz, and submit it. */
 	studentAttempt: (request: APIRequestContext) => Promise<void>;
 }
 
@@ -315,8 +315,8 @@ export interface AssignmentCourse {
  * student already enrolled.
  *
  * Enrolled through the API rather than through the page: this fixture exists so
- * an upload test can start at the upload, and clicking "Enrol" first is the
- * enrolment test's job.
+ * an upload test can start at the upload, and clicking "Enroll" first is the
+ * enrollment test's job.
  */
 export async function assignmentCourse(
 	request: APIRequestContext,

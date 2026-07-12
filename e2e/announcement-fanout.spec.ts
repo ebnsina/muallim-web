@@ -18,10 +18,10 @@ test.describe('announcement fan-out', () => {
 		const course = await publishedCourse(request, slug('fanout'));
 		const headline = `Exam moved ${randomUUID().slice(0, 6)}`;
 
-		// The student enrols through the browser (its session is the student's).
+		// The student enrolls through the browser (its session is the student's).
 		await page.goto(`/courses/${course.slug}`);
 		await ready(page);
-		await page.getByRole('button', { name: 'Enrol', exact: true }).click();
+		await page.getByRole('button', { name: 'Enroll', exact: true }).click();
 		await expect(page.getByText('Your progress')).toBeVisible();
 
 		// The owner posts an announcement over the API.

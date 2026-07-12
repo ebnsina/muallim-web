@@ -32,7 +32,7 @@
 	const byline = $derived(data.author ? data.authorName || 'this author' : '');
 
 	// The next page keeps the search and the filter: paging is a continuation of
-	// the same query, not a jump back to the whole catalogue.
+	// the same query, not a jump back to the whole catalog.
 	const moreHref = $derived.by(() => {
 		if (!data.nextCursor) return '';
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- a throwaway builder for one URL, not reactive state
@@ -52,7 +52,7 @@
 		title={byline ? `Courses by ${byline}` : 'Courses'}
 		description={byline
 			? 'Everything this author has published in this workspace.'
-			: 'Everything published in this workspace. Open one to read its syllabus before you enrol.'}
+			: 'Everything published in this workspace. Open one to read its syllabus before you enroll.'}
 	/>
 
 	{#if data.author}
@@ -76,7 +76,7 @@
 	>
 		<!-- The author rides along, hidden. A GET form submits the fields it names and
 		     nothing else, so without this, searching inside one person's courses would
-		     silently drop back to the whole catalogue. -->
+		     silently drop back to the whole catalog. -->
 		{#if data.author}
 			<input type="hidden" name="author" value={data.author} />
 		{/if}

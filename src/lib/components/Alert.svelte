@@ -55,7 +55,7 @@
 </script>
 
 <!--
-	Colour is never the only signal (WCAG 1.4.1). Every tone carries an icon *and*
+	Color is never the only signal (WCAG 1.4.1). Every tone carries an icon *and*
 	a word — the word is visually hidden because the icon and the copy already say
 	it to a sighted reader, but a screen reader hears "Error:" before the message.
 -->

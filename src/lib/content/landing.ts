@@ -156,7 +156,7 @@ export const STEPS: Step[] = [
 	},
 	{
 		title: 'Invite your students',
-		body: 'They enrol, they learn, they are marked. You see who is where.'
+		body: 'They enroll, they learn, they are marked. You see who is where.'
 	}
 ];
 

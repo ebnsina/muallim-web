@@ -14,8 +14,8 @@
 	/*
 		The word is not decoration. Roughly one man in twelve cannot separate this
 		green from this red by hue, so the icon and the word are what carry the
-		meaning and the colour merely reinforces it (WCAG 1.4.1). The tokens are
-		also separated in *lightness*, so it survives a greyscale print — there is a
+		meaning and the color merely reinforces it (WCAG 1.4.1). The tokens are
+		also separated in *lightness*, so it survives a grayscale print — there is a
 		test for that in contrast.spec.ts.
 	*/
 	const KINDS = {

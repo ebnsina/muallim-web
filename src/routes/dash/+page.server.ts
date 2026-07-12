@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
  * A board view of the same learning the dashboard lists, at its own address.
  *
  * Deliberately outside the `(app)` group: that layout draws the header and holds
- * every page inside a centred container, and this page is a full-bleed band with a
+ * every page inside a centered container, and this page is a full-bleed band with a
  * sheet on it. It cannot be that from inside a container, so it does not sit in one
  * — and it loads the person itself, since the layout that used to hand them over is
  * the layout it just stepped out of.

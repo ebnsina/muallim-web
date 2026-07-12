@@ -34,7 +34,7 @@ describe('lessonTitle', () => {
 });
 
 describe('lessonTrail', () => {
-	it('walks from the catalogue down to the lesson', () => {
+	it('walks from the catalog down to the lesson', () => {
 		expect(lessonTrail('optics', 'The Book of Optics', 'lid', 'Refraction')).toEqual([
 			{ label: 'Courses', href: '/courses' },
 			{ label: 'The Book of Optics', href: '/courses/optics' },
@@ -64,7 +64,7 @@ describe('lessonTrail', () => {
 });
 
 describe('teachTrail', () => {
-	// The same shape, rooted at the author's own list rather than the catalogue. An
+	// The same shape, rooted at the author's own list rather than the catalog. An
 	// author dropped into /courses from /teach has lost their way back.
 	it('roots the trail at Teach, not Courses', () => {
 		const trail = teachTrail('optics', 'Optics', 'lid', 'Refraction');

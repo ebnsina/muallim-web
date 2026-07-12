@@ -37,7 +37,7 @@ export function percentOf(entry: Entry): number {
 }
 
 /**
- * What colour a band is.
+ * What color a band is.
  *
  * From `is_pass`, which the scale's author set — never from the label. "D" passes
  * on the default scale and "Merit" does not exist on it, and a component that

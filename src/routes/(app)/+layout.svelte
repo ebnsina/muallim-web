@@ -45,7 +45,7 @@
 	<!--
 		`text-text`, said out loud. The band above is an aurora and an aurora paints its
 		ink white; the sheet is white paper, and anything on it that did not name its own
-		colour inherited that and vanished. It is the same trap the notification panel
+		color inherited that and vanished. It is the same trap the notification panel
 		fell into, and the sheet is where it costs a whole page rather than one row.
 	-->
 	<div class="flex-1 bg-surface text-text">

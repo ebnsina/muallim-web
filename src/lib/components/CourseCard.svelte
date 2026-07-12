@@ -59,7 +59,7 @@
 
 	// A course has no picture, and inventing one — a stock photo of a laptop — is worse
 	// than having none. The cover is light instead: its own, and the same on every
-	// screen, so a catalogue reads as a set of things rather than a list of rows.
+	// screen, so a catalog reads as a set of things rather than a list of rows.
 	const cover = $derived(auroraFor(seed ?? title));
 
 	// Unrated is not rated nought. A course nobody has reviewed shows no stars at
@@ -72,7 +72,7 @@
 </script>
 
 <!--
-	A catalogue course. The whole card is the link, so there is no "Open" button to
+	A catalog course. The whole card is the link, so there is no "Open" button to
 	press — a button that only repeats what clicking the card already does.
 
 	The cover carries what a course *is*: its name, how hard it is, how long. The
@@ -132,7 +132,7 @@
 			<!--
 				Glass, not a filled badge. A solid amber lozenge on the cover is a sticker
 				somebody put on the picture; the state is said in ink, on the light the card
-				already has, and the two states differ by their colour and their word alone.
+				already has, and the two states differ by their color and their word alone.
 			-->
 			{@const live = status === 'published'}
 			<span

@@ -8,6 +8,8 @@
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import {
 		Analytics01Icon,
+		ArrowDown01Icon,
+		ArrowUp01Icon,
 		Cancel01Icon,
 		CheckmarkCircle02Icon,
 		Delete02Icon,
@@ -263,9 +265,9 @@
 	];
 
 	const hints: Record<string, string> = {
-		none: 'Every lesson is available as soon as a learner enrols.',
+		none: 'Every lesson is available as soon as a learner enrolls.',
 		scheduled: 'Each lesson opens at its own date and time, the same for everybody.',
-		after_enrolment: "Each lesson opens a number of days after each learner's own enrolment.",
+		after_enrolment: "Each lesson opens a number of days after each learner's own enrollment.",
 		sequential: 'A lesson opens when the learner has finished every lesson before it.'
 	};
 
@@ -423,6 +425,37 @@
 										<Icon icon={DragDropVerticalIcon} class="size-5" />
 									</button>
 
+									<!--
+										The grip, and two buttons that do the same thing without it.
+
+										A drag is a gesture: it wants a pointer, a steady hand, and a browser that
+										agrees about what a drop is. Moving a section one place up is not a gesture,
+										it is a decision — so it is a button too, which works on a phone, on a
+										trackpad that fights you, and for anybody who cannot drag at all.
+									-->
+									<div class="flex flex-col">
+										<button
+											type="button"
+											class="text-muted hover:text-text focus-visible:ring-ring rounded-control px-1 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-30"
+											disabled={topicIndex === 0}
+											title="Move section up"
+											aria-label="Move section {topic.title} up"
+											onclick={() => nudgeTopic(topicIndex, -1)}
+										>
+											<Icon icon={ArrowUp01Icon} class="size-4" />
+										</button>
+										<button
+											type="button"
+											class="text-muted hover:text-text focus-visible:ring-ring rounded-control px-1 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-30"
+											disabled={topicIndex === topics.length - 1}
+											title="Move section down"
+											aria-label="Move section {topic.title} down"
+											onclick={() => nudgeTopic(topicIndex, 1)}
+										>
+											<Icon icon={ArrowDown01Icon} class="size-4" />
+										</button>
+									</div>
+
 									<form
 										method="POST"
 										action="?/renameTopic"
@@ -481,6 +514,29 @@
 											>
 												<Icon icon={DragDropVerticalIcon} class="size-4" />
 											</button>
+
+											<div class="flex flex-col">
+												<button
+													type="button"
+													class="text-muted hover:text-text focus-visible:ring-ring rounded-control px-1 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-30"
+													disabled={lessonIndex === 0}
+													title="Move lesson up"
+													aria-label="Move lesson {lesson.title} up"
+													onclick={() => nudgeLesson(topic.id, lessonIndex, -1)}
+												>
+													<Icon icon={ArrowUp01Icon} class="size-3.5" />
+												</button>
+												<button
+													type="button"
+													class="text-muted hover:text-text focus-visible:ring-ring rounded-control px-1 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-30"
+													disabled={lessonIndex === topic.lessons.length - 1}
+													title="Move lesson down"
+													aria-label="Move lesson {lesson.title} down"
+													onclick={() => nudgeLesson(topic.id, lessonIndex, 1)}
+												>
+													<Icon icon={ArrowDown01Icon} class="size-3.5" />
+												</button>
+											</div>
 											<a
 												class="underline-grow truncate"
 												href={resolve(`/teach/${data.course.slug}/lessons/${lesson.id}`)}
@@ -703,7 +759,7 @@
 							<div class="flex flex-col gap-8 lg:flex-row lg:items-center">
 								<!--
 							The mix is a part-to-whole, so it is drawn as one: three states of an
-							enrolment, summing to everybody who ever started. Hovering a slice lights
+							enrollment, summing to everybody who ever started. Hovering a slice lights
 							its row and hovering a row lights its slice — one bound value, so the two
 							cannot disagree about what is highlighted.
 						-->
@@ -721,7 +777,7 @@
 									{:else}
 										<Donut {segments} centreLabel="enrolled" bind:hovered />
 										<div class="min-w-40">
-											<DonutLegend {segments} bind:hovered caption="Enrolments by status" />
+											<DonutLegend {segments} bind:hovered caption="Enrollments by status" />
 										</div>
 									{/if}
 								</div>
@@ -826,12 +882,12 @@
 					<div>
 						<h2 class="font-medium">Prerequisites</h2>
 						<p class="text-muted mt-1 text-sm">
-							Courses a learner must finish before they may enrol on this one. An administrator
-							granting an enrolment overrides them.
+							Courses a learner must finish before they may enroll on this one. An administrator
+							granting an enrollment overrides them.
 						</p>
 
 						{#if data.prerequisites.length === 0}
-							<p class="text-muted mt-3 text-sm">None. Anyone may enrol.</p>
+							<p class="text-muted mt-3 text-sm">None. Anyone may enroll.</p>
 						{:else}
 							<ul class="mt-3 space-y-2">
 								{#each data.prerequisites as prerequisite (prerequisite.id)}
@@ -938,7 +994,7 @@
 	}
 
 	/* A thin, rounded accent line where the row will land — the one indicator, in
-	   the brand colour rather than a raw blue, drawn on a pseudo-element so it adds
+	   the brand color rather than a raw blue, drawn on a pseudo-element so it adds
 	   no layout. */
 	:global(.drop-before),
 	:global(.drop-after) {

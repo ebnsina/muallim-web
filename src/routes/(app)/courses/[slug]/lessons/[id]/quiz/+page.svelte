@@ -132,7 +132,7 @@
 
 	{#if !data.signedIn}
 		<Alert class="mt-8">
-			<a class="underline-grow" href={resolve('/login')}>Sign in</a> and enrol to take this quiz.
+			<a class="underline-grow" href={resolve('/login')}>Sign in</a> and enroll to take this quiz.
 		</Alert>
 	{:else if !data.open}
 		<form method="POST" action="?/start" class="mt-8" use:enhance>

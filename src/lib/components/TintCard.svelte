@@ -49,10 +49,10 @@
 
 <!--
 	The reusable shell behind every card: a lighter frame with a small inset, a
-	`rounded-xl` slate panel, and an optional strip below. One neutral colour, on
-	purpose — a card's colour is not a place to encode anything, so it encodes
+	`rounded-xl` slate panel, and an optional strip below. One neutral color, on
+	purpose — a card's color is not a place to encode anything, so it encodes
 	nothing and lets a badge or a bar carry the meaning. What goes in the panel and
-	the strip is the caller's, so the same frame carries a catalogue card, a
+	the strip is the caller's, so the same frame carries a catalog card, a
 	management row, or anything else.
 -->
 {#snippet body()}

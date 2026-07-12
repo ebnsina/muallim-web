@@ -24,7 +24,7 @@
 	A link that leaves — "See the leaderboard", "All courses", "Your certificates".
 
 	The arrow is the whole reason this exists. Twenty of these were written by hand,
-	each deciding its own colour and its own hover, and none of them said what they
+	each deciding its own color and its own hover, and none of them said what they
 	were: text that reads like a label until you happen to hover it. The arrow says
 	*this goes somewhere* before anybody has to try.
 

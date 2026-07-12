@@ -477,7 +477,7 @@
 					)}
 
 					<!-- items-stretch equalises the three; the popular plan then scales up from
-					     its centre so it stands taller without breaking the row. -->
+					     its center so it stands taller without breaking the row. -->
 					<div class="mt-16 grid items-stretch gap-4 lg:grid-cols-3">
 						{#each PLANS as plan, index (plan.name)}
 							<div use:inview={{ delay: index * 90 }} class={plan.highlighted ? 'lg:z-10' : ''}>

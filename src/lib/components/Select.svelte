@@ -27,7 +27,7 @@
 
 	Only the chevron is ours. It is a real icon component sitting over the control,
 	not an inline SVG encoded into a background-image — which cannot inherit
-	`currentColor`, so it stays grey when the theme goes dark.
+	`currentColor`, so it stays gray when the theme goes dark.
 -->
 <div class={cn('relative', className)}>
 	<select

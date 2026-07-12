@@ -10,7 +10,7 @@
 /*
 	Binds the semantic tokens to Tailwind's utility namespaces, so `bg-surface`,
 	`text-muted`, `border-control` exist and nothing else does. A component that
-	wants a colour Tailwind cannot name is a component asking for a colour the
+	wants a color Tailwind cannot name is a component asking for a color the
 	design system does not have — which is the conversation this file is for.
 */
 @theme {
@@ -309,12 +309,12 @@
 		isolation: isolate;
 
 		/*
-			The aurora, and the one place in this system that names colours outside the
+			The aurora, and the one place in this system that names colors outside the
 			ramps. That is deliberate and it is bounded: an aurora is a *picture*, not a
-			semantic colour — nothing on it is a button that means "primary" or a badge that
+			semantic color — nothing on it is a button that means "primary" or a badge that
 			means "danger".
 
-			Green, and the colours are lifted off a leaf: lime, spring green, a forest floor.
+			Green, and the colors are lifted off a leaf: lime, spring green, a forest floor.
 			The construction is ours — radial blooms and grain, not a photograph's specular
 			streaks, because a gradient trying to be a photo lands as neither.
 
@@ -341,8 +341,8 @@
 
 		`background-attachment: fixed` on both, so each gradient is computed against the
 		viewport rather than against its own box — which makes them the same paint, and
-		the corner arc reveals exactly the colour that is directly above it. Before this
-		the strip was a flat colour under a gradient band, and the mismatch showed as a
+		the corner arc reveals exactly the color that is directly above it. Before this
+		the strip was a flat color under a gradient band, and the mismatch showed as a
 		dark notch in the corner: the one place on the page the two ever meet.
 
 		Only the frame gets this. A card with a fixed background would show a slice of
@@ -476,7 +476,7 @@
 
 	/* Purple dream: violet through fuchsia, with an indigo floor so the pink has
 	   something to sit on. The warmest of the cool half — the one that reads as a
-	   *colour* rather than as a shade of the brand. */
+	   *color* rather than as a shade of the brand. */
 	.aurora-5 {
 		background-color: #2b0a56;
 		background-image:
@@ -488,7 +488,7 @@
 	}
 
 	/*
-		Green, and the colours are lifted straight off the leaf: a lime-white highlight, a
+		Green, and the colors are lifted straight off the leaf: a lime-white highlight, a
 		mid leaf-green, and a deep forest floor under it. The *construction* is ours —
 		radial blooms and grain, not the photograph's specular streaks — because a
 		gradient that tries to be a photo lands as neither.
@@ -510,7 +510,7 @@
 			`.aurora-ink` opts back in, and exactly one thing uses it — the certificate's
 			emblem panel, which is a printed object whose whole job is to look like an
 			award. It carries `print-color-adjust: exact`, so the printer is told to keep
-			the colour rather than "helpfully" dropping it.
+			the color rather than "helpfully" dropping it.
 		*/
 		.aurora:not(.aurora-ink) {
 			background: none;
@@ -625,7 +625,7 @@
 
 	Reduced motion is *less* motion, not none. The usual snippet — the one this file
 	used to carry — collapses every transition to 0.01ms, which also throws away the
-	colour and opacity changes that were never the problem: a button that no longer
+	color and opacity changes that were never the problem: a button that no longer
 	shades on hover, a tick that appears with no fade, an alert that snaps in. Those
 	do not move, and vestibular disorders are triggered by movement.
 

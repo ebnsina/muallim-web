@@ -81,7 +81,7 @@
 		<!--
 			The bands, so a marker can see what a percentage will be called before they
 			commit the course to it. `is_pass` is the scale author's decision; the
-			colour is read from it, never from the label.
+			color is read from it, never from the label.
 		-->
 		<div class="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
 			{#each data.scale.bands ?? [] as band (band.label)}
@@ -98,7 +98,7 @@
 			<EmptyState
 				icon={Task01Icon}
 				title="Nobody is enrolled"
-				description="Learners appear here as soon as they enrol, marked or not."
+				description="Learners appear here as soon as they enroll, marked or not."
 			/>
 		</div>
 	{:else if data.items.length === 0}
