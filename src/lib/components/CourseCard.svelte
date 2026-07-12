@@ -43,7 +43,12 @@
 		is. It is the first thing read on every card, so it is in the same place on
 		every card, and the gradient is what fills the gap rather than the type.
 	-->
-	<div class={cn('relative flex h-56 flex-col rounded-card p-4', cover)}>
+	<!--
+		A portrait, not a banner. `aspect-[3/4]` rather than a pixel height: the cover
+		is a proportion of the card it is in, so it stays a poster at every column
+		count instead of a letterbox at four and a square at two.
+	-->
+	<div class={cn('relative flex aspect-[3/4] flex-col rounded-card p-4', cover)}>
 		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
 
 		<!--
