@@ -142,7 +142,10 @@
 			{#each podium as entry (entry.rank)}
 				{@const medal = MEDAL[entry.rank]}
 				<li>
-					<Card class={cn('h-full p-5', medal.card, entry.rank === myRank && 'ring-2 ring-accent')}>
+					<Card
+						float
+						class={cn('h-full p-5', medal.card, entry.rank === myRank && 'ring-2 ring-accent')}
+					>
 						<div class="flex items-center gap-3">
 							<span
 								class={cn(

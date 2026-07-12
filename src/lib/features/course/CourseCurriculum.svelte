@@ -110,7 +110,7 @@
 			{#each topics as topic (topic.id)}
 				{@const lessons = topic.lessons ?? []}
 				{@const seconds = lessons.reduce((sum, l) => sum + (l.duration_seconds ?? 0), 0)}
-				<li class="overflow-hidden rounded-card border border-border">
+				<li class="overflow-hidden rounded-card bg-surface-raised shadow-card">
 					<!--
 						A section is a disclosure, not a link. `<details>` would do it without
 						script, but "expand all" has to drive them, and a details element driven

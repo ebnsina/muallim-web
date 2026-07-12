@@ -81,7 +81,7 @@
 		{#each data.questions as question, index (question.id)}
 			{@const answer = question.answer}
 			<li>
-				<Card class="p-5 sm:p-6">
+				<Card float class="p-5 sm:p-6">
 					<div class="flex items-start justify-between gap-4">
 						<p class="font-medium text-pretty">
 							{index + 1}. {question.prompt}

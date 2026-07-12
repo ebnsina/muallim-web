@@ -205,7 +205,7 @@
 			-->
 			<div>
 				<p class="text-sm font-medium">Preview</p>
-				<Card class="mt-2 p-5">
+				<Card float class="mt-2 p-5">
 					<ul class="space-y-2">
 						{#each preview as band, index (index)}
 							<li class="flex items-center justify-between gap-3">

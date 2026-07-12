@@ -53,7 +53,7 @@
 	{/if}
 
 	<!-- ------------------------------------------------------------- scale -->
-	<Card class="mt-8 p-5">
+	<Card float class="mt-8 p-5">
 		<form
 			method="POST"
 			action="?/setScale"
@@ -114,7 +114,7 @@
 			The learner column is sticky, because a mark in the eighth column belongs to
 			nobody if you have scrolled the name off the screen.
 		-->
-		<div class="mt-8 overflow-x-auto rounded-card border border-border">
+		<div class="mt-8 overflow-x-auto rounded-card bg-surface-raised shadow-card">
 			<table class="w-full min-w-max border-collapse text-sm">
 				<caption class="sr-only">
 					Every enrolled learner, their mark for each assessment, and their course grade.

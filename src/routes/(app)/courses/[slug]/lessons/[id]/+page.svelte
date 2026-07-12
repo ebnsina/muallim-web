@@ -141,7 +141,7 @@
 			the bottom of a reader's screen with no way back up but the page.
 		-->
 		<aside class="order-2">
-			<details class="rounded-card border border-border lg:hidden">
+			<details class="rounded-card bg-surface-raised shadow-card lg:hidden">
 				<summary class="cursor-pointer px-4 py-3 text-sm font-medium select-none">
 					Course contents
 				</summary>

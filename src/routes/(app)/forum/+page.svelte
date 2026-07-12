@@ -113,7 +113,7 @@
 		<!-- One bordered, divided list rather than a grid of floating cards: a board index is
 		     read down, and the border here is the divider between rows, not a box around each. -->
 		<ul
-			class="mt-6 max-w-4xl divide-y divide-border overflow-hidden rounded-card border border-border"
+			class="mt-6 max-w-4xl divide-y divide-border overflow-hidden rounded-card bg-surface-raised shadow-card"
 		>
 			{#each data.spaces as space (space.id)}
 				<li><BoardRow {space} /></li>

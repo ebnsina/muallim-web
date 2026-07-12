@@ -87,7 +87,7 @@
 	{:else}
 		<!-- The API returns pinned threads first, then by last activity — the order the board is read in. -->
 		<ul
-			class="mt-6 max-w-4xl divide-y divide-border overflow-hidden rounded-card border border-border"
+			class="mt-6 max-w-4xl divide-y divide-border overflow-hidden rounded-card bg-surface-raised shadow-card"
 		>
 			{#each data.threads as thread (thread.id)}
 				<li class={thread.pinned ? 'bg-accent-surface/30' : ''}>

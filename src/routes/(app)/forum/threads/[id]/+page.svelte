@@ -97,7 +97,9 @@
 		</h2>
 
 		{#if data.posts.length > 0}
-			<ul class="mt-4 divide-y divide-border overflow-hidden rounded-card border border-border">
+			<ul
+				class="mt-4 divide-y divide-border overflow-hidden rounded-card bg-surface-raised shadow-card"
+			>
 				{#each data.posts as post (post.id)}
 					<li><ReplyRow {post} deletable={post.mine || moderator} /></li>
 				{/each}

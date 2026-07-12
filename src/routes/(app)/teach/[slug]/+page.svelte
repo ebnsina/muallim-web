@@ -336,7 +336,7 @@
 	{/if}
 
 	<section class="mt-8 max-w-3xl">
-		<Card class="space-y-6 p-5">
+		<Card float class="space-y-6 p-5">
 			<div>
 				<h2 class="font-medium">Release schedule</h2>
 				<p class="text-muted mt-1 text-sm">
@@ -519,7 +519,7 @@
 	<ol class="mt-8 space-y-6">
 		{#each topics as topic, topicIndex (topic.id)}
 			<li animate:flip={{ duration: DURATION.base, easing: easeInOut }}>
-				<Card class="p-5">
+				<Card float class="p-5">
 					<!--
 						The section's drag zone is its header row, not the whole card. A card
 						contains its lessons, and a lesson's own drop would be swallowed by the

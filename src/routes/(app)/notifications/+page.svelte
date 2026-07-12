@@ -59,7 +59,9 @@
 			/>
 		</div>
 	{:else}
-		<ul class="mt-6 divide-y divide-border overflow-hidden rounded-card border border-border">
+		<ul
+			class="mt-6 divide-y divide-border overflow-hidden rounded-card bg-surface-raised shadow-card"
+		>
 			{#each data.notifications as notification (notification.id)}
 				<li>
 					<!--

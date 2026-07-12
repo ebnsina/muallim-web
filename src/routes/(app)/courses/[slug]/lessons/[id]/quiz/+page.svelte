@@ -157,7 +157,7 @@
 		>
 			{#each questions as question, index (question.id)}
 				{@const id = question.id}
-				<Card class="p-5 sm:p-6">
+				<Card float class="p-5 sm:p-6">
 					<fieldset class="space-y-3">
 						<input type="hidden" name={`q:${id}:type`} value={question.type} />
 
