@@ -11,6 +11,8 @@
 		lessonCount?: number;
 		/** The author's display name. Absent for a course whose author was erased. */
 		instructor?: string;
+		/** Where their other courses are. Absent leaves the name as plain text. */
+		instructorHref?: string;
 		/** Studying it plus finished it. Absent, or zero, draws nothing. */
 		learnerCount?: number;
 		/** The mean rating, and how many gave it. No reviews draws no stars. */
@@ -30,6 +32,7 @@
 		difficulty,
 		lessonCount,
 		instructor,
+		instructorHref,
 		learnerCount,
 		ratingAverage,
 		ratingCount,
@@ -72,10 +75,27 @@
 	the gap: 2px in, 14px against the frame's 16.
 -->
 <TintCard
-	{href}
-	class="p-0.5"
+	interactive
+	class="relative p-0.5"
 	panelClass="flex flex-col overflow-hidden rounded-[14px] bg-surface-raised p-0"
 >
+	<!--
+		The card's link is an overlay, not a wrapper.
+
+		Wrapping the card in an anchor was right until the byline became a link of its
+		own: an anchor inside an anchor is not something HTML has an answer for —
+		browsers unnest them, and which of the two a click lands on is anybody's guess.
+		A stretched overlay gives the whole card one hit area, and the byline sits above
+		it on its own.
+
+		It carries the accessible name, so a screen reader hears the course's title and
+		not "link, link".
+	-->
+	<a
+		{href}
+		aria-label={title}
+		class="absolute inset-0 z-10 rounded-2xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+	></a>
 	<!--
 		The title at the top and the meta at the foot, with the light between them.
 
@@ -138,7 +158,17 @@
 
 		{#if instructor || learners}
 			<p class="text-muted mt-2 flex items-center gap-1.5 text-xs">
-				{#if instructor}
+				{#if instructor && instructorHref}
+					<!--
+						A link inside a card that is itself a link — which is why the card's link is
+						a stretched overlay and this one sits above it. An anchor nested in an anchor
+						is not something HTML has an answer for: browsers unnest them, and which of
+						the two a click lands on is anybody's guess.
+					-->
+					<a class="underline-grow relative z-20 truncate font-medium" href={instructorHref}>
+						{instructor}
+					</a>
+				{:else if instructor}
 					<span class="truncate">{instructor}</span>
 				{/if}
 				{#if instructor && learners}

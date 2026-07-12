@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { BookOpen01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 	import {
+		ActionLink,
 		Button,
 		CourseCard,
 		EmptyState,
@@ -24,7 +25,11 @@
 		{ value: 'expert', label: 'Expert' }
 	];
 
-	const filtered = $derived(Boolean(data.q || data.difficulty));
+	const filtered = $derived(Boolean(data.q || data.difficulty || data.author));
+
+	// When the page is one person's work, it says so — and the search box below still
+	// searches within it, because the filter is in the URL the form does not name.
+	const byline = $derived(data.author ? data.authorName || 'this author' : '');
 
 	// The next page keeps the search and the filter: paging is a continuation of
 	// the same query, not a jump back to the whole catalogue.
@@ -34,6 +39,7 @@
 		const params = new URLSearchParams();
 		if (data.q) params.set('q', data.q);
 		if (data.difficulty) params.set('difficulty', data.difficulty);
+		if (data.author) params.set('author', data.author);
 		params.set('cursor', data.nextCursor);
 		return `${resolve('/courses')}?${params.toString()}`;
 	});
@@ -43,9 +49,19 @@
 
 <Page width="full">
 	<PageHeader
-		title="Courses"
-		description="Everything published in this workspace. Open one to read its syllabus before you enrol."
+		title={byline ? `Courses by ${byline}` : 'Courses'}
+		description={byline
+			? 'Everything this author has published in this workspace.'
+			: 'Everything published in this workspace. Open one to read its syllabus before you enrol.'}
 	/>
+
+	{#if data.author}
+		<!-- A way back out. A filter with no visible way to clear it is a filter people
+		     clear by editing the address bar. -->
+		<p class="mt-3">
+			<ActionLink href={resolve('/courses')} tone="muted">Every course</ActionLink>
+		</p>
+	{/if}
 
 	<!--
 		A GET form, so a search is a URL the loader reads: bookmarkable, shareable, and
@@ -58,6 +74,13 @@
 		class="mt-8 flex flex-wrap items-end gap-3"
 		role="search"
 	>
+		<!-- The author rides along, hidden. A GET form submits the fields it names and
+		     nothing else, so without this, searching inside one person's courses would
+		     silently drop back to the whole catalogue. -->
+		{#if data.author}
+			<input type="hidden" name="author" value={data.author} />
+		{/if}
+
 		<div class="min-w-0 flex-1">
 			<Label for="q" class="sr-only">Search courses</Label>
 			<div class="relative">
@@ -132,6 +155,9 @@
 						difficulty={course.difficulty}
 						lessonCount={course.lesson_count}
 						instructor={course.instructor}
+						instructorHref={course.instructor_id
+							? `${resolve('/courses')}?author=${course.instructor_id}`
+							: undefined}
 						learnerCount={course.learner_count}
 						ratingAverage={course.rating_average}
 						ratingCount={course.rating_count}

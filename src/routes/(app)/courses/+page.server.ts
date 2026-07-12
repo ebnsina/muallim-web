@@ -19,6 +19,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const q = url.searchParams.get('q')?.trim() ?? '';
 	const difficulty = url.searchParams.get('difficulty') ?? '';
 
+	// The author, by id and never by name: two people in a workspace may be called
+	// the same thing, and muallim-api keys the filter on who they are.
+	const author = url.searchParams.get('author') ?? '';
+
 	const {
 		data,
 		error: problem,
@@ -29,7 +33,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 				limit: PAGE_SIZE,
 				...(cursor ? { cursor } : {}),
 				...(q ? { q } : {}),
-				...(difficulty ? { difficulty } : {})
+				...(difficulty ? { difficulty } : {}),
+				...(author ? { author } : {})
 			}
 		}
 	});
@@ -43,6 +48,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		nextCursor: data.has_more ? (data.next_cursor ?? null) : null,
 		signedIn: Boolean(locals.accessToken),
 		q,
-		difficulty
+		difficulty,
+		author,
+
+		// The name to put in the heading when the page is one person's work. It comes
+		// from the rows themselves — every course on a filtered page has the same
+		// author — rather than from a second request for a name we were already sent.
+		authorName: author
+			? ((data.courses ?? []).find((c) => c.instructor_id === author)?.instructor ?? '')
+			: ''
 	};
 };
