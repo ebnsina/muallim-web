@@ -464,15 +464,14 @@
 												</a>
 											</div>
 
-											<!-- A white button on the aurora: the primary is the colour it would
-											     be sitting on, and a blue button on blue is a button nobody sees. -->
+											<!-- Glass on the aurora, not white. A white slab punches a hole in the
+											     brand's own light and the eye reads the paper rather than the button;
+											     the translucent fill lets the gradient through, so the button belongs
+											     to the card it stands on. -->
 											<Button
 												href={resolve(`/courses/${enrolment.course_slug}`)}
-												variant={index === 0 ? 'secondary' : 'ghost'}
+												variant={index === 0 ? 'glass' : 'ghost'}
 												size="sm"
-												class={index === 0
-													? 'border-transparent bg-surface-raised text-accent-text hover:bg-surface-raised/90'
-													: undefined}
 											>
 												Continue
 												<Icon icon={ArrowRight01Icon} class="size-4" />

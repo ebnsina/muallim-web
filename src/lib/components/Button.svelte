@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+	export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'glass';
 	export type ButtonSize = 'sm' | 'md' | 'lg';
 </script>
 
@@ -44,7 +44,22 @@
 		secondary:
 			'border border-border bg-surface-raised text-text hover:bg-surface-hover active:bg-surface-active',
 		ghost: 'text-text hover:bg-surface-hover active:bg-surface-active',
-		danger: 'bg-danger text-on-solid hover:bg-danger-hover'
+		danger: 'bg-danger text-on-solid hover:bg-danger-hover',
+
+		/*
+			For a button standing on the aurora, and nowhere else.
+
+			A white slab on the brand's own light is a hole punched in it — the eye reads
+			the paper, not the button. This is the surface's own ink at a low alpha, with
+			a hairline of it for an edge: the light shows through, so the button belongs to
+			the card instead of sitting on top of it. It is what the pills in the band are,
+			and for the same reason.
+
+			Alpha rather than a chosen colour, deliberately: the aurora is five gradients
+			and there is no one hex it is. A translucent white is correct over all of them.
+		*/
+		glass:
+			'border border-on-solid/25 bg-on-solid/15 text-on-solid backdrop-blur-sm hover:bg-on-solid/25 active:bg-on-solid/30'
 	};
 
 	const SIZES: Record<ButtonSize, string> = {
