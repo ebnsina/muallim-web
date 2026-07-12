@@ -18,7 +18,7 @@
 		 * `accent` and `success` remain for bars that are not an enrolment: a score, a
 		 * quota, anything whose full is not a finished course.
 		 */
-		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed';
+		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed' | 'inverse';
 		class?: string;
 	};
 
@@ -29,7 +29,8 @@
 		success: 'bg-success',
 		active: 'bg-chart-1',
 		completed: 'bg-chart-2',
-		lapsed: 'bg-chart-3'
+		lapsed: 'bg-chart-3',
+		inverse: 'bg-on-solid'
 	};
 
 	// A bar that renders 130% of itself is a layout bug, not a celebration.
@@ -53,7 +54,13 @@
 	aria-valuemin={0}
 	aria-valuemax={max}
 	aria-label={label}
-	class={cn('h-2 w-full overflow-hidden rounded-full bg-surface-active', className)}
+	class={cn(
+		'h-2 w-full overflow-hidden rounded-full',
+		// The track inverts with the fill: a grey groove on a coloured card is a hole
+		// punched in it.
+		tone === 'inverse' ? 'bg-on-solid/25' : 'bg-surface-active',
+		className
+	)}
 >
 	<div
 		class={cn(

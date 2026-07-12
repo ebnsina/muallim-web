@@ -13,10 +13,14 @@
 		 *
 		 * `raised` is the working surface: white, bordered, the thing to act on.
 		 * `sunken` recedes into the page — a summary you read rather than work in.
-		 * A page where everything is a white box is a page with one plane, and one
-		 * plane is no hierarchy at all: the eye has nowhere to land.
+		 * `aurora` is the brand's own light, and the fill *is* the surface: for the one
+		 * card on a page that is the thing to do next. Everything on it inverts, because
+		 * the page's ink is unreadable against it.
+		 *
+		 * A page where everything is a white box is a page with one plane, and one plane
+		 * is no hierarchy at all: the eye has nowhere to land.
 		 */
-		surface?: 'raised' | 'sunken';
+		surface?: 'raised' | 'sunken' | 'aurora';
 		/**
 		 * Lifted by a shadow instead of outlined by a border.
 		 *
@@ -64,8 +68,13 @@
 
 		// The sunken plane carries no border: it is *below* the page, and a border
 		// would draw the outline of a hole. Its fill is the only edge it needs.
-		!aurora &&
-			(surface === 'sunken' ? 'border-transparent bg-surface-sunken' : 'bg-surface-raised'),
+		//
+		// The aurora plane paints no `bg-*` at all: the `.aurora` class is the fill, and
+		// a utility would beat it — the gradient would tint white paper rather than
+		// replace it, which is exactly the pale mess it made the first time.
+		!aurora && surface === 'sunken' && 'border-transparent bg-surface-sunken',
+		!aurora && surface === 'aurora' && 'aurora border-transparent',
+		!aurora && surface === 'raised' && 'bg-surface-raised',
 
 		// A floating card is held up by its shadow, so it has no border to hold it in.
 		!aurora && float && 'border-transparent shadow-card',

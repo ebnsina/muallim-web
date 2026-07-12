@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppHeader } from '$lib/components';
+	import { AppHeader, AppRail } from '$lib/components';
 	import { canAuthor } from '$lib/roles';
 	import type { LayoutProps } from './$types';
 
@@ -32,7 +32,20 @@
 		unread={data.unread ?? 0}
 	/>
 
-	<div class="flex-1 rounded-t-2xl bg-surface">
-		{@render children()}
+	<!--
+		The rail sits inside the sheet, beside the page rather than above it: it is a
+		shortcut, not a section, and a signed-out visitor reading the catalogue has
+		nowhere it could take them. Hidden below `lg`, where the width is the page's.
+	-->
+	<div class="flex flex-1 gap-2 rounded-t-2xl bg-surface pl-4 lg:gap-4 lg:pl-6">
+		{#if data.user}
+			<div class="hidden pt-6 lg:block">
+				<AppRail />
+			</div>
+		{/if}
+
+		<div class="min-w-0 flex-1">
+			{@render children()}
+		</div>
 	</div>
 </div>

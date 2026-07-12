@@ -185,20 +185,16 @@
 								air do the work here, not another colour.
 							-->
 							<Card
+								surface={index === 0 ? 'aurora' : 'raised'}
 								float={index !== 0}
-								class={cn(
-									'lift',
-									index === 0
-										? 'border-accent-border bg-gradient-to-br from-accent-surface to-surface-raised p-6 sm:p-7'
-										: 'px-5 py-4'
-								)}
+								class={cn('lift', index === 0 ? 'p-6 sm:p-7' : 'px-5 py-4')}
 							>
 								<div class={cn('flex items-start', index === 0 ? 'gap-6' : 'gap-4')}>
 									{#if index === 0}
 										<div class="hidden shrink-0 sm:block">
 											<RadialProgress
 												value={percent}
-												tone="active"
+												tone="inverse"
 												label="{percent}% complete"
 												size={96}
 											/>
@@ -209,7 +205,7 @@
 										<div class="flex flex-wrap items-start justify-between gap-3">
 											<div class="min-w-0">
 												{#if index === 0}
-													<p class="text-accent-text text-xs font-medium tracking-wide uppercase">
+													<p class="text-xs font-medium tracking-wide text-on-solid/75 uppercase">
 														Pick up where you left off
 													</p>
 												{/if}
@@ -226,10 +222,15 @@
 												</a>
 											</div>
 
+											<!-- A white button on the aurora: the primary is the colour it would
+											     be sitting on, and a blue button on blue is a button nobody sees. -->
 											<Button
 												href={resolve(`/courses/${enrolment.course_slug}`)}
-												variant={index === 0 ? 'primary' : 'ghost'}
+												variant={index === 0 ? 'secondary' : 'ghost'}
 												size="sm"
+												class={index === 0
+													? 'border-transparent bg-surface-raised text-accent-text hover:bg-surface-raised/90'
+													: undefined}
 											>
 												Continue
 												<Icon icon={ArrowRight01Icon} class="size-4" />
@@ -243,7 +244,12 @@
 											)}
 										>
 											<span class="numeral font-medium">{percent}% done</span>
-											<span class="text-muted numeral text-xs">
+											<span
+												class={cn(
+													'numeral text-xs',
+													index === 0 ? 'text-on-solid/75' : 'text-muted'
+												)}
+											>
 												{lessonsLeft(progress)}
 												{lessonsLeft(progress) === 1 ? 'lesson' : 'lessons'} left
 											</span>
@@ -257,7 +263,7 @@
 											<Progress
 												value={progress?.lessons_completed ?? 0}
 												max={progress?.lessons_total ?? 1}
-												tone="active"
+												tone={index === 0 ? 'inverse' : 'active'}
 												class={index === 0 ? undefined : 'h-1.5'}
 												label="{percent}% of {enrolment.course_title} complete"
 											/>

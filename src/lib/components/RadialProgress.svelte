@@ -10,7 +10,7 @@
 		size?: number;
 		/** The enrolment states wear the chart palette, so a ring agrees with the
 		 *  donut slice describing the same course. See `Progress`. */
-		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed';
+		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed' | 'inverse';
 		class?: string;
 	};
 
@@ -21,7 +21,8 @@
 		success: 'stroke-success',
 		active: 'stroke-chart-1',
 		completed: 'stroke-chart-2',
-		lapsed: 'stroke-chart-3'
+		lapsed: 'stroke-chart-3',
+		inverse: 'stroke-on-solid'
 	};
 
 	const clamped = $derived(Math.min(100, Math.max(0, Math.round(value))));
@@ -44,7 +45,14 @@
 	aria-label={label}
 >
 	<svg viewBox="0 0 36 36" class="size-full -rotate-90">
-		<circle cx="18" cy="18" r={R} fill="none" class="stroke-border" stroke-width="2.5" />
+		<circle
+			cx="18"
+			cy="18"
+			r={R}
+			fill="none"
+			class={tone === 'inverse' ? 'stroke-on-solid/30' : 'stroke-border'}
+			stroke-width="2.5"
+		/>
 		<circle
 			cx="18"
 			cy="18"
