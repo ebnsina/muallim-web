@@ -198,7 +198,7 @@ Set **per repo**, never globally. Do **not** add a `Co-Authored-By` trailer or a
 
 Remote uses the `github-es` SSH host alias: `git@github-es:ebnsina/muallim-web.git`.
 
-`docs/` and `data/` are gitignored and never committed.
+`docs/` is committed and holds the project's guides. `docs/plan.md` and `data/` are gitignored and never committed.
 
 Conventional, imperative subjects, one logical change per commit:
 

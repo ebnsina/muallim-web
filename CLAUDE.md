@@ -105,6 +105,6 @@ git config user.name "ebnsina" && git config user.email "ebnsina.me@gmail.com"
 
 Do **not** add a `Co-Authored-By: Claude` trailer, or any other identity. Remote uses the `github-es` SSH host alias (`git@github-es:ebnsina/muallim-web.git`).
 
-`docs/` and `data/` are gitignored and must never be committed — no plans, no roadmap, no secrets in the public repo.
+`docs/` holds the installation, architecture, frontend, and testing guides, and is committed. `docs/plan.md` and `data/` are gitignored and must never be committed — no plans, no roadmap, no secrets.
 
 Conventional, imperative commit subjects: `feat(quiz-player): restore answers after a failed submit`.
