@@ -8,6 +8,7 @@
 		DashboardSquare01Icon,
 		Message01Icon,
 		Notification02Icon,
+		PlayCircleIcon,
 		Search01Icon
 	} from '@hugeicons/core-free-icons';
 	import { Badge, Icon, Input, Progress } from '$lib/components';
@@ -25,9 +26,30 @@
 		a state the server does not have would be a column that never fills.
 	*/
 	const COLUMNS = [
-		{ key: 'todo', title: 'Not started', dot: 'text-muted', bar: 'active' as const },
-		{ key: 'doing', title: 'In progress', dot: 'text-chart-1', bar: 'active' as const },
-		{ key: 'done', title: 'Finished', dot: 'text-chart-2', bar: 'completed' as const }
+		{
+			key: 'todo',
+			title: 'Not started',
+			dot: 'text-warning-text',
+			tile: 'bg-warning-surface text-warning-text',
+			icon: BookOpen01Icon,
+			bar: 'active' as const
+		},
+		{
+			key: 'doing',
+			title: 'In progress',
+			dot: 'text-accent-text',
+			tile: 'bg-accent-surface text-accent-text',
+			icon: PlayCircleIcon,
+			bar: 'active' as const
+		},
+		{
+			key: 'done',
+			title: 'Finished',
+			dot: 'text-success-text',
+			tile: 'bg-success-surface text-success-text',
+			icon: Award01Icon,
+			bar: 'completed' as const
+		}
 	];
 
 	// A filter over what is already on screen — no request, because every enrolment
@@ -83,14 +105,14 @@
 <svelte:head><title>Board — Muallim</title></svelte:head>
 
 <!--
-	The band runs the width of the window and the page sits on it as a sheet, its top
-	corners rounded off — so the colour is not a stripe drawn across a page but the
-	surface the page is lying on. That is why this route stepped out of the app's
-	layout: a container cannot bleed, and a page inside one cannot do this.
+	A column, so the sheet takes whatever height the band leaves and the band's colour
+	cannot show below it. `100vh minus a guessed header height` was the wrong shape of
+	answer: it left a sliver of blue at the bottom the moment the guess was off by a
+	pixel, and it would be off on every screen where the nav wraps.
 -->
-<div class="min-h-screen bg-accent">
+<div class="flex min-h-screen flex-col bg-accent">
 	<!-- ============================================================== the band -->
-	<header class="text-on-solid">
+	<header class="shrink-0 text-on-solid">
 		<div class="flex items-center gap-8 px-6 py-4 sm:px-8">
 			<a href={resolve('/dashboard')} class="flex items-center gap-2 font-semibold">
 				<Icon icon={BookOpen01Icon} class="size-5" />
@@ -145,7 +167,7 @@
 		the sheet and the window is the band it lies on, and the rounded top corners are
 		what shows it.
 	-->
-	<div class="min-h-[calc(100vh-4.5rem)] rounded-t-3xl bg-surface p-5 sm:p-6 lg:p-8">
+	<div class="flex-1 rounded-t-2xl bg-surface p-5 sm:p-6 lg:p-8">
 		<div class="flex gap-4 sm:gap-6">
 			<!--
 					Icons only, with the name behind a tooltip — and the name is also the
@@ -221,37 +243,68 @@
 
 				<div class="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
 					<!-- ================================================ the board -->
-					<div class="grid gap-4 md:grid-cols-3">
+					<div class="grid gap-5 md:grid-cols-3">
 						{#each COLUMNS as col (col.key)}
 							{@const items = column(col.key)}
-							<section class="rounded-card bg-surface-sunken p-3">
-								<h2 class="flex items-center gap-2 px-2 py-1.5 text-sm font-medium">
+							<section>
+								<h2 class="flex items-center gap-2 px-1 pb-3 text-sm font-medium">
 									<span class={cn('size-2 rounded-full bg-current', col.dot)}></span>
 									{col.title}
-									<span class="text-muted numeral ml-auto text-xs">{items.length}</span>
+									<span
+										class="text-muted numeral ml-auto rounded-pill bg-surface-sunken px-2 py-0.5 text-xs"
+									>
+										{items.length}
+									</span>
 								</h2>
 
 								{#if items.length === 0}
-									<p class="text-muted px-2 py-6 text-center text-xs">
+									<p
+										class="text-muted rounded-card border border-dashed border-border px-2 py-8 text-center text-xs"
+									>
 										{query ? 'Nothing matches.' : 'Nothing here.'}
 									</p>
 								{:else}
-									<ul class="mt-1 space-y-2">
+									<ul class="space-y-3">
 										{#each items as enrolment (enrolment.course_slug)}
 											{@const progress = enrolment.progress}
 											{@const percent = progress?.percent ?? 0}
 											<li>
 												<!--
-														The card is the whole target. An "Open" button on it would
-														only repeat what clicking it already does.
-													-->
+													A card lifted by a shadow rather than outlined by a border. This
+													is the one page in the product that does it: the system's rule is
+													that a border separates and nothing else does, and a shadow was
+													refused for good reasons — it does not theme, and forty of them
+													down a queue is a queue nobody can read. On a board of a dozen
+													cards the trade reads differently, which is what this route is
+													for. It is a proposal, and that rule is the thing it proposes.
+
+													The card is the whole target. An "Open" button would only repeat
+													what clicking it already does.
+												-->
 												<a
 													href={resolve(`/courses/${enrolment.course_slug}`)}
-													class="lift group block rounded-card border border-border bg-surface-raised p-4 transition-colors hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+													class="block rounded-2xl bg-surface-raised p-4 shadow-card transition-shadow duration-(--duration-base) hover:shadow-card-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 												>
-													<p class="text-sm font-medium text-pretty">{enrolment.course_title}</p>
+													<div class="flex items-start gap-3">
+														<!-- The tinted tile, in the state's own colour. -->
+														<span
+															class={cn(
+																'flex size-9 shrink-0 items-center justify-center rounded-control',
+																col.tile
+															)}
+														>
+															<Icon icon={col.icon} class="size-4.5" />
+														</span>
 
-													<div class="mt-3 flex items-center justify-between gap-2">
+														<div class="min-w-0 flex-1">
+															<p class={cn('text-xs font-medium', col.dot)}>{col.title}</p>
+															<p class="mt-0.5 text-sm font-medium text-pretty">
+																{enrolment.course_title}
+															</p>
+														</div>
+													</div>
+
+													<div class="mt-4 flex items-center justify-between gap-2">
 														<span class="numeral text-xs font-medium">{percent}%</span>
 														<span class="text-muted numeral text-xs">
 															{lessonsLeft(progress)} left
@@ -274,7 +327,10 @@
 														</div>
 													{:else}
 														<p
-															class="text-muted mt-3 flex items-center gap-1 text-xs font-medium group-hover:text-accent-text"
+															class={cn(
+																'mt-3 flex items-center gap-1 text-xs font-medium',
+																col.dot
+															)}
 														>
 															{percent === 0 ? 'Start' : 'Continue'}
 															<Icon icon={ArrowRight01Icon} class="size-3.5" />
@@ -291,7 +347,7 @@
 
 					<!-- ============================================== the side rail -->
 					<aside class="space-y-4">
-						<section class="rounded-card bg-surface-sunken p-5">
+						<section class="rounded-2xl bg-surface-raised p-5 shadow-card">
 							<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
 								Notifications
 								{#if data.unread > 0}
@@ -340,7 +396,7 @@
 
 						{#if data.gamification}
 							{@const g = data.gamification}
-							<section class="rounded-card bg-surface-sunken p-5">
+							<section class="rounded-2xl bg-surface-raised p-5 shadow-card">
 								<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
 								<p class="mt-3 flex items-baseline gap-2">
 									<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>

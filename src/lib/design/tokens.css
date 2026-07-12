@@ -236,6 +236,24 @@
 	--chart-3: var(--wa-10);
 
 	/*
+		Two shadows, and they are the exception the rule below argues against — spent
+		deliberately, on the board, where a dozen loose cards float on one surface and a
+		border around each draws a dozen boxes.
+
+		Layered, tinted with the neutral's own hue rather than pure black (a grey shadow
+		on a warm-neutral page reads as dirt), and shallow: the near layer says the card
+		is off the page, the far one says how far. On a dark surface a shadow is invisible
+		— so dark mode does not fake one, it goes back to a hairline ring, which is the
+		only thing that separates there.
+	*/
+	--card-shadow:
+		0 1px 2px oklch(0.2434 0.0135 259 / 0.05), 0 4px 8px -2px oklch(0.2434 0.0135 259 / 0.06),
+		0 12px 24px -6px oklch(0.2434 0.0135 259 / 0.08);
+	--card-shadow-hover:
+		0 2px 4px oklch(0.2434 0.0135 259 / 0.06), 0 10px 20px -4px oklch(0.2434 0.0135 259 / 0.1),
+		0 28px 48px -12px oklch(0.2434 0.0135 259 / 0.14);
+
+	/*
 		There are no shadow tokens, and that is the point.
 
 		Separation in this system is a border's job. A shadow is a blurred grey
@@ -380,6 +398,11 @@
 	--chart-1: var(--b-9);
 	--chart-2: var(--ok-9);
 	--chart-3: var(--wa-8);
+
+	/* A shadow on a dark surface is a smudge nobody can see, so dark mode does not
+	   fake one: the card goes back to a hairline, drawn here as a ring. */
+	--card-shadow: 0 0 0 1px var(--border);
+	--card-shadow-hover: 0 0 0 1px var(--border-strong);
 
 	--text: var(--n-12);
 	--text-muted: var(--n-11);
