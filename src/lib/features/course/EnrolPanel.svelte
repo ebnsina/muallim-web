@@ -9,7 +9,7 @@
 		Task01Icon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
-	import { Button, Card, Counter, Icon, Progress as ProgressBar } from '$lib/components';
+	import { Button, Card, Icon, Numeral, Progress as ProgressBar } from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
 	import { span } from './duration';
 	import type { CourseDetail, Prerequisite, Progress, TopicView } from './types';
@@ -149,7 +149,7 @@
 			<div class="flex items-baseline justify-between">
 				<p class="text-sm font-medium">Your progress</p>
 				<p class="text-sm font-medium">
-					<Counter value={progress?.percent ?? 0} suffix="%" />
+					<Numeral countUp value={progress?.percent ?? 0} suffix="%" />
 				</p>
 			</div>
 

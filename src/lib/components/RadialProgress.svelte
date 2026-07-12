@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DURATION, EASE } from '$lib/motion';
-	import Counter from './Counter.svelte';
+	import Numeral from './Numeral.svelte';
 
 	type Props = {
 		/** 0–100. */
@@ -91,6 +91,8 @@
 	<!-- The figure counts up while the arc sweeps — one motion, said twice, so the
 	     ring and the number arrive together rather than one after the other. -->
 	<span class="numeral absolute text-sm font-semibold" style="font-size: {size / 5}px;">
-		<Counter value={clamped} /><span class="opacity-70" style="font-size: {size / 6.5}px;">%</span>
+		<Numeral countUp value={clamped} /><span class="opacity-70" style="font-size: {size / 6.5}px;"
+			>%</span
+		>
 	</span>
 </div>

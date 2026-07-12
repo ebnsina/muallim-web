@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { cn } from '$lib/utils';
 	import { DURATION, prefersReducedMotion } from '$lib/motion';
 
@@ -7,9 +8,37 @@
 		class?: string;
 		/** Announced instead of the digits, when the number alone is not the meaning. */
 		label?: string;
+		/**
+		 * Roll up from nothing on arrival, rather than only when the value later
+		 * changes. For the figure a page is *about* — a dashboard's headline, a course's
+		 * progress — where the count settling into place is the page saying "this is
+		 * what became of your work".
+		 *
+		 * Off by default: a number in a table does not announce itself, and forty of
+		 * them rolling at once is a slot machine.
+		 */
+		countUp?: boolean;
+		/** Rendered after the digits, and it does not roll: a percent sign, a `+`. */
+		suffix?: string;
 	};
 
-	let { value, class: className, label }: Props = $props();
+	let { value, class: className, label, countUp = false, suffix = '' }: Props = $props();
+
+	/*
+		What is drawn. It is `value` except in the first frame of a `countUp`, where it
+		is nothing — and the effect that follows sets it, so the digits roll up into
+		place through the same transform they use for every other change.
+
+		One mechanism, not two. This started as a second component that animated the
+		number itself with requestAnimationFrame, which is a whole other way of doing
+		the one thing this already did.
+	*/
+	// `untrack`, because the initial capture is the point: this reads the props once,
+	// to decide where the roll starts, and the effect below is what follows them after.
+	let shown = $state(untrack(() => (countUp ? 0 : value)));
+	$effect(() => {
+		shown = value;
+	});
 
 	const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -20,7 +49,7 @@
 		than renumbering every column and rolling all of them.
 	*/
 	const characters = $derived(
-		[...String(value)].map((character, index, all) => ({
+		[...String(shown)].map((character, index, all) => ({
 			character,
 			place: all.length - index,
 			digit: /\d/.test(character) ? Number(character) : null
@@ -50,7 +79,7 @@
 	column — which is what the DOM says is there, and not what anybody meant.
 -->
 <span class={cn('numeral inline-flex leading-none', className)}>
-	<span class="sr-only select-text">{label ?? value}</span>
+	<span class="sr-only select-text">{label ?? `${value}${suffix}`}</span>
 
 	<span aria-hidden="true" class="inline-flex select-none">
 		{#each characters as { character, place, digit } (place)}
@@ -69,5 +98,7 @@
 				</span>
 			{/if}
 		{/each}
+
+		{#if suffix}<span>{suffix}</span>{/if}
 	</span>
 </span>

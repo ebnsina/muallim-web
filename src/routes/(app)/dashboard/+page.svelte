@@ -14,7 +14,7 @@
 	import {
 		ActionLink,
 		Alert,
-		Counter,
+		Numeral,
 		Badge,
 		Button,
 		Card,
@@ -274,7 +274,8 @@
 							</dt>
 
 							<dd class="order-1 flex items-baseline gap-2">
-								<Counter
+								<Numeral
+									countUp
 									value={stat.value}
 									suffix={stat.suffix}
 									class={cn('text-4xl font-semibold tracking-tight', INK[stat.tone])}
@@ -339,7 +340,8 @@
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Points earned</dt>
 					<dd class="mt-2">
-						<Counter
+						<Numeral
+							countUp
 							value={g.points}
 							class="text-accent-text text-3xl font-semibold tracking-tight"
 						/>
@@ -350,7 +352,7 @@
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Rank</dt>
 					<dd class="mt-2 flex items-baseline gap-1.5">
-						<Counter value={g.rank} class="text-3xl font-semibold tracking-tight" />
+						<Numeral countUp value={g.rank} class="text-3xl font-semibold tracking-tight" />
 						{#if g.out_of > 0}
 							<span class="text-muted numeral text-sm">of {g.out_of}</span>
 						{/if}
@@ -361,7 +363,8 @@
 				<Card float class="p-5">
 					<dt class="text-muted text-xs tracking-wide uppercase">Badges</dt>
 					<dd class="mt-2 flex items-baseline gap-1.5">
-						<Counter
+						<Numeral
+							countUp
 							value={earned}
 							class="text-warning-text text-3xl font-semibold tracking-tight"
 						/>
