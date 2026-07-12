@@ -20,21 +20,25 @@ test.describe("a learner's private lesson note", () => {
 		const box = page.getByLabel('Your notes on this lesson');
 		await expect(box).toHaveValue('');
 
+		// Nothing typed is nothing to save.
+		await expect(page.getByRole('button', { name: 'Save note' })).toBeDisabled();
+
 		// Written and saved, it comes back after a full reload — it was read from the
-		// server, not kept in the page.
+		// server, not kept in the page. The outcome is a toast.
 		const note = `Remember this: ${randomUUID().slice(0, 8)}`;
 		await box.fill(note);
 		await page.getByRole('button', { name: 'Save note' }).click();
-		await expect(page.getByText('Saved.')).toBeVisible();
+		await expect(page.getByText('Note saved.')).toBeVisible();
 
 		await page.reload();
 		await expect(page.getByLabel('Your notes on this lesson')).toHaveValue(note);
 
 		// Emptied and saved, it is gone the same way — a cleared note and one never
-		// written are the same thing.
+		// written are the same thing. Emptying a saved note is a change, so the button
+		// offers to make it.
 		await page.getByLabel('Your notes on this lesson').fill('');
-		await page.getByRole('button', { name: 'Save note' }).click();
-		await expect(page.getByText('Saved.')).toBeVisible();
+		await page.getByRole('button', { name: 'Clear note' }).click();
+		await expect(page.getByText('Note cleared.')).toBeVisible();
 
 		await page.reload();
 		await expect(page.getByLabel('Your notes on this lesson')).toHaveValue('');
@@ -83,7 +87,7 @@ test.describe("a learner's private lesson note", () => {
 		// A whole-lesson note…
 		await page.getByLabel('Your notes on this lesson').fill('Revise the method.');
 		await page.getByRole('button', { name: 'Save note' }).click();
-		await expect(page.getByText('Saved.')).toBeVisible();
+		await expect(page.getByText('Note saved.')).toBeVisible();
 
 		// …and a highlight with its own remark.
 		await page.getByText('The body of A free preview.').selectText();

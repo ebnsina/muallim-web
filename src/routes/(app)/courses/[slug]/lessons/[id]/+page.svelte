@@ -27,12 +27,26 @@
 	} from '$lib/components';
 	import { lessonTrail } from '$lib/breadcrumbs';
 	import { callAction } from '$lib/form';
+	import { toast } from '$lib/toast.svelte';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	let savingNote = $state(false);
+
+	/*
+		The note as it stands in the box, against the note as the server last knew it.
+		The difference is what makes "Save" mean anything.
+
+		`savedNote` is derived rather than captured, and the effect resettles the box
+		from it: a plain `$state(data.note)` reads the note of the lesson the page was
+		first built for, so walking to the next lesson would carry the last one's note
+		along and offer to save it there.
+	*/
+	const savedNote = $derived(data.note ?? '');
+	let noteDraft = $derived(savedNote);
+	const noteChanged = $derived(noteDraft !== savedNote);
 
 	// The marks live here so a new one shows the instant it is made and a removed one
 	// goes at once; the writable derived resettles from the server on the next load.
@@ -95,33 +109,67 @@
 		document.getElementById(`tab-${next}`)?.focus();
 	}
 
-	// Add a mark for the reader's selection, then jump to its note field so they can
-	// write straight away. On failure the list reloads to the truth.
+	/*
+		These three go over `fetch` rather than through a form, so nothing renders their
+		outcome by default: a failed mark used to disappear on the next reload and say
+		nothing about why. Each one now answers, and a failure says so.
+	*/
 	async function addHighlight(selection: { quote: string; start: number; end: number }) {
 		const result = await callAction('?/addHighlight', selection);
-		if (result.type === 'success' && result.data?.highlight) {
+		if (result.type !== 'success') {
+			toast.danger('That passage could not be marked.');
+			return;
+		}
+		if (result.data?.highlight) {
 			focusedHighlight = String(result.data.highlight.id);
 		}
 		await invalidateAll();
+		toast.success('Passage marked. Add a note to it under Highlights.');
 	}
 
+	// On blur, and only when it changed: a reader tabbing through their marks would
+	// otherwise post one save per passage they passed over.
 	async function saveHighlightNote(id: string, note: string) {
-		await callAction('?/editHighlight', { id, note });
+		const current = highlights.find((h) => h.id === id);
+		if (current && current.note === note) return;
+
+		const result = await callAction('?/editHighlight', { id, note });
+		if (result.type !== 'success') {
+			toast.danger('That note could not be saved.');
+			return;
+		}
+		toast.success(note.trim() === '' ? 'Note cleared.' : 'Note saved.');
 	}
 
 	async function removeHighlight(id: string) {
+		const kept = highlights;
 		highlights = highlights.filter((h) => h.id !== id);
-		await callAction('?/deleteHighlight', { id });
+
+		const result = await callAction('?/deleteHighlight', { id });
+		if (result.type !== 'success') {
+			highlights = kept;
+			toast.danger('That highlight could not be removed.');
+			return;
+		}
 		await invalidateAll();
+		toast.success('Highlight removed.');
 	}
 
 	const crumbs = $derived(
 		lessonTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
 	);
 
-	// The action's answer wins over the loaded lesson, so the button flips without
-	// waiting for a reload. `form` is undefined until something has been submitted.
-	const completed = $derived(form ? Boolean(form.completed) : Boolean(data.lesson.completed_at));
+	/*
+		The action's answer wins over the loaded lesson, so the button flips without
+		waiting for a reload — but only the *completion* action's answer.
+
+		`form` is whatever the last action on this page returned, and saving a note
+		returns no `completed` at all: read it as a boolean and a finished lesson
+		announced itself unfinished the moment its reader wrote a note.
+	*/
+	const completed = $derived(
+		form && 'completed' in form ? Boolean(form.completed) : Boolean(data.lesson.completed_at)
+	);
 
 	// Completing a lesson requires an enrolment, so a previewer is shown the
 	// content and nothing to press. `access` is the API's word on that, not a
@@ -143,9 +191,11 @@
 		return Math.round(seconds / 60);
 	}
 
-	// The discussion. Which question's answer box is open, and a date formatter the
-	// threads share.
+	// The discussion. Which question's answer box is open, the drafts in each box, and
+	// a date formatter the threads share.
 	let answering = $state<string | null>(null);
+	let questionDraft = $state('');
+	let answerDraft = $state('');
 	const postedOn = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 	/*
@@ -362,7 +412,16 @@
 			-->
 			{#if data.signedIn}
 				<div class="mt-12 max-w-2xl">
-					<div role="tablist" aria-label="About this lesson" class="flex flex-wrap gap-2">
+					<!--
+						One track, three segments. Separate pills read as three unrelated
+						buttons; a segmented control says these are the same question asked
+						three ways, and only one of them can be the answer.
+					-->
+					<div
+						role="tablist"
+						aria-label="About this lesson"
+						class="inline-flex gap-1 rounded-pill bg-surface-sunken p-1"
+					>
 						{#each TABS as t (t.id)}
 							{@const active = tab === t.id}
 							<button
@@ -373,10 +432,10 @@
 								aria-controls="panel-{t.id}"
 								tabindex={active ? 0 : -1}
 								class={cn(
-									'flex items-center gap-2 rounded-pill border px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+									'flex items-center gap-2 rounded-pill px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
 									active
-										? 'border-transparent bg-accent text-on-solid'
-										: 'text-muted border-border hover:bg-surface-hover hover:text-text'
+										? 'bg-accent text-on-solid'
+										: 'text-muted hover:bg-surface-hover hover:text-text'
 								)}
 								onclick={() => (tab = t.id)}
 								onkeydown={(event) => moveTab(event, t.id)}
@@ -388,7 +447,7 @@
 									<span
 										class={cn(
 											'numeral rounded-pill px-1.5 text-xs',
-											active ? 'bg-white/20' : 'bg-surface-sunken'
+											active ? 'bg-on-solid/20' : 'bg-surface-raised'
 										)}
 									>
 										{t.count}
@@ -414,10 +473,28 @@
 						action="?/saveNote"
 						class="mt-3"
 						use:enhance={() => {
+							/*
+								The outcome is a toast, not a word beside the button. "Saved." in
+								grey text under a form is a thing you have to be looking at to see,
+								and a reader who just pressed the button is looking at the button.
+							*/
+							const cleared = noteDraft.trim() === '';
 							savingNote = true;
-							return async ({ update }) => {
+
+							return async ({ result, update }) => {
 								await update({ reset: false });
 								savingNote = false;
+
+								if (result.type === 'failure') {
+									toast.danger(String(result.data?.noteMessage ?? 'Your note could not be saved.'));
+									return;
+								}
+								if (result.type === 'error') {
+									toast.danger('Your note could not be saved.');
+									return;
+								}
+
+								toast.success(cleared ? 'Note cleared.' : 'Note saved.');
 							};
 						}}
 					>
@@ -425,21 +502,38 @@
 							name="body"
 							rows={5}
 							maxlength={10000}
-							value={data.note}
+							bind:value={noteDraft}
 							aria-label="Your notes on this lesson"
 							placeholder="Jot something down as you read…"
 						/>
 
-						<div class="mt-2 flex items-center gap-3">
-							<Button type="submit" variant="secondary" size="sm" loading={savingNote}>
-								{savingNote ? 'Saving…' : 'Save note'}
-							</Button>
-
-							{#if form?.noteSaved}
-								<span class="text-xs text-success-text" role="status">Saved.</span>
-							{:else if form?.noteMessage}
-								<span class="text-xs text-danger-text" role="alert">{form.noteMessage}</span>
+						<!--
+							The commit sits at the end of the form, where the eye leaves it: a
+							button under the left edge of a box is a button you pass on the way in.
+						-->
+						<div class="mt-2 flex items-center justify-end gap-3">
+							{#if noteChanged}
+								<span class="text-muted text-xs">Unsaved changes</span>
 							{/if}
+
+							<!--
+								Nothing to save is not an act. Saving an unchanged note answered
+								"Saved." to a reader who had changed nothing, which is a lie told
+								politely.
+							-->
+							<Button
+								type="submit"
+								variant="secondary"
+								size="sm"
+								loading={savingNote}
+								disabled={!noteChanged}
+							>
+								{savingNote
+									? 'Saving…'
+									: noteDraft.trim() === '' && savedNote
+										? 'Clear note'
+										: 'Save note'}
+							</Button>
 						</div>
 					</form>
 				</div>
@@ -519,19 +613,40 @@
 					aria-labelledby="tab-discussion"
 					class="mt-5 max-w-2xl"
 				>
-					<form method="POST" action="?/askQuestion" use:enhance>
+					<form
+						method="POST"
+						action="?/askQuestion"
+						use:enhance={() => {
+							return async ({ result, update }) => {
+								await update();
+
+								if (result.type === 'failure') {
+									toast.danger(
+										String(result.data?.qaMessage ?? 'Your question could not be posted.')
+									);
+									return;
+								}
+								if (result.type === 'error') {
+									toast.danger('Your question could not be posted.');
+									return;
+								}
+
+								questionDraft = '';
+								toast.success('Question posted.');
+							};
+						}}
+					>
 						<Textarea
 							name="body"
 							rows={2}
 							maxlength={5000}
+							bind:value={questionDraft}
 							aria-label="Ask a question"
 							placeholder="Ask a question about this lesson…"
 						/>
-						<div class="mt-2 flex items-center gap-3">
-							<Button type="submit" size="sm">Ask</Button>
-							{#if form?.qaMessage}
-								<span class="text-xs text-danger-text" role="alert">{form.qaMessage}</span>
-							{/if}
+						<div class="mt-2 flex items-center justify-end gap-3">
+							<!-- An empty question is not a question. The server refuses it too. -->
+							<Button type="submit" size="sm" disabled={questionDraft.trim() === ''}>Ask</Button>
 						</div>
 					</form>
 
@@ -608,9 +723,23 @@
 												action="?/answerQuestion"
 												class="mt-4"
 												use:enhance={() => {
-													return async ({ update }) => {
+													return async ({ result, update }) => {
 														await update();
+
+														if (result.type === 'failure' || result.type === 'error') {
+															toast.danger(
+																result.type === 'failure'
+																	? String(
+																			result.data?.qaMessage ?? 'Your answer could not be posted.'
+																		)
+																	: 'Your answer could not be posted.'
+															);
+															return;
+														}
+
+														answerDraft = '';
 														answering = null;
+														toast.success('Answer posted.');
 													};
 												}}
 											>
@@ -619,11 +748,11 @@
 													name="body"
 													rows={2}
 													maxlength={5000}
+													bind:value={answerDraft}
 													aria-label="Write an answer"
 													placeholder="Write an answer…"
 												/>
-												<div class="mt-2 flex items-center gap-2">
-													<Button type="submit" size="sm">Post answer</Button>
+												<div class="mt-2 flex items-center justify-end gap-2">
 													<Button
 														type="button"
 														variant="ghost"
@@ -631,6 +760,9 @@
 														onclick={() => (answering = null)}
 													>
 														Cancel
+													</Button>
+													<Button type="submit" size="sm" disabled={answerDraft.trim() === ''}>
+														Post answer
 													</Button>
 												</div>
 											</form>

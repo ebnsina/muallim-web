@@ -9,7 +9,7 @@
 		Cancel01Icon,
 		Menu01Icon,
 		Mortarboard02Icon,
-		Notification03Icon,
+		Notification02Icon,
 		TeachingIcon,
 		UserGroupIcon,
 		DashboardSquare01Icon
@@ -129,7 +129,7 @@
 					class="relative rounded-control p-2 text-muted transition-colors hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
 					aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
 				>
-					<Icon icon={Notification03Icon} class="size-5" />
+					<Icon icon={Notification02Icon} class="size-5" />
 					{#if unread > 0}
 						<span
 							class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.65rem] leading-4 font-semibold text-on-solid"

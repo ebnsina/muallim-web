@@ -734,15 +734,16 @@
 								placeholder="What would you tell someone deciding whether to take this course? (optional)"
 								value={data.myReview?.body ?? ''}
 							/>
-							<div class="mt-4 flex items-center gap-3">
-								<Button type="submit" size="sm">
-									{data.myReview ? 'Update review' : 'Post review'}
-								</Button>
+							<!-- The commit sits at the end of the form, where the eye leaves it. -->
+							<div class="mt-4 flex items-center justify-end gap-3">
 								{#if data.myReview}
 									<Button formaction="?/unreview" type="submit" variant="ghost" size="sm">
 										Remove
 									</Button>
 								{/if}
+								<Button type="submit" size="sm">
+									{data.myReview ? 'Update review' : 'Post review'}
+								</Button>
 							</div>
 						</form>
 					</Card>

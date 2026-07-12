@@ -154,6 +154,14 @@ export async function setDripMode(
 export interface QuizCourse {
 	slug: string;
 	lessonId: string;
+	/**
+	 * The single-choice question's prompt, unique to this course.
+	 *
+	 * The content bank is workspace-wide and outlives a run, so a question banked
+	 * under a fixed prompt is still there on the next one — and a test that counts
+	 * how many times its prompt appears counted every previous run's copies too.
+	 */
+	choicePrompt: string;
 	/** Has the student enrol, take the quiz, and submit it. */
 	studentAttempt: (request: APIRequestContext) => Promise<void>;
 }
@@ -218,9 +226,10 @@ export async function quizCourse(
 		return (await response.json()).question;
 	};
 
+	const choicePrompt = `Which is compiled? (${slug})`;
 	const choice = await question({
 		type: 'single_choice',
-		prompt: 'Which is compiled?',
+		prompt: choicePrompt,
 		points: 3,
 		explanation: 'Because it is compiled.',
 		options: [{ content: 'Python' }, { content: 'Go', is_correct: true }]
@@ -243,6 +252,7 @@ export async function quizCourse(
 	return {
 		slug,
 		lessonId,
+		choicePrompt,
 
 		async studentAttempt(request: APIRequestContext) {
 			const studentToken = await studentBearer(request);
