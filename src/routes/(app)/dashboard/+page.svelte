@@ -36,6 +36,11 @@
 
 	const firstName = $derived(data.user.name.split(' ')[0]);
 
+	// The reader's own locale names the day. Computed once, on render: a dashboard is
+	// not open long enough for midnight to matter, and a clock that ticks is a clock
+	// that re-renders the page under somebody reading it.
+	const today = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' }).format(new Date());
+
 	// Furthest along first: the top of the list is the thing to resume.
 	const active = $derived(
 		data.enrolments
@@ -131,14 +136,17 @@
 		every page in the app rather than for this one. What is left here is the
 		greeting, which is a page heading and reads as one.
 	-->
-	<div class="flex flex-wrap items-end justify-between gap-4">
-		<div>
-			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-				Welcome back, {firstName}.
-			</h1>
-			<p class="text-muted mt-1 text-sm">{data.user.email}</p>
-		</div>
-		<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
+	<!--
+		The date, not the address. A person knows their own email; what they do not know,
+		arriving, is what day it is against the deadlines they are carrying. And no
+		"Browse the catalogue" button: Courses is in the band on every page, and a button
+		that repeats a menu item is a button in the way.
+	-->
+	<div>
+		<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+			Welcome back, {firstName}.
+		</h1>
+		<p class="text-muted mt-1 text-sm">{today}</p>
 	</div>
 
 	{#if form?.resent}

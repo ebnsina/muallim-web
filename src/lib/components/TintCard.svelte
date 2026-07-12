@@ -9,13 +9,19 @@
 		interactive?: boolean;
 		/** Extra classes on the outer frame. */
 		class?: string;
+		/**
+		 * Replaces the panel's own fill and padding. For a card whose panel *is* the
+		 * picture — a cover that runs to the edges — rather than a tinted box with text
+		 * inside it.
+		 */
+		panelClass?: string;
 		/** The panel's contents — a badge, a title, a line of meta. */
 		children: Snippet;
 		/** The plain strip below the panel. Omit it for a card with no footer. */
 		footer?: Snippet;
 	};
 
-	let { href, interactive, class: className, children, footer }: Props = $props();
+	let { href, interactive, class: className, panelClass, children, footer }: Props = $props();
 
 	const lifts = $derived(interactive ?? href != null);
 
@@ -50,7 +56,7 @@
 	management row, or anything else.
 -->
 {#snippet body()}
-	<div class="flex-1 rounded-xl bg-surface-sunken px-5 pt-5 pb-6">
+	<div class={cn('flex-1 rounded-xl bg-surface-sunken px-5 pt-5 pb-6', panelClass)}>
 		{@render children()}
 	</div>
 

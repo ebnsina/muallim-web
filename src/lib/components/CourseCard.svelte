@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { auroraFor, cn } from '$lib/utils';
 	import Difficulty from './Difficulty.svelte';
 	import TintCard from './TintCard.svelte';
 
@@ -8,9 +9,19 @@
 		difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
 		lessonCount?: number;
 		href: string;
+		/**
+		 * What the card's cover light is drawn from — the slug, so a course wears the
+		 * same one everywhere. Falls back to the title, which is nearly as stable.
+		 */
+		seed?: string;
 	};
 
-	let { title, summary, difficulty, lessonCount, href }: Props = $props();
+	let { title, summary, difficulty, lessonCount, href, seed }: Props = $props();
+
+	// A course has no picture, and inventing one — a stock photo of a laptop — is worse
+	// than having none. The cover is light instead: its own, and the same on every
+	// screen, so a catalogue reads as a set of things rather than a list of rows.
+	const cover = $derived(auroraFor(seed ?? title));
 </script>
 
 <!--
@@ -20,12 +31,19 @@
 	drawn by the design-system components. (Lesson and module counts are not in the
 	list payload, so they are not invented here.)
 -->
-<TintCard {href}>
-	<h2 class="line-clamp-2 min-h-[3.5rem] text-lg font-semibold text-pretty">{title}</h2>
+<TintCard {href} panelClass="overflow-hidden bg-surface-raised p-0">
+	<div class={cn('relative h-24 rounded-card', cover)}>
+		<!-- The title sits on its own cover, where a course's picture would be. -->
+		<div class="absolute inset-x-0 bottom-0 p-4">
+			<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
+		</div>
+	</div>
 
-	<!-- Always two lines, even when empty, so every card is the same height and a
+	<div class="p-4 pt-3">
+		<!-- Always two lines, even when empty, so every card is the same height and a
 	     grid of them reads as one block rather than a ragged run. -->
-	<p class="text-muted mt-1.5 line-clamp-2 min-h-[2.5rem] text-sm text-pretty">{summary ?? ''}</p>
+		<p class="text-muted line-clamp-2 min-h-[2.5rem] text-sm text-pretty">{summary ?? ''}</p>
+	</div>
 
 	{#snippet footer()}
 		<Difficulty level={difficulty} />

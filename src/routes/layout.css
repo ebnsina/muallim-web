@@ -332,6 +332,61 @@
 	}
 
 	/*
+		Five auroras, and a card picks one from its own slug — so a course wears the same
+		light on every screen, on every reload, and after a server render. `Math.random()`
+		here would give a card one colour on the server and another in the browser, which
+		is a hydration mismatch you can see.
+
+		Each is the same recipe as the default — a dark base, lights under half strength —
+		in a different quarter of the wheel. They carry white type, so none of them is
+		allowed to be pale.
+	*/
+	.aurora-1 {
+		background-color: #0e1a6b;
+		background-image:
+			radial-gradient(58% 74% at 8% 6%, rgb(135 153 255 / 0.55), transparent 62%),
+			radial-gradient(52% 66% at 88% 12%, rgb(88 0 107 / 0.72), transparent 64%),
+			radial-gradient(72% 88% at 68% 96%, rgb(12 39 191 / 0.78), transparent 66%),
+			radial-gradient(30% 40% at 96% 88%, rgb(255 138 110 / 0.28), transparent 70%);
+	}
+
+	.aurora-2 {
+		background-color: #0b3a4a;
+		background-image:
+			radial-gradient(60% 76% at 10% 8%, rgb(94 234 212 / 0.42), transparent 62%),
+			radial-gradient(54% 68% at 90% 14%, rgb(13 92 128 / 0.8), transparent 64%),
+			radial-gradient(74% 90% at 70% 98%, rgb(6 130 130 / 0.6), transparent 66%),
+			radial-gradient(32% 42% at 94% 86%, rgb(56 189 248 / 0.3), transparent 70%);
+	}
+
+	.aurora-3 {
+		background-color: #4a1338;
+		background-image:
+			radial-gradient(58% 74% at 6% 10%, rgb(255 154 191 / 0.4), transparent 62%),
+			radial-gradient(56% 70% at 92% 10%, rgb(109 20 92 / 0.8), transparent 64%),
+			radial-gradient(72% 88% at 66% 96%, rgb(190 24 93 / 0.62), transparent 66%),
+			radial-gradient(30% 40% at 96% 84%, rgb(251 146 60 / 0.28), transparent 70%);
+	}
+
+	.aurora-4 {
+		background-color: #14402a;
+		background-image:
+			radial-gradient(60% 76% at 8% 8%, rgb(134 239 172 / 0.38), transparent 62%),
+			radial-gradient(54% 68% at 90% 12%, rgb(6 78 59 / 0.85), transparent 64%),
+			radial-gradient(74% 92% at 70% 98%, rgb(13 148 136 / 0.55), transparent 66%),
+			radial-gradient(30% 40% at 95% 86%, rgb(163 230 53 / 0.25), transparent 70%);
+	}
+
+	.aurora-5 {
+		background-color: #3b1d0e;
+		background-image:
+			radial-gradient(58% 74% at 8% 8%, rgb(253 186 116 / 0.42), transparent 62%),
+			radial-gradient(56% 70% at 92% 12%, rgb(124 45 18 / 0.85), transparent 64%),
+			radial-gradient(72% 90% at 68% 98%, rgb(190 66 24 / 0.6), transparent 66%),
+			radial-gradient(30% 40% at 96% 86%, rgb(244 114 182 / 0.24), transparent 70%);
+	}
+
+	/*
 		The aurora never prints. It is ink an inkjet would spend a cartridge on, it turns
 		a certificate into a dark rectangle with white type nobody can read on paper, and
 		the browser drops backgrounds by default anyway — so this says out loud what it
