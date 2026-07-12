@@ -341,8 +341,10 @@
 		in a different quarter of the wheel. They carry white type, so none of them is
 		allowed to be pale.
 	*/
+	/* The flat colour behind the sheet: the band's own base, or a sliver of the
+	   wrong blue shows wherever the sheet does not reach. Follows the band — teal. */
 	.bg-aurora-base {
-		background-color: #0e1a6b;
+		background-color: #0b3a4a;
 	}
 
 	.aurora-1 {
