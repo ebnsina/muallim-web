@@ -305,34 +305,29 @@
 		isolation: isolate;
 
 		/*
-			The base is a *dark* step, and the lights are mixed over it. It was built the
-			other way round first — a mid step lifted by pale highlights — and the card came
-			out the colour of a swimming pool with white text swimming in it. On a surface
-			that carries type, the fill has to clear 4.5:1 against that type at its lightest
-			point, not at its average.
+			The aurora, and the one place in this system that names a colour outside the
+			ramps.
+
+			That is deliberate and it is bounded: an aurora is a *picture*, not a semantic
+			colour — nothing on it is a button that means "primary" or a badge that means
+			"danger", and tying it to the brand blue only produced a flat blue rectangle
+			with a lighter corner. Five lights, four hues, mixed the way the reference does
+			it: periwinkle, violet, cobalt, a deep navy, and one warm ember so the whole
+			thing is not cold.
+
+			What is *not* free: it carries white type. The base stays dark and the lights
+			stay under half strength, because a surface with text on it has to clear 4.5:1
+			at its lightest point, not on average — the first version was a pale lavender
+			wash with white text swimming in it.
 		*/
-		background-color: var(--b-10);
+		background-color: #0e1a6b;
 		background-image:
-			radial-gradient(
-				80% 95% at 6% 8%,
-				color-mix(in oklab, var(--b-8) 45%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				70% 90% at 98% 10%,
-				color-mix(in oklab, var(--b-12) 55%, transparent),
-				transparent 62%
-			),
-			radial-gradient(
-				95% 110% at 80% 110%,
-				color-mix(in oklab, var(--b-9) 60%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				55% 70% at 35% 75%,
-				color-mix(in oklab, var(--b-11) 45%, transparent),
-				transparent 70%
-			);
+			radial-gradient(58% 74% at 8% 6%, rgb(135 153 255 / 0.55), transparent 62%),
+			radial-gradient(52% 66% at 88% 12%, rgb(88 0 107 / 0.72), transparent 64%),
+			radial-gradient(72% 88% at 68% 96%, rgb(12 39 191 / 0.78), transparent 66%),
+			radial-gradient(46% 60% at 34% 82%, rgb(120 60 200 / 0.5), transparent 68%),
+			radial-gradient(30% 40% at 96% 88%, rgb(255 138 110 / 0.28), transparent 70%),
+			radial-gradient(90% 120% at 50% 50%, rgb(8 27 134 / 0.55), transparent 72%);
 		color: var(--text-on-solid);
 	}
 
@@ -345,7 +340,7 @@
 		z-index: -1;
 		border-radius: inherit;
 		pointer-events: none;
-		opacity: 0.22;
+		opacity: 0.4;
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 	}
 
