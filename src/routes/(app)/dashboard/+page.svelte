@@ -63,6 +63,13 @@
 		data.enrolments.reduce((total, e) => total + (e.progress?.lessons_completed ?? 0), 0)
 	);
 
+	// Every lesson on every course they are on. A count with no denominator is a
+	// number nobody can place: 39 is most of a course or a tenth of a syllabus, and
+	// muallim-api already sends the total, so there is no excuse for not saying which.
+	const lessonsAll = $derived(
+		data.enrolments.reduce((total, e) => total + (e.progress?.lessons_total ?? 0), 0)
+	);
+
 	function lessonsLeft(progress: { lessons_total?: number; lessons_completed?: number } | null) {
 		return Math.max(0, (progress?.lessons_total ?? 0) - (progress?.lessons_completed ?? 0));
 	}
@@ -100,13 +107,21 @@
 	const STATS = $derived([
 		{
 			label: 'Lessons completed',
-			value: lessonsDone,
+			value: `${lessonsDone}`,
+			// The number against what it is a number *of*, and a bar of the same fraction:
+			// the empty half of the bar is the part of this dashboard that is the point.
+			of: lessonsAll > 0 ? `of ${lessonsAll}` : '',
+			percent: lessonsAll === 0 ? 0 : Math.round((lessonsDone / lessonsAll) * 100),
+			bar: 'active' as const,
 			tone: 'accent' as const,
 			icon: TaskDone01Icon
 		},
 		{
 			label: 'Average progress',
 			value: `${averagePercent}%`,
+			of: data.enrolments.length > 0 ? `across ${data.enrolments.length} courses` : '',
+			percent: averagePercent,
+			bar: 'lapsed' as const,
 			tone: 'warning' as const,
 			icon: ChartAverageIcon
 		}
@@ -230,17 +245,41 @@
 					class="grid content-center gap-6 border-border max-lg:border-t max-lg:pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 lg:border-l lg:border-r lg:px-8"
 				>
 					{#each STATS as stat (stat.label)}
-						<div>
-							<dt class="text-muted flex items-center gap-2 text-xs">
+						<!--
+							The figure first and its name under it, small. A stat tile leads with the
+							number because the number is what was asked for; the label is what you
+							read second, to find out what it was the number of.
+
+							Source order is dt, dd, dd — a term and the two things said about it —
+							and `order` puts the figure on top. The reader gets the layout; a screen
+							reader still gets the sentence.
+						-->
+						<div class="flex flex-col">
+							<dt class="text-muted order-2 mt-1.5 flex items-center gap-2 text-xs">
 								<span
-									class={cn('flex size-6 items-center justify-center rounded-md', TILE[stat.tone])}
+									class={cn('flex size-5 items-center justify-center rounded-md', TILE[stat.tone])}
 								>
-									<Icon icon={stat.icon} class="size-3.5" strokeWidth={2} />
+									<Icon icon={stat.icon} class="size-3" strokeWidth={2} />
 								</span>
 								{stat.label}
 							</dt>
-							<dd class={cn('numeral mt-2 text-3xl font-semibold tracking-tight', INK[stat.tone])}>
-								{stat.value}
+
+							<dd class="order-1 flex items-baseline gap-2">
+								<span class={cn('numeral text-4xl font-semibold tracking-tight', INK[stat.tone])}>
+									{stat.value}
+								</span>
+								{#if stat.of}
+									<span class="text-muted numeral text-sm">{stat.of}</span>
+								{/if}
+							</dd>
+
+							<dd class="order-3 mt-3">
+								<Progress
+									value={stat.percent}
+									tone={stat.bar}
+									class="h-1.5"
+									label="{stat.percent}% — {stat.label.toLowerCase()}"
+								/>
 							</dd>
 						</div>
 					{/each}
