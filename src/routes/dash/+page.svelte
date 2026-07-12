@@ -91,7 +91,7 @@
 <div class="min-h-screen bg-accent">
 	<!-- ============================================================== the band -->
 	<header class="text-on-solid">
-		<div class="mx-auto flex max-w-[110rem] items-center gap-8 px-6 py-4 sm:px-8">
+		<div class="flex items-center gap-8 px-6 py-4 sm:px-8">
 			<a href={resolve('/dashboard')} class="flex items-center gap-2 font-semibold">
 				<Icon icon={BookOpen01Icon} class="size-5" />
 				Muallim
@@ -138,217 +138,221 @@
 		</div>
 	</header>
 
-	<!-- ============================================================= the sheet -->
-	<div class="mx-auto max-w-[110rem] px-0 sm:px-4">
-		<div class="min-h-[calc(100vh-4.5rem)] rounded-t-3xl bg-surface p-4 sm:p-6">
-			<div class="flex gap-4 sm:gap-6">
-				<!--
+	<!--
+		============================================================== the sheet
+
+		Edge to edge: no gutter, no centring, no maximum width. The only thing between
+		the sheet and the window is the band it lies on, and the rounded top corners are
+		what shows it.
+	-->
+	<div class="min-h-[calc(100vh-4.5rem)] rounded-t-3xl bg-surface p-5 sm:p-6 lg:p-8">
+		<div class="flex gap-4 sm:gap-6">
+			<!--
 					Icons only, with the name behind a tooltip — and the name is also the
 					`aria-label`, so the rail is not a rebus to anyone who cannot hover it:
 					a screen reader and a keyboard both get the word, not the picture.
 				-->
-				<nav aria-label="Sections" class="hidden shrink-0 sm:block">
-					<ul class="sticky top-6 flex flex-col gap-1.5">
-						{#each RAIL as item (item.href)}
-							<li class="group relative">
-								<a
-									href={item.href}
-									aria-label={item.label}
-									aria-current={item.current ? 'page' : undefined}
-									class={cn(
-										'flex size-11 items-center justify-center rounded-card transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-										item.current
-											? 'bg-accent-surface text-accent-text'
-											: 'text-muted hover:bg-surface-sunken hover:text-text'
-									)}
-								>
-									<Icon icon={item.icon} class="size-5" />
-								</a>
+			<nav aria-label="Sections" class="hidden shrink-0 sm:block">
+				<ul class="sticky top-6 flex flex-col gap-1.5">
+					{#each RAIL as item (item.href)}
+						<li class="group relative">
+							<a
+								href={item.href}
+								aria-label={item.label}
+								aria-current={item.current ? 'page' : undefined}
+								class={cn(
+									'flex size-11 items-center justify-center rounded-card transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+									item.current
+										? 'bg-accent-surface text-accent-text'
+										: 'text-muted hover:bg-surface-sunken hover:text-text'
+								)}
+							>
+								<Icon icon={item.icon} class="size-5" />
+							</a>
 
-								<!--
+							<!--
 									Shown on hover and on keyboard focus alike. A tooltip that only
 									answers a mouse is a tooltip half the readers never see.
 								-->
-								<span
-									role="tooltip"
-									class="pointer-events-none absolute top-1/2 left-full z-10 ml-2 -translate-y-1/2 rounded-control bg-text px-2 py-1 text-xs whitespace-nowrap text-surface opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-								>
-									{item.label}
-								</span>
-							</li>
-						{/each}
-					</ul>
-				</nav>
+							<span
+								role="tooltip"
+								class="pointer-events-none absolute top-1/2 left-full z-10 ml-2 -translate-y-1/2 rounded-control bg-text px-2 py-1 text-xs whitespace-nowrap text-surface opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+							>
+								{item.label}
+							</span>
+						</li>
+					{/each}
+				</ul>
+			</nav>
 
-				<div class="min-w-0 flex-1">
-					<div class="flex flex-wrap items-end justify-between gap-4">
-						<div>
-							<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">My learning</h1>
-							<p class="text-muted mt-1 text-sm">
-								<span class="numeral">{data.enrolments.length}</span>
-								{data.enrolments.length === 1 ? 'course' : 'courses'}, by where you have got to.
-							</p>
-						</div>
-
-						<div class="relative">
-							<Icon
-								icon={Search01Icon}
-								class="text-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-							/>
-							<Input
-								bind:value={query}
-								placeholder="Filter courses…"
-								aria-label="Filter courses by title"
-								class="w-56 pl-9"
-							/>
-							{#if query}
-								<button
-									type="button"
-									class="text-muted absolute top-1/2 right-2 -translate-y-1/2 rounded-control p-1 hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-									aria-label="Clear the filter"
-									onclick={() => (query = '')}
-								>
-									<Icon icon={Cancel01Icon} class="size-4" />
-								</button>
-							{/if}
-						</div>
+			<div class="min-w-0 flex-1">
+				<div class="flex flex-wrap items-end justify-between gap-4">
+					<div>
+						<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">My learning</h1>
+						<p class="text-muted mt-1 text-sm">
+							<span class="numeral">{data.enrolments.length}</span>
+							{data.enrolments.length === 1 ? 'course' : 'courses'}, by where you have got to.
+						</p>
 					</div>
 
-					<div class="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
-						<!-- ================================================ the board -->
-						<div class="grid gap-4 md:grid-cols-3">
-							{#each COLUMNS as col (col.key)}
-								{@const items = column(col.key)}
-								<section class="rounded-card bg-surface-sunken p-3">
-									<h2 class="flex items-center gap-2 px-2 py-1.5 text-sm font-medium">
-										<span class={cn('size-2 rounded-full bg-current', col.dot)}></span>
-										{col.title}
-										<span class="text-muted numeral ml-auto text-xs">{items.length}</span>
-									</h2>
+					<div class="relative">
+						<Icon
+							icon={Search01Icon}
+							class="text-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+						/>
+						<Input
+							bind:value={query}
+							placeholder="Filter courses…"
+							aria-label="Filter courses by title"
+							class="w-56 pl-9"
+						/>
+						{#if query}
+							<button
+								type="button"
+								class="text-muted absolute top-1/2 right-2 -translate-y-1/2 rounded-control p-1 hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+								aria-label="Clear the filter"
+								onclick={() => (query = '')}
+							>
+								<Icon icon={Cancel01Icon} class="size-4" />
+							</button>
+						{/if}
+					</div>
+				</div>
 
-									{#if items.length === 0}
-										<p class="text-muted px-2 py-6 text-center text-xs">
-											{query ? 'Nothing matches.' : 'Nothing here.'}
-										</p>
-									{:else}
-										<ul class="mt-1 space-y-2">
-											{#each items as enrolment (enrolment.course_slug)}
-												{@const progress = enrolment.progress}
-												{@const percent = progress?.percent ?? 0}
-												<li>
-													<!--
+				<div class="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
+					<!-- ================================================ the board -->
+					<div class="grid gap-4 md:grid-cols-3">
+						{#each COLUMNS as col (col.key)}
+							{@const items = column(col.key)}
+							<section class="rounded-card bg-surface-sunken p-3">
+								<h2 class="flex items-center gap-2 px-2 py-1.5 text-sm font-medium">
+									<span class={cn('size-2 rounded-full bg-current', col.dot)}></span>
+									{col.title}
+									<span class="text-muted numeral ml-auto text-xs">{items.length}</span>
+								</h2>
+
+								{#if items.length === 0}
+									<p class="text-muted px-2 py-6 text-center text-xs">
+										{query ? 'Nothing matches.' : 'Nothing here.'}
+									</p>
+								{:else}
+									<ul class="mt-1 space-y-2">
+										{#each items as enrolment (enrolment.course_slug)}
+											{@const progress = enrolment.progress}
+											{@const percent = progress?.percent ?? 0}
+											<li>
+												<!--
 														The card is the whole target. An "Open" button on it would
 														only repeat what clicking it already does.
 													-->
-													<a
-														href={resolve(`/courses/${enrolment.course_slug}`)}
-														class="lift group block rounded-card border border-border bg-surface-raised p-4 transition-colors hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-													>
-														<p class="text-sm font-medium text-pretty">{enrolment.course_title}</p>
-
-														<div class="mt-3 flex items-center justify-between gap-2">
-															<span class="numeral text-xs font-medium">{percent}%</span>
-															<span class="text-muted numeral text-xs">
-																{lessonsLeft(progress)} left
-															</span>
-														</div>
-
-														<div class="mt-1.5">
-															<Progress
-																value={progress?.lessons_completed ?? 0}
-																max={progress?.lessons_total ?? 1}
-																tone={col.bar}
-																class="h-1.5"
-																label="{percent}% of {enrolment.course_title} complete"
-															/>
-														</div>
-
-														{#if col.key === 'done'}
-															<div class="mt-3">
-																<Badge tone="success" icon={Award01Icon}>Complete</Badge>
-															</div>
-														{:else}
-															<p
-																class="text-muted mt-3 flex items-center gap-1 text-xs font-medium group-hover:text-accent-text"
-															>
-																{percent === 0 ? 'Start' : 'Continue'}
-																<Icon icon={ArrowRight01Icon} class="size-3.5" />
-															</p>
-														{/if}
-													</a>
-												</li>
-											{/each}
-										</ul>
-									{/if}
-								</section>
-							{/each}
-						</div>
-
-						<!-- ============================================== the side rail -->
-						<aside class="space-y-4">
-							<section class="rounded-card bg-surface-sunken p-5">
-								<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
-									Notifications
-									{#if data.unread > 0}
-										<span
-											class="numeral rounded-pill bg-accent px-1.5 text-xs font-semibold text-on-solid"
-										>
-											{data.unread}
-										</span>
-									{/if}
-								</h2>
-
-								{#if data.notifications.length === 0}
-									<p class="text-muted mt-4 text-sm">Nothing to read.</p>
-								{:else}
-									<ul class="mt-4 space-y-3">
-										{#each data.notifications.slice(0, 5) as notification (notification.id)}
-											<li>
 												<a
-													href={notification.link || resolve('/notifications')}
-													class="block rounded-control underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+													href={resolve(`/courses/${enrolment.course_slug}`)}
+													class="lift group block rounded-card border border-border bg-surface-raised p-4 transition-colors hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 												>
-													<p
-														class={cn(
-															'truncate text-sm',
-															notification.read ? 'text-muted' : 'font-medium'
-														)}
-													>
-														{notification.title}
-													</p>
-													<p class="text-muted numeral mt-0.5 text-xs">
-														{postedOn.format(new Date(notification.created_at))}
-													</p>
+													<p class="text-sm font-medium text-pretty">{enrolment.course_title}</p>
+
+													<div class="mt-3 flex items-center justify-between gap-2">
+														<span class="numeral text-xs font-medium">{percent}%</span>
+														<span class="text-muted numeral text-xs">
+															{lessonsLeft(progress)} left
+														</span>
+													</div>
+
+													<div class="mt-1.5">
+														<Progress
+															value={progress?.lessons_completed ?? 0}
+															max={progress?.lessons_total ?? 1}
+															tone={col.bar}
+															class="h-1.5"
+															label="{percent}% of {enrolment.course_title} complete"
+														/>
+													</div>
+
+													{#if col.key === 'done'}
+														<div class="mt-3">
+															<Badge tone="success" icon={Award01Icon}>Complete</Badge>
+														</div>
+													{:else}
+														<p
+															class="text-muted mt-3 flex items-center gap-1 text-xs font-medium group-hover:text-accent-text"
+														>
+															{percent === 0 ? 'Start' : 'Continue'}
+															<Icon icon={ArrowRight01Icon} class="size-3.5" />
+														</p>
+													{/if}
 												</a>
 											</li>
 										{/each}
 									</ul>
-
-									<a
-										href={resolve('/notifications')}
-										class="text-accent-text mt-4 inline-block text-sm underline-offset-4 hover:underline"
-									>
-										All notifications
-									</a>
 								{/if}
 							</section>
-
-							{#if data.gamification}
-								{@const g = data.gamification}
-								<section class="rounded-card bg-surface-sunken p-5">
-									<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
-									<p class="mt-3 flex items-baseline gap-2">
-										<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
-										<span class="text-muted text-sm">points</span>
-									</p>
-									<p class="text-muted mt-1 text-xs">
-										Rank <span class="numeral">{g.rank}</span> of
-										<span class="numeral">{g.out_of}</span>
-									</p>
-								</section>
-							{/if}
-						</aside>
+						{/each}
 					</div>
+
+					<!-- ============================================== the side rail -->
+					<aside class="space-y-4">
+						<section class="rounded-card bg-surface-sunken p-5">
+							<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
+								Notifications
+								{#if data.unread > 0}
+									<span
+										class="numeral rounded-pill bg-accent px-1.5 text-xs font-semibold text-on-solid"
+									>
+										{data.unread}
+									</span>
+								{/if}
+							</h2>
+
+							{#if data.notifications.length === 0}
+								<p class="text-muted mt-4 text-sm">Nothing to read.</p>
+							{:else}
+								<ul class="mt-4 space-y-3">
+									{#each data.notifications.slice(0, 5) as notification (notification.id)}
+										<li>
+											<a
+												href={notification.link || resolve('/notifications')}
+												class="block rounded-control underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+											>
+												<p
+													class={cn(
+														'truncate text-sm',
+														notification.read ? 'text-muted' : 'font-medium'
+													)}
+												>
+													{notification.title}
+												</p>
+												<p class="text-muted numeral mt-0.5 text-xs">
+													{postedOn.format(new Date(notification.created_at))}
+												</p>
+											</a>
+										</li>
+									{/each}
+								</ul>
+
+								<a
+									href={resolve('/notifications')}
+									class="text-accent-text mt-4 inline-block text-sm underline-offset-4 hover:underline"
+								>
+									All notifications
+								</a>
+							{/if}
+						</section>
+
+						{#if data.gamification}
+							{@const g = data.gamification}
+							<section class="rounded-card bg-surface-sunken p-5">
+								<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
+								<p class="mt-3 flex items-baseline gap-2">
+									<span class="numeral text-3xl font-semibold tracking-tight">{g.points}</span>
+									<span class="text-muted text-sm">points</span>
+								</p>
+								<p class="text-muted mt-1 text-xs">
+									Rank <span class="numeral">{g.rank}</span> of
+									<span class="numeral">{g.out_of}</span>
+								</p>
+							</section>
+						{/if}
+					</aside>
 				</div>
 			</div>
 		</div>
