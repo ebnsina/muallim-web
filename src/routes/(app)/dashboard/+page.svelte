@@ -12,6 +12,7 @@
 		TaskDone01Icon
 	} from '@hugeicons/core-free-icons';
 	import {
+		ActionLink,
 		Alert,
 		Badge,
 		Button,
@@ -316,12 +317,7 @@
 					Progress points
 				</h2>
 
-				<a
-					class="text-accent-text text-sm underline-offset-4 hover:underline"
-					href={resolve('/leaderboard')}
-				>
-					See the leaderboard
-				</a>
+				<ActionLink href={resolve('/leaderboard')}>See the leaderboard</ActionLink>
 			</div>
 
 			<!--
@@ -511,12 +507,7 @@
 			{#if finished.length > 0}
 				<div class="mt-10 flex items-baseline justify-between gap-3">
 					<h2 class="text-lg font-semibold">Finished</h2>
-					<a
-						class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
-						href={resolve('/certificates')}
-					>
-						Your certificates
-					</a>
+					<ActionLink href={resolve('/certificates')} tone="muted">Your certificates</ActionLink>
 				</div>
 				<ul class="mt-4 space-y-2">
 					{#each finished as enrolment (enrolment.course_slug)}
@@ -549,12 +540,7 @@
 				<section>
 					<div class="flex items-baseline justify-between gap-3">
 						<h2 class="text-lg font-semibold">Recently taught</h2>
-						<a
-							class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
-							href={resolve('/teach')}
-						>
-							All courses
-						</a>
+						<ActionLink href={resolve('/teach')} tone="muted">All courses</ActionLink>
 					</div>
 
 					{#if data.teaching.length === 0}

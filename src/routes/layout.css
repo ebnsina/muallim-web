@@ -349,6 +349,21 @@
 		background-attachment: fixed;
 	}
 
+	/*
+		A squircle: the corner curves into the straight edge instead of meeting it at a
+		tangent, so the shape reads as one continuous outline rather than an arc glued
+		between two lines. It is what the pills in the band are.
+
+		`corner-shape` is Chrome 139 and Safari 26. Where it is not understood the
+		declaration is dropped and the `border-radius` beside it stands on its own —
+		a rounded rectangle, which is what these were before. Nothing to detect and
+		nothing to fall back to.
+	*/
+	.squircle {
+		border-radius: 1rem;
+		corner-shape: squircle;
+	}
+
 	.aurora-1 {
 		background-color: #0e1a6b;
 		background-image:

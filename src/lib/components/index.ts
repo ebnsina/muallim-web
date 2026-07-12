@@ -7,6 +7,7 @@
  */
 // AiField/AiQuiz are imported directly where used, not re-exported here: they pull
 // in the TanStack AI SDK, and the barrel is on every page's import path.
+export { default as ActionLink } from './ActionLink.svelte';
 export { default as Alert, type AlertTone } from './Alert.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
 export { default as AuroraBackdrop } from './AuroraBackdrop.svelte';

@@ -86,6 +86,46 @@
 	const current = (href: string) =>
 		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 
+	/*
+		Where the pill is, and how wide.
+
+		Measured from the tab it belongs to rather than computed from the labels: the
+		widths depend on the font, and the font arrives after the markup does. A layout
+		that guesses is a layout that is wrong for one frame on every cold load.
+
+		`measured` stays false until the first measurement lands, so the server-rendered
+		band shows the active tab's own fill instead of a pill sitting at zero.
+	*/
+	let navEl = $state<HTMLElement>();
+	const tabs: Record<string, HTMLElement | undefined> = $state({});
+	let pill = $state({ x: 0, w: 0, measured: false });
+
+	function measurePill() {
+		const active = links.find((link) => current(link.href));
+		const el = active ? tabs[active.href] : undefined;
+		if (!el || !navEl) {
+			pill = { ...pill, measured: false };
+			return;
+		}
+		// `offsetLeft` is relative to the nav, which is the offset parent — the pill is
+		// absolutely positioned inside it, so that number *is* the translation.
+		pill = { x: el.offsetLeft, w: el.offsetWidth, measured: true };
+	}
+
+	// Re-measured when the route changes (a different tab) and when the window does
+	// (the nav is laid out by flexbox, so a resize moves every tab under it).
+	$effect(() => {
+		page.url.pathname;
+		links.length;
+		measurePill();
+	});
+
+	// And once the webfont has landed. Until it does the labels are metric-fallback
+	// wide, and a pill measured against those is a pill that fits the wrong text.
+	$effect(() => {
+		document.fonts?.ready.then(measurePill);
+	});
+
 	// A monogram, from the first letters of the name. A face nobody uploaded is a
 	// grey silhouette; two initials in the accent are a person.
 	const initials = $derived(
@@ -142,7 +182,7 @@
 	});
 </script>
 
-<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} />
+<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} onresize={measurePill} />
 
 <!--
 	A band, not a bar. It runs the width of the window and the page lies on it as a
@@ -172,17 +212,45 @@
 			a filled pill rather than an underline: on a solid colour an underline is a
 			scratch, and the fill is the only mark that survives.
 		-->
-		<nav aria-label="Main" class="hidden items-center gap-1 sm:flex">
+		<nav bind:this={navEl} aria-label="Main" class="relative hidden items-center gap-1 sm:flex">
+			<!--
+				One pill, moved — not six pills, one of which is lit.
+
+				The fill is a single element that slides to whichever tab is current, so the
+				eye follows the mark from where it was to where it went. Six independently
+				fading backgrounds say "that one stopped, this one started", which is the
+				same information and none of the continuity.
+
+				It is `aria-hidden`: `aria-current="page"` on the link is what says which
+				section this is. The pill is a picture of that, for people who can see it.
+			-->
+			<span
+				aria-hidden="true"
+				class={cn(
+					// `inset-y-0`, exactly the tab's own box: the pill was inset by a few pixels
+					// and read as a smaller mark than the hover fill it replaced, so the two
+					// disagreed about how big a tab is.
+					'squircle pointer-events-none absolute inset-y-0 left-0 bg-on-solid/15',
+					'transition-[transform,width,opacity] duration-260 ease-out',
+					pill.measured ? 'opacity-100' : 'opacity-0'
+				)}
+				style="transform: translateX({pill.x}px); width: {pill.w}px"
+			></span>
+
 			{#each links as link (link.href)}
 				{@const active = current(link.href)}
 				<a
+					bind:this={tabs[link.href]}
 					href={link.href}
 					aria-current={active ? 'page' : undefined}
 					class={cn(
-						'flex items-center gap-2 rounded-pill px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none',
-						active
-							? 'bg-on-solid/15 text-on-solid'
-							: 'text-on-solid/75 hover:bg-on-solid/10 hover:text-on-solid'
+						'squircle relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none',
+						active ? 'text-on-solid' : 'text-on-solid/75 hover:bg-on-solid/10 hover:text-on-solid',
+
+						// Until the pill has been measured — the first server-rendered paint —
+						// the active tab wears its own fill. Otherwise the band arrives with
+						// nothing lit, and the mark appears out of nowhere a frame later.
+						active && !pill.measured && 'bg-on-solid/15'
 					)}
 				>
 					<Icon icon={link.icon} class="size-4" />

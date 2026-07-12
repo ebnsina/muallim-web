@@ -8,6 +8,7 @@
 		PlusSignIcon
 	} from '@hugeicons/core-free-icons';
 	import {
+		ActionLink,
 		Alert,
 		Badge,
 		Button,
@@ -94,12 +95,7 @@
 						</p>
 
 						{#snippet footer()}
-							<a
-								class="text-muted text-sm underline-offset-4 hover:text-text hover:underline"
-								href={resolve(`/teach/${course.slug}`)}
-							>
-								Edit
-							</a>
+							<ActionLink href={resolve(`/teach/${course.slug}`)} tone="muted">Edit</ActionLink>
 
 							<form
 								method="POST"
