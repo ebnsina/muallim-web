@@ -59,7 +59,7 @@
 			and there is no one hex it is. A translucent white is correct over all of them.
 		*/
 		glass:
-			'border border-on-solid/25 bg-on-solid/15 text-on-solid backdrop-blur-sm hover:bg-on-solid/25 active:bg-on-solid/30'
+			'bg-on-solid/15 text-on-solid backdrop-blur-sm hover:bg-on-solid/25 active:bg-on-solid/30'
 	};
 
 	const SIZES: Record<ButtonSize, string> = {

@@ -56,13 +56,16 @@
 		const offset = (first.getDay() + 6) % 7; // Sunday=0 → Monday=0
 		const start = new Date(first.getFullYear(), first.getMonth(), 1 - offset);
 
-		// As many whole weeks as the month actually spans — five, or six when it runs
-		// over. A fixed six leaves a blank row on most months, and a blank row on a
-		// card this size is a hole.
-		const days = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
-		const rows = Math.ceil((offset + days) / 7);
+		/*
+			Always six weeks, even when the month spans five.
 
-		return Array.from({ length: rows }, (_, week) =>
+			The rows were counted per month, which is tidier and wrong: July needs five
+			and August needs six, so pressing the arrow between them moved everything
+			below the calendar by a row. A control that resizes when you use it is a
+			control you have to re-find after every press. The sixth row is the
+			neighbouring month's days, drawn faint — it was going to draw them anyway.
+		*/
+		return Array.from({ length: 6 }, (_, week) =>
 			Array.from({ length: 7 }, (_, day) => {
 				const date = new Date(
 					start.getFullYear(),
