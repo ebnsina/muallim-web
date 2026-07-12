@@ -156,7 +156,9 @@
 	you cannot press is worse than no menu at all.
 -->
 <header class="aurora aurora-6 sticky top-0 z-30 text-on-solid">
-	<div class="flex h-16 items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
+	<!-- Taller than a bar needs to be, deliberately: the band is a surface, and a surface
+	     has to be big enough for its light to read as light. -->
+	<div class="flex h-20 items-center gap-3 px-4 sm:h-24 sm:gap-6 sm:px-6 lg:px-8">
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
 			<span class="flex size-8 items-center justify-center rounded-control bg-on-solid/15">
 				<Icon icon={Mortarboard02Icon} class="size-5" />
