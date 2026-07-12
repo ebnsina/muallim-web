@@ -49,22 +49,27 @@ test.describe("a learner's private lesson note", () => {
 		await page.getByText('The body of A free preview.').selectText();
 		await page.getByRole('button', { name: 'Add note' }).click();
 
-		// The passage joins the list, where its note is written and saved on blur.
-		await expect(page.getByRole('heading', { name: 'Highlighted passages' })).toBeVisible();
+		// The passage joins the list under its own tab, where its note is written and
+		// saved on blur. The save is awaited rather than assumed: blur fires it and
+		// does not wait for it, so reloading on the next line would race it.
+		await page.getByRole('tab', { name: /Highlights/ }).click();
 		const note = page.getByLabel('Note on this passage');
 		await note.fill('Worth remembering.');
+
+		const saved = page.waitForResponse((r) => r.url().includes('editHighlight'));
 		await note.blur();
+		await saved;
 
 		// It survives a reload — mark, quote, and note all read back from the server.
 		// The quote now appears twice (in the marked text and in the list), which is
 		// the mark doing its job; the note is the unambiguous thing to assert on.
 		await page.reload();
-		await expect(page.getByRole('heading', { name: 'Highlighted passages' })).toBeVisible();
+		await page.getByRole('tab', { name: /Highlights/ }).click();
 		await expect(page.getByLabel('Note on this passage')).toHaveValue('Worth remembering.');
 
 		// Removing it takes the passage out of the list.
 		await page.getByRole('button', { name: 'Remove this highlight' }).click();
-		await expect(page.getByRole('heading', { name: 'Highlighted passages' })).toHaveCount(0);
+		await expect(page.getByLabel('Note on this passage')).toHaveCount(0);
 	});
 
 	test('the revision page gathers a note and a highlight under their lesson', async ({
@@ -83,6 +88,7 @@ test.describe("a learner's private lesson note", () => {
 		// …and a highlight with its own remark.
 		await page.getByText('The body of A free preview.').selectText();
 		await page.getByRole('button', { name: 'Add note' }).click();
+		await page.getByRole('tab', { name: /Highlights/ }).click();
 		const passageNote = page.getByLabel('Note on this passage');
 		await passageNote.fill('Key line.');
 		await passageNote.blur();

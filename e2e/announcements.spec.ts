@@ -25,10 +25,12 @@ test.describe('course announcements', () => {
 		await page.getByRole('button', { name: 'Post announcement' }).click();
 		await expect(page.getByText(headline)).toBeVisible();
 
-		// …it appears on the course page a learner reads.
+		// …it appears on the course page a learner reads. The headline is the row; the
+		// body is behind it, so a notice costs a line until somebody wants it.
 		await page.goto(`/courses/${course.slug}`);
 		await expect(page.getByRole('heading', { name: 'Announcements' })).toBeVisible();
 		await expect(page.getByText(headline)).toBeVisible();
+		await page.getByRole('button', { name: headline }).click();
 		await expect(page.getByText('The exam is next Friday.')).toBeVisible();
 
 		// Removing it takes it off both.

@@ -21,6 +21,7 @@ test.describe('notifications', () => {
 		// The student asks through the browser, on the preview lesson (readable to all).
 		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
 		await ready(page);
+		await page.getByRole('tab', { name: /Discussion/ }).click();
 		await page.getByLabel('Ask a question').fill(question);
 		await page.getByRole('button', { name: 'Ask', exact: true }).click();
 		await expect(page.getByText(question)).toBeVisible();

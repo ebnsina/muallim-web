@@ -18,9 +18,10 @@ test.describe('lesson discussion', () => {
 		const question = `How does this work ${randomUUID().slice(0, 6)}?`;
 		const answer = `It works like this ${randomUUID().slice(0, 6)}.`;
 
-		// The preview lesson is readable, so its discussion is open.
+		// The preview lesson is readable, so its discussion is open — behind its tab.
 		await page.goto(`/courses/${course.slug}/lessons/${course.previewLessonId}`);
 		await ready(page);
+		await page.getByRole('tab', { name: /Discussion/ }).click();
 
 		await page.getByLabel('Ask a question').fill(question);
 		await page.getByRole('button', { name: 'Ask', exact: true }).click();

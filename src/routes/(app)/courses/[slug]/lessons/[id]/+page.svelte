@@ -8,6 +8,8 @@
 		Clock01Icon,
 		Delete02Icon,
 		Message01Icon,
+		QuoteDownIcon,
+		StickyNote02Icon,
 		Tick02Icon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -36,6 +38,62 @@
 	// goes at once; the writable derived resettles from the server on the next load.
 	let highlights = $derived(data.highlights);
 	let focusedHighlight = $state<string | null>(null);
+
+	/*
+		Notes, marks and the discussion are three things a reader does *about* a
+		lesson, not three more things to scroll past to reach the next one. They share
+		one panel below the text, and the tabs pick between them.
+	*/
+	type Tab = 'notes' | 'highlights' | 'discussion';
+	let tab = $state<Tab>('notes');
+
+	const TABS = $derived([
+		{ id: 'notes' as const, label: 'Notes', icon: StickyNote02Icon, count: 0 },
+		{
+			id: 'highlights' as const,
+			label: 'Highlights',
+			icon: QuoteDownIcon,
+			count: highlights.length
+		},
+		{
+			id: 'discussion' as const,
+			label: 'Discussion',
+			icon: Message01Icon,
+			count: data.questions.length
+		}
+	]);
+
+	/*
+		A destructive control that is always on screen is clutter on every row it is
+		not wanted on. It appears when the row does — on hover, and on focus, so the
+		keyboard reaches what the mouse does.
+
+		Only where a pointer can hover: `lg:` rather than a bare `opacity-0`, because
+		on a touch screen there is no hover state to reveal it with, and an invisible
+		delete button is a delete button nobody has.
+	*/
+	const REVEAL_ON_HOVER =
+		'shrink-0 rounded-control p-1 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 lg:focus-visible:opacity-100';
+
+	// The same, keyed to the answer's own row: an answer sits inside a question's
+	// card, and a bare `group-hover` there would reveal every answer's control at
+	// once the moment the pointer touched the card.
+	const REVEAL_ON_ANSWER_HOVER =
+		'shrink-0 rounded-control p-1 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:opacity-0 lg:group-hover/answer:opacity-100 lg:group-focus-within/answer:opacity-100 lg:focus-visible:opacity-100';
+
+	// Left and right walk the tabs, as a tablist is expected to. Without it the
+	// arrow keys do nothing and the widget is a row of buttons wearing a role.
+	function moveTab(event: KeyboardEvent, current: Tab) {
+		if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+		event.preventDefault();
+
+		const order = TABS.map((t) => t.id);
+		const step = event.key === 'ArrowRight' ? 1 : -1;
+		const next = order[(order.indexOf(current) + step + order.length) % order.length];
+
+		tab = next;
+		document.getElementById(`tab-${next}`)?.focus();
+	}
 
 	// Add a mark for the reader's selection, then jump to its note field so they can
 	// write straight away. On failure the list reloads to the truth.
@@ -163,9 +221,13 @@
 <Page width="full">
 	<Breadcrumbs {crumbs} />
 
-	<div class="mt-6 grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-14">
-		<!-- The outline: a sticky column on a wide screen, a disclosure on a narrow one. -->
-		<aside class="order-2 lg:order-1">
+	<div class="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+		<!--
+			The outline sits beside the lesson, and scrolls inside itself rather than
+			with the page: a course of forty lessons would otherwise run a column of
+			links past the bottom of a reader's screen with no way back up but the page.
+		-->
+		<aside class="order-2">
 			<details class="rounded-card border border-border lg:hidden">
 				<summary class="cursor-pointer px-4 py-3 text-sm font-medium select-none">
 					Course contents
@@ -175,13 +237,15 @@
 				</div>
 			</details>
 
-			<div class="hidden lg:sticky lg:top-24 lg:block">
+			<div
+				class="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-card lg:border lg:border-border lg:p-4"
+			>
 				{@render outline()}
 			</div>
 		</aside>
 
 		<!-- ---------------------------------------------------------- the lesson -->
-		<div class="order-1 min-w-0 lg:order-2">
+		<div class="order-1 min-w-0">
 			<PageHeader title={data.lesson.title}>
 				{#snippet meta()}
 					<span class="text-muted flex items-center gap-1.5">
@@ -292,14 +356,58 @@
 			{/if}
 
 			<!--
+				One panel, three tabs. A tablist, not a row of buttons: the roles are what
+				make the arrow keys work and what tells a screen reader that picking one
+				replaces the panel below rather than navigating away.
+			-->
+			{#if data.signedIn}
+				<div class="mt-12 max-w-2xl">
+					<div role="tablist" aria-label="About this lesson" class="flex flex-wrap gap-2">
+						{#each TABS as t (t.id)}
+							{@const active = tab === t.id}
+							<button
+								type="button"
+								role="tab"
+								id="tab-{t.id}"
+								aria-selected={active}
+								aria-controls="panel-{t.id}"
+								tabindex={active ? 0 : -1}
+								class={cn(
+									'flex items-center gap-2 rounded-pill border px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+									active
+										? 'border-transparent bg-accent text-on-solid'
+										: 'text-muted border-border hover:bg-surface-hover hover:text-text'
+								)}
+								onclick={() => (tab = t.id)}
+								onkeydown={(event) => moveTab(event, t.id)}
+							>
+								<Icon icon={t.icon} class="size-4" />
+								{t.label}
+
+								{#if t.count > 0}
+									<span
+										class={cn(
+											'numeral rounded-pill px-1.5 text-xs',
+											active ? 'bg-white/20' : 'bg-surface-sunken'
+										)}
+									>
+										{t.count}
+									</span>
+								{/if}
+							</button>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			<!--
 				A private margin. Only a signed-in reader has one — it is theirs, kept
 				against the lesson and shown to nobody else. The whole note is sent on
 				save; emptying it clears it, which is why there is nothing to delete.
 			-->
-			{#if data.signedIn}
-				<section class="mt-12 max-w-2xl">
-					<h2 class="text-sm font-medium tracking-wide uppercase">Your notes</h2>
-					<p class="text-muted mt-1 text-xs">Private to you. Nobody else can read them.</p>
+			{#if data.signedIn && tab === 'notes'}
+				<div id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" class="mt-5 max-w-2xl">
+					<p class="text-muted text-xs">Private to you. Nobody else can read them.</p>
 
 					<form
 						method="POST"
@@ -334,22 +442,29 @@
 							{/if}
 						</div>
 					</form>
+				</div>
+			{/if}
 
-					<!--
-						The passages marked in the text, each with its own remark. Select any
-						words above to add one; the quote is the anchor, kept so the passage is
-						recognisable even after the lesson is edited under it.
-					-->
+			<!--
+				The passages marked in the text, each with its own remark. Select any words
+				in the lesson to add one; the quote is the anchor, kept so the passage is
+				recognisable even after the lesson is edited under it.
+			-->
+			{#if data.signedIn && tab === 'highlights'}
+				<div
+					id="panel-highlights"
+					role="tabpanel"
+					aria-labelledby="tab-highlights"
+					class="mt-5 max-w-2xl"
+				>
 					{#if highlights.length > 0}
-						<div class="mt-10">
-							<h2 class="text-sm font-medium tracking-wide uppercase">Highlighted passages</h2>
-
-							<ul class="mt-3 space-y-3">
+						<div>
+							<ul class="space-y-3">
 								{#each highlights as highlight (highlight.id)}
 									<li
 										id="highlight-{highlight.id}"
 										class={cn(
-											'rounded-card border p-4 transition-colors',
+											'group rounded-card border p-4 transition-colors',
 											focusedHighlight === highlight.id
 												? 'border-warning-border bg-warning-surface/40'
 												: 'border-border'
@@ -364,7 +479,7 @@
 
 											<button
 												type="button"
-												class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+												class={cn(REVEAL_ON_HOVER, 'text-muted hover:text-danger-text')}
 												aria-label="Remove this highlight"
 												onclick={() => removeHighlight(highlight.id)}
 											>
@@ -384,23 +499,27 @@
 								{/each}
 							</ul>
 						</div>
+					{:else}
+						<p class="text-muted text-sm">
+							Select any passage in the lesson above to mark it, and add a note against it.
+						</p>
 					{/if}
-				</section>
+				</div>
 			{/if}
 
 			<!--
 				The public discussion. Shared with everyone studying the course, unlike the
-				private note above. Only a signed-in reader who may read the lesson sees it —
-				the API returns an empty thread otherwise.
+				private note. Only a signed-in reader who may read the lesson sees it — the
+				API returns an empty thread otherwise.
 			-->
-			{#if data.signedIn}
-				<section class="mt-14 max-w-2xl">
-					<h2 class="flex items-center gap-2 text-sm font-medium tracking-wide uppercase">
-						<Icon icon={Message01Icon} class="size-4" />
-						Discussion
-					</h2>
-
-					<form method="POST" action="?/askQuestion" class="mt-4" use:enhance>
+			{#if data.signedIn && tab === 'discussion'}
+				<div
+					id="panel-discussion"
+					role="tabpanel"
+					aria-labelledby="tab-discussion"
+					class="mt-5 max-w-2xl"
+				>
+					<form method="POST" action="?/askQuestion" use:enhance>
 						<Textarea
 							name="body"
 							rows={2}
@@ -420,7 +539,7 @@
 						<ul class="mt-6 space-y-4">
 							{#each data.questions as question (question.id)}
 								<li>
-									<Card class="p-5">
+									<Card class="group p-5">
 										<div class="flex items-start justify-between gap-3">
 											<div class="min-w-0">
 												<p class="text-sm whitespace-pre-wrap">{question.body}</p>
@@ -436,7 +555,7 @@
 													<input type="hidden" name="id" value={question.id} />
 													<button
 														type="submit"
-														class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+														class={cn(REVEAL_ON_HOVER, 'text-muted hover:text-danger-text')}
 														aria-label="Remove this question"
 													>
 														<Icon icon={Delete02Icon} class="size-4" />
@@ -449,7 +568,7 @@
 										{#if (question.answers ?? []).length > 0}
 											<ul class="mt-4 space-y-3 border-l-2 border-border pl-4">
 												{#each question.answers ?? [] as answer (answer.id)}
-													<li class="flex items-start justify-between gap-3">
+													<li class="group/answer flex items-start justify-between gap-3">
 														<div class="min-w-0">
 															<p class="text-sm whitespace-pre-wrap">{answer.body}</p>
 															<p class="text-muted mt-1.5 flex items-center gap-2 text-xs">
@@ -467,7 +586,10 @@
 																<input type="hidden" name="id" value={answer.id} />
 																<button
 																	type="submit"
-																	class="text-muted hover:text-danger-text shrink-0 rounded-control p-1 transition-colors"
+																	class={cn(
+																		REVEAL_ON_ANSWER_HOVER,
+																		'text-muted hover:text-danger-text'
+																	)}
 																	aria-label="Remove this answer"
 																>
 																	<Icon icon={Delete02Icon} class="size-4" />
@@ -528,7 +650,7 @@
 					{:else}
 						<p class="text-muted mt-4 text-sm">No questions yet. Be the first to ask.</p>
 					{/if}
-				</section>
+				</div>
 			{/if}
 
 			<!--
