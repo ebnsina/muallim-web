@@ -73,7 +73,11 @@
 		// a utility would beat it — the gradient would tint white paper rather than
 		// replace it, which is exactly the pale mess it made the first time.
 		!aurora && surface === 'sunken' && 'border-transparent bg-surface-sunken',
-		!aurora && surface === 'aurora' && 'aurora border-transparent',
+		// `border-0`, not a transparent border. A 1px border means the padding box is a
+		// pixel inside the border box, and the grain overlay — inset to the padding box
+		// with the same radius — misses the corner arc by exactly that pixel. It shows
+		// up as a notch in the top-left corner and nowhere else you would think to look.
+		!aurora && surface === 'aurora' && 'aurora border-0',
 		!aurora && surface === 'raised' && 'bg-surface-raised',
 
 		// A floating card is held up by its shadow, so it has no border to hold it in.
