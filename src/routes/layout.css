@@ -341,6 +341,10 @@
 		in a different quarter of the wheel. They carry white type, so none of them is
 		allowed to be pale.
 	*/
+	.bg-aurora-base {
+		background-color: #0e1a6b;
+	}
+
 	.aurora-1 {
 		background-color: #0e1a6b;
 		background-image:

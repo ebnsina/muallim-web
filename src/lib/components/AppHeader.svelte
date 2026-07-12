@@ -155,7 +155,7 @@
 	stacking order it covers the account menu that hangs out of the band — and a menu
 	you cannot press is worse than no menu at all.
 -->
-<header class="sticky top-0 z-30 bg-accent text-on-solid">
+<header class="aurora sticky top-0 z-30 text-on-solid">
 	<div class="flex h-16 items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
 			<span class="flex size-8 items-center justify-center rounded-control bg-on-solid/15">

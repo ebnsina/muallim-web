@@ -25,7 +25,7 @@
 	moment the guess is off by a pixel, and it is off on every screen where the nav
 	wraps.
 -->
-<div class="flex min-h-dvh flex-col bg-accent">
+<div class="flex min-h-dvh flex-col bg-aurora-base">
 	<AppHeader
 		user={data.user ?? undefined}
 		canAuthor={canAuthor(data.user)}
@@ -42,7 +42,13 @@
 		gutter runs into the window, and a line of it 1400px long is a line nobody can
 		find their way back across.
 	-->
-	<div class="flex-1 rounded-t-2xl bg-surface">
+	<!--
+		`text-text`, said out loud. The band above is an aurora and an aurora paints its
+		ink white; the sheet is white paper, and anything on it that did not name its own
+		colour inherited that and vanished. It is the same trap the notification panel
+		fell into, and the sheet is where it costs a whole page rather than one row.
+	-->
+	<div class="flex-1 rounded-t-2xl bg-surface text-text">
 		{@render children()}
 	</div>
 </div>
