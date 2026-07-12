@@ -143,11 +143,11 @@
 		"Browse the catalogue" button: Courses is in the band on every page, and a button
 		that repeats a menu item is a button in the way.
 	-->
-	<div>
+	<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
 		<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
 			Welcome back, {firstName}.
 		</h1>
-		<p class="text-muted mt-1 text-sm">{today}</p>
+		<p class="text-muted text-sm">{today}</p>
 	</div>
 
 	{#if form?.resent}
@@ -193,23 +193,29 @@
 			At a glance
 		</h2>
 
+		<!--
+			Three columns of equal width, divided rather than floated: what became of the
+			courses, what has been done in them, and what is owed next. They were a donut
+			with two numbers adrift beside it and a calendar pinned to the far edge, which
+			read as three things that had been pushed apart rather than three that belong.
+		-->
 		<Card float class="mt-4 p-5 sm:p-6">
-			<div class="flex flex-col gap-8 lg:flex-row lg:items-stretch">
+			<div class="grid gap-8 lg:grid-cols-3 lg:gap-0">
 				<!--
 					What became of every course this learner started — three states of one
 					whole, so they are drawn as parts of one rather than as three tiles that
 					happen to sit together. Hovering a row lights its slice and hovering a
 					slice lights its row: one bound value, so the two cannot disagree.
 				-->
-				<div class="flex items-center gap-6 lg:w-80 lg:shrink-0">
-					<Donut segments={courseMix} centreLabel="courses" bind:hovered size={150} />
+				<div class="flex items-center justify-center gap-6 lg:pr-8">
+					<Donut segments={courseMix} centreLabel="courses" bind:hovered size={140} />
 
 					{#if data.enrolments.length === 0}
-						<p class="text-muted min-w-44 text-sm">
+						<p class="text-muted min-w-40 text-sm">
 							Nothing yet. Enrol on a course and this fills itself in.
 						</p>
 					{:else}
-						<div class="min-w-44">
+						<div class="min-w-40">
 							<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
 						</div>
 					{/if}
@@ -221,7 +227,7 @@
 					every number is the same ink is a page you have to read rather than scan.
 				-->
 				<dl
-					class="grid flex-1 grid-cols-2 content-center gap-6 lg:border-l lg:border-border lg:pl-8"
+					class="grid content-center gap-6 border-border max-lg:border-t max-lg:pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 lg:border-l lg:border-r lg:px-8"
 				>
 					{#each STATS as stat (stat.label)}
 						<div>
@@ -241,15 +247,14 @@
 				</dl>
 
 				<!--
-					What is owed, and when. The right of this card was empty, and a learner's
-					next question after "how am I doing" is "what is due" — the calendar is
-					the one thing on this page with a date on it, so it earns the space.
+					What is owed, and when. A learner's next question after "how am I doing" is
+					"what is due", so it sits in the same card, in the third of it.
 
 					Every date on it is real: muallim-api answers /v1/me/deadlines with the
 					assignments this learner has not handed in, and decides what is overdue
 					against its own clock.
 				-->
-				<div class="lg:w-72 lg:shrink-0 lg:border-l lg:border-border lg:pl-8">
+				<div class="border-border max-lg:border-t max-lg:pt-8 lg:pl-8">
 					<MiniCalendar deadlines={data.deadlines} />
 				</div>
 			</div>
