@@ -8,13 +8,28 @@
 		 * Lists of cards stay flat, or the list becomes a texture.
 		 */
 		elevation?: 'flat' | 'raised';
+		/**
+		 * The plane this card sits on.
+		 *
+		 * `raised` is the working surface: white, bordered, the thing to act on.
+		 * `sunken` recedes into the page — a summary you read rather than work in.
+		 * A page where everything is a white box is a page with one plane, and one
+		 * plane is no hierarchy at all: the eye has nowhere to land.
+		 */
+		surface?: 'raised' | 'sunken';
 		/** A soft aurora tint over the surface — the marketing look, theme-aware. */
 		aurora?: boolean;
 		class?: string;
 		children: Snippet;
 	};
 
-	let { elevation = 'flat', aurora = false, class: className, children }: Props = $props();
+	let {
+		elevation = 'flat',
+		surface = 'raised',
+		aurora = false,
+		class: className,
+		children
+	}: Props = $props();
 </script>
 
 <!--
@@ -29,8 +44,16 @@
 <div
 	class={cn(
 		'rounded-card border',
-		aurora ? 'card-aurora border-border' : 'bg-surface-raised',
-		!aurora && elevation === 'raised' ? 'border-border-strong' : 'border-border',
+		aurora && 'card-aurora border-border',
+
+		// The sunken plane carries no border: it is *below* the page, and a border
+		// would draw the outline of a hole. Its fill is the only edge it needs.
+		!aurora &&
+			(surface === 'sunken' ? 'border-transparent bg-surface-sunken' : 'bg-surface-raised'),
+
+		!aurora &&
+			surface === 'raised' &&
+			(elevation === 'raised' ? 'border-border-strong' : 'border-border'),
 		className
 	)}
 >

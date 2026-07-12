@@ -242,7 +242,9 @@
 			{ key: 'inactive', label: 'Lapsed', value: a.inactive, tone: 'text-chart-3' }
 		]}
 		<section class="mt-8">
-			<Card class="p-5 sm:p-6">
+			<!-- Sunken: a summary is read, not worked in. The editor below is the plane
+			     an instructor acts on, and it stays white. -->
+			<Card surface="sunken" class="p-5 sm:p-6">
 				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
 
 				<div class="mt-5">

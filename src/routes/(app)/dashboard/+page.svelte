@@ -118,12 +118,24 @@
 <svelte:head><title>Dashboard — Muallim</title></svelte:head>
 
 <Page width="full">
-	<div class="flex flex-wrap items-end justify-between gap-4">
-		<div>
-			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Welcome back, {firstName}.</h1>
-			<p class="text-muted mt-1 text-sm">{data.user.email}</p>
+	<!--
+		A horizon. The page used to open on a heading floating in grey, which gives the
+		eye nothing to start from; a band with a wash of the accent says where the page
+		begins. Built from tokens, so it themes — a hardcoded gradient reads as premium
+		light on white and as grime on a dark surface.
+	-->
+	<div
+		class="rounded-card bg-gradient-to-br from-accent-surface via-surface-sunken to-surface-sunken p-6 sm:p-8"
+	>
+		<div class="flex flex-wrap items-end justify-between gap-4">
+			<div>
+				<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+					Welcome back, {firstName}.
+				</h1>
+				<p class="text-muted mt-1 text-sm">{data.user.email}</p>
+			</div>
+			<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
 		</div>
-		<Button href={resolve('/courses')} variant="secondary" size="sm">Browse the catalogue</Button>
 	</div>
 
 	{#if form?.resent}
@@ -271,7 +283,7 @@
 		<!-- =================================================== summary (aside) -->
 		<aside class="space-y-8">
 			<!-- On the side, where a summary belongs: it is read, not worked in. -->
-			<Card class="p-5">
+			<Card surface="sunken" class="p-5">
 				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
 
 				<!--
@@ -314,7 +326,7 @@
 			<!-- Points, rank, and badges — a nudge to keep going. -->
 			{#if data.gamification}
 				{@const g = data.gamification}
-				<Card class="p-5">
+				<Card surface="sunken" class="p-5">
 					<div class="flex items-baseline justify-between gap-3">
 						<h2 class="text-sm font-medium tracking-wide uppercase">Progress points</h2>
 						<a

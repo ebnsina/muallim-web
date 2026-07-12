@@ -44,7 +44,11 @@
 		column it comes first: on a phone the fold lands above the first heading.
 	-->
 	<div class="relative">
-		<div class="rounded-card bg-surface-sunken p-6 sm:p-8 lg:pb-20">
+		<!-- The same wash as the dashboard's horizon, from the same tokens: the top of a
+		     page looks like the top of a page, wherever you are in the product. -->
+		<div
+			class="rounded-card bg-gradient-to-br from-accent-surface via-surface-sunken to-surface-sunken p-6 sm:p-8 lg:pb-20"
+		>
 			<div class="lg:mr-96 xl:mr-112">
 				<CourseBanner course={data.course} {crumbs} reviews={data.reviewSummary} />
 			</div>
