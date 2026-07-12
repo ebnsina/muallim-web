@@ -18,6 +18,7 @@
 	} from '@hugeicons/core-free-icons';
 	import type { IconSvgElement } from '@hugeicons/svelte';
 	import { DURATION, easeOut, popover } from '$lib/motion';
+	import { Pill } from '$lib/pill.svelte';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
@@ -87,43 +88,23 @@
 		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 
 	/*
-		Where the pill is, and how wide.
-
-		Measured from the tab it belongs to rather than computed from the labels: the
-		widths depend on the font, and the font arrives after the markup does. A layout
-		that guesses is a layout that is wrong for one frame on every cold load.
-
-		`measured` stays false until the first measurement lands, so the server-rendered
-		band shows the active tab's own fill instead of a pill sitting at zero.
+		The band's sliding pill. The measuring lives in `Pill` — the lesson's tabs are
+		the same widget with different paint, and two copies of a measurement are two
+		things to keep in step.
 	*/
-	let navEl = $state<HTMLElement>();
-	const tabs: Record<string, HTMLElement | undefined> = $state({});
-	let pill = $state({ x: 0, w: 0, measured: false });
-
-	function measurePill() {
-		const active = links.find((link) => current(link.href));
-		const el = active ? tabs[active.href] : undefined;
-		if (!el || !navEl) {
-			pill = { ...pill, measured: false };
-			return;
-		}
-		// `offsetLeft` is relative to the nav, which is the offset parent — the pill is
-		// absolutely positioned inside it, so that number *is* the translation.
-		pill = { x: el.offsetLeft, w: el.offsetWidth, measured: true };
-	}
+	const pill = new Pill();
+	const activeHref = $derived(links.find((link) => current(link.href))?.href);
 
 	// Re-measured when the route changes (a different tab) and when the window does
 	// (the nav is laid out by flexbox, so a resize moves every tab under it).
 	$effect(() => {
-		page.url.pathname;
-		links.length;
-		measurePill();
+		pill.measure(activeHref);
 	});
 
 	// And once the webfont has landed. Until it does the labels are metric-fallback
 	// wide, and a pill measured against those is a pill that fits the wrong text.
 	$effect(() => {
-		document.fonts?.ready.then(measurePill);
+		document.fonts?.ready.then(() => pill.measure(activeHref));
 	});
 
 	// A monogram, from the first letters of the name. A face nobody uploaded is a
@@ -182,7 +163,11 @@
 	});
 </script>
 
-<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} onresize={measurePill} />
+<svelte:window
+	onclick={onWindowClick}
+	onkeydown={onWindowKeydown}
+	onresize={() => pill.measure(activeHref)}
+/>
 
 <!--
 	A band, not a bar. It runs the width of the window and the page lies on it as a
@@ -212,7 +197,11 @@
 			a filled pill rather than an underline: on a solid colour an underline is a
 			scratch, and the fill is the only mark that survives.
 		-->
-		<nav bind:this={navEl} aria-label="Main" class="relative hidden items-center gap-1 sm:flex">
+		<nav
+			bind:this={pill.track}
+			aria-label="Main"
+			class="relative hidden items-center gap-1 sm:flex"
+		>
 			<!--
 				One pill, moved — not six pills, one of which is lit.
 
@@ -232,15 +221,15 @@
 					// disagreed about how big a tab is.
 					'squircle pointer-events-none absolute inset-y-0 left-0 bg-on-solid/15',
 					'transition-[transform,width,opacity] duration-260 ease-out',
-					pill.measured ? 'opacity-100' : 'opacity-0'
+					pill.pos.measured ? 'opacity-100' : 'opacity-0'
 				)}
-				style="transform: translateX({pill.x}px); width: {pill.w}px"
+				style={pill.style}
 			></span>
 
 			{#each links as link (link.href)}
 				{@const active = current(link.href)}
 				<a
-					bind:this={tabs[link.href]}
+					bind:this={pill.items[link.href]}
 					href={link.href}
 					aria-current={active ? 'page' : undefined}
 					class={cn(
@@ -250,7 +239,7 @@
 						// Until the pill has been measured — the first server-rendered paint —
 						// the active tab wears its own fill. Otherwise the band arrives with
 						// nothing lit, and the mark appears out of nowhere a frame later.
-						active && !pill.measured && 'bg-on-solid/15'
+						active && !pill.pos.measured && 'bg-on-solid/15'
 					)}
 				>
 					<Icon icon={link.icon} class="size-4" />

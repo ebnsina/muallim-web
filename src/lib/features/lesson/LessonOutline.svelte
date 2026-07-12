@@ -16,10 +16,7 @@
 </script>
 
 <nav aria-label="Course outline">
-	<a
-		href={resolve(`/courses/${slug}`)}
-		class="block text-sm font-semibold underline-offset-4 hover:underline"
-	>
+	<a href={resolve(`/courses/${slug}`)} class="underline-grow block text-sm font-semibold">
 		{courseTitle}
 	</a>
 

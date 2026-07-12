@@ -68,7 +68,7 @@
 		<ul class="mt-6 space-y-4">
 			{#each questions as question (question.id)}
 				<li>
-					<Card class="group p-5">
+					<Card float class="group p-5">
 						<div class="flex items-start justify-between gap-3">
 							<div class="min-w-0">
 								<p class="text-sm whitespace-pre-wrap">{question.body}</p>

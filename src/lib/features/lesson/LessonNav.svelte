@@ -22,7 +22,7 @@
 	{#if previous}
 		<a
 			href={resolve(`/courses/${slug}/lessons/${previous.id}`)}
-			class="lift group flex items-center gap-3 rounded-card border border-border p-4 sm:col-start-1"
+			class="lift group flex items-center gap-3 rounded-card bg-surface-raised p-4 shadow-card sm:col-start-1"
 		>
 			<Icon
 				icon={ArrowLeft01Icon}
@@ -38,7 +38,7 @@
 	{#if next}
 		<a
 			href={resolve(`/courses/${slug}/lessons/${next.id}`)}
-			class="lift group flex items-center gap-3 rounded-card border border-border p-4 text-right sm:col-start-2"
+			class="lift group flex items-center gap-3 rounded-card bg-surface-raised p-4 text-right shadow-card sm:col-start-2"
 		>
 			<span class="min-w-0 flex-1">
 				<span class="text-muted text-xs">Next</span>

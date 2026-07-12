@@ -156,7 +156,7 @@
 			</details>
 
 			<div
-				class="hidden lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-card lg:border lg:border-border lg:p-4"
+				class="hidden lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-card lg:bg-surface-raised lg:p-4 lg:shadow-card"
 			>
 				<LessonOutline
 					slug={data.slug}
