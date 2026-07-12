@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Award01Icon, ChampionIcon } from '@hugeicons/core-free-icons';
-	import { Card, EmptyState, Icon, Page, Progress } from '$lib/components';
+	import { Card, EmptyState, Icon, Page, PageHeader, Progress } from '$lib/components';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
@@ -70,13 +70,20 @@
 <svelte:head><title>Leaderboard — Muallim</title></svelte:head>
 
 <Page width="wide">
+	<!-- The page's own name. It went missing when this was rebuilt around the podium,
+	     and a page with no h1 is a page a screen reader cannot announce. -->
+	<PageHeader
+		title="Leaderboard"
+		description="Points for finishing lessons and courses, across everybody in this workspace."
+	/>
+
 	<!--
 		Your own standing, on the aurora. This is a page about doing well, and the card
 		that says how *you* are doing is the one it is about — the rest is other people.
 	-->
 	{#if data.me && data.me.out_of > 0}
 		{@const me = data.me}
-		<Card surface="aurora" class="p-6 sm:p-8">
+		<Card surface="aurora" class="mt-8 p-6 sm:p-8">
 			<div class="flex flex-wrap items-center gap-6">
 				<span class="flex size-16 shrink-0 items-center justify-center rounded-full bg-on-solid/15">
 					<Icon icon={ChampionIcon} class="size-8" />

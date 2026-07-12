@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { Alert02Icon } from '@hugeicons/core-free-icons';
 	import { Alert, Icon, Page } from '$lib/components';
+	import { auroraFor, cn } from '$lib/utils';
 	import {
 		CourseAnnouncements,
 		CourseBanner,
@@ -44,11 +45,16 @@
 		column it comes first: on a phone the fold lands above the first heading.
 	-->
 	<div class="relative">
-		<!-- The same wash as the dashboard's horizon, from the same tokens: the top of a
-		     page looks like the top of a page, wherever you are in the product. -->
-		<div
-			class="rounded-card bg-gradient-to-br from-accent-surface via-surface-sunken to-surface-sunken p-6 sm:p-8 lg:pb-20"
-		>
+		<!--
+			The course's own light, from the same seed its card in the catalogue uses — so
+			a course is one colour wherever you meet it, and arriving here from the
+			catalogue is arriving at the thing you clicked rather than at a grey page
+			about it.
+
+			It replaced a wash of accent-surface into surface-sunken, which was the same
+			pale rectangle on every course in the workspace.
+		-->
+		<div class={cn('rounded-card p-6 sm:p-8 lg:pb-20', auroraFor(data.course.slug))}>
 			<div class="lg:mr-96 xl:mr-112">
 				<CourseBanner course={data.course} {crumbs} reviews={data.reviewSummary} />
 			</div>
@@ -61,7 +67,13 @@
 			then leaves with the banner.
 		-->
 		<div class="lg:absolute lg:inset-y-0 lg:top-8 lg:right-8 lg:w-80 xl:w-96">
-			<div class="lg:sticky lg:top-24">
+			<!--
+				`top-32`, not `top-24`. The band is 6rem tall and the sheet's rounded edge is a
+				further 1rem of sticky strip on top of it — a card pinned at 6rem starts exactly
+				where they end, so it arrives with its own top edge shaved off and nothing
+				between it and the chrome. This clears both, and leaves a gap to breathe.
+			-->
+			<div class="lg:sticky lg:top-32">
 				<EnrolPanel
 					course={data.course}
 					topics={data.topics}

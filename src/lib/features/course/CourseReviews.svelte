@@ -47,7 +47,7 @@
 		for them; everyone else reads the wall.
 	-->
 	{#if enrolled}
-		<Card class="mt-4 p-5">
+		<Card float class="mt-4 p-5">
 			<form method="POST" action="?/review" use:enhance>
 				<p class="text-sm font-medium">
 					{mine ? 'Your review' : 'Share what you thought'}
@@ -80,7 +80,7 @@
 		<ul class="mt-6 space-y-4">
 			{#each reviews as review (review.created_at + review.author_name)}
 				<li>
-					<Card class="p-5">
+					<Card float class="p-5">
 						<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
 							<div class="flex items-center gap-2">
 								<Stars value={review.rating} size="sm" />

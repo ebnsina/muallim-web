@@ -76,6 +76,13 @@ pnpm build
 
 **Pages use the width they have.** `Page width="full"` (max-w-7xl, aligned with the header) for lists, grids, and anything with a sidebar; `wide` (max-w-5xl) for forms and tables; `prose` (max-w-2xl) only for something to read. Do not leave a page stranded in a narrow column with empty gutters.
 
+**Nothing on a page may jump.** Anything that changes size when a reader uses it — a disclosure opening, a filter emptying a list, a month with six weeks where the last one had five — moves everything under it, and the reader loses the line they were on. Two rules, and they are not negotiable:
+
+- **A control does not resize when you use it.** Reserve the space it will need: the mini calendar draws six week-rows in every month, not five in July and six in August, because paging the month must not move the page. The same reasoning gives the catalogue's summary a two-line minimum and the dashboard's stat tiles a fixed grid.
+- **What must change height, animates.** A body appearing in one frame *is* a jump, however small. Reveal it with `transition:slide` at `DURATION.base` — the eye can follow a height it watched grow, and it cannot follow one that was suddenly there. Svelte's transitions compile to CSS animations, so `prefers-reduced-motion` already collapses them to nothing; a reader who asked for stillness gets the content, immediately, without the movement.
+
+Reserve, or animate. Never snap.
+
 **The marketing site has its own look — keep to it.** Landing (`src/routes/+page.svelte`) plus a per-audience page at `/solutions/[slug]`, one template driven by `src/lib/content/segments.ts` (nonprofits, creators, schools, coaching, agencies). Conventions the user converged on, the hard way:
 
 - **Dark hero, light body.** The hero is a full-bleed dark aurora band (`.hero-blue` + `AuroraBackdrop`), fixed-dark in either theme; the rest of the page follows the app theme, **light by default** — do not lock it dark. A quiet page-wide `PageAurora` carries the hero's colour behind everything.

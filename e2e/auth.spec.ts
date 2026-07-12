@@ -72,14 +72,15 @@ test('signing in and out', async ({ page }) => {
 
 	await expect(page).toHaveURL('/dashboard');
 
-	// The dashboard greets by first name, so the email is what identifies whose
-	// session this is. Asserting on the greeting alone would pass for anyone whose
-	// name happens to start the same way.
+	// The dashboard greets by first name, and no longer prints the address — a
+	// person knows their own email, and the space says the date instead. Whose
+	// session this is is asserted in the account menu, which still names it: the
+	// greeting alone would pass for anyone whose name starts the same way.
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome back');
-	await expect(page.getByText(OWNER.email)).toBeVisible();
 
 	await ready(page);
 	await page.getByRole('button', { name: 'Account' }).click();
+	await expect(page.getByText(OWNER.email)).toBeVisible();
 	await page.getByRole('button', { name: 'Sign out' }).click();
 	await expect(page).toHaveURL('/');
 

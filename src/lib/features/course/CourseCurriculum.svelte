@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import { SquareLock01Icon } from '@hugeicons/core-free-icons';
 	import { Badge, Icon, LessonIcon } from '$lib/components';
+	import { DURATION, easeOut } from '$lib/motion';
 	import { minutes, span } from './duration';
 	import type { CourseDetail, LessonView, TopicView } from './types';
 
@@ -17,18 +19,25 @@
 
 	let { course, topics, lessonCount, durationSeconds, enrolled, enrolledAt }: Props = $props();
 
-	// Sections start closed, as they do on any syllabus long enough to need them —
-	// except the first, which is the one a reader opens anyway.
+	/*
+		Every section starts closed. The first used to start open, which sounds like a
+		courtesy and made "Expand all" a liar: the reader's eye is on section one, they
+		press the button, and the one thing they are looking at does not move — because
+		it was already open. The press worked; it just could not be seen to.
+
+		A syllabus is a list of sections. Opening one is the reader's decision, and the
+		button that opens all of them now always does something.
+	*/
 	let open = $state<Record<string, boolean>>({});
-	const allOpen = $derived(topics.length > 0 && topics.every((t) => open[t.id] ?? t === topics[0]));
+	const allOpen = $derived(topics.length > 0 && topics.every((t) => open[t.id] ?? false));
 
 	function toggleAll() {
 		const next = !allOpen;
 		open = Object.fromEntries(topics.map((t) => [t.id, next]));
 	}
 
-	function isOpen(topicId: string, index: number): boolean {
-		return open[topicId] ?? index === 0;
+	function isOpen(topicId: string): boolean {
+		return open[topicId] ?? false;
 	}
 
 	/**
@@ -76,7 +85,7 @@
 		{#if topics.length > 0}
 			<button
 				type="button"
-				class="text-sm font-medium text-accent-text underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+				class="underline-grow text-sm font-medium text-accent-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 				onclick={toggleAll}
 			>
 				{allOpen ? 'Collapse all sections' : 'Expand all sections'}
@@ -98,7 +107,7 @@
 		</p>
 
 		<ol class="mt-4 space-y-3">
-			{#each topics as topic, section (topic.id)}
+			{#each topics as topic (topic.id)}
 				{@const lessons = topic.lessons ?? []}
 				{@const seconds = lessons.reduce((sum, l) => sum + (l.duration_seconds ?? 0), 0)}
 				<li class="overflow-hidden rounded-card border border-border">
@@ -110,14 +119,14 @@
 					<h3>
 						<button
 							type="button"
-							class="flex w-full items-center gap-3 bg-surface-sunken px-5 py-4 text-left transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
-							aria-expanded={isOpen(topic.id, section)}
+							class="flex w-full items-center gap-3 bg-surface-raised px-5 py-4 text-left transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
+							aria-expanded={isOpen(topic.id)}
 							aria-controls="section-{topic.id}"
-							onclick={() => (open[topic.id] = !isOpen(topic.id, section))}
+							onclick={() => (open[topic.id] = !isOpen(topic.id))}
 						>
 							<svg
 								class="text-muted size-4 shrink-0 transition-transform duration-150"
-								class:rotate-180={isOpen(topic.id, section)}
+								class:rotate-180={isOpen(topic.id)}
 								viewBox="0 0 20 20"
 								fill="none"
 								stroke="currentColor"
@@ -139,8 +148,14 @@
 						</button>
 					</h3>
 
-					{#if isOpen(topic.id, section)}
-						<ul id="section-{topic.id}" class="divide-y divide-border border-t border-border">
+					{#if isOpen(topic.id)}
+						<!-- It slides. A section that appears in one frame throws every section
+						     under it down the page, and the reader loses the one they were on. -->
+						<ul
+							id="section-{topic.id}"
+							class="divide-y divide-border border-t border-border"
+							transition:slide={{ duration: DURATION.base, easing: easeOut }}
+						>
 							{#each lessons as lesson (lesson.id)}
 								{@const locked = opensOn(lesson)}
 								<li>

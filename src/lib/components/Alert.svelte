@@ -73,7 +73,10 @@
 >
 	<Icon icon={TONES[tone].icon} class="mt-0.5 size-4 shrink-0" />
 
-	<div class="min-w-0">
+	<!-- `flex-1`: the content column takes the width the icon leaves. Shrink-to-fit,
+	     it ended wherever the text happened to end — so anything an alert puts on its
+	     right margin (a date, a dismiss) sat in the middle of the box instead. -->
+	<div class="min-w-0 flex-1">
 		<span class="sr-only">{label ?? TONES[tone].word}:</span>
 		{#if title}
 			<p class="font-semibold">{title}</p>

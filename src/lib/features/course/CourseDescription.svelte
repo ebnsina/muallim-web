@@ -29,7 +29,7 @@
 
 	<button
 		type="button"
-		class="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent-text underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+		class="underline-grow mt-3 flex items-center gap-1.5 text-sm font-medium text-accent-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
 		aria-expanded={expanded}
 		aria-controls="course-description"
 		onclick={() => (expanded = !expanded)}

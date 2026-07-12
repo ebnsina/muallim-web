@@ -8,10 +8,24 @@
 		/** When set, the stars become radio buttons that write to this field. */
 		name?: string;
 		size?: 'sm' | 'md';
+		/**
+		 * `inverse` for stars standing on an aurora. The accent is a blue chosen against
+		 * white paper; on the brand's own light it is a star nobody sees.
+		 */
+		tone?: 'accent' | 'inverse';
 		class?: string;
 	};
 
-	let { name, value = $bindable(0), size = 'md', class: className }: Props = $props();
+	let {
+		name,
+		value = $bindable(0),
+		size = 'md',
+		tone = 'accent',
+		class: className
+	}: Props = $props();
+
+	const FILL = $derived(tone === 'inverse' ? 'text-on-solid' : 'text-accent');
+	const EMPTY = $derived(tone === 'inverse' ? 'text-on-solid/35' : 'text-border-strong');
 
 	const STARS = [1, 2, 3, 4, 5];
 	const px = $derived(size === 'sm' ? 'size-3.5' : 'size-5');
@@ -49,10 +63,7 @@
 		aria-label="Rated {filled} out of 5"
 	>
 		{#each STARS as star (star)}
-			<Icon
-				icon={StarIcon}
-				class="{px} {star <= filled ? 'text-accent [&_*]:fill-current' : 'text-border-strong'}"
-			/>
+			<Icon icon={StarIcon} class="{px} {star <= filled ? `${FILL} [&_*]:fill-current` : EMPTY}" />
 		{/each}
 	</span>
 {/if}

@@ -9,10 +9,12 @@
 
 	type Props = {
 		crumbs: Crumb[];
+		/** `inverse` for a trail standing on an aurora, where the page's greys vanish. */
+		tone?: 'default' | 'inverse';
 		class?: string;
 	};
 
-	let { crumbs, class: className }: Props = $props();
+	let { crumbs, tone = 'default', class: className }: Props = $props();
 
 	/*
 		The last crumb is where you are, so it is never a link.
@@ -38,7 +40,12 @@
 	arrow right, Optics" out loud.
 -->
 <nav aria-label="Breadcrumb" class={className}>
-	<ol class="text-muted flex flex-wrap items-center gap-1.5 text-sm">
+	<ol
+		class={[
+			'flex flex-wrap items-center gap-1.5 text-sm',
+			tone === 'inverse' ? 'text-on-solid/75' : 'text-muted'
+		]}
+	>
 		{#each trail as crumb, index (crumb.label + index)}
 			<li class="flex min-w-0 items-center gap-1.5">
 				{#if index > 0}
@@ -48,7 +55,12 @@
 				{#if crumb.href}
 					<a
 						href={crumb.href}
-						class="max-w-[16ch] truncate rounded-control underline-offset-4 transition-colors hover:text-text hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:max-w-[24ch]"
+						class={[
+							'max-w-[16ch] truncate rounded-control underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:max-w-[24ch]',
+							tone === 'inverse'
+								? 'hover:text-on-solid focus-visible:ring-on-solid'
+								: 'hover:text-text focus-visible:ring-ring'
+						]}
 						title={crumb.label}
 					>
 						{crumb.label}
@@ -56,7 +68,10 @@
 				{:else}
 					<span
 						aria-current="page"
-						class="max-w-[18ch] truncate font-medium text-text sm:max-w-[32ch]"
+						class={[
+							'max-w-[18ch] truncate font-medium sm:max-w-[32ch]',
+							tone === 'inverse' ? 'text-on-solid' : 'text-text'
+						]}
 						title={crumb.label}
 					>
 						{crumb.label}
