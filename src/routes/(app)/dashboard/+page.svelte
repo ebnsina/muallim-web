@@ -6,7 +6,6 @@
 		Award01Icon,
 		BookOpen01Icon,
 		ChartAverageIcon,
-		CheckmarkBadge01Icon,
 		CheckmarkCircle02Icon,
 		PencilEdit02Icon,
 		PlusSignIcon,
@@ -17,6 +16,8 @@
 		Badge,
 		Button,
 		Card,
+		Donut,
+		DonutLegend,
 		EmptyState,
 		Icon,
 		Page,
@@ -61,7 +62,7 @@
 	}
 
 	/*
-		Four numbers, each one the learner could count for themselves. No streak, no
+		Every number here is one the learner could count for themselves. No streak, no
 		hours studied, no "insights": a figure nobody can check is a figure nobody
 		should be shown, and that rule is what keeps the invented widgets other
 		dashboards carry off this one.
@@ -71,14 +72,26 @@
 		fabricated engagement score. That is why they earn a place here and "hours
 		studied" does not.
 	*/
+
+	// Every course this learner ever started, by what became of it. These three sum to
+	// one whole, which is why they are drawn as parts of one and not as three tiles
+	// that happen to sit together.
+	const lapsed = $derived(
+		data.enrolments.filter((e) => e.status !== 'active' && e.status !== 'completed')
+	);
+
+	const courseMix = $derived([
+		{ key: 'active', label: 'In progress', value: active.length, tone: 'text-chart-1' },
+		{ key: 'finished', label: 'Finished', value: finished.length, tone: 'text-chart-2' },
+		{ key: 'lapsed', label: 'Lapsed', value: lapsed.length, tone: 'text-chart-3' }
+	]);
+
+	let hovered = $state<string | null>(null);
+
+	// The two figures that are *not* parts of that whole. A stat tile is the right
+	// form for a lone number, and forcing them into the ring would be a lie about
+	// what they are.
 	const STATS = $derived([
-		{ label: 'In progress', value: active.length, tone: 'accent' as const, icon: BookOpen01Icon },
-		{
-			label: 'Finished',
-			value: finished.length,
-			tone: 'success' as const,
-			icon: CheckmarkBadge01Icon
-		},
 		{
 			label: 'Lessons completed',
 			value: lessonsDone,
@@ -257,11 +270,31 @@
 
 		<!-- =================================================== summary (aside) -->
 		<aside class="space-y-8">
-			<!-- The four numbers, a compact block rather than a strip: on the side they
-			     read as a summary, which is what they are. -->
+			<!-- On the side, where a summary belongs: it is read, not worked in. -->
 			<Card class="p-5">
 				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
-				<dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-6">
+
+				<!--
+					What became of every course this learner started — three states of one
+					whole, so they are drawn as parts of one rather than as three tiles that
+					happen to sit together. Hovering a row lights its slice and hovering a
+					slice lights its row: one bound value, so the two cannot disagree.
+				-->
+				<div class="mt-5 flex items-center gap-5">
+					<Donut segments={courseMix} centreLabel="courses" bind:hovered size={132} />
+
+					{#if data.enrolments.length === 0}
+						<p class="text-muted min-w-0 flex-1 text-sm">
+							Nothing yet. Enrol on a course and this fills itself in.
+						</p>
+					{:else}
+						<div class="min-w-0 flex-1">
+							<DonutLegend segments={courseMix} bind:hovered caption="Your courses by status" />
+						</div>
+					{/if}
+				</div>
+
+				<dl class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-border pt-5">
 					{#each STATS as stat (stat.label)}
 						<div>
 							<dt class="text-muted flex items-center gap-2 text-xs">

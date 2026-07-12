@@ -17,7 +17,6 @@
 		Breadcrumbs,
 		Button,
 		Card,
-		CollapsibleCard,
 		Donut,
 		DonutLegend,
 		Field,
@@ -38,9 +37,8 @@
 
 	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
-	// The analytics card, and which slice the pointer or keyboard is on. The donut and
-	// its legend share this one value, which is what links their highlighting.
-	let glanceOpen = $state(true);
+	// Which slice the pointer or keyboard is on. The donut and its legend share this
+	// one value, which is what links their highlighting.
 	let hovered = $state<string | null>(null);
 
 	/*
@@ -244,17 +242,10 @@
 			{ key: 'inactive', label: 'Lapsed', value: a.inactive, tone: 'text-chart-3' }
 		]}
 		<section class="mt-8">
-			<CollapsibleCard
-				title="At a glance"
-				summary="{a.total_enrolments} enrolled · {Math.round(a.completion_rate * 100)}% complete"
-				bind:open={glanceOpen}
-			>
-				{#if a.total_enrolments === 0}
-					<!-- A donut of nothing is a grey ring and a zero. Say the thing instead. -->
-					<p class="text-muted text-sm">
-						Nobody has enrolled yet. The numbers arrive with the first learner.
-					</p>
-				{:else}
+			<Card class="p-5 sm:p-6">
+				<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+
+				<div class="mt-5">
 					<div class="flex flex-col gap-8 lg:flex-row lg:items-center">
 						<!--
 							The mix is a part-to-whole, so it is drawn as one: three states of an
@@ -263,10 +254,22 @@
 							cannot disagree about what is highlighted.
 						-->
 						<div class="flex items-center gap-6">
-							<Donut {segments} centreLabel="enrolled" bind:hovered />
-							<div class="min-w-40">
-								<DonutLegend {segments} bind:hovered caption="Enrolments by status" />
-							</div>
+							{#if a.total_enrolments === 0}
+								<!--
+									An empty ring and a zero, rather than a hidden chart. The shape stays
+									where a reader learned to look for it, and the sentence beside it says
+									why it is empty — which "0 / enrolled" alone would not.
+								-->
+								<Donut {segments} centreLabel="enrolled" bind:hovered />
+								<p class="text-muted min-w-40 text-sm">
+									Nobody has enrolled yet. The mix fills in with the first learner.
+								</p>
+							{:else}
+								<Donut {segments} centreLabel="enrolled" bind:hovered />
+								<div class="min-w-40">
+									<DonutLegend {segments} bind:hovered caption="Enrolments by status" />
+								</div>
+							{/if}
 						</div>
 
 						<!--
@@ -311,8 +314,8 @@
 							</div>
 						</dl>
 					</div>
-				{/if}
-			</CollapsibleCard>
+				</div>
+			</Card>
 		</section>
 	{/if}
 
