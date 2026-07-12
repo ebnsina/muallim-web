@@ -28,6 +28,7 @@
 		Stars,
 		Textarea
 	} from '$lib/components';
+	import { toast } from '$lib/toast.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -133,6 +134,10 @@
 	// One announcement open at a time. They are notices, not a thread.
 	let shownAnnouncement = $state<string | null>(null);
 
+	// The two acts that change what this reader may do, and both reach the API.
+	let enrolling = $state(false);
+	let cancelling = $state(false);
+
 	const dripNotice: Record<string, string> = {
 		scheduled: 'Lessons in this course open on their own dates.',
 		after_enrolment: 'Lessons open a few days apart, counted from the day you enrol.',
@@ -204,8 +209,8 @@
 		column it comes first: on a phone the fold lands above the first heading.
 	-->
 	<div class="relative">
-		<div class="rounded-xl bg-surface-sunken p-6 sm:p-8 lg:pb-20">
-			<div class="lg:mr-[24rem] xl:mr-[28rem]">
+		<div class="rounded-card bg-surface-sunken p-6 sm:p-8 lg:pb-20">
+			<div class="lg:mr-96 xl:mr-112">
 				<Breadcrumbs {crumbs} />
 
 				<div class="mt-5 flex flex-wrap items-center gap-2">
@@ -273,7 +278,7 @@
 			a parent as tall as the page, the card sticks for exactly its own height and
 			then leaves with the hero.
 		-->
-		<div class="lg:absolute lg:inset-y-0 lg:top-8 lg:right-8 lg:w-[20rem] xl:w-[24rem]">
+		<div class="lg:absolute lg:inset-y-0 lg:top-8 lg:right-8 lg:w-80 xl:w-96">
 			<div class="lg:sticky lg:top-24">
 				<Card elevation="raised" class="mt-6 p-6 lg:mt-0">
 					{#if enrolled}
@@ -324,9 +329,32 @@
 							Your notes &amp; highlights
 						</Button>
 
-						<form method="POST" action="?/cancel" use:enhance class="mt-3">
-							<Button type="submit" variant="ghost" size="sm" class="w-full">
-								Cancel enrolment
+						<form
+							method="POST"
+							action="?/cancel"
+							class="mt-3"
+							use:enhance={() => {
+								cancelling = true;
+								return async ({ result, update }) => {
+									await update();
+									cancelling = false;
+
+									if (result.type === 'failure' || result.type === 'error') return;
+									// Progress survives a cancellation, and a learner about to lose
+									// access is the person who most needs telling that it does.
+									toast.info('Enrolment cancelled. Your progress is kept if you come back.');
+								};
+							}}
+						>
+							<Button
+								type="submit"
+								variant="ghost"
+								size="sm"
+								class="w-full"
+								loading={cancelling}
+								disabled={cancelling}
+							>
+								{cancelling ? 'Cancelling…' : 'Cancel enrolment'}
 							</Button>
 						</form>
 					{:else if !data.signedIn}
@@ -376,8 +404,29 @@
 							Enrol to open every lesson and track what you have finished.
 						</p>
 
-						<form method="POST" action="?/enrol" use:enhance class="mt-5">
-							<Button type="submit" class="w-full">Enrol</Button>
+						<!--
+							Enrolling reaches the API and then reloads the page under you. Without
+							a pending state the button is dead for as long as that takes, and a
+							dead button is a button you press again.
+						-->
+						<form
+							method="POST"
+							action="?/enrol"
+							class="mt-5"
+							use:enhance={() => {
+								enrolling = true;
+								return async ({ result, update }) => {
+									await update();
+									enrolling = false;
+
+									if (result.type === 'failure' || result.type === 'error') return;
+									toast.success('You are enrolled. Every lesson is open.');
+								};
+							}}
+						>
+							<Button type="submit" class="w-full" loading={enrolling}>
+								{enrolling ? 'Enrolling…' : 'Enrol'}
+							</Button>
 						</form>
 					{/if}
 
@@ -417,7 +466,7 @@
 			containing block: end the wrapper at the hero and the card stops following
 			you exactly where a reader starts needing it.
 		-->
-		<div class="mt-10 lg:mr-[24rem] lg:mt-8 xl:mr-[28rem]">
+		<div class="mt-10 lg:mr-96 lg:mt-8 xl:mr-112">
 			{#if form?.message}
 				<Alert tone="danger" class="mb-6" role="alert">{form.message}</Alert>
 			{/if}
@@ -468,8 +517,9 @@
 							<div>
 								<button
 									type="button"
-									class="flex w-full items-center gap-3 px-4 py-3 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
+									class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent-surface/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:outline-none"
 									aria-expanded={isShown}
+									aria-controls="announcement-{announcement.id}"
 									onclick={() => (shownAnnouncement = isShown ? null : announcement.id)}
 								>
 									<Icon icon={Megaphone01Icon} class="text-accent-text size-4 shrink-0" />
@@ -488,7 +538,10 @@
 								</button>
 
 								{#if isShown}
-									<p class="text-muted px-4 pb-4 pl-11 text-sm whitespace-pre-wrap">
+									<p
+										id="announcement-{announcement.id}"
+										class="text-muted px-4 pb-4 pl-11 text-sm whitespace-pre-wrap"
+									>
 										{announcement.body}
 									</p>
 								{/if}
@@ -668,7 +721,8 @@
 
 					<div class="relative mt-4">
 						<div
-							class="text-muted space-y-4 text-sm leading-relaxed whitespace-pre-wrap"
+							id="course-description"
+							class="text-muted max-w-2xl space-y-4 text-sm leading-relaxed whitespace-pre-wrap"
 							class:max-h-64={!showFullDescription}
 							class:overflow-hidden={!showFullDescription}
 						>
@@ -685,7 +739,9 @@
 
 					<button
 						type="button"
-						class="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent-text underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+						class="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent-text underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+						aria-expanded={showFullDescription}
+						aria-controls="course-description"
 						onclick={() => (showFullDescription = !showFullDescription)}
 					>
 						{showFullDescription ? 'Show less' : 'Show more'}
