@@ -64,7 +64,7 @@
 		bind:this={pill.track}
 		role="tablist"
 		aria-label="About this lesson"
-		class="relative inline-flex gap-1 rounded-pill bg-surface-sunken p-1"
+		class="squircle relative inline-flex gap-1 bg-surface-sunken p-1"
 	>
 		<!--
 			The fill, and it is `aria-hidden`: `aria-selected` on the tab is what says
@@ -73,7 +73,10 @@
 		<span
 			aria-hidden="true"
 			class={cn(
-				'squircle pointer-events-none absolute inset-y-1 left-0 bg-accent',
+				// The track is the button's shape, not a lozenge, and the fill inside it is
+				// the same shape one step smaller — so the two curves nest instead of one
+				// being a stadium inside a rectangle.
+				'squircle-sm pointer-events-none absolute inset-y-1 left-0 bg-accent',
 				'transition-[transform,width,opacity] duration-260 ease-out',
 				pill.pos.measured ? 'opacity-100' : 'opacity-0'
 			)}
@@ -91,7 +94,7 @@
 				aria-controls="panel-{t.id}"
 				tabindex={active ? 0 : -1}
 				class={cn(
-					'squircle relative z-10 flex items-center gap-2 px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+					'squircle-sm relative z-10 flex items-center gap-2 px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
 					active ? 'text-on-solid' : 'text-muted hover:text-text',
 
 					// Until the pill has been measured — the server-rendered frame — the chosen
@@ -107,7 +110,7 @@
 				{#if t.count > 0}
 					<span
 						class={cn(
-							'numeral rounded-pill px-1.5 text-xs',
+							'numeral rounded-md px-1.5 text-xs',
 							active ? 'bg-on-solid/20' : 'bg-surface-raised'
 						)}
 					>

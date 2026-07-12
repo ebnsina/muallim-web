@@ -257,15 +257,19 @@
 	/*
 		Lesson prose, and the one place the 16px UI default is broken.
 
-		18px at 1.6 over a 65ch measure. The measure is the middle of a range the
+		18px at 1.75 over a 65ch measure. The measure is the middle of a range the
 		reading research argues about — Ruder 50–60, Bringhurst 66, WCAG's ceiling
-		80 — and the line height clears WCAG 1.4.12's 1.5 minimum.
+		80 — and the leading is well clear of WCAG 1.4.12's 1.5 minimum.
+
+		1.6 was the comfortable minimum for UI text and too tight for a page somebody
+		reads for twenty minutes: the longer the measure, the more air a line needs to
+		stop the eye landing back on the one it just left.
 		https://baymard.com/blog/line-length-readability
 	*/
 	.prose {
 		max-width: var(--container-prose);
 		font-size: 1.125rem;
-		line-height: 1.6;
+		line-height: 1.75;
 	}
 
 	.prose :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote) {
@@ -361,6 +365,14 @@
 	*/
 	.squircle {
 		border-radius: 1rem;
+		corner-shape: squircle;
+	}
+
+	/* The inner one. A radius is concentric with the one outside it only when it is
+	   smaller by exactly the gap — 0.75rem inside a 1rem squircle with 4px of track
+	   around it. */
+	.squircle-sm {
+		border-radius: 0.75rem;
 		corner-shape: squircle;
 	}
 
