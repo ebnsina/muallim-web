@@ -26,32 +26,38 @@
 
 <!--
 	A catalogue course. The whole card is the link, so there is no "Open" button to
-	press — a button that only repeats what clicking the card already does. The
-	strip below carries what the listing actually knows instead: the difficulty,
-	drawn by the design-system components. (Lesson and module counts are not in the
-	list payload, so they are not invented here.)
+	press — a button that only repeats what clicking the card already does.
+
+	Everything that identifies the course lives on the cover: its name, how hard it
+	is, how long it is. That was three tiers before — a title on the light, a
+	summary on paper, and a strip of meta under a rule — and three tiers is two
+	horizons the eye has to cross to learn one thing. The paper below carries the
+	one thing the cover cannot: what the course is actually about, in prose.
 -->
 <TintCard {href} panelClass="overflow-hidden bg-surface-raised p-0">
-	<div class={cn('relative h-24 rounded-card', cover)}>
-		<!-- The title sits on its own cover, where a course's picture would be. -->
-		<div class="absolute inset-x-0 bottom-0 p-4">
-			<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
+	<div class={cn('relative flex h-44 flex-col justify-end rounded-card p-4', cover)}>
+		<h2 class="line-clamp-2 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
+
+		<!--
+			The meta, in the cover's own ink. `inverse` on the bars for the same reason the
+			button on the aurora is glass: the accent is a blue chosen against white paper,
+			and on the brand's light it is a mark nobody sees.
+		-->
+		<div class="mt-2.5 flex items-center justify-between gap-3">
+			<Difficulty level={difficulty} tone="inverse" />
+
+			{#if lessonCount != null}
+				<span class="text-sm text-on-solid/85">
+					<span class="numeral">{lessonCount}</span>
+					{lessonCount === 1 ? 'lesson' : 'lessons'}
+				</span>
+			{/if}
 		</div>
 	</div>
 
-	<div class="p-4 pt-3">
-		<!-- Always two lines, even when empty, so every card is the same height and a
+	<!-- Always two lines, even when empty, so every card is the same height and a
 	     grid of them reads as one block rather than a ragged run. -->
+	<div class="p-4">
 		<p class="text-muted line-clamp-2 min-h-[2.5rem] text-sm text-pretty">{summary ?? ''}</p>
 	</div>
-
-	{#snippet footer()}
-		<Difficulty level={difficulty} />
-		{#if lessonCount != null}
-			<span class="text-muted text-sm">
-				<span class="numeral">{lessonCount}</span>
-				{lessonCount === 1 ? 'lesson' : 'lessons'}
-			</span>
-		{/if}
-	{/snippet}
 </TintCard>

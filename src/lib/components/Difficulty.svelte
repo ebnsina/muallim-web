@@ -5,10 +5,17 @@
 		level: string;
 		/** Hidden on a dense card, where the bars and a tooltip are enough. */
 		showLabel?: boolean;
+		/**
+		 * `inverse` for the bars standing on an aurora: the accent is a blue chosen
+		 * against white paper, and on the brand's own light it is a bar nobody sees.
+		 * There the mark is the surface's own ink, and the unfilled steps are that ink
+		 * at a low alpha.
+		 */
+		tone?: 'accent' | 'inverse';
 		class?: string;
 	};
 
-	let { level, showLabel = true, class: className }: Props = $props();
+	let { level, showLabel = true, tone = 'accent', class: className }: Props = $props();
 
 	// An unknown level fills nothing rather than throwing, and still names itself.
 	const filled = $derived(LEVELS.indexOf(level as (typeof LEVELS)[number]) + 1);
@@ -38,13 +45,21 @@
 					index === 1 && 'h-2',
 					index === 2 && 'h-2.5',
 					index === 3 && 'h-3',
-					index < filled ? 'bg-accent' : 'bg-border-strong'
+					index < filled
+						? tone === 'inverse'
+							? 'bg-on-solid'
+							: 'bg-accent'
+						: tone === 'inverse'
+							? 'bg-on-solid/30'
+							: 'bg-border-strong'
 				]}
 			></span>
 		{/each}
 	</span>
 
 	{#if showLabel}
-		<span class="text-muted text-xs capitalize">{level}</span>
+		<span class={['text-xs capitalize', tone === 'inverse' ? 'text-on-solid/85' : 'text-muted']}>
+			{level}
+		</span>
 	{/if}
 </span>
