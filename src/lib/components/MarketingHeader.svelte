@@ -6,24 +6,15 @@
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
-	// The header sits over the hero and scrolls away with it — not sticky. `overDark`
-	// pages (every hero is dark now) get white nav text.
-	let { overDark = true }: { overDark?: boolean } = $props();
-
+	// The header sits over the hero and scrolls away with it — not sticky. The hero
+	// follows the theme now, so the nav does too: no white-on-white in light mode.
 	const home = resolve('/');
-	const ghost = $derived(overDark ? '!text-white hover:!bg-white/10' : '');
 </script>
 
 <header class="absolute inset-x-0 top-0 z-50">
 	<div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
-		<a
-			href={home}
-			class={cn('flex shrink-0 items-center gap-2.5 font-semibold', overDark && 'text-white')}
-		>
-			<Icon
-				icon={Mortarboard02Icon}
-				class={cn('size-6', overDark ? 'text-white' : 'text-accent')}
-			/>
+		<a href={home} class="flex shrink-0 items-center gap-2.5 font-semibold">
+			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
 			Muallim
 		</a>
 
@@ -32,10 +23,7 @@
 			<div class="group relative">
 				<button
 					type="button"
-					class={cn(
-						'inline-flex items-center gap-1 rounded-control px-3 py-1.5 font-medium transition-colors',
-						overDark ? 'text-white/80 hover:text-white' : 'text-muted hover:text-text'
-					)}
+					class="inline-flex cursor-pointer items-center gap-1 rounded-control px-3 py-1.5 font-medium text-muted transition-colors hover:text-text"
 				>
 					Solutions
 					<Icon
@@ -73,14 +61,12 @@
 				</div>
 			</div>
 
-			<Button href="{home}#capabilities" variant="ghost" size="sm" pill class={ghost}>
-				What ships
-			</Button>
+			<Button href="{home}#capabilities" variant="ghost" size="sm" pill>Everything it does</Button>
 		</nav>
 
 		<!-- Sign in and the one CTA on the right. -->
 		<div class="ml-auto flex items-center gap-1 sm:gap-2">
-			<Button href={resolve('/login')} variant="ghost" size="sm" pill class={ghost}>Sign in</Button>
+			<Button href={resolve('/login')} variant="ghost" size="sm" pill>Sign in</Button>
 			<Button href={resolve('/register')} size="sm" pill>Get started</Button>
 		</div>
 	</div>

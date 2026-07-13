@@ -10,7 +10,6 @@
 export { default as ActionLink } from './ActionLink.svelte';
 export { default as Alert, type AlertTone } from './Alert.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
-export { default as AuroraBackdrop } from './AuroraBackdrop.svelte';
 export { default as AuthShell } from './AuthShell.svelte';
 export { default as Badge, type BadgeTone } from './Badge.svelte';
 export { default as Breadcrumbs, type Crumb } from './Breadcrumbs.svelte';
@@ -34,7 +33,6 @@ export { default as MarketingFooter } from './MarketingFooter.svelte';
 export { default as MarketingHeader } from './MarketingHeader.svelte';
 export { default as Numeral } from './Numeral.svelte';
 export { default as Page, type PageWidth } from './Page.svelte';
-export { default as PageAurora } from './PageAurora.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Sheet } from './Sheet.svelte';
 export { default as Progress } from './Progress.svelte';

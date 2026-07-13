@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { Card, Icon } from '$lib/components';
 	import { inview } from '$lib/actions/inview';
 	import Section from './Section.svelte';
-	import { PLATFORM, ROADMAP } from './content';
+	import { PLATFORM } from './content';
 </script>
 
 <Section
@@ -9,31 +10,20 @@
 	eyebrow="Underneath"
 	title="An API first, and a website second"
 	lead="This page's app is one client of the same public contract a mobile app, a plugin, or your own integration would use."
-	class="grid gap-14 lg:grid-cols-[1.2fr_0.8fr] lg:gap-20"
+	class="grid gap-5 md:grid-cols-3"
 >
-	<dl>
-		{#each PLATFORM as item, i (item.title)}
-			<div
-				class="border-t border-border py-6 first:border-t-0 first:pt-0"
-				use:inview={{ delay: i * 70 }}
-			>
-				<dt class="font-semibold">{item.title}</dt>
-				<dd class="mt-2 leading-relaxed text-muted">{item.line}</dd>
-			</div>
-		{/each}
-	</dl>
+	{#each PLATFORM as item, i (item.title)}
+		<div use:inview={{ delay: i * 80 }}>
+			<Card float class="lift h-full p-7">
+				<span
+					class="flex size-10 items-center justify-center rounded-control bg-accent-surface text-accent-text"
+				>
+					<Icon icon={item.icon} class="size-5" />
+				</span>
 
-	<!-- Said plainly, and on the page, so nobody plans around a thing that is not there. -->
-	<div class="squircle self-start bg-surface-sunken p-7" use:inview={{ delay: 140 }}>
-		<p class="text-xs font-semibold tracking-[0.14em] text-muted uppercase">Not built yet</p>
-
-		<dl class="mt-5 space-y-5">
-			{#each ROADMAP as item (item.title)}
-				<div>
-					<dt class="text-sm font-medium">{item.title}</dt>
-					<dd class="mt-1 text-sm leading-relaxed text-muted">{item.line}</dd>
-				</div>
-			{/each}
-		</dl>
-	</div>
+				<h3 class="mt-5 font-semibold">{item.title}</h3>
+				<p class="mt-2.5 leading-relaxed text-muted">{item.line}</p>
+			</Card>
+		</div>
+	{/each}
 </Section>

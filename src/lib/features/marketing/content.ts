@@ -9,7 +9,10 @@ import {
 	BookOpen01Icon,
 	Building01Icon,
 	BubbleChatIcon,
+	CodeIcon,
 	Quiz01Icon,
+	Shield01Icon,
+	SquareLock02Icon,
 	UserGroupIcon
 } from '@hugeicons/core-free-icons';
 
@@ -116,25 +119,18 @@ export const QUESTION_TYPES = [
 /** Why an API-first backend matters to somebody buying one. */
 export const PLATFORM = [
 	{
+		icon: CodeIcon,
 		title: 'An OpenAPI 3.1 contract',
 		line: 'The spec is generated from the server, so it cannot drift from it. This site is its first client, not its only one.'
 	},
 	{
+		icon: SquareLock02Icon,
 		title: 'One API, many schools',
 		line: 'The workspace is resolved from the host. Two schools on the same deployment never see one another’s rows.'
 	},
 	{
+		icon: Shield01Icon,
 		title: 'Errors you can handle',
 		line: 'Every failure is an RFC 9457 problem document with a correlation id. Nothing renders as an unexplained 500.'
-	}
-] as const;
-
-/** Not built. Listed so nobody plans around a feature that is not there. */
-export const ROADMAP = [
-	{ title: 'Mobile apps', line: 'The web app is responsive today. Native apps are not started.' },
-	{ title: 'SCORM and LTI', line: 'No player, no tool. Courses are authored in Muallim.' },
-	{
-		title: 'Subscriptions and bundles',
-		line: 'A course is bought once. Recurring billing is not built.'
 	}
 ] as const;

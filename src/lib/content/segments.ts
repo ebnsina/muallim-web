@@ -25,10 +25,10 @@ import type { IconSvgElement } from '@hugeicons/svelte';
 /*
 	The solution pages, one per audience, kept out of their markup.
 
-	Same two rules as the landing: `today` is built and works now, `roadmap` is
-	not and the page says so where the reader can see it. The `verdict` is the
-	honest part — who this is ready for, and who should wait. A marketing page that
-	names its own gaps is the only kind worth trusting.
+	One rule: every line here is a thing the product does. A page that narrates its
+	own gaps — "coming soon", "not yet ready for the RFP" — reads as an apology, and
+	nobody buys an apology. The way to stay honest is to write nothing you cannot
+	demonstrate, not to publish a list of what is missing.
 */
 
 interface Point {
@@ -52,9 +52,6 @@ export interface Segment {
 	today: Point[];
 	/** One capability worth dwelling on, drawn straight from `today`. */
 	highlight: { label: string; title: string; body: string; points: string[] };
-	roadmap: Point[];
-	/** The honest bottom line: ready for whom, and who should wait. */
-	verdict: { ready: string; wait: string };
 }
 
 export const SEGMENTS: Segment[] = [
@@ -64,9 +61,9 @@ export const SEGMENTS: Segment[] = [
 		tagline: 'Teach and grow a community, free',
 		heroIcon: HeartHandshakeIcon,
 		eyebrow: 'For nonprofits & community builders',
-		headline: 'Everything you need is already here.',
+		headline: 'Teach it for free. Grow the community around it.',
 		blurb:
-			'Free courses, open enrollment, and a community layer that keeps people coming back — with no dependency on the paid pieces still being built.',
+			'Open enrollment, a forum where questions get answered in the open, and announcements that reach every member — in the app and in their inbox.',
 		shot: {
 			src: '/marketing/forum.webp',
 			alt: 'A community board: threads with their author, their age, and how many replies they drew.',
@@ -91,35 +88,24 @@ export const SEGMENTS: Segment[] = [
 		],
 		highlight: {
 			label: 'Community',
-			title: 'The part that keeps a community alive is the part you get today.',
-			body: 'The forum, the Q&A, and announcements are built, tested, and running. They are the core of "teach and grow your community," and none of them wait on the commerce work still to come.',
+			title: 'A community will teach itself, given somewhere to do it.',
+			body: 'Threads per space, questions answered on the lesson they were asked about, and an announcement that reaches everyone at once. This is the part that turns a course into a place people come back to.',
 			points: [
 				'Threads and replies, scoped per space',
 				'Questions answered where everyone can learn from them',
 				'Announcements delivered in-app and by email'
 			]
-		},
-		roadmap: [
-			{
-				icon: Package01Icon,
-				title: 'Donations & paid tiers',
-				body: 'Taking money — for a supporter tier or a paid workshop — arrives with the commerce work. Everything free works now.'
-			}
-		],
-		verdict: {
-			ready: 'You can run a full community learning program today, end to end, at no cost.',
-			wait: 'If taking donations or membership fees in-platform is essential, that piece is still ahead.'
 		}
 	},
 	{
 		slug: 'creators',
 		nav: 'Solo creators',
-		tagline: 'Build and teach now, sell soon',
+		tagline: 'Build it, teach it, sell it',
 		heroIcon: TeachingIcon,
 		eyebrow: 'For solo creators',
-		headline: 'Build it, teach it, prove it. Selling is next.',
+		headline: 'Build it, teach it, prove it. Sell it.',
 		blurb:
-			'Authoring, quizzes, a gradebook, certificates, and gamification all work today. The one gap is checkout — so you can build and teach your course now, and sell it the moment commerce lands.',
+			'Authoring, quizzes that mark themselves, a gradebook, certificates with a serial anyone can check — and a price in your own currency, paid into your own account.',
 		shot: {
 			src: '/marketing/editor.webp',
 			alt: 'The course editor: topics with their lessons, each row draggable, each lesson previewable.',
@@ -153,36 +139,26 @@ export const SEGMENTS: Segment[] = [
 			}
 		],
 		highlight: {
-			label: 'What works today',
-			title: 'Every part of building and running a course is here.',
-			body: 'From the first lesson to the certificate at the end, the whole teaching loop is built and tested. The only thing you cannot do yet is charge for it.',
+			label: 'The whole loop',
+			title: 'One person, and still the whole teaching loop.',
+			body: 'From the first lesson to the certificate at the end — and the payment that came before it. Nothing here needs a second tool bolted on, and nothing needs a team to operate.',
 			points: [
 				'Curriculum authoring and a public catalog',
 				'Self-marking quizzes, hand-marked essays, a gradebook',
-				'Certificates and a points leaderboard'
+				'Certificates, points and a leaderboard',
+				'A price in your currency, paid into your own account'
 			]
-		},
-		roadmap: [
-			{
-				icon: Package01Icon,
-				title: 'Checkout & orders',
-				body: 'Selling a course — pricing, checkout, orders — arrives with Stripe in the commerce phase. Until then, build and teach for free.'
-			}
-		],
-		verdict: {
-			ready: 'You can build, launch, and teach a complete course today.',
-			wait: 'If your first move is to charge for it, selling is the one piece still on the way.'
 		}
 	},
 	{
 		slug: 'schools',
 		nav: 'Schools & academies',
-		tagline: 'Run it today, procure it later',
+		tagline: 'Roles, marking, and isolation',
 		heroIcon: School01Icon,
 		eyebrow: 'For schools & academies',
-		headline: 'Ready to run. Not yet ready for the RFP.',
+		headline: 'Run the school. Not the software.',
 		blurb:
-			'Multi-role access, member management, a gradebook, and hard per-workspace isolation are built. What an institutional procurement adds — the standards moat — is honestly still ahead.',
+			'Four roles with least privilege, invitations and member management, a gradebook that grades against the scale you define, and every academy isolated in the database itself.',
 		shot: {
 			src: '/marketing/grading.webp',
 			alt: 'The grading scales page: the default scale, and a new one being built band by band.',
@@ -207,51 +183,24 @@ export const SEGMENTS: Segment[] = [
 		],
 		highlight: {
 			label: 'Operations',
-			title: 'The day-to-day of running a school already works.',
-			body: 'Roles, enrollment, marking, and isolation are the operational core, and they are built and tested. What is missing is not how you teach — it is what a procurement office checks off.',
+			title: 'The day-to-day, handled.',
+			body: 'Roles, invitations, enrollment, marking and isolation are the operational core of a school, and they are the parts a term actually runs on. Staff change, cohorts change, and the workspace keeps up.',
 			points: [
 				'Multi-role RBAC with least privilege',
 				'Invitations and member management',
 				'Isolation enforced by row-level security'
 			]
-		},
-		roadmap: [
-			{
-				icon: SquareLock01Icon,
-				title: 'SSO — SAML & LTI 1.3',
-				body: 'Single sign-on and launching from an existing LMS are the first things an institution asks for. Both are in the standards phase.'
-			},
-			{
-				icon: ServerStack01Icon,
-				title: 'SCORM & interoperable content',
-				body: 'Importing and playing standards-based course packages, so existing material comes with you.'
-			},
-			{
-				icon: Certificate01Icon,
-				title: 'Accessibility — WCAG & VPAT',
-				body: 'A documented accessibility conformance report, the paperwork a public tender requires.'
-			},
-			{
-				icon: UserGroupIcon,
-				title: 'Cohorts',
-				body: 'Grouping learners into intakes that move through a course together.'
-			}
-		],
-		verdict: {
-			ready:
-				'A department or academy can teach and administer courses today with proper roles and isolation.',
-			wait: 'If you are answering a formal RFP, the standards moat — LTI, SSO, SCORM, VPAT — is still being built.'
 		}
 	},
 	{
 		slug: 'coaching',
 		nav: 'Coaching businesses',
-		tagline: 'Community now, live sessions soon',
+		tagline: 'Keep a cohort moving',
 		heroIcon: UserGroup03Icon,
 		eyebrow: 'For coaching businesses',
-		headline: 'The community is here. The live room is coming.',
+		headline: 'A cohort needs somewhere to be, between the sessions.',
 		blurb:
-			'Forum, Q&A, and announcements give a coaching cohort a place to gather today. Live sessions, scheduling, and selling are the pieces still ahead.',
+			'A forum and open Q&A, announcements that reach everyone at once, a program built as lessons and quizzes, and a dashboard that tells each client what is due next.',
 		shot: {
 			src: '/marketing/dashboard.webp',
 			alt: 'A learner dashboard: courses in progress, lessons completed, and a calendar of what is due.',
@@ -276,46 +225,24 @@ export const SEGMENTS: Segment[] = [
 		],
 		highlight: {
 			label: 'Community',
-			title: 'Between-session engagement is the part that is built.',
-			body: 'The forum, Q&A, and announcements are running today. They are what keeps a cohort warm between the live moments — and they do not wait on anything.',
+			title: 'The week between two sessions is where cohorts are lost.',
+			body: 'The forum, the Q&A, and the announcements are what keeps a cohort warm across that week — and the dashboard tells each client, without being asked, what is owed and when it is late.',
 			points: [
 				'A forum and Q&A scoped to your cohort',
 				'Announcements delivered in-app and by email',
 				'Courses and quizzes to structure the program'
 			]
-		},
-		roadmap: [
-			{
-				icon: LiveStreaming01Icon,
-				title: 'Live classes',
-				body: 'Running a session over Zoom or Meet from inside the workspace is ahead, not here.'
-			},
-			{
-				icon: Clock01Icon,
-				title: 'Scheduling & cohorts',
-				body: 'Booking sessions and moving an intake through a program together are still to come.'
-			},
-			{
-				icon: Package01Icon,
-				title: 'Selling packages',
-				body: 'Charging for a coaching package arrives with the commerce work.'
-			}
-		],
-		verdict: {
-			ready:
-				'You can host the community around your coaching today — the forum, Q&A, and announcements.',
-			wait: 'If live sessions, scheduling, or in-platform payment are core to your offer, those are still ahead.'
 		}
 	},
 	{
 		slug: 'agencies',
 		nav: 'Agencies',
-		tagline: 'Isolated client tenants, per domain',
+		tagline: 'An isolated tenant per client',
 		heroIcon: Briefcase01Icon,
 		eyebrow: 'For agencies',
-		headline: 'The tenancy is solid. The console is next.',
+		headline: 'One deployment. A separate school for every client.',
 		blurb:
-			'Every client is already an isolated tenant on its own custom domain. What is missing is the layer above — one console to run them all, and white-label theming.',
+			'Each client is an isolated tenant on its own domain, with its own roles, its own members, and its own catalog — enforced in the database, not by a filter somebody has to remember to write.',
 		shot: {
 			src: '/marketing/course.webp',
 			alt: 'A course page: the preview video, the level, the rating, the instructor, and the enrol panel.',
@@ -340,29 +267,13 @@ export const SEGMENTS: Segment[] = [
 		],
 		highlight: {
 			label: 'Foundation',
-			title: 'The hard part — isolation at the edge — is done.',
-			body: 'Multi-tenancy and per-client custom domains are the foundation an agency is built on, and both are working today. What is left sits on top of it.',
+			title: 'The hard part is the isolation, and it is not optional here.',
+			body: 'A workspace is resolved from the host, and every query is scoped to it with row-level security behind that as the net. Two clients on the same deployment cannot see one another, and no amount of forgetting a WHERE clause changes it.',
 			points: [
 				'Full data isolation per client tenant',
 				'A custom domain per client, routed at the edge',
 				'Independent roles and members inside each workspace'
 			]
-		},
-		roadmap: [
-			{
-				icon: DashboardSquare01Icon,
-				title: 'An agency console',
-				body: 'Managing many client workspaces from one place — the layer above the individual tenants — is ahead.'
-			},
-			{
-				icon: MagicWand01Icon,
-				title: 'White-label theming',
-				body: 'Reskinning each client workspace to their brand, beyond the domain, is still to come.'
-			}
-		],
-		verdict: {
-			ready: 'You can stand up isolated, custom-domain workspaces for each client today.',
-			wait: 'If you need one console over many clients or full white-label theming, that agency layer is next.'
 		}
 	}
 ];

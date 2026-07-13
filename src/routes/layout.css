@@ -573,22 +573,55 @@
 	}
 
 	/*
-		The centered hero's backdrop. A deep, near-black blue base lit by two brand
-		glows — a spotlight behind the headline and a brighter bloom rising from where
-		the product frame meets it — for depth a flat gradient cannot give. Fixed dark
-		values, not theme tokens, because the hero is dark in either theme. The grid
-		and grain layers on top are what make it read as premium rather than painted.
+		The hero's backdrop, and it follows the theme.
+
+		Two brand glows — a spotlight behind the headline, a bloom rising from where the
+		product frame meets the page — over the page's own surfaces. Built from tokens,
+		not fixed dark values: a light reader gets a lit white page, a dark reader gets
+		the deep one, and neither gets a band of somebody else's theme in the middle of
+		their own. The grain on top is what keeps a large gradient from banding.
 	*/
-	.hero-blue {
+	.hero-wash {
 		background:
-			radial-gradient(46% 40% at 50% -8%, oklch(0.62 0.13 243 / 0.4), transparent 70%),
-			radial-gradient(72% 55% at 50% 118%, oklch(0.56 0.18 243 / 0.6), transparent 72%),
-			linear-gradient(
-				180deg,
-				oklch(0.15 0.025 250) 0%,
-				oklch(0.19 0.05 246) 52%,
-				oklch(0.25 0.085 244) 100%
-			);
+			radial-gradient(
+				60% 46% at 50% -8%,
+				color-mix(in oklab, var(--accent) 20%, transparent),
+				transparent 72%
+			),
+			radial-gradient(
+				80% 55% at 50% 112%,
+				color-mix(in oklab, var(--accent) 16%, transparent),
+				transparent 74%
+			),
+			linear-gradient(180deg, var(--surface-sunken) 0%, var(--surface) 60%);
+	}
+
+	/* Dark needs more of the glow, not less: the same 20% that tints a white page
+	   disappears entirely against near-black. */
+	:root[data-theme='dark'] .hero-wash {
+		background:
+			radial-gradient(
+				62% 48% at 50% -6%,
+				color-mix(in oklab, var(--accent) 34%, transparent),
+				transparent 72%
+			),
+			radial-gradient(
+				85% 55% at 50% 112%,
+				color-mix(in oklab, var(--accent) 26%, transparent),
+				transparent 74%
+			),
+			linear-gradient(180deg, var(--surface-sunken) 0%, var(--surface) 60%);
+	}
+
+	/* The panel version — the closing call, and the specimen band. Same light, contained. */
+	.hero-panel {
+		background:
+			radial-gradient(
+				70% 60% at 50% -10%,
+				color-mix(in oklab, var(--accent) 22%, transparent),
+				transparent 70%
+			),
+			linear-gradient(180deg, var(--surface-raised), var(--surface-sunken));
 	}
 
 	/* Fine film grain. Kills the banding a big dark gradient shows on cheap panels
