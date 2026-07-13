@@ -67,7 +67,7 @@
 			class:bleed-right={!flip}
 			use:inview={{ delay: 100 }}
 		>
-			<ProductShot {src} {alt} {path} />
+			<ProductShot {src} {alt} {path} tilt={flip ? 'left' : 'right'} />
 		</div>
 	</div>
 </section>

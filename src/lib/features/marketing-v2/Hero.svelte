@@ -54,17 +54,13 @@
 
 		<!-- The dashboard as it renders: a screenshot of the app, not a drawing of one. -->
 		<div class="relative mt-16 sm:mt-20" use:inview={{ delay: 120 }}>
-			<div
-				class="pointer-events-none absolute -inset-x-24 -top-12 bottom-0 -z-10 rounded-[50%] bg-white/10 blur-3xl"
-				aria-hidden="true"
-			></div>
-
 			<ProductShot
 				eager
+				glow="light"
 				src="/marketing/dashboard.webp"
 				alt="A learner's dashboard: courses in progress, lessons completed, average progress, and a calendar of what is due."
 				path="muallim.app/dashboard"
-				class="mx-auto max-w-5xl !ring-white/15"
+				class="mx-auto max-w-5xl"
 			/>
 
 			<div class="hero-fade pointer-events-none absolute inset-x-0 -bottom-px h-28 sm:h-36"></div>
