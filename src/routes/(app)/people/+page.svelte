@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import {
 		Alert02Icon,
+		ArrowDown01Icon,
 		CheckmarkCircle02Icon,
 		Clock01Icon,
 		Mail01Icon,
@@ -23,7 +24,16 @@
 		Select,
 		Sheet
 	} from '$lib/components';
-	import { invitationTone, isOutstanding, memberTone, roleHint, roleLabel } from '$lib/people';
+	import { appendPage, canLoadMore, removeRow, replaceRow, type Paged } from '$lib/paging';
+	import {
+		invitationTone,
+		isOutstanding,
+		memberTone,
+		roleHint,
+		roleLabel,
+		type Invitation,
+		type Member
+	} from '$lib/people';
 	import { LIMITS, ROLES, invitationSchema, memberRoleSchema, type Role } from '$lib/schemas';
 	import { toast } from '$lib/toast.svelte';
 	import { validated, type FieldErrors } from '$lib/validation';
@@ -36,13 +46,24 @@
 	let errors = $state<FieldErrors>({});
 	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
+	const memberKey = (member: Member) => member.user_id;
+	const invitationKey = (invitation: Invitation) => invitation.id;
+
 	/*
-		What each picker is showing. Seeded from the server and reassigned as a whole —
+		The rows on screen. Writable $derived: the server's first page seeds them, "Load
+		more" appends the next, and every write updates the row where it stands — because
+		re-reading the list would throw a reader three pages in back to the first.
+	*/
+	let members = $derived(data.members as Paged<Member>);
+	let invitations = $derived(data.invitations as Paged<Invitation>);
+
+	/*
+		What each picker is showing. Seeded from the rows and reassigned as a whole —
 		a refused change (your own role, the last owner) puts the old one back, because
 		a control left displaying a change the API rejected is a lie about the workspace.
 	*/
 	let roles = $derived(
-		Object.fromEntries(data.members.map((m) => [m.user_id, m.role])) as Record<string, Role>
+		Object.fromEntries(members.rows.map((m) => [m.user_id, m.role])) as Record<string, Role>
 	);
 
 	let saving = $state<string | null>(null);
@@ -50,6 +71,8 @@
 	let removing = $state<string | null>(null);
 	let withdrawing = $state<string | null>(null);
 	let inviting = $state(false);
+	let loadingMembers = $state(false);
+	let loadingInvitations = $state(false);
 
 	// The role the invite form is asking for, so its hint can say what it means.
 	let inviteRole = $state<Role>('student');
@@ -71,7 +94,7 @@
 	<section class="mt-8">
 		<h2 class="text-lg font-semibold">Members</h2>
 
-		{#if data.members.length === 0}
+		{#if members.rows.length === 0}
 			<div class="mt-4">
 				<EmptyState
 					icon={UserMultiple02Icon}
@@ -83,7 +106,7 @@
 			<div class="mt-4 overflow-x-auto rounded-card bg-surface-raised shadow-card">
 				<table class="w-full border-collapse text-sm">
 					<caption class="sr-only">
-						Every member: their name, address, role, and whether they may sign in.
+						Every member: their name, address, role, when they joined, and whether they may sign in.
 					</caption>
 
 					<thead>
@@ -92,6 +115,7 @@
 							<th scope="col" class="px-4 py-3 font-medium">Email</th>
 							<th scope="col" class="w-44 px-4 py-3 font-medium">Role</th>
 							<th scope="col" class="px-4 py-3 font-medium">Status</th>
+							<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Joined</th>
 							<!-- Wide enough for the question the button turns into: asking must not
 							     widen the table under the reader. -->
 							<th scope="col" class="w-52 px-4 py-3 text-right font-medium">
@@ -101,7 +125,7 @@
 					</thead>
 
 					<tbody>
-						{#each data.members as member (member.user_id)}
+						{#each members.rows as member (member.user_id)}
 							<tr class="border-b border-border last:border-0 hover:bg-surface-sunken">
 								<th scope="row" class="px-4 py-3 text-left font-medium whitespace-nowrap">
 									{member.name}
@@ -128,16 +152,22 @@
 												const chosen = String(formData.get('role')) as Role;
 												saving = member.user_id;
 
-												return async ({ result, update }) => {
-													await update();
+												return async ({ result }) => {
 													saving = null;
 
 													// Refused. `member` is the row the server last sent, so its role is
 													// the one that still stands.
-													if (result.type === 'failure' || result.type === 'error') {
+													if (result.type !== 'success') {
 														roles = { ...roles, [member.user_id]: member.role };
+														await applyAction(result);
 														return;
 													}
+
+													// The row where it stands, not a re-read: the pages already loaded stay.
+													members = replaceRow(members, memberKey, member.user_id, {
+														...member,
+														role: chosen
+													});
 													toast.success(`${member.name}'s role is now ${roleLabel(chosen)}.`);
 												};
 											}
@@ -173,6 +203,10 @@
 									</Badge>
 								</td>
 
+								<td class="text-muted numeral px-4 py-3 whitespace-nowrap">
+									{when.format(new Date(member.joined_at))}
+								</td>
+
 								<td class="px-4 py-3 text-right whitespace-nowrap">
 									{#if confirming === member.user_id}
 										<form
@@ -181,12 +215,16 @@
 											class="flex items-center justify-end gap-2"
 											use:enhance={() => {
 												removing = member.user_id;
-												return async ({ result, update }) => {
-													await update();
+												return async ({ result }) => {
 													removing = null;
 													confirming = null;
 
-													if (result.type === 'failure' || result.type === 'error') return;
+													if (result.type !== 'success') {
+														await applyAction(result);
+														return;
+													}
+
+													members = removeRow(members, memberKey, member.user_id);
 													toast.success(`${member.name} is no longer in this workspace.`);
 												};
 											}}
@@ -232,6 +270,39 @@
 				</table>
 			</div>
 
+			<!-- No total: muallim-api runs no COUNT(*), so nothing here may claim one. The
+			     button is the only thing that knows there is more, and it goes when there is not. -->
+			{#if canLoadMore(members)}
+				<form
+					method="POST"
+					action="?/moreMembers"
+					class="mt-4 flex justify-center"
+					use:enhance={() => {
+						loadingMembers = true;
+						return async ({ result }) => {
+							loadingMembers = false;
+
+							// Not `update()`: re-running the load would drop every page but the first.
+							if (result.type !== 'success') return applyAction(result);
+
+							const next = result.data?.moreMembers as Paged<Member> | undefined;
+							if (next) members = appendPage(members, next, memberKey);
+						};
+					}}
+				>
+					<input type="hidden" name="cursor" value={members.cursor} />
+					<Button
+						type="submit"
+						variant="secondary"
+						loading={loadingMembers}
+						disabled={loadingMembers}
+					>
+						<Icon icon={ArrowDown01Icon} class="size-4" />
+						Load more members
+					</Button>
+				</form>
+			{/if}
+
 			<p class="text-muted mt-3 text-xs">
 				Removing someone ends their membership here. Their Muallim account survives, and they can be
 				invited back.
@@ -244,92 +315,133 @@
 		<h2 class="text-lg font-semibold">Invitations</h2>
 
 		<div class="mt-4 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-			{#if data.invitations.length === 0}
+			{#if invitations.rows.length === 0}
 				<EmptyState
 					icon={Mail01Icon}
 					title="Nothing outstanding"
 					description="Invitations you send appear here until they are accepted, withdrawn, or expire."
 				/>
 			{:else}
-				<div class="overflow-x-auto rounded-card bg-surface-raised shadow-card">
-					<table class="w-full border-collapse text-sm">
-						<caption class="sr-only">
-							Every invitation: the address, the role it offers, how it stands, and when it lapses.
-						</caption>
+				<div>
+					<div class="overflow-x-auto rounded-card bg-surface-raised shadow-card">
+						<table class="w-full border-collapse text-sm">
+							<caption class="sr-only">
+								Every invitation: the address, the role it offers, how it stands, and when it
+								lapses.
+							</caption>
 
-						<thead>
-							<tr class="border-b border-border bg-surface-sunken text-left">
-								<th scope="col" class="px-4 py-3 font-medium">Email</th>
-								<th scope="col" class="px-4 py-3 font-medium">Role</th>
-								<th scope="col" class="px-4 py-3 font-medium">Status</th>
-								<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Expires</th>
-								<th scope="col" class="w-48 px-4 py-3 text-right font-medium">
-									<span class="sr-only">Withdraw</span>
-								</th>
-							</tr>
-						</thead>
-
-						<tbody>
-							{#each data.invitations as invitation (invitation.id)}
-								<tr class="border-b border-border last:border-0 hover:bg-surface-sunken">
-									<th scope="row" class="px-4 py-3 text-left font-normal">{invitation.email}</th>
-
-									<td class="px-4 py-3">
-										<Badge tone="neutral">{roleLabel(invitation.role)}</Badge>
-									</td>
-
-									<td class="px-4 py-3">
-										<Badge
-											tone={invitationTone(invitation.status)}
-											icon={invitation.status === 'pending'
-												? Clock01Icon
-												: invitation.status === 'accepted'
-													? CheckmarkCircle02Icon
-													: UnavailableIcon}
-										>
-											{invitation.status}
-										</Badge>
-									</td>
-
-									<td class="text-muted numeral px-4 py-3 whitespace-nowrap">
-										{when.format(new Date(invitation.expires_at))}
-									</td>
-
-									<td class="px-4 py-3 text-right whitespace-nowrap">
-										{#if isOutstanding(invitation)}
-											<form
-												method="POST"
-												action="?/withdraw"
-												use:enhance={() => {
-													withdrawing = invitation.id;
-													return async ({ result, update }) => {
-														await update();
-														withdrawing = null;
-
-														if (result.type === 'failure' || result.type === 'error') return;
-														toast.success('Withdrawn. The link in their inbox no longer works.');
-													};
-												}}
-											>
-												<input type="hidden" name="id" value={invitation.id} />
-												<Button
-													type="submit"
-													variant="secondary"
-													size="sm"
-													loading={withdrawing === invitation.id}
-													disabled={withdrawing === invitation.id}
-													aria-label="Withdraw the invitation to {invitation.email}"
-												>
-													<Icon icon={UnavailableIcon} class="size-4" />
-													Withdraw
-												</Button>
-											</form>
-										{/if}
-									</td>
+							<thead>
+								<tr class="border-b border-border bg-surface-sunken text-left">
+									<th scope="col" class="px-4 py-3 font-medium">Email</th>
+									<th scope="col" class="px-4 py-3 font-medium">Role</th>
+									<th scope="col" class="px-4 py-3 font-medium">Status</th>
+									<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Expires</th>
+									<th scope="col" class="w-48 px-4 py-3 text-right font-medium">
+										<span class="sr-only">Withdraw</span>
+									</th>
 								</tr>
-							{/each}
-						</tbody>
-					</table>
+							</thead>
+
+							<tbody>
+								{#each invitations.rows as invitation (invitation.id)}
+									<tr class="border-b border-border last:border-0 hover:bg-surface-sunken">
+										<th scope="row" class="px-4 py-3 text-left font-normal">{invitation.email}</th>
+
+										<td class="px-4 py-3">
+											<Badge tone="neutral">{roleLabel(invitation.role)}</Badge>
+										</td>
+
+										<td class="px-4 py-3">
+											<Badge
+												tone={invitationTone(invitation.status)}
+												icon={invitation.status === 'pending'
+													? Clock01Icon
+													: invitation.status === 'accepted'
+														? CheckmarkCircle02Icon
+														: UnavailableIcon}
+											>
+												{invitation.status}
+											</Badge>
+										</td>
+
+										<td class="text-muted numeral px-4 py-3 whitespace-nowrap">
+											{when.format(new Date(invitation.expires_at))}
+										</td>
+
+										<td class="px-4 py-3 text-right whitespace-nowrap">
+											{#if isOutstanding(invitation)}
+												<form
+													method="POST"
+													action="?/withdraw"
+													use:enhance={() => {
+														withdrawing = invitation.id;
+														return async ({ result }) => {
+															withdrawing = null;
+
+															if (result.type !== 'success') {
+																await applyAction(result);
+																return;
+															}
+
+															// Not deleted — muallim-api stamps `revoked_at`, and the row reads so.
+															invitations = replaceRow(invitations, invitationKey, invitation.id, {
+																...invitation,
+																status: 'revoked'
+															});
+															toast.success('Withdrawn. The link in their inbox no longer works.');
+														};
+													}}
+												>
+													<input type="hidden" name="id" value={invitation.id} />
+													<Button
+														type="submit"
+														variant="secondary"
+														size="sm"
+														loading={withdrawing === invitation.id}
+														disabled={withdrawing === invitation.id}
+														aria-label="Withdraw the invitation to {invitation.email}"
+													>
+														<Icon icon={UnavailableIcon} class="size-4" />
+														Withdraw
+													</Button>
+												</form>
+											{/if}
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+
+					{#if canLoadMore(invitations)}
+						<form
+							method="POST"
+							action="?/moreInvitations"
+							class="mt-4 flex justify-center"
+							use:enhance={() => {
+								loadingInvitations = true;
+								return async ({ result }) => {
+									loadingInvitations = false;
+
+									if (result.type !== 'success') return applyAction(result);
+
+									const next = result.data?.moreInvitations as Paged<Invitation> | undefined;
+									if (next) invitations = appendPage(invitations, next, invitationKey);
+								};
+							}}
+						>
+							<input type="hidden" name="cursor" value={invitations.cursor} />
+							<Button
+								type="submit"
+								variant="secondary"
+								loading={loadingInvitations}
+								disabled={loadingInvitations}
+							>
+								<Icon icon={ArrowDown01Icon} class="size-4" />
+								Load more invitations
+							</Button>
+						</form>
+					{/if}
 				</div>
 			{/if}
 
@@ -342,10 +454,18 @@
 					() => {
 						inviting = true;
 						return async ({ result, update }) => {
-							await update();
+							// Applies the result and clears the fields; `invalidateAll: false` is what
+							// keeps the pages already loaded from being thrown away underneath.
+							await update({ invalidateAll: false });
 							inviting = false;
 
-							if (result.type === 'failure' || result.type === 'error') return;
+							if (result.type !== 'success') return;
+
+							// The API sent the row back, so a newest-first list takes it at the head.
+							const invited = result.data?.invited as Invitation | undefined;
+							if (invited) {
+								invitations = { ...invitations, rows: [invited, ...invitations.rows] };
+							}
 							toast.success('Invitation sent. The link goes to their inbox.');
 						};
 					}

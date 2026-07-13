@@ -1,7 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { slide } from 'svelte/transition';
 	import {
+		ArrowDown01Icon,
+		Certificate01Icon,
+		CheckmarkCircle02Icon,
 		Delete02Icon,
 		PlusSignIcon,
 		Search01Icon,
@@ -14,6 +18,7 @@
 		Button,
 		Card,
 		Certificate,
+		EmptyState,
 		Field,
 		Icon,
 		Input,
@@ -23,6 +28,8 @@
 		Textarea
 	} from '$lib/components';
 	import { renderPreview, SAMPLE } from '$lib/certificate-preview';
+	import { appendPage, canLoadMore, replaceRow, type Paged } from '$lib/paging';
+	import { DURATION, easeOut } from '$lib/motion';
 	import {
 		LIMITS,
 		certificateLookupSchema,
@@ -31,7 +38,10 @@
 	} from '$lib/schemas';
 	import { toast } from '$lib/toast.svelte';
 	import { validated, type FieldErrors } from '$lib/validation';
+	import type { components } from '$lib/api/schema';
 	import type { PageProps } from './$types';
+
+	type CertificateView = components['schemas']['CertificateView'];
 
 	let { data, form }: PageProps = $props();
 
@@ -40,19 +50,19 @@
 
 	const crumbs = [{ label: 'Teach', href: resolve('/teach') }, { label: 'Certificates' }];
 
-	const found = $derived(data.lookup?.certificate ?? null);
+	const when = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
+	const key = (certificate: CertificateView) => certificate.serial;
 
-	// Withdrawing is asked about before it is done, in the panel itself. `window.confirm`
-	// is blocked, and a dialog for a decision this size is a dialog nobody reads.
-	let confirming = $state(false);
-	let revoking = $state(false);
+	/* The rows on screen: the server's first page, plus whatever "Load more" appended.
+	   A withdrawal replaces its row where it stands, so nothing under the reader moves. */
+	let certificates = $derived(data.certificates as Paged<CertificateView>);
+
+	// Withdrawing is asked about in the row itself. `window.confirm` is blocked, and a
+	// dialog for a decision this size is a dialog nobody reads.
+	let confirming = $state<string | null>(null);
+	let revoking = $state<string | null>(null);
 	let searching = $state(false);
-
-	const issued = $derived(
-		found
-			? new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(found.issued_at))
-			: ''
-	);
+	let loadingMore = $state(false);
 
 	// The default wording is the starting point, so an author edits from something
 	// that already works. It is the description only — the learner's name, the
@@ -78,7 +88,7 @@
 	<PageHeader
 		class="mt-4"
 		title="Certificates"
-		description="The words a certificate carries, and the way to withdraw one that should not stand."
+		description="Every certificate this workspace has issued, and the words the next one will carry."
 	/>
 
 	{#if form?.message}
@@ -87,9 +97,296 @@
 		<Alert tone="success" class="mt-6" role="status">Saved “{form.created}”.</Alert>
 	{/if}
 
-	<!-- --------------------------------------------------- existing templates -->
+	<!-- ----------------------------------------------------------------- issued -->
 	<section class="mt-8">
-		<h2 class="text-lg font-semibold">In this workspace</h2>
+		<div class="flex flex-wrap items-end justify-between gap-4">
+			<div>
+				<h2 class="text-lg font-semibold">Issued</h2>
+				<p class="text-muted mt-1 text-sm">Newest first. A certificate is earned, not granted.</p>
+			</div>
+
+			<!-- Secondary: the list leads, but a registrar holding the number should not
+			     have to page to it. It narrows the list to that one certificate. -->
+			<form
+				method="POST"
+				action="?/find"
+				class="flex items-start gap-2"
+				use:enhance={validated(
+					certificateLookupSchema,
+					(next) => (errors = next),
+					() => {
+						searching = true;
+						return async ({ update }) => {
+							await update();
+							searching = false;
+						};
+					}
+				)}
+			>
+				<div class="w-56">
+					<Input
+						name="serial"
+						value={data.serial ?? ''}
+						invalid={Boolean(problem('serial'))}
+						aria-label="Find a certificate by its number"
+						placeholder="CERT-…"
+						{...LIMITS.certificateSerial}
+					/>
+				</div>
+
+				<Button type="submit" variant="secondary" loading={searching} disabled={searching}>
+					<Icon icon={Search01Icon} class="size-4" />
+					Find
+				</Button>
+			</form>
+		</div>
+
+		{#if problem('serial')}
+			<p class="mt-2 text-right text-sm text-danger-text">{problem('serial')}</p>
+		{/if}
+
+		{#if data.serial}
+			<div class="mt-4 flex flex-wrap items-center gap-3">
+				<p class="text-muted text-sm">
+					Showing the certificate numbered <span class="numeral text-text">{data.serial}</span>.
+				</p>
+				<Button href={resolve('/teach/certificates')} variant="ghost" size="sm">Show all</Button>
+			</div>
+		{/if}
+
+		{#if data.notFound}
+			<Alert tone="warning" class="mt-4" role="status">{data.notFound}</Alert>
+		{:else if certificates.rows.length === 0}
+			<div class="mt-4">
+				<EmptyState
+					icon={Certificate01Icon}
+					title="Nothing issued yet"
+					description="A certificate is issued when a learner completes a course that awards one. They will appear here, newest first."
+				/>
+			</div>
+		{:else}
+			<div class="mt-4 overflow-x-auto rounded-card bg-surface-raised shadow-card">
+				<table class="w-full border-collapse text-sm">
+					<caption class="sr-only">
+						Every certificate: its number, who earned it, which course, when it was issued, and
+						whether it still stands.
+					</caption>
+
+					<thead>
+						<tr class="border-b border-border bg-surface-sunken text-left">
+							<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Number</th>
+							<th scope="col" class="px-4 py-3 font-medium">Learner</th>
+							<th scope="col" class="px-4 py-3 font-medium">Course</th>
+							<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Issued</th>
+							<th scope="col" class="px-4 py-3 font-medium">Status</th>
+							<!-- Wide enough for the question the button turns into: asking must not
+							     widen the table under the reader. -->
+							<th scope="col" class="w-56 px-4 py-3 text-right font-medium">
+								<span class="sr-only">Withdraw</span>
+							</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						{#each certificates.rows as certificate (certificate.serial)}
+							<!-- No rule under a row whose reason or question is the next row: the two are
+							     one thing, and a line between them would say they were two. -->
+							<tr
+								class="border-b border-border hover:bg-surface-sunken"
+								class:border-0={confirming === certificate.serial ||
+									(certificate.revoked && Boolean(certificate.revoked_reason))}
+							>
+								<th scope="row" class="numeral px-4 py-3 text-left font-medium whitespace-nowrap">
+									<a
+										class="underline-grow"
+										href={resolve(`/verify/${certificate.serial}`)}
+										target="_blank"
+										rel="noopener"
+									>
+										{certificate.serial}
+									</a>
+								</th>
+
+								<td class="px-4 py-3">{certificate.learner_name}</td>
+								<td class="text-muted px-4 py-3">{certificate.course_title}</td>
+
+								<td class="text-muted numeral px-4 py-3 whitespace-nowrap">
+									{when.format(new Date(certificate.issued_at))}
+								</td>
+
+								<td class="px-4 py-3">
+									<Badge
+										tone={certificate.revoked ? 'danger' : 'success'}
+										icon={certificate.revoked ? UnavailableIcon : CheckmarkCircle02Icon}
+									>
+										{certificate.revoked ? 'Withdrawn' : 'Valid'}
+									</Badge>
+								</td>
+
+								<td class="px-4 py-3 text-right whitespace-nowrap">
+									{#if certificate.revoked}
+										<span class="text-muted numeral text-xs">
+											{certificate.revoked_at ? when.format(new Date(certificate.revoked_at)) : ''}
+										</span>
+									{:else if confirming !== certificate.serial}
+										<Button
+											variant="secondary"
+											size="sm"
+											onclick={() => (confirming = certificate.serial)}
+											aria-label="Withdraw certificate {certificate.serial}, {certificate.learner_name}"
+										>
+											<Icon icon={UnavailableIcon} class="size-4" />
+											Withdraw
+										</Button>
+									{/if}
+								</td>
+							</tr>
+
+							{#if certificate.revoked && certificate.revoked_reason}
+								<tr class="border-b border-border last:border-0">
+									<td colspan="6" class="px-4 pb-3">
+										<p class="text-muted text-xs">
+											<span class="font-medium text-danger-text">Withdrawn:</span>
+											{certificate.revoked_reason}
+										</p>
+									</td>
+								</tr>
+							{/if}
+
+							{#if confirming === certificate.serial}
+								<!-- The reason is not a formality: it is what the number will say from now on. -->
+								<tr class="border-b border-border last:border-0 bg-surface-sunken">
+									<td colspan="6" class="px-4 py-0">
+										<div transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+											<form
+												method="POST"
+												action="?/revoke"
+												class="py-4"
+												use:enhance={validated(
+													revokeCertificateSchema,
+													(next) => (errors = next),
+													() => {
+														revoking = certificate.serial;
+														return async ({ result }) => {
+															revoking = null;
+
+															if (result.type !== 'success') {
+																await applyAction(result);
+																return;
+															}
+
+															confirming = null;
+
+															// The row as the API now reads it back — not a guess at it.
+															const after = result.data?.revoked as CertificateView | undefined;
+															if (after) {
+																certificates = replaceRow(
+																	certificates,
+																	key,
+																	certificate.serial,
+																	after
+																);
+															}
+															toast.success('Withdrawn. The number now says so.');
+														};
+													}
+												)}
+											>
+												<input type="hidden" name="serial" value={certificate.serial} />
+
+												<div class="flex flex-wrap items-start justify-between gap-4">
+													<div class="w-full max-w-md">
+														<Field
+															id="reason-{certificate.serial}"
+															label="Why is it being withdrawn?"
+															error={problem('reason')}
+															hint="Shown to anyone who checks the number."
+														>
+															{#snippet children({ id, describedBy, invalid })}
+																<Textarea
+																	{id}
+																	{invalid}
+																	name="reason"
+																	rows={2}
+																	aria-describedby={describedBy}
+																	{...LIMITS.revokeReason}
+																/>
+															{/snippet}
+														</Field>
+													</div>
+
+													<div class="flex items-center gap-2 pt-7">
+														<Button
+															type="submit"
+															variant="danger"
+															loading={revoking === certificate.serial}
+															disabled={revoking === certificate.serial}
+															aria-label="Yes, withdraw certificate {certificate.serial}"
+														>
+															<Icon icon={UnavailableIcon} class="size-4" />
+															Yes, withdraw
+														</Button>
+														<Button
+															type="button"
+															variant="ghost"
+															onclick={() => (confirming = null)}
+														>
+															Keep
+														</Button>
+													</div>
+												</div>
+
+												<p class="text-muted mt-3 max-w-md text-xs">
+													The certificate is not deleted. The number keeps answering, and says it
+													was withdrawn.
+												</p>
+											</form>
+										</div>
+									</td>
+								</tr>
+							{/if}
+						{/each}
+					</tbody>
+				</table>
+			</div>
+
+			<!-- No total: muallim-api runs no COUNT(*), so nothing here may claim one. The
+			     button is the only thing that knows there is more, and it goes when there is not. -->
+			{#if canLoadMore(certificates)}
+				<form
+					method="POST"
+					action="?/more"
+					class="mt-4 flex justify-center"
+					use:enhance={() => {
+						loadingMore = true;
+						return async ({ result }) => {
+							loadingMore = false;
+
+							// Not `update()`: re-running the load would drop every page but the first.
+							if (result.type !== 'success') return applyAction(result);
+
+							const next = result.data?.more as Paged<CertificateView> | undefined;
+							if (next) certificates = appendPage(certificates, next, key);
+						};
+					}}
+				>
+					<input type="hidden" name="cursor" value={certificates.cursor} />
+					<Button type="submit" variant="secondary" loading={loadingMore} disabled={loadingMore}>
+						<Icon icon={ArrowDown01Icon} class="size-4" />
+						Load more certificates
+					</Button>
+				</form>
+			{/if}
+		{/if}
+	</section>
+
+	<!-- --------------------------------------------------- existing templates -->
+	<section class="mt-12">
+		<h2 class="text-lg font-semibold">Templates</h2>
+		<p class="text-muted mt-1 text-sm">
+			The words a certificate carries. A certificate already issued keeps the words it was issued
+			with.
+		</p>
 
 		<ul class="mt-4 space-y-2">
 			{#each data.templates as template (template.id ?? 'builtin')}
@@ -240,168 +537,5 @@
 				/>
 			</div>
 		</div>
-	</section>
-
-	<!-- --------------------------------------------------- withdraw a certificate -->
-	<section class="mt-12 max-w-2xl">
-		<h2 class="text-lg font-semibold">Withdraw a certificate</h2>
-		<p class="text-muted mt-1 text-sm">
-			A certificate is found by its number — the one printed on it. Nothing lists what a workspace
-			has issued.
-		</p>
-
-		<form
-			method="POST"
-			action="?/find"
-			class="mt-4"
-			use:enhance={validated(
-				certificateLookupSchema,
-				(next) => (errors = next),
-				() => {
-					searching = true;
-					return async ({ update }) => {
-						await update();
-						searching = false;
-					};
-				}
-			)}
-		>
-			<Sheet>
-				<Field
-					id="serial"
-					label="Certificate number"
-					error={problem('serial')}
-					hint="Printed at the foot of the certificate."
-				>
-					{#snippet children({ id, describedBy, invalid })}
-						<Input
-							{id}
-							{invalid}
-							name="serial"
-							value={data.lookup?.serial ?? ''}
-							aria-describedby={describedBy}
-							{...LIMITS.certificateSerial}
-						/>
-					{/snippet}
-				</Field>
-
-				{#snippet footer()}
-					<Button type="submit" variant="secondary" loading={searching} disabled={searching}>
-						<Icon icon={Search01Icon} class="size-4" />
-						Find it
-					</Button>
-				{/snippet}
-			</Sheet>
-		</form>
-
-		{#if data.lookup?.message}
-			<Alert tone="warning" class="mt-4" role="status">{data.lookup.message}</Alert>
-		{/if}
-
-		{#if found}
-			<Card float class="mt-4 p-5">
-				<div class="flex flex-wrap items-start justify-between gap-3">
-					<div class="min-w-0">
-						<p class="font-medium">{found.learner_name}</p>
-						<p class="text-muted mt-0.5 text-sm">{found.course_title}</p>
-					</div>
-
-					<Badge
-						tone={found.revoked ? 'danger' : 'success'}
-						icon={found.revoked ? UnavailableIcon : undefined}
-					>
-						{found.revoked ? 'Withdrawn' : 'Valid'}
-					</Badge>
-				</div>
-
-				<dl class="text-muted mt-4 grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-[auto_1fr]">
-					<dt class="font-medium text-text">Issued</dt>
-					<dd class="numeral">{issued}</dd>
-
-					<dt class="font-medium text-text">Number</dt>
-					<dd class="numeral">{found.serial}</dd>
-
-					{#if found.revoked && found.revoked_reason}
-						<dt class="font-medium text-danger-text">Reason</dt>
-						<dd>{found.revoked_reason}</dd>
-					{/if}
-				</dl>
-
-				{#if found.revoked}
-					<p class="text-muted mt-4 text-xs">
-						The number still answers, and tells whoever asks that this certificate was withdrawn. A
-						withdrawal cannot be undone here.
-					</p>
-				{:else}
-					<!-- The reason is not a formality: it is what the number will say from now on. -->
-					<form
-						method="POST"
-						action="?/revoke"
-						class="mt-5 border-t border-border pt-5"
-						use:enhance={validated(
-							revokeCertificateSchema,
-							(next) => (errors = next),
-							() => {
-								revoking = true;
-								return async ({ result, update }) => {
-									await update();
-									revoking = false;
-									confirming = false;
-
-									if (result.type === 'failure' || result.type === 'error') return;
-									toast.success('Withdrawn. The number now says so.');
-								};
-							}
-						)}
-					>
-						<input type="hidden" name="serial" value={found.serial} />
-
-						<Field
-							id="reason"
-							label="Reason"
-							error={problem('reason')}
-							hint="Shown to anyone who checks the number."
-						>
-							{#snippet children({ id, describedBy, invalid })}
-								<Textarea
-									{id}
-									{invalid}
-									name="reason"
-									rows={2}
-									aria-describedby={describedBy}
-									{...LIMITS.revokeReason}
-								/>
-							{/snippet}
-						</Field>
-
-						<!-- The caution stands whether or not the question has been asked, so asking it
-					     swaps the buttons and moves nothing else. -->
-						<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-							<p class="text-muted max-w-xs text-xs">
-								The certificate is not deleted. The number keeps answering, and says it was
-								withdrawn.
-							</p>
-
-							<div class="flex items-center gap-2">
-								{#if confirming}
-									<Button type="submit" variant="danger" loading={revoking} disabled={revoking}>
-										<Icon icon={UnavailableIcon} class="size-4" />
-										Yes, withdraw
-									</Button>
-									<Button type="button" variant="ghost" onclick={() => (confirming = false)}>
-										Keep
-									</Button>
-								{:else}
-									<Button type="button" variant="secondary" onclick={() => (confirming = true)}>
-										<Icon icon={UnavailableIcon} class="size-4" />
-										Withdraw this certificate
-									</Button>
-								{/if}
-							</div>
-						</div>
-					</form>
-				{/if}
-			</Card>
-		{/if}
 	</section>
 </Page>

@@ -1,5 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { pageOf } from '$lib/paging';
 import { authedApi } from '$lib/server/api';
 import {
 	certificateLookupSchema,
@@ -9,54 +10,93 @@ import {
 import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
+/** One page of issued certificates. muallim-api's ceiling is 100. */
+const PAGE_SIZE = 50;
+
 /**
- * The workspace's certificate templates, and the certificate a serial names.
+ * What this workspace has issued, and the words a certificate carries.
  *
- * `/teach/+layout.server.ts` has established `course:write`, which is what the
- * API's template endpoints require. The built-in default comes back first, and is
- * not something anybody may edit or delete.
- *
- * muallim-api lists no issued certificates — `GET /v1/certificates/{serial}` answers
- * one number at a time, and nothing enumerates them — so withdrawing one starts
- * with the number, and the page shows what that number actually says before
- * offering to withdraw it.
+ * `/teach/+layout.server.ts` has established `course:write`, which is what both the
+ * list and the template endpoints require. A serial narrows the list to one
+ * certificate — for a registrar holding the number, which is faster than paging to it.
  */
 export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
-	if (!locals.accessToken) error(401, 'Sign in to manage certificate templates.');
+	if (!locals.accessToken) error(401, 'Sign in to manage certificates.');
 
 	const api = authedApi(url.origin, locals.accessToken);
+	const serial = url.searchParams.get('serial')?.trim();
 
-	const { data, error: problem, response } = await api.GET('/v1/certificate-templates');
+	const [templates, issued] = await Promise.all([
+		api.GET('/v1/certificate-templates'),
+		serial
+			? api.GET('/v1/certificates/{serial}', { params: { path: { serial } } })
+			: api.GET('/v1/certificates', { params: { query: { limit: PAGE_SIZE } } })
+	]);
 
-	if (problem || !data) {
+	if (templates.error || !templates.data) {
 		error(
-			response?.status ?? 500,
-			problemMessage(problem, 'Certificate templates could not be loaded.')
+			templates.response?.status ?? 500,
+			problemMessage(templates.error, 'Certificate templates could not be loaded.')
 		);
 	}
 
 	setHeaders({ 'cache-control': 'private, no-store' });
 
-	const serial = url.searchParams.get('serial')?.trim();
-	if (!serial) return { templates: data.templates ?? [], lookup: null };
+	// A number nobody issued is not a broken page: it is an answer. The list says so
+	// and offers the way back to all of them.
+	if (serial) {
+		const found = issued.data && 'certificate' in issued.data ? issued.data.certificate : null;
 
-	const found = await api.GET('/v1/certificates/{serial}', { params: { path: { serial } } });
-
-	// A number nobody issued is not a broken page: it is an answer. The section says
-	// so and the templates above it stay where they were.
-	return {
-		templates: data.templates ?? [],
-		lookup: {
+		return {
+			templates: templates.data.templates ?? [],
 			serial,
-			certificate: found.data?.certificate ?? null,
-			message: found.error
-				? problemMessage(found.error, 'No certificate carries that number.')
-				: null
-		}
+			notFound: found ? null : problemMessage(issued.error, 'No certificate carries that number.'),
+			certificates: pageOf(found ? [found] : [], undefined, false)
+		};
+	}
+
+	if (issued.error || !issued.data || !('certificates' in issued.data)) {
+		error(
+			issued.response?.status ?? 500,
+			problemMessage(issued.error, 'This workspace’s certificates could not be loaded.')
+		);
+	}
+
+	return {
+		templates: templates.data.templates ?? [],
+		serial: null,
+		notFound: null,
+		certificates: pageOf(issued.data.certificates, issued.data.next_cursor, issued.data.has_more)
 	};
 };
 
 export const actions: Actions = {
+	/*
+		The next page of certificates. The cursor is opaque and goes back unread; one the
+		API did not issue comes back a 422, and the page prints the sentence it came with.
+	*/
+	more: async ({ request, locals, url }) => {
+		if (!locals.accessToken) error(401, 'Sign in to manage certificates.');
+
+		const cursor = String((await request.formData()).get('cursor') ?? '');
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).GET('/v1/certificates', {
+			params: { query: { limit: PAGE_SIZE, cursor } }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'The next page of certificates could not be loaded.')
+			});
+		}
+
+		return { more: pageOf(data.certificates, data.next_cursor, data.has_more) };
+	},
+
 	create: async ({ request, locals, url }) => {
 		if (!locals.accessToken) error(401, 'Sign in to manage certificate templates.');
 
@@ -99,7 +139,7 @@ export const actions: Actions = {
 		return { deleted: true };
 	},
 
-	/** Look a certificate up by its number. The serial is the only handle there is. */
+	/** Narrow the list to one number — the handle a registrar already holds. */
 	find: async ({ request }) => {
 		const parsed = parseForm(certificateLookupSchema, await request.formData());
 		if (!parsed.ok) return fail(400, { errors: parsed.errors });
@@ -118,13 +158,11 @@ export const actions: Actions = {
 		const parsed = parseForm(revokeCertificateSchema, await request.formData());
 		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
-		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
-			'/v1/certificates/{serial}/revoke',
-			{
-				params: { path: { serial: parsed.value.serial } },
-				body: { reason: parsed.value.reason }
-			}
-		);
+		const api = authedApi(url.origin, locals.accessToken);
+		const { error: problem, response } = await api.POST('/v1/certificates/{serial}/revoke', {
+			params: { path: { serial: parsed.value.serial } },
+			body: { reason: parsed.value.reason }
+		});
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
@@ -132,8 +170,12 @@ export const actions: Actions = {
 			});
 		}
 
-		// Back to the number, which now answers that it was withdrawn — the whole point
-		// of not deleting it, and the only proof the author has that it worked.
-		redirect(303, `/teach/certificates?serial=${encodeURIComponent(parsed.value.serial)}`);
+		// The row as it now reads, so it can be replaced where it stands — the reader
+		// stays on the page they were paging, and sees the number say it was withdrawn.
+		const after = await api.GET('/v1/certificates/{serial}', {
+			params: { path: { serial: parsed.value.serial } }
+		});
+
+		return { revoked: after.data?.certificate ?? null };
 	}
 };

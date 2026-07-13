@@ -1,12 +1,13 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { pageOf } from '$lib/paging';
 import { authedApi } from '$lib/server/api';
 import { invitationSchema, memberRoleSchema } from '$lib/schemas';
 import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
-/** muallim-api's ceiling on both lists. There is no cursor, so this is the page. */
-const PAGE_SIZE = 200;
+/** One page of either list. muallim-api's ceiling is 100; the rest is behind a cursor. */
+const PAGE_SIZE = 50;
 
 /*
 	The workspace's people: who is in it, and who has been asked.
@@ -43,12 +44,65 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
 
 	return {
-		members: members.data.members ?? [],
-		invitations: invitations.data.invitations ?? []
+		members: pageOf(members.data.members, members.data.next_cursor, members.data.has_more),
+		invitations: pageOf(
+			invitations.data.invitations,
+			invitations.data.next_cursor,
+			invitations.data.has_more
+		)
 	};
 };
 
 export const actions: Actions = {
+	/*
+		The next page of members. The cursor is opaque and goes back unread; one the API
+		did not issue comes back a 422, and the page prints the sentence it came with.
+	*/
+	moreMembers: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login?next=%2Fpeople');
+
+		const cursor = String((await request.formData()).get('cursor') ?? '');
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).GET('/v1/members', {
+			params: { query: { limit: PAGE_SIZE, cursor } }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'The next page of members could not be loaded.')
+			});
+		}
+
+		return { moreMembers: pageOf(data.members, data.next_cursor, data.has_more) };
+	},
+
+	/** The next page of invitations. Same cursor, same refusal. */
+	moreInvitations: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login?next=%2Fpeople');
+
+		const cursor = String((await request.formData()).get('cursor') ?? '');
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).GET('/v1/invitations', {
+			params: { query: { limit: PAGE_SIZE, cursor } }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'The next page of invitations could not be loaded.')
+			});
+		}
+
+		return { moreInvitations: pageOf(data.invitations, data.next_cursor, data.has_more) };
+	},
+
 	/*
 		Promote or demote. muallim-api revokes the member's sessions, so the new role is
 		in force on their next request — and it refuses a self-demotion and the removal
@@ -74,7 +128,9 @@ export const actions: Actions = {
 			});
 		}
 
-		return { role: parsed.value.role };
+		// Named, because the page updates that row where it stands rather than re-reading
+		// the list: a reader three pages in must not be thrown back to the first.
+		return { role: parsed.value.role, user_id: userId };
 	},
 
 	/** The membership goes; the person's account does not. They can be invited back. */
@@ -94,7 +150,7 @@ export const actions: Actions = {
 			});
 		}
 
-		return { removed: true };
+		return { removed: userId };
 	},
 
 	/*
@@ -108,21 +164,27 @@ export const actions: Actions = {
 		const parsed = parseForm(invitationSchema, await request.formData());
 		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
-		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
-			'/v1/invitations',
-			{ body: parsed.value }
-		);
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/invitations', {
+			body: parsed.value
+		});
 
-		if (problem) {
+		if (problem || !data) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(problem, 'That invitation could not be sent.')
 			});
 		}
 
-		return { invited: parsed.value.email };
+		// The row itself, so the page can put it at the head of a newest-first list
+		// without re-reading — and without the token, which the API returns to nobody.
+		return { invited: data.invitation };
 	},
 
-	/** Withdraw an outstanding invitation. The link in the inbox stops working. */
+	/** Withdraw an outstanding invitation. The row stays and reads `revoked`; the link
+	 *  in the inbox stops working. */
 	withdraw: async ({ request, locals, url }) => {
 		if (!locals.accessToken) redirect(303, '/login?next=%2Fpeople');
 
@@ -139,6 +201,6 @@ export const actions: Actions = {
 			});
 		}
 
-		return { withdrawn: true };
+		return { withdrawn: id };
 	}
 };
