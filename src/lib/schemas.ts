@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseAddresses } from '$lib/cohort';
 
 /*
 	Every form's rules, once — read by the page and by the action. The bounds are
@@ -52,6 +53,10 @@ export const LIMITS = {
 	// well under its 4000, because bKash's three are packed into that one field.
 	gatewayPublicId: { required: true, maxlength: 200 },
 	gatewaySecret: { required: true, maxlength: 500 },
+
+	// No `maxlength`: 500 addresses of 320 characters is a paste muallim-api accepts,
+	// and an attribute that refused it would be a rule this repo invented.
+	cohortEmails: { required: true },
 
 	inviteEmail: { required: true, type: 'email', maxlength: 320 },
 	memberRole: { required: true },
@@ -319,6 +324,29 @@ export const invitationSchema = z.object({
 });
 
 export const memberRoleSchema = z.object({ role });
+
+/** muallim-api takes 1 to 500 addresses in one import. */
+export const MAX_COHORT = 500;
+
+/*
+	A pasted cohort. The textarea is one string; the schema is the list it means, so
+	`parseAddresses` runs before the rules do — in the page and in the action alike.
+	The refusal names the address that is not one: "invalid email" under a box of
+	forty lines is a hunt.
+*/
+export const cohortSchema = z.object({
+	emails: z.preprocess(
+		(value) => (typeof value === 'string' ? parseAddresses(value) : value),
+		z
+			.array(z.string())
+			.min(1, 'Paste at least one email address.')
+			.max(MAX_COHORT, `That is more than ${MAX_COHORT} addresses. Import them in batches.`)
+			.superRefine((addresses, ctx) => {
+				const bad = addresses.find((address) => !z.email().safeParse(address).success);
+				if (bad) ctx.addIssue({ code: 'custom', message: `“${bad}” is not an email address.` });
+			})
+	)
+});
 
 /** Your own name. Trimmed here as the API trims it there. */
 export const renameSchema = z.object({

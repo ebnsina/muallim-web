@@ -7,6 +7,7 @@
 	import { DURATION, easeInOut, easeOut } from '$lib/motion';
 	import { draggable, droppable, type DragDropState } from '@thisux/sveltednd';
 	import {
+		Alert02Icon,
 		Analytics01Icon,
 		ArrowDown01Icon,
 		CreditCardIcon,
@@ -24,6 +25,9 @@
 		Settings02Icon,
 		Tick02Icon,
 		TaskDone01Icon,
+		UserAdd01Icon,
+		UserCheck01Icon,
+		UserGroupIcon,
 		ViewIcon
 	} from '@hugeicons/core-free-icons';
 	import type { ActionResult } from '@sveltejs/kit';
@@ -47,12 +51,24 @@
 		Select,
 		Sheet,
 		Stars,
-		Textarea
+		Textarea,
+		type IconSvgElement
 	} from '$lib/components';
 	import AiOutline from '$lib/components/AiOutline.svelte';
 	import {
+		OUTCOMES,
+		outcomeHint,
+		outcomeLabel,
+		outcomeTone,
+		parseAddresses,
+		resultsFor,
+		type Outcome
+	} from '$lib/cohort';
+	import {
 		LIMITS,
+		MAX_COHORT,
 		announcementSchema,
+		cohortSchema,
 		lessonSchema,
 		prerequisiteSchema,
 		previewSchema,
@@ -107,7 +123,7 @@
 		which updates the data without navigating — so the tab a person is working in
 		survives their own edits, which is the only thing it has to survive.
 	*/
-	type Tool = 'curriculum' | 'announcements' | 'insights' | 'settings';
+	type Tool = 'curriculum' | 'learners' | 'announcements' | 'insights' | 'settings';
 
 	const TOOLS = $derived([
 		{
@@ -116,6 +132,10 @@
 			icon: TaskDone01Icon,
 			count: data.lessonCount
 		},
+
+		// Nothing lists a course's roster, so the tab carries no count: a number here
+		// would be one this page made up.
+		{ id: 'learners' as const, label: 'Learners', icon: UserGroupIcon, count: 0 },
 		{
 			id: 'announcements' as const,
 			label: 'Announcements',
@@ -151,6 +171,22 @@
 	// The composer is closed until it is wanted. An empty form at the top of a list of
 	// notices is a form that pushes the notices off the screen for nothing.
 	let composing = $state(false);
+
+	/*
+		The cohort a person pastes. It is split, trimmed, lower-cased and de-duplicated
+		here — the same `parseAddresses` the schema and the action run — so the count
+		under the box is the list that will actually be sent, not the lines that were
+		typed. muallim-api cleans it a third time; agreeing with it is the point.
+	*/
+	let pasted = $state('');
+	const addresses = $derived(parseAddresses(pasted));
+	let importing = $state(false);
+
+	const OUTCOME_ICONS: Record<Outcome, IconSvgElement> = {
+		enrolled: CheckmarkCircle02Icon,
+		already_enrolled: UserCheck01Icon,
+		not_a_member: Alert02Icon
+	};
 
 	const PREVIEW_SOURCES = [
 		{ value: 'none', label: 'No preview' },
@@ -762,6 +798,173 @@
 					<AiOutline enabled={data.aiEnabled} courseTitle={data.course.title} />
 				</div>
 			{/if}
+		</div>
+	{/if}
+
+	<!-- ============================================================ learners -->
+	{#if tool === 'learners'}
+		<div id="panel-learners" role="tabpanel" aria-labelledby="tool-learners" tabindex="-1">
+			<section class="mt-8 max-w-3xl">
+				<h2 class="flex items-center gap-2.5 text-lg font-semibold">
+					<span
+						class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent-text"
+					>
+						<Icon icon={UserGroupIcon} class="size-4.5" strokeWidth={2} />
+					</span>
+					Import a cohort
+				</h2>
+				<p class="text-muted mt-2 text-sm">
+					Enroll people who are already in this workspace, by their email address. This does not
+					create accounts and it sends no invitations — somebody who has not joined and accepted
+					their invitation cannot be enrolled. Invite them on the
+					<a class="underline underline-offset-4" href={resolve('/people')}>People</a> page first.
+				</p>
+
+				<form
+					method="POST"
+					action="?/importCohort"
+					class="mt-5"
+					use:enhance={validated(cohortSchema, setErrors('cohort'), () => {
+						importing = true;
+						return async ({ update }) => {
+							// The paste stays: it is what the report below is a report of.
+							await update({ reset: false });
+							importing = false;
+						};
+					})}
+				>
+					<Sheet>
+						<Field
+							id="cohort-emails"
+							label="Email addresses"
+							hint="One per line. Commas and semicolons separate too, so a paste out of a spreadsheet works."
+							error={problem('cohort', 'emails')}
+						>
+							{#snippet children({ id, describedBy, invalid })}
+								<Textarea
+									{id}
+									{invalid}
+									name="emails"
+									bind:value={pasted}
+									rows={10}
+									class="font-mono text-xs"
+									placeholder="ada@school.edu, grace@school.edu, alan@school.edu"
+									{...LIMITS.cohortEmails}
+									aria-describedby={describedBy}
+								/>
+							{/snippet}
+						</Field>
+
+						<!-- One line, always drawn: a count that appears with the first address
+						     would push the button down as somebody types into the box. -->
+						<p class="text-muted mt-3 text-xs" aria-live="polite">
+							{#if addresses.length === 0}
+								No addresses yet. Up to <span class="numeral">{MAX_COHORT}</span> at a time.
+							{:else}
+								<span class="numeral">{addresses.length}</span>
+								{addresses.length === 1 ? 'address' : 'addresses'} to import — blank lines and repeats
+								removed.
+							{/if}
+						</p>
+
+						{#snippet footer()}
+							<Button type="submit" loading={importing}>
+								<Icon icon={UserAdd01Icon} class="size-4" />
+								{importing ? 'Importing…' : 'Import cohort'}
+							</Button>
+						{/snippet}
+					</Sheet>
+				</form>
+
+				<!-- ------------------------------------------------------- the report -->
+				{#if form?.imported}
+					{@const report = form.imported}
+					{@const results = report.results ?? []}
+					<div class="mt-8" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+						<h3 class="text-lg font-semibold">What the import did</h3>
+
+						<Card float class="mt-4 p-5">
+							<dl class="grid gap-6 sm:grid-cols-3">
+								{#each OUTCOMES as outcome (outcome)}
+									{@const tally =
+										outcome === 'enrolled'
+											? report.enrolled
+											: outcome === 'already_enrolled'
+												? report.already_enrolled
+												: report.not_members}
+									<div class="flex flex-col">
+										<dt class="text-muted order-2 mt-1.5 flex items-center gap-2 text-xs">
+											<span
+												class={cn(
+													'flex size-5 items-center justify-center rounded-md',
+													outcome === 'enrolled' && 'bg-success-surface text-success-text',
+													outcome === 'already_enrolled' && 'bg-surface-sunken text-muted',
+													outcome === 'not_a_member' && 'bg-warning-surface text-warning-text'
+												)}
+											>
+												<Icon icon={OUTCOME_ICONS[outcome]} class="size-3" strokeWidth={2} />
+											</span>
+											{outcomeLabel(outcome)}
+										</dt>
+										<dd class="order-1">
+											<Numeral
+												countUp
+												value={tally}
+												class={cn(
+													'text-4xl font-semibold tracking-tight',
+													outcome === 'enrolled' && 'text-success-text',
+													outcome === 'not_a_member' && 'text-warning-text'
+												)}
+											/>
+										</dd>
+									</div>
+								{/each}
+							</dl>
+						</Card>
+
+						<!-- Worst first: the addresses nobody holds are the misspellings and the
+						     people who never joined, and they are the only ones needing a person. -->
+						{#each OUTCOMES as outcome (outcome)}
+							{@const rows = resultsFor(results, outcome)}
+							{#if rows.length > 0}
+								<Card float class="mt-4 p-5">
+									<div class="flex flex-wrap items-center justify-between gap-3">
+										<h4 class="flex items-center gap-2 font-medium">
+											<!-- `normal-case`: the Badge capitalizes every word, and "Not A Member"
+											     is not a sentence anybody wrote. -->
+											<Badge
+												tone={outcomeTone(outcome)}
+												icon={OUTCOME_ICONS[outcome]}
+												class="normal-case"
+											>
+												{outcomeLabel(outcome)}
+											</Badge>
+											<span class="text-muted text-sm">
+												<span class="numeral">{rows.length}</span>
+												{rows.length === 1 ? 'address' : 'addresses'}
+											</span>
+										</h4>
+
+										{#if outcome === 'not_a_member'}
+											<ActionLink href={resolve('/people')} tone="muted">Invite them</ActionLink>
+										{/if}
+									</div>
+
+									<p class="text-muted mt-2 text-sm">{outcomeHint(outcome)}</p>
+
+									<ul class="mt-3">
+										{#each rows as row (row.email)}
+											<li class="border-t border-border py-2 font-mono text-xs break-all">
+												{row.email}
+											</li>
+										{/each}
+									</ul>
+								</Card>
+							{/if}
+						{/each}
+					</div>
+				{/if}
+			</section>
 		</div>
 	{/if}
 

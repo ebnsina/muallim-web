@@ -4,6 +4,7 @@ import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import {
 	announcementSchema,
+	cohortSchema,
 	lessonSchema,
 	prerequisiteSchema,
 	previewSchema,
@@ -474,6 +475,40 @@ export const actions: Actions = {
 				message: problemMessage(problem, 'Could not change that lesson.')
 			});
 		}
+	},
+
+	/*
+		Enrol a pasted cohort. The addresses are already split, trimmed, lower-cased and
+		de-duplicated by the schema — the same list the page counted — and muallim-api
+		reports a line for every one of them. It creates no accounts: an address nobody
+		in the workspace holds comes back `not_a_member` and is skipped.
+	*/
+	importCohort: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const parsed = parseForm(cohortSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'cohort', errors: parsed.errors });
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/courses/{slug}/enrolments/import',
+			{
+				params: { path: { slug: params.slug } },
+				body: { emails: parsed.value.emails }
+			}
+		);
+
+		// A 422 says why — an empty list, or more than 500 — so its sentence is shown.
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not import that cohort.')
+			});
+		}
+
+		return { imported: data };
 	},
 
 	postAnnouncement: async ({ request, locals, params, url }) => {

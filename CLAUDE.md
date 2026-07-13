@@ -98,7 +98,9 @@ pnpm build
 
 **A form's submit sits at its bottom-right, and every action button carries an icon.** Exceptions, all deliberate: a lone CTA with no fields ("Mark as complete"), a `w-full` submit, a row action positioned by its container, and a filter bar's inline button.
 
-**An editor is one tool at a time.** The course editor (`/teach/[slug]`) is four tabs — Curriculum (the default, because it is what an author came for), Announcements, Insights, Settings — not four tools stacked down 2,700 pixels. Tab state is local, not in the URL: every write goes through `use:enhance`, so the tab survives the edits made in it, which is all it has to survive.
+**An editor is one tool at a time.** The course editor (`/teach/[slug]`) is five tabs — Curriculum (the default, because it is what an author came for), Learners, Announcements, Insights, Settings — not five tools stacked down 3,000 pixels. Tab state is local, not in the URL: every write goes through `use:enhance`, so the tab survives the edits made in it, which is all it has to survive.
+
+**Importing a cohort enrolls members; it does not make them.** Learners is `POST /v1/courses/{slug}/enrolments/import` — paste up to 500 addresses (`parseAddresses` in `$lib/cohort.ts` splits on lines, commas and semicolons, trims, lower-cases and de-duplicates, so the count under the box is the list that will be sent). The report leads with `not_a_member`, because that is the only group needing a person: nobody in the workspace holds that address, **no account was created and no invitation was sent**, and the copy says so and points at `/people`. `already_enrolled` is not an error — it is what re-running an import looks like — so the report is never a "Success" banner with the failures folded under it. Nothing lists a course's roster, so the tab shows no count and no member list.
 
 **Pages use the width they have.** `Page width="full"` (max-w-7xl, aligned with the header) for lists, grids, and anything with a sidebar; `wide` (max-w-5xl) for forms and tables; `prose` (max-w-2xl) only for something to read. Do not leave a page stranded in a narrow column with empty gutters.
 
