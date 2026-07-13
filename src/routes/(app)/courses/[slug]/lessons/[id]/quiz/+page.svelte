@@ -90,7 +90,7 @@
 
 	{#if finished.length > 0}
 		<section class="mt-8">
-			<h2 class="text-sm font-medium tracking-wide uppercase">Your attempts</h2>
+			<h2 class="text-lg font-semibold">Your attempts</h2>
 			<ul class="mt-3 space-y-2">
 				{#each finished as attempt (attempt.number)}
 					<li>

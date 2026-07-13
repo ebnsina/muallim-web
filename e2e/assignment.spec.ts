@@ -125,7 +125,9 @@ test.describe('marking an assignment', () => {
 
 		await expect(page.getByRole('heading', { name: 'Essay: the House of Wisdom' })).toBeVisible();
 		await page.getByLabel('Grade').fill('80');
-		await expect(page.getByText('Passes')).toBeVisible();
+		// Exact: the field's own hint says "60 passes and completes the lesson", and a
+		// substring match cannot tell that sentence from the badge it is looking for.
+		await expect(page.getByText('Passes', { exact: true })).toBeVisible();
 
 		await page.getByLabel('Feedback').fill('Clear and well argued.');
 		await page.getByRole('button', { name: 'Record grade' }).click();

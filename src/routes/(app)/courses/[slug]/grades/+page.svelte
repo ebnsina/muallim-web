@@ -127,7 +127,7 @@
 			{/if}
 		</Card>
 
-		<h2 class="mt-10 text-sm font-medium tracking-wide uppercase">Assessments</h2>
+		<h2 class="mt-10 text-lg font-semibold">Assessments</h2>
 
 		<!-- The marks stay plain numerals: forty figures rolling at once is a slot machine. -->
 		<ul class="mt-4 space-y-2">

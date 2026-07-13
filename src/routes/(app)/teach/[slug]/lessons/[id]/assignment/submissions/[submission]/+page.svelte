@@ -111,6 +111,7 @@
 		<Field
 			id="points"
 			label="Grade"
+			error={form?.pointsMessage}
 			hint="Out of {assignment.points}. {assignment.passing_points} passes and completes the lesson."
 		>
 			{#snippet children({ id, describedBy, invalid })}

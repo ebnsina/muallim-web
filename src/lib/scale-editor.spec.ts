@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	generalProblems,
+	nameProblem,
 	problemFor,
 	scaleProblems,
 	sortedBands,
@@ -39,8 +40,13 @@ describe('scaleProblems', () => {
 		expect(scaleProblems('Pass/fail', passFail)).toEqual([]);
 	});
 
-	it('wants a name', () => {
-		expect(generalProblems(scaleProblems('  ', passFail))).toContain('Give the scale a name.');
+	// The name has a control of its own, so its problem sits under that control and
+	// never in the whole-scale summary.
+	it('wants a name, and pins the problem to the name field', () => {
+		const problems = scaleProblems('  ', passFail);
+
+		expect(nameProblem(problems)).toBe('Give the scale a name.');
+		expect(generalProblems(problems)).not.toContain('Give the scale a name.');
 	});
 
 	it('wants at least one band', () => {

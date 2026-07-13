@@ -84,7 +84,7 @@ export const actions: Actions = {
 		guard(locals.accessToken);
 
 		const title = String((await request.formData()).get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'Give the section a title.' });
+		if (!title) return fail(400, { newTopicMessage: 'Give the section a title.' });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/topics',
@@ -104,7 +104,9 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const id = String(form.get('id') ?? '');
 		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'A section needs a title.' });
+
+		// Every section has a rename box, so the refusal names the one it came from.
+		if (!title) return fail(400, { topicId: id, renameMessage: 'A section needs a title.' });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
 			'/v1/topics/{id}',
@@ -167,7 +169,9 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const topicId = String(form.get('topic_id') ?? '');
 		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'Give the lesson a title.' });
+
+		// Likewise: one "add a lesson" box per section, so the refusal names its section.
+		if (!title) return fail(400, { topicId, addLessonMessage: 'Give the lesson a title.' });
 
 		// A new lesson starts as text with no video. muallim-api defaults to exactly
 		// this, but the generated client requires both fields, and stating them is
@@ -299,7 +303,7 @@ export const actions: Actions = {
 		guard(locals.accessToken);
 
 		const requiresSlug = String((await request.formData()).get('requires_slug') ?? '');
-		if (!requiresSlug) return fail(400, { message: 'Choose a course to require.' });
+		if (!requiresSlug) return fail(400, { prerequisiteMessage: 'Choose a course to require.' });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/prerequisites',

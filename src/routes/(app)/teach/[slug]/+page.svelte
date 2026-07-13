@@ -54,6 +54,14 @@
 
 	let { data, form }: PageProps = $props();
 
+	// Every section carries a rename box and an "add a lesson" box, so a refusal from
+	// either has to say which section it came from — otherwise one bad title would
+	// mark every box on the page.
+	const renameError = (topicId: string) =>
+		form?.topicId === topicId ? form?.renameMessage : undefined;
+	const addLessonError = (topicId: string) =>
+		form?.topicId === topicId ? form?.addLessonMessage : undefined;
+
 	/*
 		Four tools, one at a time.
 
@@ -458,19 +466,35 @@
 										</button>
 									</div>
 
-									<form
-										method="POST"
-										action="?/renameTopic"
-										class="flex items-center gap-2"
-										use:enhance
-									>
+									<form method="POST" action="?/renameTopic" use:enhance>
 										<input type="hidden" name="id" value={topic.id} />
-										<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
-										<Input id="topic-{topic.id}" name="title" value={topic.title} class="w-64" />
-										<Button type="submit" variant="secondary">
-											<Icon icon={PencilEdit02Icon} class="size-4" />
-											Rename
-										</Button>
+										<div class="flex items-center gap-2">
+											<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
+											<Input
+												id="topic-{topic.id}"
+												name="title"
+												value={topic.title}
+												class="w-64"
+												invalid={Boolean(renameError(topic.id))}
+												aria-describedby={renameError(topic.id)
+													? `topic-${topic.id}-error`
+													: undefined}
+											/>
+											<Button type="submit" variant="secondary">
+												<Icon icon={PencilEdit02Icon} class="size-4" />
+												Rename
+											</Button>
+										</div>
+
+										{#if renameError(topic.id)}
+											<p
+												id="topic-{topic.id}-error"
+												class="text-danger-text mt-2 text-xs font-medium"
+												role="alert"
+											>
+												{renameError(topic.id)}
+											</p>
+										{/if}
 									</form>
 								</div>
 
@@ -597,38 +621,65 @@
 								{/each}
 							</ul>
 
-							<form
-								method="POST"
-								action="?/addLesson"
-								class="mt-4 flex items-center gap-2"
-								use:enhance
-							>
+							<form method="POST" action="?/addLesson" class="mt-4" use:enhance>
 								<input type="hidden" name="topic_id" value={topic.id} />
-								<Label class="sr-only" for="lesson-title-{topic.id}">New lesson title</Label>
-								<Input
-									id="lesson-title-{topic.id}"
-									name="title"
-									placeholder="New lesson"
-									class="w-64"
-									required
-								/>
-								<Button type="submit" variant="secondary">
-									<Icon icon={PlusSignIcon} class="size-4" />
-									Add lesson
-								</Button>
+								<div class="flex items-center gap-2">
+									<Label class="sr-only" for="lesson-title-{topic.id}">New lesson title</Label>
+									<Input
+										id="lesson-title-{topic.id}"
+										name="title"
+										placeholder="New lesson"
+										class="w-64"
+										required
+										invalid={Boolean(addLessonError(topic.id))}
+										aria-describedby={addLessonError(topic.id)
+											? `lesson-title-${topic.id}-error`
+											: undefined}
+									/>
+									<Button type="submit" variant="secondary">
+										<Icon icon={PlusSignIcon} class="size-4" />
+										Add lesson
+									</Button>
+								</div>
+
+								{#if addLessonError(topic.id)}
+									<p
+										id="lesson-title-{topic.id}-error"
+										class="text-danger-text mt-2 text-xs font-medium"
+										role="alert"
+									>
+										{addLessonError(topic.id)}
+									</p>
+								{/if}
 							</form>
 						</Card>
 					</li>
 				{/each}
 			</ol>
 
-			<form method="POST" action="?/addTopic" class="mt-8 flex items-center gap-2" use:enhance>
-				<Label class="sr-only" for="new-topic">New section title</Label>
-				<Input id="new-topic" name="title" placeholder="New section" class="w-64" required />
-				<Button type="submit">
-					<Icon icon={PlusSignIcon} class="size-4" />
-					Add section
-				</Button>
+			<form method="POST" action="?/addTopic" class="mt-8" use:enhance>
+				<div class="flex items-center gap-2">
+					<Label class="sr-only" for="new-topic">New section title</Label>
+					<Input
+						id="new-topic"
+						name="title"
+						placeholder="New section"
+						class="w-64"
+						required
+						invalid={Boolean(form?.newTopicMessage)}
+						aria-describedby={form?.newTopicMessage ? 'new-topic-error' : undefined}
+					/>
+					<Button type="submit">
+						<Icon icon={PlusSignIcon} class="size-4" />
+						Add section
+					</Button>
+				</div>
+
+				{#if form?.newTopicMessage}
+					<p id="new-topic-error" class="text-danger-text mt-2 text-xs font-medium" role="alert">
+						{form.newTopicMessage}
+					</p>
+				{/if}
 			</form>
 
 			{#if data.aiEnabled}
@@ -956,22 +1007,34 @@
 						{/if}
 
 						{#if data.candidates.length > 0}
-							<form
-								method="POST"
-								action="?/addPrerequisite"
-								class="mt-4 flex items-center gap-2"
-								use:enhance
-							>
-								<Label class="sr-only" for="requires-slug">Course to require</Label>
-								<Select id="requires-slug" name="requires_slug">
-									{#each data.candidates as candidate (candidate.id)}
-										<option value={candidate.slug}>{candidate.title}</option>
-									{/each}
-								</Select>
-								<Button type="submit" variant="secondary">
-									<Icon icon={PlusSignIcon} class="size-4" />
-									Require
-								</Button>
+							<form method="POST" action="?/addPrerequisite" class="mt-4" use:enhance>
+								<div class="flex items-center gap-2">
+									<Label class="sr-only" for="requires-slug">Course to require</Label>
+									<Select
+										id="requires-slug"
+										name="requires_slug"
+										invalid={Boolean(form?.prerequisiteMessage)}
+										aria-describedby={form?.prerequisiteMessage ? 'requires-slug-error' : undefined}
+									>
+										{#each data.candidates as candidate (candidate.id)}
+											<option value={candidate.slug}>{candidate.title}</option>
+										{/each}
+									</Select>
+									<Button type="submit" variant="secondary">
+										<Icon icon={PlusSignIcon} class="size-4" />
+										Require
+									</Button>
+								</div>
+
+								{#if form?.prerequisiteMessage}
+									<p
+										id="requires-slug-error"
+										class="text-danger-text mt-2 text-xs font-medium"
+										role="alert"
+									>
+										{form.prerequisiteMessage}
+									</p>
+								{/if}
 							</form>
 						{:else}
 							<p class="text-muted mt-4 text-sm">

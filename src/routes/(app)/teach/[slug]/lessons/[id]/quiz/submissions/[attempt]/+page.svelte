@@ -8,6 +8,7 @@
 		Breadcrumbs,
 		Button,
 		Card,
+		Field,
 		Icon,
 		Input,
 		Label,
@@ -117,18 +118,25 @@
 							<form method="POST" class="mt-4 space-y-3" use:enhance>
 								<input type="hidden" name="question_id" value={question.id} />
 
-								<div class="space-y-2">
-									<Label for={`points-${question.id}`}>Points</Label>
-									<Input
-										id={`points-${question.id}`}
-										name="points"
-										type="number"
-										min="0"
-										max={question.points}
-										required
-										class="w-24"
-									/>
-								</div>
+								<Field
+									id={`points-${question.id}`}
+									label="Points"
+									error={form?.questionId === question.id ? form.pointsMessage : undefined}
+								>
+									{#snippet children({ id, describedBy, invalid })}
+										<Input
+											{id}
+											{invalid}
+											name="points"
+											type="number"
+											min="0"
+											max={question.points}
+											required
+											class="w-24"
+											aria-describedby={describedBy}
+										/>
+									{/snippet}
+								</Field>
 
 								<div class="space-y-2">
 									<Label for={`feedback-${question.id}`}>Feedback</Label>

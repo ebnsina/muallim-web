@@ -51,8 +51,13 @@ export const actions: Actions = {
 
 		const raw = String(form.get('points') ?? '').trim();
 		const points = Number(raw);
+		// The page renders one marking form per open question, so the refusal names the
+		// question it is about — otherwise it would light up every box on the page.
 		if (raw === '' || !Number.isInteger(points) || points < 0) {
-			return fail(400, { message: 'The award must be a whole number of points, zero or more.' });
+			return fail(400, {
+				questionId,
+				pointsMessage: 'The award must be a whole number of points, zero or more.'
+			});
 		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(

@@ -14,6 +14,7 @@
 		Breadcrumbs,
 		Button,
 		Checkbox,
+		Field,
 		Icon,
 		Input,
 		Label,
@@ -88,10 +89,11 @@
 	{#if !data.quiz}
 		<form method="POST" action="?/create" class="mt-8 space-y-4" use:enhance>
 			<p class="text-muted text-sm">This lesson has no quiz yet.</p>
-			<div class="space-y-2">
-				<Label for="title">Title</Label>
-				<Input id="title" name="title" required />
-			</div>
+			<Field id="title" label="Title" error={form?.titleMessage}>
+				{#snippet children({ id, describedBy, invalid })}
+					<Input {id} {invalid} name="title" required aria-describedby={describedBy} />
+				{/snippet}
+			</Field>
 			<div class="flex items-center justify-end gap-3">
 				<Button type="submit">
 					<Icon icon={PlusSignIcon} class="size-4" />
@@ -100,6 +102,10 @@
 			</div>
 		</form>
 	{:else}
+		<!-- Bound here because a snippet is its own function: the `{#if}` above narrows
+		     `data.quiz`, and that narrowing does not reach inside a field's children. -->
+		{@const quiz = data.quiz}
+
 		<div class="mt-8 flex gap-4">
 			<ActionLink href={resolve(`/teach/${data.slug}/lessons/${data.lessonId}/quiz/submissions`)}>
 				Marking queue
@@ -110,10 +116,18 @@
 			<h2 class="text-lg font-medium">Settings</h2>
 
 			<form method="POST" action="?/settings" class="mt-4 space-y-4" use:enhance>
-				<div class="space-y-2">
-					<Label for="title">Title</Label>
-					<Input id="title" name="title" value={data.quiz.title} required />
-				</div>
+				<Field id="title" label="Title" error={form?.titleMessage}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="title"
+							value={quiz.title}
+							required
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
 				<div class="space-y-2">
 					<Label for="description">Description</Label>
@@ -126,41 +140,58 @@
 				</div>
 
 				<div class="grid gap-4 sm:grid-cols-3">
-					<div class="space-y-2">
-						<Label for="passing_percent">Pass mark (%)</Label>
-						<Input
-							id="passing_percent"
-							name="passing_percent"
-							type="number"
-							min="0"
-							max="100"
-							value={data.quiz.passing_percent}
-						/>
-					</div>
-					<div class="space-y-2">
-						<Label for="time_limit_seconds">Time limit (seconds)</Label>
-						<Input
-							id="time_limit_seconds"
-							name="time_limit_seconds"
-							type="number"
-							min="0"
-							value={data.quiz.time_limit_seconds}
-							aria-describedby="time-hint"
-						/>
-						<p id="time-hint" class="text-muted text-xs">Zero means no limit.</p>
-					</div>
-					<div class="space-y-2">
-						<Label for="max_attempts">Attempts</Label>
-						<Input
-							id="max_attempts"
-							name="max_attempts"
-							type="number"
-							min="0"
-							value={data.quiz.max_attempts}
-							aria-describedby="attempts-hint"
-						/>
-						<p id="attempts-hint" class="text-muted text-xs">Zero means unlimited.</p>
-					</div>
+					<Field id="passing_percent" label="Pass mark (%)" error={form?.passingMessage}>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="passing_percent"
+								type="number"
+								min="0"
+								max="100"
+								value={quiz.passing_percent}
+								aria-describedby={describedBy}
+							/>
+						{/snippet}
+					</Field>
+
+					<Field
+						id="time_limit_seconds"
+						label="Time limit (seconds)"
+						error={form?.timeLimitMessage}
+						hint="Zero means no limit."
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="time_limit_seconds"
+								type="number"
+								min="0"
+								value={quiz.time_limit_seconds}
+								aria-describedby={describedBy}
+							/>
+						{/snippet}
+					</Field>
+
+					<Field
+						id="max_attempts"
+						label="Attempts"
+						error={form?.attemptsMessage}
+						hint="Zero means unlimited."
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="max_attempts"
+								type="number"
+								min="0"
+								value={quiz.max_attempts}
+								aria-describedby={describedBy}
+							/>
+						{/snippet}
+					</Field>
 				</div>
 
 				<div class="flex items-center justify-end gap-3">
@@ -355,15 +386,33 @@
 					</Select>
 				</div>
 
-				<div class="space-y-2">
-					<Label for="prompt">Prompt</Label>
-					<Textarea id="prompt" name="prompt" rows={2} required />
-				</div>
+				<Field id="prompt" label="Prompt" error={form?.promptMessage}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Textarea
+							{id}
+							{invalid}
+							name="prompt"
+							rows={2}
+							required
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
-				<div class="space-y-2">
-					<Label for="points">Points</Label>
-					<Input id="points" name="points" type="number" min="0" value="1" class="w-32" />
-				</div>
+				<Field id="points" label="Points" error={form?.pointsMessage}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="points"
+							type="number"
+							min="0"
+							value="1"
+							class="w-32"
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
 				<!--
 					The type select decides which of the next three blocks exists, and each of

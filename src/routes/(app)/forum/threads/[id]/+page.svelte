@@ -102,7 +102,7 @@
 
 	<!-- Replies, oldest first. -->
 	<section class="mt-8">
-		<h2 class="text-sm font-medium tracking-wide uppercase">
+		<h2 class="text-lg font-semibold">
 			<span class="numeral">{data.thread.reply_count}</span>
 			{data.thread.reply_count === 1 ? 'reply' : 'replies'}
 		</h2>

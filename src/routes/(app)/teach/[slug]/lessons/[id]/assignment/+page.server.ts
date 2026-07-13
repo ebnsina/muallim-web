@@ -107,8 +107,10 @@ export const actions: Actions = {
 		if (!locals.accessToken) error(401, 'Sign in to edit this lesson.');
 
 		const form = await request.formData();
+		// The only thing this layer refuses is the deadline, so the refusal renders
+		// under the deadline. `message` stays the page's voice for an API failure.
 		const { body, problem: invalid } = bodyFrom(form);
-		if (!body) return fail(422, { message: invalid ?? 'That assignment is not valid.' });
+		if (!body) return fail(422, { dueMessage: invalid ?? 'That deadline is not a date.' });
 
 		const api = authedApi(url.origin, locals.accessToken);
 		const exists = form.get('exists') === 'true';

@@ -46,12 +46,14 @@ export const actions: Actions = {
 		// of the course's public URL, so it is derived once and then frozen.
 		const slug = String(form.get('slug') ?? '').trim() || slugify(title);
 
-		if (!title) return fail(400, { title, summary, message: 'Give the course a title.' });
+		// Both refusals are about the title, so they travel under their own key and
+		// render beneath that field. `message` stays the page's voice for an API failure.
+		if (!title) return fail(400, { title, summary, titleMessage: 'Give the course a title.' });
 		if (!slug) {
 			return fail(400, {
 				title,
 				summary,
-				message: 'That title produces no usable web address. Set one explicitly.'
+				titleMessage: 'That title produces no usable web address. Set one explicitly.'
 			});
 		}
 

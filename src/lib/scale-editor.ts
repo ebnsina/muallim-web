@@ -14,10 +14,16 @@ export interface DraftBand {
 }
 
 export interface ScaleProblem {
-	/** The band the problem is about, or -1 for a whole-scale problem. */
+	/** The band the problem is about, `SCALE` for the whole scale, `NAME` for its name. */
 	index: number;
 	message: string;
 }
+
+/** A problem about the whole scale — it has no one control to sit under. */
+export const SCALE = -1;
+
+/** A problem about the name, which does: it renders under the name field. */
+export const NAME = -2;
 
 /**
  * Bands, highest floor first — the order the API stores them and a reader reads
@@ -38,10 +44,10 @@ export function scaleProblems(name: string, bands: DraftBand[]): ScaleProblem[] 
 	const problems: ScaleProblem[] = [];
 
 	if (name.trim() === '') {
-		problems.push({ index: -1, message: 'Give the scale a name.' });
+		problems.push({ index: NAME, message: 'Give the scale a name.' });
 	}
 	if (bands.length === 0) {
-		problems.push({ index: -1, message: 'A scale needs at least one band.' });
+		problems.push({ index: SCALE, message: 'A scale needs at least one band.' });
 		return problems;
 	}
 
@@ -71,20 +77,25 @@ export function scaleProblems(name: string, bands: DraftBand[]): ScaleProblem[] 
 
 	if (!coversZero) {
 		problems.push({
-			index: -1,
+			index: SCALE,
 			message: 'One band must start at 0%, or a low score has no grade.'
 		});
 	}
 	if (!anyPass) {
-		problems.push({ index: -1, message: 'Mark at least one band as a pass.' });
+		problems.push({ index: SCALE, message: 'Mark at least one band as a pass.' });
 	}
 
 	return problems;
 }
 
-/** The whole-scale problems, for the summary above the form. */
+/** The whole-scale problems — the ones no single control can own. */
 export function generalProblems(problems: ScaleProblem[]): string[] {
-	return problems.filter((p) => p.index === -1).map((p) => p.message);
+	return problems.filter((p) => p.index === SCALE).map((p) => p.message);
+}
+
+/** The problem with the name, for the message under the name field. */
+export function nameProblem(problems: ScaleProblem[]): string | undefined {
+	return problems.find((p) => p.index === NAME)?.message;
 }
 
 /** The problem attached to one band, if any, for the message beside its row. */

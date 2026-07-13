@@ -175,7 +175,12 @@
 			`datetime-local` has no time zone, so it is read and written in the author's
 			own. The API stores an instant; whoever looks at it next sees it in theirs.
 		-->
-		<Field id="due_at" label="Deadline" hint="Leave it empty for no deadline.">
+		<Field
+			id="due_at"
+			label="Deadline"
+			error={form?.dueMessage}
+			hint="Leave it empty for no deadline."
+		>
 			{#snippet children({ id, describedBy, invalid })}
 				<Input
 					{id}

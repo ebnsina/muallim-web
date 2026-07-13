@@ -9,6 +9,7 @@
 		Button,
 		Card,
 		Checkbox,
+		Field,
 		Icon,
 		Input,
 		Page,
@@ -18,6 +19,7 @@
 	import { bandTone } from '$lib/grades';
 	import {
 		generalProblems,
+		nameProblem,
 		problemFor,
 		scaleProblems,
 		sortedBands,
@@ -39,6 +41,7 @@
 
 	const problems = $derived(scaleProblems(name, bands));
 	const general = $derived(generalProblems(problems));
+	const nameError = $derived(nameProblem(problems));
 	const preview = $derived(sortedBands(bands));
 	const canSave = $derived(problems.length === 0);
 
@@ -70,7 +73,7 @@
 
 	<!-- ------------------------------------------------------- existing scales -->
 	<section class="mt-8">
-		<h2 class="text-sm font-medium tracking-wide uppercase">In this workspace</h2>
+		<h2 class="text-lg font-semibold">In this workspace</h2>
 
 		<ul class="mt-4 space-y-2">
 			{#each data.scales as scale (scale.id ?? 'builtin')}
@@ -123,10 +126,19 @@
 					<p class="text-muted mt-0.5 text-sm">Turn a range of percentages into a letter.</p>
 				{/snippet}
 
-				<div>
-					<label for="scale-name" class="mb-1.5 block text-sm font-medium">Name</label>
-					<Input id="scale-name" name="name" bind:value={name} placeholder="Honours" required />
-				</div>
+				<Field id="scale-name" label="Name" error={nameError}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="name"
+							bind:value={name}
+							placeholder="Honours"
+							required
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
 				<div class="mt-6 space-y-3">
 					<div class="flex items-baseline justify-between">

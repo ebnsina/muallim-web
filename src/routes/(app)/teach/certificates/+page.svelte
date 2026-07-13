@@ -59,7 +59,7 @@
 
 	<!-- --------------------------------------------------- existing templates -->
 	<section class="mt-8">
-		<h2 class="text-sm font-medium tracking-wide uppercase">In this workspace</h2>
+		<h2 class="text-lg font-semibold">In this workspace</h2>
 
 		<ul class="mt-4 space-y-2">
 			{#each data.templates as template (template.id ?? 'builtin')}

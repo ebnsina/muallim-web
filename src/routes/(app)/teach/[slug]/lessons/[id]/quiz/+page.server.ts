@@ -122,7 +122,7 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'A quiz needs a title.' });
+		if (!title) return fail(400, { titleMessage: 'A quiz needs a title.' });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/lessons/{id}/quiz',
@@ -141,17 +141,24 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'A quiz needs a title.' });
+		if (!title) return fail(400, { titleMessage: 'A quiz needs a title.' });
 
 		const timeLimit = wholeNumber(form.get('time_limit_seconds'), 0);
 		const maxAttempts = wholeNumber(form.get('max_attempts'), 0);
 		const passing = wholeNumber(form.get('passing_percent'), 0);
 
-		if (Number.isNaN(timeLimit) || Number.isNaN(maxAttempts) || Number.isNaN(passing)) {
-			return fail(400, { message: 'The limits must be whole numbers, zero or more.' });
+		// One refusal per box. "The limits must be whole numbers" named three inputs at
+		// once, so it could not sit under any of them.
+		if (Number.isNaN(passing) || passing > 100) {
+			return fail(400, { passingMessage: 'The passing grade is a percentage, 0 to 100.' });
 		}
-		if (passing > 100) {
-			return fail(400, { message: 'The passing grade is a percentage.' });
+		if (Number.isNaN(timeLimit)) {
+			return fail(400, {
+				timeLimitMessage: 'The time limit is a whole number of seconds, zero or more.'
+			});
+		}
+		if (Number.isNaN(maxAttempts)) {
+			return fail(400, { attemptsMessage: 'Attempts must be a whole number, zero or more.' });
 		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
@@ -191,11 +198,11 @@ export const actions: Actions = {
 		const type: QuestionType = oneOf(TYPES, String(form.get('type') ?? ''), 'single_choice');
 
 		const prompt = String(form.get('prompt') ?? '').trim();
-		if (!prompt) return fail(400, { message: 'A question needs a prompt.' });
+		if (!prompt) return fail(400, { promptMessage: 'A question needs a prompt.' });
 
 		const points = wholeNumber(form.get('points'), 1);
 		if (Number.isNaN(points)) {
-			return fail(400, { message: 'Points must be a whole number, zero or more.' });
+			return fail(400, { pointsMessage: 'Points must be a whole number, zero or more.' });
 		}
 
 		const typed = type === 'short_answer' || type === 'fill_blanks';

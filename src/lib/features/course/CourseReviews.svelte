@@ -10,11 +10,13 @@
 		/** This reader's own review, when they have left one. */
 		mine: Review | null;
 		enrolled: boolean;
-		/** A refusal from the last submission, if there was one. */
+		/** An API failure from the last submission — about the act, not about a field. */
 		message?: string;
+		/** A refused rating. It belongs under the stars, not in a banner above them. */
+		ratingMessage?: string;
 	};
 
-	let { reviews, summary, mine, enrolled, message }: Props = $props();
+	let { reviews, summary, mine, enrolled, message, ratingMessage }: Props = $props();
 
 	const mediumDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 	const hasReviews = $derived(summary.count > 0);
@@ -55,6 +57,13 @@
 				</p>
 				<div class="mt-3">
 					<Stars name="rating" bind:value={myRating} />
+
+					<!-- The refusal sits under the control it names, in plain text. -->
+					{#if ratingMessage}
+						<p id="rating-error" class="text-danger-text mt-2 text-xs font-medium" role="alert">
+							{ratingMessage}
+						</p>
+					{/if}
 				</div>
 				<Textarea
 					name="body"

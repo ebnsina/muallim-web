@@ -115,8 +115,10 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const rating = Number(form.get('rating') ?? 0);
 		const body = String(form.get('body') ?? '').trim();
+		// About the stars, so it renders under the stars. `reviewMessage` stays the
+		// section's voice for an API failure.
 		if (!rating || rating < 1 || rating > 5) {
-			return fail(400, { reviewMessage: 'Choose a rating from 1 to 5 stars.' });
+			return fail(400, { ratingMessage: 'Choose a rating from 1 to 5 stars.' });
 		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(

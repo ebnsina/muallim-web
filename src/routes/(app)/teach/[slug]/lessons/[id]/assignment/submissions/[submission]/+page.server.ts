@@ -44,7 +44,7 @@ export const actions: Actions = {
 
 		// `0` is a grade, and `Number('')` is 0. An empty box is not a zero.
 		if (!Number.isInteger(points) || String(form.get('points') ?? '').trim() === '') {
-			return fail(422, { message: 'A grade is a whole number of points.' });
+			return fail(422, { pointsMessage: 'A grade is a whole number of points.' });
 		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(

@@ -64,7 +64,7 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { message: 'A lesson needs a title.' });
+		if (!title) return fail(400, { titleMessage: 'A lesson needs a title.' });
 
 		const contentType: ContentType = oneOf(
 			CONTENT_TYPES,
@@ -92,20 +92,23 @@ export const actions: Actions = {
 		const availableAfterDays =
 			dripMode === 'after_enrolment' && afterDaysRaw !== '' ? Number(afterDaysRaw) : undefined;
 
+		// Each refusal names one control, so each travels under that control's own key.
 		if (
 			availableAfterDays !== undefined &&
 			(!Number.isInteger(availableAfterDays) || availableAfterDays < 0)
 		) {
-			return fail(400, { message: 'Days after enrolling must be a whole number, zero or more.' });
+			return fail(400, {
+				afterDaysMessage: 'Days after enrolling must be a whole number, zero or more.'
+			});
 		}
 		if (availableAt !== undefined && Number.isNaN(Date.parse(availableAt))) {
-			return fail(400, { message: 'That release date is not a date.' });
+			return fail(400, { availableAtMessage: 'That release date is not a date.' });
 		}
 
 		const durationRaw = String(form.get('duration_seconds') ?? '').trim();
 		const duration = durationRaw === '' ? 0 : Number(durationRaw);
 		if (!Number.isInteger(duration) || duration < 0) {
-			return fail(400, { message: 'Duration must be a whole number of seconds.' });
+			return fail(400, { durationMessage: 'Duration must be a whole number of seconds.' });
 		}
 
 		// Every field the form owns is sent, so this PATCH is a complete statement of

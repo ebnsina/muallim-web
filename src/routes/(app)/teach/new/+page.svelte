@@ -63,9 +63,16 @@
 		>
 			<Sheet>
 				<div class="space-y-5">
-					<Field id="title" label="Title">
-						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="title" required bind:value={title} />
+					<Field id="title" label="Title" error={form?.titleMessage}>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="title"
+								required
+								aria-describedby={describedBy}
+								bind:value={title}
+							/>
 							<AiField
 								enabled={data.aiEnabled}
 								label="Suggest a title"

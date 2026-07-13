@@ -8,6 +8,7 @@
 		Breadcrumbs,
 		Button,
 		Checkbox,
+		Field,
 		Icon,
 		Input,
 		Label,
@@ -127,10 +128,18 @@
 	>
 		<Sheet>
 			<div class="space-y-4">
-				<div class="space-y-2">
-					<Label for="title">Title</Label>
-					<Input id="title" name="title" value={data.lesson.title} required />
-				</div>
+				<Field id="title" label="Title" error={form?.titleMessage}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="title"
+							value={data.lesson.title}
+							required
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
 				<div class="space-y-2">
 					<Label for="content_type">Type</Label>
@@ -215,35 +224,43 @@
 				<input type="hidden" name="drip_mode" value={data.dripMode} />
 
 				{#if data.dripMode === 'scheduled'}
-					<div class="space-y-2">
-						<Label for="available_at">Opens on</Label>
-						<Input
-							id="available_at"
-							name="available_at"
-							type="datetime-local"
-							value={localDateTime(data.availableAt)}
-							aria-describedby="available-at-hint"
-						/>
-						<p id="available-at-hint" class="text-muted text-xs">
-							The same instant for every learner. Leave blank to keep the current date.
-						</p>
-					</div>
+					<Field
+						id="available_at"
+						label="Opens on"
+						error={form?.availableAtMessage}
+						hint="The same instant for every learner. Leave blank to keep the current date."
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="available_at"
+								type="datetime-local"
+								value={localDateTime(data.availableAt)}
+								aria-describedby={describedBy}
+							/>
+						{/snippet}
+					</Field>
 				{:else if data.dripMode === 'after_enrolment'}
-					<div class="space-y-2">
-						<Label for="available_after_days">Opens this many days after enrolling</Label>
-						<Input
-							id="available_after_days"
-							name="available_after_days"
-							type="number"
-							min="0"
-							step="1"
-							value={data.availableAfterDays ?? ''}
-							aria-describedby="after-days-hint"
-						/>
-						<p id="after-days-hint" class="text-muted text-xs">
-							Counted from each learner's own enrollment, so they see different dates.
-						</p>
-					</div>
+					<Field
+						id="available_after_days"
+						label="Opens this many days after enrolling"
+						error={form?.afterDaysMessage}
+						hint="Counted from each learner's own enrollment, so they see different dates."
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="available_after_days"
+								type="number"
+								min="0"
+								step="1"
+								value={data.availableAfterDays ?? ''}
+								aria-describedby={describedBy}
+							/>
+						{/snippet}
+					</Field>
 				{:else if data.dripMode === 'sequential'}
 					<p class="text-muted text-sm">
 						This course releases one lesson at a time. This lesson opens when the learner has
@@ -251,17 +268,20 @@
 					</p>
 				{/if}
 
-				<div class="space-y-2">
-					<Label for="duration_seconds">Duration (seconds)</Label>
-					<Input
-						id="duration_seconds"
-						name="duration_seconds"
-						type="number"
-						min="0"
-						step="1"
-						value={data.lesson.duration_seconds ?? 0}
-					/>
-				</div>
+				<Field id="duration_seconds" label="Duration (seconds)" error={form?.durationMessage}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="duration_seconds"
+							type="number"
+							min="0"
+							step="1"
+							value={data.lesson.duration_seconds ?? 0}
+							aria-describedby={describedBy}
+						/>
+					{/snippet}
+				</Field>
 
 				<div class="flex items-center gap-2">
 					<Checkbox id="is_preview" name="is_preview" checked={data.lesson.is_preview} />
