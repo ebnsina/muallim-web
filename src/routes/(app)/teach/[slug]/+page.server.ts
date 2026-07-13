@@ -7,6 +7,7 @@ import {
 	lessonSchema,
 	prerequisiteSchema,
 	previewSchema,
+	priceSchema,
 	renameSectionSchema,
 	sectionSchema
 } from '$lib/schemas';
@@ -26,11 +27,16 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		api.GET('/v1/certificate-templates'),
 		api.GET('/v1/courses/{slug}/certificate-template', { params: { path: { slug: params.slug } } }),
 		api.GET('/v1/courses/{slug}/announcements', { params: { path: { slug: params.slug } } }),
-		api.GET('/v1/courses/{slug}/analytics', { params: { path: { slug: params.slug } } })
+		api.GET('/v1/courses/{slug}/analytics', { params: { path: { slug: params.slug } } }),
+
+		// Whether this workspace can be paid at all. A 503 means the deployment takes
+		// no payments, and the section says so rather than offering a button that fails.
+		api.GET('/v1/billing/account', { params: { query: { gateway: 'fake' } } })
 	]);
 
 	await parent();
-	const [prerequisites, mine, templates, courseTemplate, announcements, analytics] = await rest;
+	const [prerequisites, mine, templates, courseTemplate, announcements, analytics, account] =
+		await rest;
 
 	// Every other course in the workspace, so the author picks a prerequisite from
 	// a list rather than typing a slug and finding out later that they mistyped it.
@@ -47,7 +53,11 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		currentTemplateId: courseTemplate.data?.template_id ?? null,
 
 		announcements: announcements.data?.announcements ?? [],
-		analytics: analytics.data ?? null
+		analytics: analytics.data ?? null,
+
+		// The payment account, and nothing invented: absent means this workspace has
+		// not connected one, or this deployment sells nothing at all.
+		account: account.data?.account ?? null
 	};
 };
 
@@ -296,6 +306,72 @@ export const actions: Actions = {
 	},
 
 	/** The preview clip a stranger watches. muallim-api resolves the link to a player. */
+	/** Connect this workspace's payment account. The school is the merchant, not us. */
+	connectPayments: async ({ locals, url }) => {
+		guard(locals.accessToken);
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/billing/connect', {
+			body: { gateway: 'fake', return_url: `${url.origin}${url.pathname}` }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not connect a payment account.')
+			});
+		}
+
+		// The gateway's own onboarding. Nothing about a bank account touches this app.
+		redirect(303, data.url);
+	},
+
+	/** Price the course, or make it free again. */
+	setPrice: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const form = await request.formData();
+		const api = authedApi(url.origin, locals.accessToken);
+
+		// A blank amount is not a price of nothing — it is the course going free.
+		if (String(form.get('amount') ?? '').trim() === '') {
+			const { error: problem, response } = await api.DELETE('/v1/courses/{slug}/price', {
+				params: { path: { slug: params.slug } }
+			});
+			if (problem) {
+				return fail(response?.status ?? 500, {
+					message: problemMessage(problem, 'Could not make that course free.')
+				});
+			}
+			return { priceSaved: true };
+		}
+
+		const parsed = parseForm(priceSchema, form);
+		if (!parsed.ok) return fail(400, { scope: 'price', errors: parsed.errors });
+
+		const { amount, currency } = parsed.value;
+
+		// Minor units on the wire, always. The author types 1200; the API is told 120000.
+		const { error: problem, response } = await api.PUT('/v1/courses/{slug}/price', {
+			params: { path: { slug: params.slug } },
+			body: {
+				amount_minor: Math.round(amount * 100),
+				currency: currency.toUpperCase(),
+				gateway: 'fake'
+			}
+		});
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not price that course.')
+			});
+		}
+
+		return { priceSaved: true };
+	},
+
 	setPreview: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 

@@ -170,6 +170,7 @@
 						learnerCount={course.learner_count}
 						ratingAverage={course.rating_average}
 						ratingCount={course.rating_count}
+						price={course.price}
 						seed={course.slug}
 						href={resolve(`/courses/${course.slug}`)}
 					/>

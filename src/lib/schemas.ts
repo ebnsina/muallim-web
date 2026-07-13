@@ -243,6 +243,18 @@ export const previewSchema = z
 		message: 'Paste the link to the preview.'
 	});
 
+/*
+	A course's price, as an author types it: major units, because nobody prices a
+	course at 120000 paisa. The action multiplies; the API is told minor units.
+*/
+export const priceSchema = z.object({
+	amount: z.coerce
+		.number({ error: 'A price is a number.' })
+		.positive('A price is more than nothing.')
+		.max(1_000_000, 'That is more than this system will sell a course for.'),
+	currency: z.string().trim().length(3, 'A currency is three letters, like BDT or USD.')
+});
+
 // --------------------------------------------------------------------- Q&A
 
 export const questionAskSchema = z.object({

@@ -7,12 +7,14 @@
 		File01Icon,
 		PlayCircleIcon,
 		PlayIcon,
+		ShoppingCart01Icon,
 		StickyNote02Icon,
 		Task01Icon,
 		Tick02Icon,
 		UserAdd01Icon
 	} from '@hugeicons/core-free-icons';
 	import { Button, Card, Icon, Numeral, Progress as ProgressBar } from '$lib/components';
+	import { formatMoney } from '$lib/money';
 	import { toast } from '$lib/toast.svelte';
 	import { auroraFor, cn } from '$lib/utils';
 	import { span } from './duration';
@@ -218,14 +220,19 @@
 				</Button>
 			</form>
 		{:else if !signedIn}
-			<p class="font-medium">Ready to start?</p>
-			<p class="text-muted mt-1 text-sm">
-				Sign in to enroll and keep track of what you have finished.
-			</p>
+			{#if course.price}
+				<p class="numeral text-3xl font-semibold tracking-tight">{formatMoney(course.price)}</p>
+				<p class="text-muted mt-1 text-sm">Sign in to buy it.</p>
+			{:else}
+				<p class="font-medium">Ready to start?</p>
+				<p class="text-muted mt-1 text-sm">
+					Sign in to enroll and keep track of what you have finished.
+				</p>
+			{/if}
 
 			<Button href={`${resolve('/login')}?next=${encodeURIComponent(next)}`} class="mt-5 w-full">
 				<Icon icon={UserAdd01Icon} class="size-4" />
-				Sign in to enroll
+				{course.price ? 'Sign in to buy' : 'Sign in to enroll'}
 			</Button>
 		{:else if openPrerequisites.length > 0}
 			<h2 class="font-medium">Before you enroll</h2>
@@ -256,6 +263,23 @@
 				<Icon icon={UserAdd01Icon} class="size-4" />
 				Enroll
 			</Button>
+		{:else if course.price}
+			<!--
+				A priced course is bought, not enrolled on: muallim-api answers 402 to a free
+				enrolment, and the button that would earn it is a button that ends in an
+				apology. The checkout is the school's own gateway; a card never touches us.
+			-->
+			<p class="numeral text-3xl font-semibold tracking-tight">
+				{formatMoney(course.price)}
+			</p>
+			<p class="text-muted mt-1 text-sm">One payment. The course is yours to keep.</p>
+
+			<form method="POST" action="?/buy" class="mt-5" use:enhance>
+				<Button type="submit" class="w-full">
+					<Icon icon={ShoppingCart01Icon} class="size-4" />
+					Buy this course
+				</Button>
+			</form>
 		{:else}
 			<p class="font-medium">Ready to start?</p>
 			<p class="text-muted mt-1 text-sm">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { CheckmarkCircle02Icon, PencilEdit02Icon } from '@hugeicons/core-free-icons';
+	import { formatMoney, type Money } from '$lib/money';
 	import { auroraFor, cn } from '$lib/utils';
 	import Icon from './Icon.svelte';
 	import Difficulty from './Difficulty.svelte';
@@ -21,6 +22,8 @@
 		/** The mean rating, and how many gave it. No reviews draws no stars. */
 		ratingAverage?: number;
 		ratingCount?: number;
+		/** What it costs. Absent is free, which is what most courses are. */
+		price?: Money;
 		/**
 		 * `draft` or `published`, for an author looking at their own shelf. A learner
 		 * never sees an unpublished course, so a listing that omits this is a listing
@@ -51,6 +54,7 @@
 		learnerCount,
 		ratingAverage,
 		ratingCount,
+		price,
 		status,
 		actions,
 		href,

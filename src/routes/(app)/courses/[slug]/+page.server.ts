@@ -79,6 +79,34 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 };
 
 export const actions: Actions = {
+	/** Buy a course. The order is pending until the gateway's webhook says otherwise. */
+	buy: async ({ locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/courses/{slug}/checkout', {
+			params: { path: { slug: params.slug } },
+			body: {
+				gateway: 'fake',
+				success_url: `${url.origin}/courses/${params.slug}?paid=1`,
+				cancel_url: `${url.origin}/courses/${params.slug}`
+			}
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not start that checkout.')
+			});
+		}
+
+		// The gateway's own page. A card number never touches this app, and never
+		// touches muallim-api either.
+		redirect(303, data.url);
+	},
+
 	enrol: async ({ locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 

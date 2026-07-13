@@ -9,6 +9,7 @@
 	import {
 		Analytics01Icon,
 		ArrowDown01Icon,
+		CreditCardIcon,
 		StarIcon,
 		ArrowUp01Icon,
 		Cancel01Icon,
@@ -54,11 +55,13 @@
 		lessonSchema,
 		prerequisiteSchema,
 		previewSchema,
+		priceSchema,
 		renameSectionSchema,
 		sectionSchema
 	} from '$lib/schemas';
 	import { validated, type FieldErrors } from '$lib/validation';
 	import { Pill } from '$lib/pill.svelte';
+	import { formatMoney } from '$lib/money';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
@@ -155,6 +158,18 @@
 		{ value: 'embed', label: 'Embed' },
 		{ value: 'hosted', label: 'Hosted' }
 	];
+
+	// The course's price, as the author typed it: major units in the box, minor units
+	// on the wire.
+	const price = $derived(
+		data.course.price
+			? {
+					minor: data.course.price.amount_minor,
+					major: data.course.price.amount_minor / 100,
+					currency: data.course.price.currency
+				}
+			: null
+	);
 
 	// The select drives which fields are shown, so its value is state.
 	// The author's choice while they are choosing, the saved one after that. A plain
@@ -1023,7 +1038,96 @@
 		<div id="panel-settings" role="tabpanel" aria-labelledby="tool-settings" tabindex="-1">
 			<section class="mt-8 max-w-3xl">
 				<Card float class="space-y-6 p-5">
+					<!--
+						Payments. The workspace is the merchant: the learner pays this school's own
+						account, and Muallim takes a fee. Nothing about a bank touches this app.
+					-->
 					<div>
+						<h2 class="font-medium">Payments</h2>
+
+						{#if !data.account}
+							<p class="text-muted mt-1 text-sm">
+								Connect an account to sell this course. The money goes to you; we take a fee.
+							</p>
+
+							<form method="POST" action="?/connectPayments" class="mt-3" use:enhance>
+								<Button type="submit" variant="secondary">
+									<Icon icon={CreditCardIcon} class="size-4" />
+									Connect payments
+								</Button>
+							</form>
+						{:else if !data.account.ready}
+							<p class="text-muted mt-1 text-sm">
+								Your account is connected but the gateway will not take charges on it yet.
+							</p>
+							<Badge tone="warning" class="mt-3">{data.account.status}</Badge>
+						{:else}
+							<p class="text-muted mt-1 text-sm">
+								What a learner pays for this course. Leave it empty to give it away.
+							</p>
+
+							<form
+								method="POST"
+								action="?/setPrice"
+								class="mt-3 space-y-2"
+								use:enhance={validated(priceSchema, setErrors('price'))}
+							>
+								<div class="flex flex-wrap items-end gap-2">
+									<div class="w-36">
+										<Label class="sr-only" for="price-amount">Price</Label>
+										<Input
+											id="price-amount"
+											name="amount"
+											type="number"
+											min="0"
+											step="0.01"
+											class="numeral"
+											placeholder="1200"
+											value={price?.major ?? ''}
+											invalid={Boolean(problem('price', 'amount'))}
+										/>
+									</div>
+
+									<div class="w-28">
+										<Label class="sr-only" for="price-currency">Currency</Label>
+										<Input
+											id="price-currency"
+											name="currency"
+											maxlength={3}
+											class="numeral uppercase"
+											placeholder="BDT"
+											value={price?.currency ?? 'BDT'}
+											invalid={Boolean(problem('price', 'currency'))}
+										/>
+									</div>
+
+									<Button type="submit" variant="secondary">
+										<Icon icon={FloppyDiskIcon} class="size-4" />
+										Save
+									</Button>
+								</div>
+
+								{#if problem('price', 'amount') || problem('price', 'currency')}
+									<p class="text-xs font-medium text-danger-text" role="alert">
+										{problem('price', 'amount') ?? problem('price', 'currency')}
+									</p>
+								{/if}
+							</form>
+
+							{#if price}
+								<p class="text-muted mt-2 text-xs">
+									Learners see {formatMoney({
+										amount_minor: price.minor,
+										currency: price.currency
+									})} and buy it rather than enrolling.
+								</p>
+							{:else}
+								<p class="text-muted mt-2 text-xs">Free. Anybody may enroll.</p>
+							{/if}
+						{/if}
+					</div>
+
+					<div class="border-t border-border pt-6">
 						<h2 class="font-medium">Preview</h2>
 						<p class="text-muted mt-1 text-sm">
 							The clip a stranger watches before deciding to enroll. Paste the link; muallim-api
