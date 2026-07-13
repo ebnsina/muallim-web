@@ -12,6 +12,7 @@ export type LessonView = components['schemas']['LessonView'];
 export type Announcement = components['schemas']['AnnouncementView'];
 export type Review = components['schemas']['ReviewView'];
 export type Progress = components['schemas']['ProgressView'];
+export type EnrolmentSource = components['schemas']['EnrolmentView']['source'];
 
 export type ReviewSummary = { count: number; average: number };
 

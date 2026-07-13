@@ -9,6 +9,7 @@
 		BookOpen01Icon,
 		Cancel01Icon,
 		ChampionIcon,
+		Invoice01Icon,
 		Menu01Icon,
 		Mortarboard02Icon,
 		Logout01Icon,
@@ -401,6 +402,16 @@
 							>
 								<Icon icon={UserIcon} class="text-muted size-4" />
 								Your profile
+							</a>
+
+							<!-- What you bought, beside who you are: a receipt is personal, not a section. -->
+							<a
+								role="menuitem"
+								href={resolve('/receipts')}
+								class="hover:bg-surface-hover flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+							>
+								<Icon icon={Invoice01Icon} class="text-muted size-4" />
+								Purchases
 							</a>
 
 							<a

@@ -28,6 +28,7 @@
 	} from '@hugeicons/core-free-icons';
 	import type { ActionResult } from '@sveltejs/kit';
 	import {
+		ActionLink,
 		Alert,
 		Badge,
 		Breadcrumbs,
@@ -1043,7 +1044,11 @@
 						account, and Muallim takes a fee. Nothing about a bank touches this app.
 					-->
 					<div>
-						<h2 class="font-medium">Payments</h2>
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<h2 class="font-medium">Payments</h2>
+							<!-- The gateways themselves are the workspace's, not this course's. -->
+							<ActionLink href={resolve('/teach/payments')} tone="muted">All gateways</ActionLink>
+						</div>
 
 						{#if !data.account}
 							<p class="text-muted mt-1 text-sm">

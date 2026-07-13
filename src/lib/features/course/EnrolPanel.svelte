@@ -4,7 +4,9 @@
 	import {
 		Award01Icon,
 		Cancel01Icon,
+		CheckmarkCircle02Icon,
 		File01Icon,
+		Invoice01Icon,
 		PlayCircleIcon,
 		PlayIcon,
 		ShoppingCart01Icon,
@@ -13,12 +15,20 @@
 		Tick02Icon,
 		UserAdd01Icon
 	} from '@hugeicons/core-free-icons';
-	import { Button, Card, Icon, Numeral, Progress as ProgressBar } from '$lib/components';
+	import {
+		Button,
+		Card,
+		Icon,
+		Label,
+		Numeral,
+		Progress as ProgressBar,
+		Select
+	} from '$lib/components';
 	import { formatMoney } from '$lib/money';
 	import { toast } from '$lib/toast.svelte';
 	import { auroraFor, cn } from '$lib/utils';
 	import { span } from './duration';
-	import type { CourseDetail, Prerequisite, Progress, TopicView } from './types';
+	import type { CourseDetail, EnrolmentSource, Prerequisite, Progress, TopicView } from './types';
 
 	type Props = {
 		course: CourseDetail;
@@ -26,11 +36,20 @@
 		progress: Progress | null;
 		prerequisites: Prerequisite[];
 		signedIn: boolean;
+		/** How this reader's enrollment was come by, when they have one. */
+		source: EnrolmentSource | null;
+		/** The gateways the workspace has ready — empty for a reader who may not ask. */
+		gateways: string[];
 		/** Where to return to after signing in. */
 		next: string;
 	};
 
-	let { course, topics, progress, prerequisites, signedIn, next }: Props = $props();
+	let { course, topics, progress, prerequisites, signedIn, source, gateways, next }: Props =
+		$props();
+
+	// A bought enrolment is not cancellable: muallim-api answers 409, and rightly —
+	// cancelling would not return the money. The workspace refunds it.
+	const bought = $derived(source === 'purchase');
 
 	// A preview plays when it is asked to: an autoplaying clip on a page somebody is
 	// reading is a clip they did not ask for.
@@ -190,35 +209,58 @@
 				Your notes &amp; highlights
 			</Button>
 
-			<form
-				method="POST"
-				action="?/cancel"
-				class="mt-3"
-				use:enhance={() => {
-					cancelling = true;
-					return async ({ result, update }) => {
-						await update();
-						cancelling = false;
+			{#if bought}
+				<!--
+					Bought, so there is nothing to cancel. The workspace holds the money — it is
+					the merchant — so it is the workspace that gives it back, and a button here
+					would only earn a 409 saying so.
+				-->
+				<div class="mt-5 border-t border-border pt-5">
+					<p class="flex items-center gap-2 text-sm font-medium text-success-text">
+						<Icon icon={CheckmarkCircle02Icon} class="size-4" />
+						You bought this course.
+					</p>
+					<p class="text-muted mt-1 text-sm">
+						It is yours to keep. A refund is issued by the workspace that sold it — ask them, and
+						the enrollment comes off with the money.
+					</p>
 
-						if (result.type === 'failure' || result.type === 'error') return;
-						// Progress survives a cancellation, and a learner about to lose access is
-						// the person who most needs telling that it does.
-						toast.info('Enrollment cancelled. Your progress is kept if you come back.');
-					};
-				}}
-			>
-				<Button
-					type="submit"
-					variant="ghost"
-					size="sm"
-					class="w-full"
-					loading={cancelling}
-					disabled={cancelling}
+					<Button href={resolve('/receipts')} variant="secondary" size="sm" class="mt-3 w-full">
+						<Icon icon={Invoice01Icon} class="size-4" />
+						See your purchase
+					</Button>
+				</div>
+			{:else}
+				<form
+					method="POST"
+					action="?/cancel"
+					class="mt-3"
+					use:enhance={() => {
+						cancelling = true;
+						return async ({ result, update }) => {
+							await update();
+							cancelling = false;
+
+							if (result.type === 'failure' || result.type === 'error') return;
+							// Progress survives a cancellation, and a learner about to lose access is
+							// the person who most needs telling that it does.
+							toast.info('Enrollment cancelled. Your progress is kept if you come back.');
+						};
+					}}
 				>
-					<Icon icon={Cancel01Icon} class="size-4" />
-					{cancelling ? 'Cancelling…' : 'Cancel enrollment'}
-				</Button>
-			</form>
+					<Button
+						type="submit"
+						variant="ghost"
+						size="sm"
+						class="w-full"
+						loading={cancelling}
+						disabled={cancelling}
+					>
+						<Icon icon={Cancel01Icon} class="size-4" />
+						{cancelling ? 'Cancelling…' : 'Cancel enrollment'}
+					</Button>
+				</form>
+			{/if}
 		{:else if !signedIn}
 			{#if course.price}
 				<p class="numeral text-3xl font-semibold tracking-tight">{formatMoney(course.price)}</p>
@@ -274,7 +316,22 @@
 			</p>
 			<p class="text-muted mt-1 text-sm">One payment. The course is yours to keep.</p>
 
-			<form method="POST" action="?/buy" class="mt-5" use:enhance>
+			<form method="POST" action="?/buy" class="mt-5 space-y-3" use:enhance>
+				<!--
+					A choice only when there is one. With a single connected gateway the buyer is
+					not asked a question with one answer; the action sends them to it.
+				-->
+				{#if gateways.length > 1}
+					<div class="space-y-2">
+						<Label for="checkout-gateway">Pay with</Label>
+						<Select id="checkout-gateway" name="gateway" class="w-full">
+							{#each gateways as gateway (gateway)}
+								<option value={gateway} class="capitalize">{gateway}</option>
+							{/each}
+						</Select>
+					</div>
+				{/if}
+
 				<Button type="submit" class="w-full">
 					<Icon icon={ShoppingCart01Icon} class="size-4" />
 					Buy this course

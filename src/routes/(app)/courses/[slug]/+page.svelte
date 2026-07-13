@@ -80,6 +80,8 @@
 					progress={data.progress}
 					prerequisites={data.prerequisites}
 					signedIn={data.signedIn}
+					source={data.source}
+					gateways={data.gateways}
 					next={data.next}
 				/>
 			</div>

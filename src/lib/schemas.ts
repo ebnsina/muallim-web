@@ -44,7 +44,12 @@ export const LIMITS = {
 	templateHeading: { required: true, maxlength: 200 },
 	templateBody: { required: true, maxlength: 4000 },
 	templateSignatory: { maxlength: 200 },
-	reviewBody: { maxlength: 4000 }
+	reviewBody: { maxlength: 4000 },
+
+	// The gateway's own keys. `public_id` is the API's 200; every secret part is kept
+	// well under its 4000, because bKash's three are packed into that one field.
+	gatewayPublicId: { required: true, maxlength: 200 },
+	gatewaySecret: { required: true, maxlength: 500 }
 } as const;
 
 // `.trim()` before `.min(1)`: the browser's `required` asks whether a character was
@@ -253,6 +258,27 @@ export const priceSchema = z.object({
 		.positive('A price is more than nothing.')
 		.max(1_000_000, 'That is more than this system will sell a course for.'),
 	currency: z.string().trim().length(3, 'A currency is three letters, like BDT or USD.')
+});
+
+// ------------------------------------------------------- gateway credentials
+
+/** SSLCommerz: a store id and a store password. Both go straight to the API. */
+export const sslcommerzSchema = z.object({
+	public_id: text(200, 'The store id is missing.'),
+	secret: text(500, 'The store password is missing.')
+});
+
+/*
+	bKash: an app key, and three secrets the web packs into one JSON string.
+
+	The API's `secret` is a single write-only field; the driver reads an object out of
+	it. Three inputs here, one field on the wire — see `packBkashSecret`.
+*/
+export const bkashSchema = z.object({
+	public_id: text(200, 'The app key is missing.'),
+	app_secret: text(500, 'The app secret is missing.'),
+	username: text(500, 'The username is missing.'),
+	password: text(500, 'The password is missing.')
 });
 
 // --------------------------------------------------------------------- Q&A

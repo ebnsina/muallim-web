@@ -1,9 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
+import { canAuthor } from '$lib/roles';
 import { apiAs, authedApi } from '$lib/server/api';
 import { reviewSchema } from '$lib/schemas';
 import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
+
+/** Every gateway the API knows, in the order a checkout tries them. The fake one last. */
+const GATEWAYS = ['stripe', 'sslcommerz', 'bkash', 'fake'] as const;
 
 export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	const api = apiAs(url.origin, locals.accessToken);
@@ -39,8 +43,30 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			: Promise.resolve(null)
 	]);
 
-	await parent();
+	const { user } = await parent();
 	const [progress, prerequisites, enrolments, announcements, reviews] = await rest;
+
+	const mine = (enrolments?.data?.enrolments ?? []).find((e) => e.course_slug === params.slug);
+
+	/*
+		Which gateways this workspace can be paid through — for the readers allowed to
+		ask. `GET /v1/billing/account` requires course:write, so a learner is answered
+		403 and there is no other endpoint that lists them. A buyer who cannot see the
+		list is not shown a picker; the checkout action finds the gateway instead.
+	*/
+	const gateways = canAuthor(user)
+		? (
+				await Promise.all(
+					GATEWAYS.map(async (gateway) => {
+						const { data } = await authedApi(url.origin, locals.accessToken!).GET(
+							'/v1/billing/account',
+							{ params: { query: { gateway } } }
+						);
+						return data?.account?.ready ? gateway : null;
+					})
+				)
+			).filter((gateway) => gateway !== null)
+		: [];
 
 	// Which prerequisites this reader has finished. muallim-api refuses the enrollment
 	// and names them, but a learner should see the gate before they walk into it.
@@ -62,9 +88,12 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		// After-enrollment drip counts from this learner's own enrollment, so the page
 		// cannot compute an unlock date without it. Sequential drip has no date at
 		// all, and muallim-api is the only thing that knows which lesson comes next.
-		enrolledAt:
-			(enrolments?.data?.enrolments ?? []).find((e) => e.course_slug === params.slug)
-				?.enrolled_at ?? null,
+		enrolledAt: mine?.enrolled_at ?? null,
+
+		// How the enrollment was come by. A bought one cannot be cancelled — the API
+		// answers 409 — so the panel offers a refund to ask for rather than a button.
+		source: mine?.source ?? null,
+		gateways,
 
 		// A reader who is not enrolled has no progress, and that is an ordinary
 		// answer rather than a failure of this page.
@@ -79,32 +108,52 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 };
 
 export const actions: Actions = {
-	/** Buy a course. The order is pending until the gateway's webhook says otherwise. */
-	buy: async ({ locals, params, url }) => {
+	/*
+		Buy a course. The order is pending until the gateway's webhook says otherwise.
+
+		The buyer names a gateway when the page could offer a choice. When it could not
+		— which is every learner, since the account endpoint requires course:write —
+		the candidates are tried in turn and the first one that opens a checkout wins.
+		A gateway the workspace has not connected refuses in one transaction and leaves
+		no order behind, so this discovers what a learner may not read, and charges
+		nobody twice. With one connected gateway it is one request, as before.
+	*/
+	buy: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-		const {
-			data,
-			error: problem,
-			response
-		} = await authedApi(url.origin, locals.accessToken).POST('/v1/courses/{slug}/checkout', {
-			params: { path: { slug: params.slug } },
-			body: {
-				gateway: 'fake',
-				success_url: `${url.origin}/courses/${params.slug}?paid=1`,
-				cancel_url: `${url.origin}/courses/${params.slug}`
-			}
-		});
+		const chosen = String((await request.formData()).get('gateway') ?? '');
+		const candidates = GATEWAYS.filter((g) => (chosen ? g === chosen : true));
 
-		if (problem || !data) {
-			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not start that checkout.')
+		const api = authedApi(url.origin, locals.accessToken);
+		let last: { status: number; message: string } | null = null;
+
+		for (const gateway of candidates) {
+			const {
+				data,
+				error: problem,
+				response
+			} = await api.POST('/v1/courses/{slug}/checkout', {
+				params: { path: { slug: params.slug } },
+				body: {
+					gateway,
+					success_url: `${url.origin}/courses/${params.slug}?paid=1`,
+					cancel_url: `${url.origin}/courses/${params.slug}`
+				}
 			});
+
+			// The gateway's own page. A card number never touches this app, and never
+			// touches muallim-api either.
+			if (data) redirect(303, data.url);
+
+			last = {
+				status: response?.status ?? 500,
+				message: problemMessage(problem, 'Could not start that checkout.')
+			};
 		}
 
-		// The gateway's own page. A card number never touches this app, and never
-		// touches muallim-api either.
-		redirect(303, data.url);
+		return fail(last?.status ?? 500, {
+			message: last?.message ?? 'Could not start that checkout.'
+		});
 	},
 
 	enrol: async ({ locals, params, url }) => {

@@ -27,6 +27,8 @@
 <Page width="full">
 	<PageHeader title="Your courses" description="Drafts are visible only to you.">
 		{#snippet actions()}
+			<Button href={resolve('/teach/sales')} variant="secondary" size="sm">Sales</Button>
+			<Button href={resolve('/teach/payments')} variant="secondary" size="sm">Payments</Button>
 			<Button href={resolve('/teach/grading')} variant="secondary" size="sm">Grading scales</Button>
 			<Button href={resolve('/teach/certificates')} variant="secondary" size="sm">
 				Certificates
