@@ -73,13 +73,15 @@
 				</div>
 			</div>
 
-			<Button href="{home}#pricing" variant="ghost" size="sm" pill class={ghost}>Pricing</Button>
+			<Button href="{home}#capabilities" variant="ghost" size="sm" pill class={ghost}>
+				What ships
+			</Button>
 		</nav>
 
-		<!-- Sign in and Contact sales on the right. -->
+		<!-- Sign in and the one CTA on the right. -->
 		<div class="ml-auto flex items-center gap-1 sm:gap-2">
 			<Button href={resolve('/login')} variant="ghost" size="sm" pill class={ghost}>Sign in</Button>
-			<Button href="{home}#pricing" size="sm" pill>Contact sales</Button>
+			<Button href={resolve('/register')} size="sm" pill>Get started</Button>
 		</div>
 	</div>
 </header>

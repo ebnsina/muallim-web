@@ -6,7 +6,7 @@
 	import ProductShot from './ProductShot.svelte';
 	import { LIFECYCLE } from './content';
 
-	const here = resolve('/v2');
+	const here = resolve('/');
 </script>
 
 <section class="hero-blue relative isolate overflow-hidden text-white">

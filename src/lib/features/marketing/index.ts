@@ -6,6 +6,7 @@ export { default as Nav } from './Nav.svelte';
 export { default as Platform } from './Platform.svelte';
 export { default as ProductShot } from './ProductShot.svelte';
 export { default as Sales } from './Sales.svelte';
+export { default as Segments } from './Segments.svelte';
 export { default as Section } from './Section.svelte';
 export { default as Showcase } from './Showcase.svelte';
 export * from './content';

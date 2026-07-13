@@ -573,27 +573,6 @@
 	}
 
 	/*
-		The logo marquee. The track holds two copies of the list and slides by half
-		its width, so the loop is seamless. Reduced-motion collapses the animation to
-		a frozen frame, which is simply the strip standing still.
-	*/
-	.marquee-track {
-		display: flex;
-		width: max-content;
-		animation: marquee 45s linear infinite;
-	}
-
-	.marquee:hover .marquee-track {
-		animation-play-state: paused;
-	}
-
-	@keyframes marquee {
-		to {
-			transform: translateX(-50%);
-		}
-	}
-
-	/*
 		The centered hero's backdrop. A deep, near-black blue base lit by two brand
 		glows — a spotlight behind the headline and a brighter bloom rising from where
 		the product frame meets it — for depth a flat gradient cannot give. Fixed dark
@@ -633,7 +612,7 @@
 	ones (transform, translate, rotate, scale, width, height) are dropped from every
 	transition, and the ones that only change appearance are kept. Keyframed animation
 	still collapses, because a keyframe cannot be filtered this way — and the aurora
-	and the marquee are pure movement.
+	and the reveal are pure movement.
 
 	The duration is deliberately NOT forced. `transition-duration` starts at `0s`, so
 	an element that declared no transition has none; pinning a duration on `*` would

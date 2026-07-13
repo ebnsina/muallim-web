@@ -39,7 +39,11 @@
 			<nav aria-label="Product">
 				<h2 class="text-sm font-semibold">Product</h2>
 				<ul class="mt-4 space-y-2.5 text-sm text-muted">
-					<li><a class="underline-offset-4 hover:underline" href="{home}#pricing">Pricing</a></li>
+					<li>
+						<a class="underline-offset-4 hover:underline" href="{home}#capabilities">
+							What ships
+						</a>
+					</li>
 					<li>
 						<a class="underline-offset-4 hover:underline" href={resolve('/ui')}>Design system</a>
 					</li>

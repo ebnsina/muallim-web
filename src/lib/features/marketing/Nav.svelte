@@ -4,7 +4,7 @@
 	import { Button, Icon } from '$lib/components';
 
 	// v2's own header: the shared MarketingHeader overflows the viewport below ~360px.
-	const here = resolve('/v2');
+	const here = resolve('/');
 
 	const LINKS = [
 		{ label: 'What ships', hash: 'capabilities' },
