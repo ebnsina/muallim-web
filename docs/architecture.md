@@ -46,6 +46,6 @@ The residual: a replica restart moves a browser to a process with an empty map, 
 
 Nothing renders a blank screen and nothing renders a stack trace.
 
-- `src/routes/+error.svelte` — distinguishes 404 from 5xx, and always offers a way out.
+- `src/routes/+error.svelte` — distinguishes 404 from 403 from 5xx, and always offers a way out. A 403 renders muallim-api's own sentence and offers no "Try again": pressing it earns the same answer.
 - `handleError` in `src/hooks.server.ts` — logs the real error against a correlation ID, returns only a safe shape. The ID is shown to the user so they can quote it.
 - `src/error.html` — last resort for errors that escape the root layout. Depends on no bundle, no stylesheet, no font.
