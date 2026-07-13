@@ -13,13 +13,6 @@ import {
 	UserGroupIcon
 } from '@hugeicons/core-free-icons';
 
-/** The three figures the hero stands on. Each is countable in the API's own schema. */
-export const FIGURES = [
-	{ value: 11, label: 'question types', note: 'from true/false to image matching' },
-	{ value: 4, label: 'workspace roles', note: 'owner, admin, instructor, student' },
-	{ value: 3, label: 'ways to release a course', note: 'by date, after enrolling, in order' }
-] as const;
-
 /** The loop a course actually runs. Every step is a route in the app today. */
 export const LIFECYCLE = [
 	{ step: 'Author', line: 'Topics, lessons, video, a preview anyone can watch before enrolling.' },
@@ -118,14 +111,6 @@ export const QUESTION_TYPES = [
 	'Numeric range',
 	'Image answering',
 	'Image matching'
-] as const;
-
-/** How money moves. The school is the merchant; we are not. */
-export const SALES = [
-	'Connect your workspace to your own payment account. The money lands in it.',
-	'Price a course in your own currency, or make it free again.',
-	'Access is granted when the gateway confirms the payment, never on the redirect back.',
-	'Every learner keeps a record of what they bought, and you keep a record of every order.'
 ] as const;
 
 /** Why an API-first backend matters to somebody buying one. */

@@ -1,59 +1,63 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { CheckmarkBadge01Icon, Search01Icon } from '@hugeicons/core-free-icons';
-	import { Badge, Card, Icon } from '$lib/components';
+	import { Icon } from '$lib/components';
 	import { inview } from '$lib/actions/inview';
-	import Section from './Section.svelte';
-
-	// Illustrative: what a lookup returns. The serial format is the API's own.
-	const SERIAL = 'MU-2026-0F3A19C4';
-
-	const FACTS = [
-		'Write a certificate template once, in the workspace, and choose it per course.',
-		'A learner completes the course and the certificate is issued with its own serial.',
-		'Anyone holding the serial can read the certificate. No account, no sign-in.',
-		'Revoke one and the serial still answers. It says the certificate was withdrawn.'
-	];
 </script>
 
-<Section
-	id="certificates"
-	eyebrow="Certificates"
-	title="A certificate is only worth what an employer can check."
-	lead="Muallim's are a number, and the number answers. That is the whole difference between a credential and a PDF."
-	tinted
-	class="grid items-center gap-6 lg:grid-cols-2"
->
-	<div use:inview>
-		<Card float class="p-6 sm:p-8">
-			<div class="flex items-center gap-2 text-sm text-muted">
-				<Icon icon={Search01Icon} class="size-4" />
-				Certificate lookup
-			</div>
+<section id="certificates" class="hero-blue relative isolate overflow-hidden px-6 py-24 text-white">
+	<div class="grain pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true"></div>
 
-			<p class="numeral mt-4 text-xl font-semibold tracking-tight sm:text-2xl">{SERIAL}</p>
-
-			<div class="mt-5 flex flex-wrap items-center gap-3">
-				<Badge tone="success" icon={CheckmarkBadge01Icon}>valid</Badge>
-				<span class="text-sm text-muted">Issued 4 March 2026 · Foundations of Arabic Grammar</span>
-			</div>
-
-			<p class="mt-6 border-t border-border pt-5 text-sm text-pretty text-muted">
-				A public answer, by design. Whoever holds the number may read what it says, which is what a
-				certificate is for.
+	<div class="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
+		<div use:inview>
+			<p class="flex items-center gap-3 text-xs font-semibold tracking-[0.14em] uppercase">
+				<span class="h-px w-6 bg-white/30" aria-hidden="true"></span>
+				Certificates
 			</p>
-		</Card>
-	</div>
 
-	<ul class="space-y-4" use:inview={{ delay: 100 }}>
-		{#each FACTS as fact (fact)}
-			<li class="flex gap-3 text-pretty">
-				<Icon
-					icon={CheckmarkBadge01Icon}
-					class="mt-0.5 size-5 shrink-0 text-accent"
-					strokeWidth={2}
-				/>
-				<span>{fact}</span>
-			</li>
-		{/each}
-	</ul>
-</Section>
+			<h2 class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+				A certificate is only worth the check behind it
+			</h2>
+
+			<p class="mt-5 text-lg leading-relaxed text-pretty text-white/70">
+				Every certificate a workspace issues carries a serial, and the serial answers to anyone — an
+				employer, a registrar, a parent — with no account and no login. Withdraw one and the serial
+				still answers. It says the certificate was withdrawn.
+			</p>
+
+			<a
+				href={resolve('/verify')}
+				class="underline-grow mt-8 inline-flex items-center gap-2 font-medium text-white"
+			>
+				<Icon icon={Search01Icon} class="size-4" />
+				Check a serial
+			</a>
+		</div>
+
+		<!-- The verification answer, in the shape it comes back in. -->
+		<div use:inview={{ delay: 120 }}>
+			<div class="squircle bg-white/8 p-6 ring-1 ring-white/15 backdrop-blur-md sm:p-8">
+				<p class="text-xs tracking-[0.14em] text-white/45 uppercase">Specimen</p>
+
+				<p class="numeral mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+					MLM-7QK4-2F8D-19XA
+				</p>
+
+				<div class="mt-6 flex items-center gap-2.5 border-t border-white/10 pt-6">
+					<Icon icon={CheckmarkBadge01Icon} class="size-5 shrink-0 text-white" />
+					<p class="text-sm">
+						<span class="font-medium">Valid.</span>
+						<span class="text-white/60">
+							Issued by the workspace that taught the course, on the date it was earned.
+						</span>
+					</p>
+				</div>
+
+				<p class="mt-5 text-xs leading-relaxed text-white/45">
+					A revoked serial returns the same page and says so, rather than going missing — a
+					certificate that disappears is a certificate nobody can disprove.
+				</p>
+			</div>
+		</div>
+	</div>
+</section>

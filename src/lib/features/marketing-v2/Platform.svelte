@@ -1,25 +1,39 @@
 <script lang="ts">
-	import { SourceCodeIcon } from '@hugeicons/core-free-icons';
-	import { Card, Icon } from '$lib/components';
 	import { inview } from '$lib/actions/inview';
 	import Section from './Section.svelte';
-	import { PLATFORM } from './content';
+	import { PLATFORM, ROADMAP } from './content';
 </script>
 
 <Section
 	id="platform"
-	eyebrow="Under it"
-	title="An API first, and a website second."
-	lead="Muallim is a backend with a published contract. This site is the first thing built against it, which is the only reason to trust that the contract is real."
-	class="grid gap-6 md:grid-cols-3"
+	eyebrow="Underneath"
+	title="An API first, and a website second"
+	lead="This page's app is one client of the same public contract a mobile app, a plugin, or your own integration would use."
+	class="grid gap-14 lg:grid-cols-[1.2fr_0.8fr] lg:gap-20"
 >
-	{#each PLATFORM as item, i (item.title)}
-		<div use:inview={{ delay: i * 80 }} class="h-full">
-			<Card aurora class="flex h-full flex-col p-6">
-				<Icon icon={SourceCodeIcon} class="size-5 text-accent" />
-				<h3 class="mt-4 font-semibold">{item.title}</h3>
-				<p class="mt-2 text-sm text-pretty text-muted">{item.line}</p>
-			</Card>
-		</div>
-	{/each}
+	<dl>
+		{#each PLATFORM as item, i (item.title)}
+			<div
+				class="border-t border-border py-6 first:border-t-0 first:pt-0"
+				use:inview={{ delay: i * 70 }}
+			>
+				<dt class="font-semibold">{item.title}</dt>
+				<dd class="mt-2 leading-relaxed text-muted">{item.line}</dd>
+			</div>
+		{/each}
+	</dl>
+
+	<!-- Said plainly, and on the page, so nobody plans around a thing that is not there. -->
+	<div class="squircle self-start bg-surface-sunken p-7" use:inview={{ delay: 140 }}>
+		<p class="text-xs font-semibold tracking-[0.14em] text-muted uppercase">Not built yet</p>
+
+		<dl class="mt-5 space-y-5">
+			{#each ROADMAP as item (item.title)}
+				<div>
+					<dt class="text-sm font-medium">{item.title}</dt>
+					<dd class="mt-1 text-sm leading-relaxed text-muted">{item.line}</dd>
+				</div>
+			{/each}
+		</dl>
+	</div>
 </Section>

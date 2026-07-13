@@ -1,12 +1,11 @@
-export { default as Assessment } from './Assessment.svelte';
 export { default as Capabilities } from './Capabilities.svelte';
 export { default as Certificates } from './Certificates.svelte';
 export { default as Closing } from './Closing.svelte';
 export { default as Hero } from './Hero.svelte';
-export { default as Lifecycle } from './Lifecycle.svelte';
 export { default as Nav } from './Nav.svelte';
 export { default as Platform } from './Platform.svelte';
-export { default as Roadmap } from './Roadmap.svelte';
+export { default as ProductShot } from './ProductShot.svelte';
 export { default as Sales } from './Sales.svelte';
 export { default as Section } from './Section.svelte';
+export { default as Showcase } from './Showcase.svelte';
 export * from './content';
