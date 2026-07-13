@@ -3,11 +3,12 @@
 	import { Mortarboard02Icon } from '@hugeicons/core-free-icons';
 	import { SEGMENTS } from '$lib/content/segments';
 	import Icon from './Icon.svelte';
+	import ThemeToggle from './ThemeToggle.svelte';
 
 	const home = resolve('/');
 </script>
 
-<footer>
+<footer class="border-t border-border bg-surface-sunken">
 	<div class="mx-auto max-w-6xl px-6 py-16">
 		<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
 			<div class="lg:col-span-1">
@@ -80,10 +81,15 @@
 		</div>
 
 		<div
-			class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-8 text-sm text-muted"
+			class="mt-14 flex flex-wrap items-center justify-between gap-x-6 gap-y-5 border-t border-border pt-8 text-sm text-muted"
 		>
 			<p>© <span class="numeral">2026</span> Muallim</p>
-			<p>Made for people who teach.</p>
+
+			<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+				<p>Made for people who teach.</p>
+				<!-- Auto is the default, and it follows the system for as long as it is left there. -->
+				<ThemeToggle segmented />
+			</div>
 		</div>
 	</div>
 </footer>

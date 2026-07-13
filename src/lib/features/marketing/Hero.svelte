@@ -52,7 +52,11 @@
 			</div>
 		</div>
 
-		<!-- The dashboard as it renders: a screenshot of the app, not a drawing of one. -->
+		<!--
+			The dashboard as it renders: a screenshot of the app, not a drawing of one.
+			The whole frame, ending on its own rounded edge — a shot faded out at the
+			bottom is a shot that looks cropped, which is what it was.
+		-->
 		<div class="relative mt-16 sm:mt-20" use:inview={{ delay: 120 }}>
 			<ProductShot
 				eager
@@ -62,13 +66,11 @@
 				path="muallim.app/dashboard"
 				class="mx-auto max-w-5xl"
 			/>
-
-			<div class="hero-fade pointer-events-none absolute inset-x-0 -bottom-px h-28 sm:h-36"></div>
 		</div>
 	</div>
 
 	<!-- The loop a course runs, along the seam where the hero ends. -->
-	<div class="hero-foot mt-20 border-t border-white/10">
+	<div class="hero-foot mt-24 border-t border-white/10 sm:mt-28">
 		<ol class="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-white/10 sm:grid-cols-3 lg:grid-cols-5">
 			{#each LIFECYCLE as stage, i (stage.step)}
 				<li class="hero-foot px-6 py-8 text-left" use:inview={{ delay: i * 60 }}>
@@ -82,12 +84,6 @@
 </section>
 
 <style>
-	/* The screenshot dissolves into the hero instead of ending on an edge. The stop
-	   colour is the hero's own gradient where the frame ends, or the fade reads as a panel. */
-	.hero-fade {
-		background: linear-gradient(180deg, transparent, oklch(0.21 0.06 245) 88%);
-	}
-
 	/* One flat surface under the rail: the hero's own gradient, repeated per cell, banded. */
 	.hero-foot {
 		background: oklch(0.25 0.085 244);

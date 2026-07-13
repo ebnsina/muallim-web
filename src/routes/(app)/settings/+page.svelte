@@ -65,13 +65,13 @@
 			<div>
 				<p class="font-medium">Theme</p>
 				<!-- It never reaches the server: the theme is stamped before the first paint
-				     from a cookie this browser wrote, so it is this browser's decision. -->
+				     from this browser's own storage, so it is this browser's decision. -->
 				<p class="text-muted mt-1 text-sm">
-					Light, dark, or whatever this device is set to. Kept on this browser.
+					Auto follows this device, and keeps following it when the device changes.
 				</p>
 			</div>
 
-			<ThemeToggle />
+			<ThemeToggle segmented />
 		</Card>
 	</section>
 

@@ -3,13 +3,16 @@ import {
 	Award01Icon,
 	Certificate01Icon,
 	Clock01Icon,
+	HeartHandshakeIcon,
 	DashboardSquare01Icon,
 	LiveStreaming01Icon,
 	MagicWand01Icon,
 	Megaphone01Icon,
 	Message01Icon,
 	Package01Icon,
+	Briefcase01Icon,
 	Quiz01Icon,
+	School01Icon,
 	ServerStack01Icon,
 	Shield01Icon,
 	SquareLock01Icon,
@@ -44,9 +47,8 @@ export interface Segment {
 	eyebrow: string;
 	headline: string;
 	blurb: string;
-	/** Placeholder photo (Unsplash) — swap for a licensed image before launch. */
-	image: string;
-	imageAlt: string;
+	/** A real screenshot of the running app. Never a stock photo, never a drawing. */
+	shot: { src: string; alt: string; path: string };
 	today: Point[];
 	/** One capability worth dwelling on, drawn straight from `today`. */
 	highlight: { label: string; title: string; body: string; points: string[] };
@@ -60,14 +62,16 @@ export const SEGMENTS: Segment[] = [
 		slug: 'nonprofits',
 		nav: 'Nonprofits & community',
 		tagline: 'Teach and grow a community, free',
-		heroIcon: UserGroupIcon,
+		heroIcon: HeartHandshakeIcon,
 		eyebrow: 'For nonprofits & community builders',
 		headline: 'Everything you need is already here.',
 		blurb:
 			'Free courses, open enrollment, and a community layer that keeps people coming back — with no dependency on the paid pieces still being built.',
-		image:
-			'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=70',
-		imageAlt: 'Volunteers gathered around a table, learning together',
+		shot: {
+			src: '/marketing/forum.webp',
+			alt: 'A community board: threads with their author, their age, and how many replies they drew.',
+			path: 'muallim.app/forum'
+		},
 		today: [
 			{
 				icon: Award01Icon,
@@ -116,9 +120,11 @@ export const SEGMENTS: Segment[] = [
 		headline: 'Build it, teach it, prove it. Selling is next.',
 		blurb:
 			'Authoring, quizzes, a gradebook, certificates, and gamification all work today. The one gap is checkout — so you can build and teach your course now, and sell it the moment commerce lands.',
-		image:
-			'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=70',
-		imageAlt: 'A teacher explaining at a whiteboard',
+		shot: {
+			src: '/marketing/editor.webp',
+			alt: 'The course editor: topics with their lessons, each row draggable, each lesson previewable.',
+			path: 'muallim.app/teach/medicine-the-canon'
+		},
 		today: [
 			{
 				icon: TeachingIcon,
@@ -172,14 +178,16 @@ export const SEGMENTS: Segment[] = [
 		slug: 'schools',
 		nav: 'Schools & academies',
 		tagline: 'Run it today, procure it later',
-		heroIcon: Shield01Icon,
+		heroIcon: School01Icon,
 		eyebrow: 'For schools & academies',
 		headline: 'Ready to run. Not yet ready for the RFP.',
 		blurb:
 			'Multi-role access, member management, a gradebook, and hard per-workspace isolation are built. What an institutional procurement adds — the standards moat — is honestly still ahead.',
-		image:
-			'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=70',
-		imageAlt: 'Students seated in a lecture hall',
+		shot: {
+			src: '/marketing/grading.webp',
+			alt: 'The grading scales page: the default scale, and a new one being built band by band.',
+			path: 'muallim.app/teach/grading'
+		},
 		today: [
 			{
 				icon: UserGroup03Icon,
@@ -239,14 +247,16 @@ export const SEGMENTS: Segment[] = [
 		slug: 'coaching',
 		nav: 'Coaching businesses',
 		tagline: 'Community now, live sessions soon',
-		heroIcon: Message01Icon,
+		heroIcon: UserGroup03Icon,
 		eyebrow: 'For coaching businesses',
 		headline: 'The community is here. The live room is coming.',
 		blurb:
 			'Forum, Q&A, and announcements give a coaching cohort a place to gather today. Live sessions, scheduling, and selling are the pieces still ahead.',
-		image:
-			'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=70',
-		imageAlt: 'A small group in a coaching session',
+		shot: {
+			src: '/marketing/dashboard.webp',
+			alt: 'A learner dashboard: courses in progress, lessons completed, and a calendar of what is due.',
+			path: 'muallim.app/dashboard'
+		},
 		today: [
 			{
 				icon: Message01Icon,
@@ -301,14 +311,16 @@ export const SEGMENTS: Segment[] = [
 		slug: 'agencies',
 		nav: 'Agencies',
 		tagline: 'Isolated client tenants, per domain',
-		heroIcon: ServerStack01Icon,
+		heroIcon: Briefcase01Icon,
 		eyebrow: 'For agencies',
 		headline: 'The tenancy is solid. The console is next.',
 		blurb:
 			'Every client is already an isolated tenant on its own custom domain. What is missing is the layer above — one console to run them all, and white-label theming.',
-		image:
-			'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=70',
-		imageAlt: 'An open-plan office with a team at work',
+		shot: {
+			src: '/marketing/course.webp',
+			alt: 'A course page: the preview video, the level, the rating, the instructor, and the enrol panel.',
+			path: 'muallim.app/courses/medicine-the-canon'
+		},
 		today: [
 			{
 				icon: ServerStack01Icon,

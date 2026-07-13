@@ -54,7 +54,7 @@
 				{src}
 				{alt}
 				width="2360"
-				height="1560"
+				height="1290"
 				loading={eager ? 'eager' : 'lazy'}
 				fetchpriority={eager ? 'high' : 'auto'}
 				decoding="async"
