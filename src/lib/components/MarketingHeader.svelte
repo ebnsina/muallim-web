@@ -12,7 +12,7 @@
 </script>
 
 <header class="absolute inset-x-0 top-0 z-50">
-	<div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
+	<div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:gap-8 sm:px-6">
 		<a href={home} class="flex shrink-0 items-center gap-2.5 font-semibold">
 			<Icon icon={Mortarboard02Icon} class="size-6 text-accent" />
 			Muallim
