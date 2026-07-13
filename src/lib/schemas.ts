@@ -228,6 +228,21 @@ export const awardSchema = (maxPoints: number) =>
 		)
 	});
 
+/*
+	A course's preview. Source and URL travel together — the API refuses one without
+	the other — and `none` needs no URL, so the refinement asks for one only when
+	somebody is actually serving the clip.
+*/
+export const previewSchema = z
+	.object({
+		preview_source: z.enum(['none', 'youtube', 'vimeo', 'embed', 'hosted']),
+		preview_url: optionalText(2000)
+	})
+	.refine((v) => v.preview_source === 'none' || v.preview_url !== '', {
+		path: ['preview_url'],
+		message: 'Paste the link to the preview.'
+	});
+
 // --------------------------------------------------------------------- Q&A
 
 export const questionAskSchema = z.object({

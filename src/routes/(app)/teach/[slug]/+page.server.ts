@@ -6,6 +6,7 @@ import {
 	announcementSchema,
 	lessonSchema,
 	prerequisiteSchema,
+	previewSchema,
 	renameSectionSchema,
 	sectionSchema
 } from '$lib/schemas';
@@ -292,6 +293,32 @@ export const actions: Actions = {
 				message: problemMessage(problem, 'Could not reorder the lessons.')
 			});
 		}
+	},
+
+	/** The preview clip a stranger watches. muallim-api resolves the link to a player. */
+	setPreview: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const parsed = parseForm(previewSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'preview', errors: parsed.errors });
+
+		const { preview_source, preview_url } = parsed.value;
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
+			'/v1/courses/{slug}',
+			{
+				params: { path: { slug: params.slug } },
+				body: { preview_source, preview_url: preview_source === 'none' ? '' : preview_url }
+			}
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'Could not set that preview.')
+			});
+		}
+
+		return { previewSaved: true };
 	},
 
 	setDripMode: async ({ request, locals, params, url }) => {

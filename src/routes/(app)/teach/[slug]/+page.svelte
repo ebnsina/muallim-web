@@ -53,6 +53,7 @@
 		announcementSchema,
 		lessonSchema,
 		prerequisiteSchema,
+		previewSchema,
 		renameSectionSchema,
 		sectionSchema
 	} from '$lib/schemas';
@@ -146,6 +147,20 @@
 	// The composer is closed until it is wanted. An empty form at the top of a list of
 	// notices is a form that pushes the notices off the screen for nothing.
 	let composing = $state(false);
+
+	const PREVIEW_SOURCES = [
+		{ value: 'none', label: 'No preview' },
+		{ value: 'youtube', label: 'YouTube' },
+		{ value: 'vimeo', label: 'Vimeo' },
+		{ value: 'embed', label: 'Embed' },
+		{ value: 'hosted', label: 'Hosted' }
+	];
+
+	// The select drives which fields are shown, so its value is state.
+	// The author's choice while they are choosing, the saved one after that. A plain
+	// `$state` seeded from `data` would keep the old value when the save reloads it.
+	let sourceOverride = $state<string | null>(null);
+	const previewSource = $derived(sourceOverride ?? data.course.preview_source ?? 'none');
 
 	const announcementDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
@@ -1009,6 +1024,80 @@
 			<section class="mt-8 max-w-3xl">
 				<Card float class="space-y-6 p-5">
 					<div>
+						<h2 class="font-medium">Preview</h2>
+						<p class="text-muted mt-1 text-sm">
+							The clip a stranger watches before deciding to enroll. Paste the link; muallim-api
+							turns it into a player it will vouch for.
+						</p>
+
+						<form
+							method="POST"
+							action="?/setPreview"
+							class="mt-3 space-y-3"
+							use:enhance={validated(
+								previewSchema,
+								(next) => (errors = { ...errors, 'preview:': next })
+							)}
+						>
+							<div class="flex flex-wrap items-end gap-2">
+								<div>
+									<Label class="sr-only" for="preview-source">Preview source</Label>
+									<Select
+										id="preview-source"
+										name="preview_source"
+										value={previewSource}
+										onchange={(event) => (sourceOverride = event.currentTarget.value)}
+									>
+										{#each PREVIEW_SOURCES as source (source.value)}
+											<option value={source.value}>{source.label}</option>
+										{/each}
+									</Select>
+								</div>
+
+								{#if previewSource !== 'none'}
+									<!-- Deliberately not `type="url"`: a hosted clip is a bare id, and the
+									     browser would refuse to submit it. The API decides what is valid. -->
+									<div
+										class="min-w-0 flex-1"
+										transition:slide={{ duration: DURATION.base, easing: easeOut }}
+									>
+										<Label class="sr-only" for="preview-url">
+											{previewSource === 'hosted' ? 'Video ID' : 'Video URL'}
+										</Label>
+										<Input
+											id="preview-url"
+											name="preview_url"
+											value={data.course.preview_url ?? ''}
+											placeholder={previewSource === 'hosted'
+												? 'The hosted id'
+												: 'https://www.youtube.com/watch?v=…'}
+											maxlength={2000}
+											invalid={Boolean(problem('preview', 'preview_url'))}
+										/>
+									</div>
+								{/if}
+
+								<Button type="submit" variant="secondary">
+									<Icon icon={FloppyDiskIcon} class="size-4" />
+									Save
+								</Button>
+							</div>
+
+							{#if problem('preview', 'preview_url')}
+								<p class="text-xs font-medium text-danger-text" role="alert">
+									{problem('preview', 'preview_url')}
+								</p>
+							{/if}
+						</form>
+
+						{#if data.course.preview_embed_url}
+							<p class="text-muted mt-2 text-xs">
+								Learners see it at the top of the panel that asks them to enroll.
+							</p>
+						{/if}
+					</div>
+
+					<div class="border-t border-border pt-6">
 						<h2 class="font-medium">Release schedule</h2>
 						<p class="text-muted mt-1 text-sm">
 							How this course hands its lessons to a learner. A free preview is never held back, and

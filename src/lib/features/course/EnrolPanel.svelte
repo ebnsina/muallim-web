@@ -14,6 +14,7 @@
 	} from '@hugeicons/core-free-icons';
 	import { Button, Card, Icon, Numeral, Progress as ProgressBar } from '$lib/components';
 	import { toast } from '$lib/toast.svelte';
+	import { auroraFor, cn } from '$lib/utils';
 	import { span } from './duration';
 	import type { CourseDetail, Prerequisite, Progress, TopicView } from './types';
 
@@ -29,24 +30,9 @@
 
 	let { course, topics, progress, prerequisites, signedIn, next }: Props = $props();
 
-	/*
-		⚠️ The stock preview. One clip, every course, and it teaches nothing.
-
-		It is here because the shape of the card needs it and muallim-api cannot answer
-		yet: `catalog` has no preview column and `media` has nowhere to put one. When
-		the course carries `preview_url` and `preview_poster`, read them off `course`
-		and delete these two lines — the markup below does not change.
-	*/
-	const PREVIEW_SRC = '/stock/course-preview.mp4';
-	const PREVIEW_POSTER = '/stock/course-preview.jpg';
-
-	let video = $state<HTMLVideoElement>();
+	// A preview plays when it is asked to: an autoplaying clip on a page somebody is
+	// reading is a clip they did not ask for.
 	let playing = $state(false);
-
-	function play() {
-		playing = true;
-		video?.play();
-	}
 
 	const enrolled = $derived(progress !== null);
 	const openPrerequisites = $derived(prerequisites.filter((p) => !p.done));
@@ -100,51 +86,46 @@
      plainly separate; the shadow is what says it is lifted off. -->
 <Card float class="mt-6 overflow-hidden p-0 lg:mt-0">
 	<!--
-		The preview, at the top of the card that asks you to enroll — the shape every
-		catalog on the web has settled on, because a person decides with their eyes
+		The preview, at the top of the card that asks you to enrol — the shape every
+		catalogue on the web has settled on, because a person decides with their eyes
 		before they read a word of the syllabus.
 
-		⚠️ PLACEHOLDER. `static/stock/course-preview.mp4` is a generated gradient with
-		no teaching in it, the same clip on every course. muallim-api has no preview
-		field yet: `media` owns uploads and transcoding, `catalog` has no column
-		pointing at one. When it does, `previewSrc`/`previewPoster` come off the course
-		and this constant goes. Nothing else here changes.
+		`preview_embed_url` and never `preview_url`: the first is written by muallim-api
+		from a validated id, the second is whatever an author typed. Framing the second
+		would run an author's URL on this origin.
 	-->
-	<div class="relative aspect-video overflow-hidden rounded-b-card bg-surface-sunken">
-		<video
-			class="size-full object-cover"
-			src={PREVIEW_SRC}
-			poster={PREVIEW_POSTER}
-			preload="none"
-			controls={playing}
-			playsinline
-			bind:this={video}
-		>
-			<track kind="captions" />
-		</video>
+	{#if course.preview_embed_url}
+		<div class="relative aspect-video overflow-hidden rounded-b-card bg-surface-sunken">
+			{#if playing}
+				<iframe
+					class="size-full"
+					src="{course.preview_embed_url}{course.preview_embed_url.includes('?')
+						? '&'
+						: '?'}autoplay=1"
+					title="Preview of {course.title}"
+					allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+					allowfullscreen
+				></iframe>
+			{:else}
+				<!-- The cover is the poster, and the whole surface is the button: a 40px
+				     target in the middle of a picture is a target people miss. -->
+				<div class={cn('absolute inset-0', auroraFor(course.slug))}></div>
 
-		{#if !playing}
-			<!--
-				The play button is the whole surface. A 40px target in the middle of a
-				200px picture is a target people miss, and the picture is doing nothing
-				else with the click.
-			-->
-			<button
-				type="button"
-				class="group absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35 text-on-solid transition-colors hover:bg-black/45 focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:ring-inset focus-visible:outline-none"
-				onclick={play}
-			>
-				<!-- The mark itself, no disc behind it: the scrim is already the surface it
-				     stands on, and a filled circle on top of it is a second one. -->
-				<Icon
-					icon={PlayIcon}
-					class="size-12 transition-transform motion-safe:group-hover:scale-110"
-					strokeWidth={1.5}
-				/>
-				<span class="text-sm font-medium">Preview this course</span>
-			</button>
-		{/if}
-	</div>
+				<button
+					type="button"
+					class="group absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35 text-on-solid transition-colors hover:bg-black/45 focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:ring-inset focus-visible:outline-none"
+					onclick={() => (playing = true)}
+				>
+					<Icon
+						icon={PlayIcon}
+						class="size-12 transition-transform motion-safe:group-hover:scale-110"
+						strokeWidth={1.5}
+					/>
+					<span class="text-sm font-medium">Preview this course</span>
+				</button>
+			{/if}
+		</div>
+	{/if}
 
 	<div class="p-6">
 		{#if enrolled}
