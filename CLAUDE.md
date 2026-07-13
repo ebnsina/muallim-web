@@ -24,6 +24,8 @@ pnpm build
 
 ## Rules that are easy to violate
 
+**Docs are part of the change, not a follow-up.** A rule in this file that the code has outgrown is worse than no rule: it is a confident instruction to do the wrong thing, and the next person — or the next model — will follow it. So when a convention changes, CLAUDE.md changes in the _same_ commit; when a page or a component is added, the docs that describe the system say so. This has already bitten: three rules here ("hover is a scale", "a card's colour is neutral", "reordering is not up/down buttons") went false while the product moved, and nothing failed to tell us. Nothing ever will — a stale doc has no test.
+
 **Comments are one line, two at most.** Say the one thing the markup or code cannot. No multi-paragraph essays — trim to the load-bearing sentence.
 
 **Never assume a library API.** Query Context7 (`resolve-library-id` → `query-docs`) before writing against any dependency. Svelte 5 and Tailwind 4 both broke long-standing patterns, and training data lags releases.
@@ -41,6 +43,8 @@ pnpm build
 **`src/lib/server/` never reaches the client.** Secrets live there.
 
 **Every error path renders deliberately.** `error(404, ...)` from `load`; `+error.svelte` boundaries; `handleError` in `hooks.server.ts` logs the real error and returns only a safe shape with a correlation ID; `src/error.html` is the last resort and must not depend on the app bundle. Know the trap: an error in the _root_ layout's `load` cannot be caught by any `+error.svelte` — it falls through to `error.html`.
+
+**A validation error is a sentence about a field, so it sits under the field.** Pass it to `Field`'s `error` prop (plain danger-toned text under the control, wired to `aria-describedby`, and the control goes `invalid`) — not an `Alert` banner at the top of the page, which shouts about one input from across the room. `Alert` is for what a _page_ has to say: an action that failed, a session that expired, a thing that was saved.
 
 **Loading, empty, error, and success are four states.** A component handling only success is unfinished.
 

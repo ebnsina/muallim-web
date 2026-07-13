@@ -661,10 +661,6 @@
 					</Button>
 				</div>
 
-				{#if form?.announcementMessage}
-					<Alert tone="danger" class="mt-4" role="alert">{form.announcementMessage}</Alert>
-				{/if}
-
 				{#if composing}
 					<!-- Closed until it is wanted: an empty form standing above the notices is a
 					     form that pushes the notices off the screen for nothing. -->
@@ -682,7 +678,7 @@
 					>
 						<Sheet>
 							<div class="space-y-4">
-								<Field id="announcement-title" label="Title">
+								<Field id="announcement-title" label="Title" error={form?.announcementMessage}>
 									{#snippet children({ id, invalid })}
 										<Input {id} {invalid} name="title" required maxlength={200} />
 									{/snippet}

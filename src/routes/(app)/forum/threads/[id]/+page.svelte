@@ -9,7 +9,7 @@
 		SquareLock01Icon,
 		SquareUnlock01Icon
 	} from '@hugeicons/core-free-icons';
-	import { Alert, Badge, Breadcrumbs, Button, Card, Icon, Page, Textarea } from '$lib/components';
+	import { Badge, Breadcrumbs, Button, Card, Icon, Page, Textarea } from '$lib/components';
 	import { exactTime, relativeTime, ReplyRow } from '$lib/features/forum';
 	import { canModerate } from '$lib/roles';
 	import type { PageProps } from './$types';
@@ -100,10 +100,6 @@
 		</article>
 	</Card>
 
-	{#if form?.message}
-		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
-	{/if}
-
 	<!-- Replies, oldest first. -->
 	<section class="mt-8">
 		<h2 class="text-sm font-medium tracking-wide uppercase">
@@ -142,7 +138,23 @@
 					maxlength={20000}
 					aria-label="Write a reply"
 					placeholder="Write a reply…"
+					invalid={Boolean(form?.message)}
+					aria-describedby={form?.message ? 'reply-error' : undefined}
 				/>
+
+				<!--
+					The refusal sits under the field it is about, in plain text.
+
+					It was an Alert above the replies: a red banner the width of the page, eight
+					rows away from the box it was talking about, so the eye had to travel back
+					down and guess the connection. A validation message is a sentence about one
+					field, and it belongs where the field is.
+				-->
+				{#if form?.message}
+					<p id="reply-error" class="mt-2 text-sm text-danger-text" role="alert">
+						{form.message}
+					</p>
+				{/if}
 				<!-- The submit sits at the right end of the field it submits: the eye finishes a
 				     form at its bottom-right corner, and every other form in the app agrees. -->
 				<div class="mt-2 flex justify-end">

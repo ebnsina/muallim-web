@@ -51,10 +51,6 @@
 		{/snippet}
 	</PageHeader>
 
-	{#if form?.message}
-		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
-	{/if}
-
 	<!-- The composer pushes the thread list down, so it grows rather than appears. -->
 	{#if composing}
 		<div class="mt-6 max-w-2xl" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
@@ -65,7 +61,7 @@
 					{/snippet}
 
 					<div class="space-y-4">
-						<Field id="thread-title" label="Title">
+						<Field id="thread-title" label="Title" error={form?.message}>
 							{#snippet children({ id })}
 								<Input {id} name="title" required maxlength={200} />
 							{/snippet}

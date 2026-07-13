@@ -42,10 +42,6 @@
 		{/snippet}
 	</PageHeader>
 
-	{#if form?.message}
-		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
-	{/if}
-
 	<!-- The composer pushes the board list down, so it grows rather than appears. -->
 	{#if moderator && composing}
 		<div class="mt-6 max-w-2xl" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
@@ -68,7 +64,10 @@
 					{/snippet}
 
 					<div class="space-y-4">
-						<Field id="board-title" label="Title">
+						<!-- The refusal rides on the field it is about — Field renders it under the
+						     control, in plain text. A banner at the top of the page is a sentence about
+						     one input, shouted from across the room. -->
+						<Field id="board-title" label="Title" error={form?.message}>
 							{#snippet children({ id })}
 								<Input {id} name="title" required maxlength={200} />
 							{/snippet}
