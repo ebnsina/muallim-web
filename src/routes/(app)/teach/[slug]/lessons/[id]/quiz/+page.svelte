@@ -26,9 +26,22 @@
 	import AiQuiz from '$lib/components/AiQuiz.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
 	import { DURATION, easeOut } from '$lib/motion';
+	import { LIMITS, questionSchema, quizSettingsSchema, quizTitleSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// Three forms, one bag each: a bad pass mark in Settings must not mark the prompt
+	// in "Add a question", and both live on this page at once.
+	let errors = $state<Record<string, FieldErrors>>({});
+
+	const setErrors = (scope: string) => (next: FieldErrors) => {
+		errors = { ...errors, [scope]: next };
+	};
+
+	const problem = (scope: string, field: string) =>
+		errors[scope]?.[field] ?? (form?.scope === scope ? form?.errors?.[field] : undefined);
 
 	const crumbs = $derived(
 		teachTrail(data.slug, data.course.title, data.lessonId, data.lessonTitle, { label: 'Quiz' })
@@ -87,11 +100,16 @@
 	{/if}
 
 	{#if !data.quiz}
-		<form method="POST" action="?/create" class="mt-8 space-y-4" use:enhance>
+		<form
+			method="POST"
+			action="?/create"
+			class="mt-8 space-y-4"
+			use:enhance={validated(quizTitleSchema, setErrors('create'))}
+		>
 			<p class="text-muted text-sm">This lesson has no quiz yet.</p>
-			<Field id="title" label="Title" error={form?.titleMessage}>
+			<Field id="title" label="Title" error={problem('create', 'title')}>
 				{#snippet children({ id, describedBy, invalid })}
-					<Input {id} {invalid} name="title" required aria-describedby={describedBy} />
+					<Input {id} {invalid} name="title" {...LIMITS.quizTitle} aria-describedby={describedBy} />
 				{/snippet}
 			</Field>
 			<div class="flex items-center justify-end gap-3">
@@ -115,15 +133,20 @@
 		<section class="mt-8">
 			<h2 class="text-lg font-medium">Settings</h2>
 
-			<form method="POST" action="?/settings" class="mt-4 space-y-4" use:enhance>
-				<Field id="title" label="Title" error={form?.titleMessage}>
+			<form
+				method="POST"
+				action="?/settings"
+				class="mt-4 space-y-4"
+				use:enhance={validated(quizSettingsSchema, setErrors('settings'))}
+			>
+				<Field id="title" label="Title" error={problem('settings', 'title')}>
 					{#snippet children({ id, describedBy, invalid })}
 						<Input
 							{id}
 							{invalid}
 							name="title"
 							value={quiz.title}
-							required
+							{...LIMITS.quizTitle}
 							aria-describedby={describedBy}
 						/>
 					{/snippet}
@@ -135,20 +158,23 @@
 						id="description"
 						name="description"
 						rows={2}
+						{...LIMITS.quizDescription}
 						value={data.quiz.description ?? ''}
 					/>
 				</div>
 
 				<div class="grid gap-4 sm:grid-cols-3">
-					<Field id="passing_percent" label="Pass mark (%)" error={form?.passingMessage}>
+					<Field
+						id="passing_percent"
+						label="Pass mark (%)"
+						error={problem('settings', 'passing_percent')}
+					>
 						{#snippet children({ id, describedBy, invalid })}
 							<Input
 								{id}
 								{invalid}
 								name="passing_percent"
-								type="number"
-								min="0"
-								max="100"
+								{...LIMITS.passingPercent}
 								value={quiz.passing_percent}
 								aria-describedby={describedBy}
 							/>
@@ -158,7 +184,7 @@
 					<Field
 						id="time_limit_seconds"
 						label="Time limit (seconds)"
-						error={form?.timeLimitMessage}
+						error={problem('settings', 'time_limit_seconds')}
 						hint="Zero means no limit."
 					>
 						{#snippet children({ id, describedBy, invalid })}
@@ -166,8 +192,7 @@
 								{id}
 								{invalid}
 								name="time_limit_seconds"
-								type="number"
-								min="0"
+								{...LIMITS.timeLimit}
 								value={quiz.time_limit_seconds}
 								aria-describedby={describedBy}
 							/>
@@ -177,7 +202,7 @@
 					<Field
 						id="max_attempts"
 						label="Attempts"
-						error={form?.attemptsMessage}
+						error={problem('settings', 'max_attempts')}
 						hint="Zero means unlimited."
 					>
 						{#snippet children({ id, describedBy, invalid })}
@@ -185,8 +210,7 @@
 								{id}
 								{invalid}
 								name="max_attempts"
-								type="number"
-								min="0"
+								{...LIMITS.maxAttempts}
 								value={quiz.max_attempts}
 								aria-describedby={describedBy}
 							/>
@@ -366,16 +390,20 @@
 				method="POST"
 				action="?/addQuestion"
 				class="mt-4 space-y-4"
-				use:enhance={() =>
-					async ({ update, result }) => {
-						await update({ reset: true });
-						if (result.type === 'success') {
-							rows = [
-								{ content: '', match: '' },
-								{ content: '', match: '' }
-							];
+				use:enhance={validated(
+					questionSchema,
+					setErrors('question'),
+					() =>
+						async ({ update, result }) => {
+							await update({ reset: true });
+							if (result.type === 'success') {
+								rows = [
+									{ content: '', match: '' },
+									{ content: '', match: '' }
+								];
+							}
 						}
-					}}
+				)}
 			>
 				<div class="space-y-2">
 					<Label for="type">Type</Label>
@@ -386,27 +414,26 @@
 					</Select>
 				</div>
 
-				<Field id="prompt" label="Prompt" error={form?.promptMessage}>
+				<Field id="prompt" label="Prompt" error={problem('question', 'prompt')}>
 					{#snippet children({ id, describedBy, invalid })}
 						<Textarea
 							{id}
 							{invalid}
 							name="prompt"
 							rows={2}
-							required
+							{...LIMITS.questionPrompt}
 							aria-describedby={describedBy}
 						/>
 					{/snippet}
 				</Field>
 
-				<Field id="points" label="Points" error={form?.pointsMessage}>
+				<Field id="points" label="Points" error={problem('question', 'points')}>
 					{#snippet children({ id, describedBy, invalid })}
 						<Input
 							{id}
 							{invalid}
 							name="points"
-							type="number"
-							min="0"
+							{...LIMITS.questionPoints}
 							value="1"
 							class="w-32"
 							aria-describedby={describedBy}
@@ -536,6 +563,7 @@
 						id="explanation"
 						name="explanation"
 						rows={2}
+						{...LIMITS.questionExplanation}
 						aria-describedby="explanation-hint"
 					/>
 					<p id="explanation-hint" class="text-muted text-xs">

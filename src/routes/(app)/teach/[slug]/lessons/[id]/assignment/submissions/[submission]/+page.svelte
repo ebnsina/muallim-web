@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { gradeSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import { resolve } from '$app/paths';
 	import { Task01Icon } from '@hugeicons/core-free-icons';
 	import {
@@ -59,6 +61,9 @@
 	let points = $state<number | ''>(data.submission.points ?? '');
 
 	const passes = $derived(typeof points === 'number' && points >= assignment.passing_points);
+
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 </script>
 
 <svelte:head><title>Marking — {assignment.title}</title></svelte:head>
@@ -107,11 +112,20 @@
 		learner to hand in again. muallim-api records it in the same transaction as the
 		lesson completion, so a corrected fail reopens the lesson it had closed.
 	-->
-	<form method="POST" action="?/mark" use:enhance class="mt-10 space-y-6">
+	<form
+		method="POST"
+		action="?/mark"
+		use:enhance={validated(gradeSchema(assignment.points), (next) => (errors = next))}
+		class="mt-10 space-y-6"
+	>
+		<!-- The assignment's own maximum travels with the mark, so the schema on the
+		     server can bound it without loading the assignment twice. -->
+		<input type="hidden" name="max_points" value={assignment.points} />
+
 		<Field
 			id="points"
 			label="Grade"
-			error={form?.pointsMessage}
+			error={problem('points')}
 			hint="Out of {assignment.points}. {assignment.passing_points} passes and completes the lesson."
 		>
 			{#snippet children({ id, describedBy, invalid })}

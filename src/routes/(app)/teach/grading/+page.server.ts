@@ -1,6 +1,8 @@
 import { error, fail } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { scaleNameSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -60,12 +62,17 @@ export const actions: Actions = {
 		if (!locals.accessToken) error(401, 'Sign in to manage grading scales.');
 
 		const form = await request.formData();
-		const name = String(form.get('name') ?? '').trim();
-		const bands = bandsFrom(form);
+
+		// The name is a field; the bands are rules about each other, and `internal/grade`
+		// is the only thing that holds all of them.
+		const parsed = parseForm(scaleNameSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
+
+		const name = parsed.value.name;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/grading-scales',
-			{ body: { name, bands } }
+			{ body: { name, bands: bandsFrom(form) } }
 		);
 
 		if (problem) {

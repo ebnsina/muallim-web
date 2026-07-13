@@ -1,29 +1,9 @@
 import { error, fail } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { assignmentSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
-
-interface AssignmentBody {
-	title: string;
-	instructions: string;
-	points: number;
-	passing_points: number;
-	max_files: number;
-	max_bytes: number;
-	due_at: string | null | undefined;
-	allow_late: boolean;
-}
-
-/** What a `datetime-local` input produces, turned into an instant the API accepts. */
-function deadlineFrom(value: FormDataEntryValue | null): string | null | undefined {
-	if (value === null) return undefined;
-
-	const local = String(value).trim();
-	if (local === '') return null;
-
-	const at = new Date(local);
-	return Number.isNaN(at.getTime()) ? undefined : at.toISOString();
-}
 
 /** The same instant, in the shape `datetime-local` wants: local time, no zone. */
 function toLocalInput(iso: string | null | undefined): string {
@@ -68,35 +48,6 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	};
 };
 
-/**
- * Everything an author may set, read out of one form.
- *
- * `due_at` carries three meanings and they are all needed: a string sets the
- * deadline, `null` clears it, and an absent field leaves it alone. Only the first
- * two can come out of a form that always has the input in it.
- */
-function bodyFrom(form: FormData): { body?: AssignmentBody; problem?: string } {
-	const raw = form.get('due_at');
-	const dueAt = deadlineFrom(raw);
-
-	if (dueAt === undefined && raw !== null) {
-		return { problem: 'That deadline is not a date.' };
-	}
-
-	return {
-		body: {
-			title: String(form.get('title') ?? '').trim(),
-			instructions: String(form.get('instructions') ?? '').trim(),
-			points: Number(form.get('points')),
-			passing_points: Number(form.get('passing_points')),
-			max_files: Number(form.get('max_files')),
-			max_bytes: Number(form.get('max_bytes')),
-			due_at: dueAt,
-			allow_late: form.get('allow_late') === 'on'
-		}
-	};
-}
-
 export const actions: Actions = {
 	/**
 	 * Create or replace. One button, because an author does not care which verb the
@@ -107,10 +58,16 @@ export const actions: Actions = {
 		if (!locals.accessToken) error(401, 'Sign in to edit this lesson.');
 
 		const form = await request.formData();
-		// The only thing this layer refuses is the deadline, so the refusal renders
-		// under the deadline. `message` stays the page's voice for an API failure.
-		const { body, problem: invalid } = bodyFrom(form);
-		if (!body) return fail(422, { dueMessage: invalid ?? 'That deadline is not a date.' });
+
+		const parsed = parseForm(assignmentSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
+
+		// A blank deadline is `null` — the author took it off, which is a thing they mean.
+		const body = {
+			...parsed.value,
+			due_at: parsed.value.due_at ? new Date(parsed.value.due_at).toISOString() : null,
+			allow_late: form.get('allow_late') === 'on'
+		};
 
 		const api = authedApi(url.origin, locals.accessToken);
 		const exists = form.get('exists') === 'true';

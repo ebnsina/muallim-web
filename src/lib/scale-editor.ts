@@ -1,10 +1,10 @@
 /**
- * The rules a grading scale has to satisfy, checked in the browser.
+ * The rules a grading scale's *bands* have to satisfy, checked in the browser.
  *
- * The API is the authority — it refuses a bad scale whatever this file says — but
- * an author building one wants to know a band is duplicated before they press
- * Save, not after. This is the same rule set as `internal/grade`, said in the
- * place the author is typing.
+ * They are rules about each other — no two floors alike, something covering zero —
+ * which is why they are not a Zod schema; the name is one field, so it is one
+ * (`scaleNameSchema`). The API is the authority either way: this is `internal/grade`,
+ * said in the place the author is typing.
  */
 
 export interface DraftBand {
@@ -14,16 +14,13 @@ export interface DraftBand {
 }
 
 export interface ScaleProblem {
-	/** The band the problem is about, `SCALE` for the whole scale, `NAME` for its name. */
+	/** The band the problem is about, or `SCALE` for the whole scale. */
 	index: number;
 	message: string;
 }
 
 /** A problem about the whole scale — it has no one control to sit under. */
 export const SCALE = -1;
-
-/** A problem about the name, which does: it renders under the name field. */
-export const NAME = -2;
 
 /**
  * Bands, highest floor first — the order the API stores them and a reader reads
@@ -34,18 +31,15 @@ export function sortedBands<T extends { min: number | '' }>(bands: T[]): T[] {
 }
 
 /**
- * Why this scale cannot be saved yet, or an empty list when it can.
+ * Why these bands cannot be saved yet, or an empty list when they can.
  *
- * Every reason `internal/grade` would refuse it: an empty label, a floor off the
+ * Every reason `internal/grade` would refuse them: an empty label, a floor off the
  * 0–100 range, two bands sharing a floor, nothing covering zero, nothing that
  * passes. Refused here so the author fixes it in place rather than reading a 422.
  */
-export function scaleProblems(name: string, bands: DraftBand[]): ScaleProblem[] {
+export function scaleProblems(bands: DraftBand[]): ScaleProblem[] {
 	const problems: ScaleProblem[] = [];
 
-	if (name.trim() === '') {
-		problems.push({ index: NAME, message: 'Give the scale a name.' });
-	}
 	if (bands.length === 0) {
 		problems.push({ index: SCALE, message: 'A scale needs at least one band.' });
 		return problems;
@@ -91,11 +85,6 @@ export function scaleProblems(name: string, bands: DraftBand[]): ScaleProblem[] 
 /** The whole-scale problems — the ones no single control can own. */
 export function generalProblems(problems: ScaleProblem[]): string[] {
 	return problems.filter((p) => p.index === SCALE).map((p) => p.message);
-}
-
-/** The problem with the name, for the message under the name field. */
-export function nameProblem(problems: ScaleProblem[]): string | undefined {
-	return problems.find((p) => p.index === NAME)?.message;
 }
 
 /** The problem attached to one band, if any, for the message beside its row. */

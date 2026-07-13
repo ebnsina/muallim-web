@@ -1,7 +1,15 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { gradeSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
+
+/** The assignment's own maximum, carried by the form so the schema can bound the mark. */
+function maxPoints(form: FormData): number {
+	const max = Number(form.get('max_points'));
+	return Number.isInteger(max) && max > 0 ? max : 1000;
+}
 
 /** One learner's work, with what it is worth. */
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -40,18 +48,18 @@ export const actions: Actions = {
 		if (!locals.accessToken) error(401, 'Sign in to mark this assignment.');
 
 		const form = await request.formData();
-		const points = Number(form.get('points'));
 
-		// `0` is a grade, and `Number('')` is 0. An empty box is not a zero.
-		if (!Number.isInteger(points) || String(form.get('points') ?? '').trim() === '') {
-			return fail(422, { pointsMessage: 'A grade is a whole number of points.' });
-		}
+		// The schema the page ran; this one decides. A blank box is not a zero.
+		const parsed = parseForm(gradeSchema(maxPoints(form)), form);
+		if (!parsed.ok) return fail(422, { errors: parsed.errors });
+
+		const { points, feedback } = parsed.value;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
 			'/v1/assignment-submissions/{id}/mark',
 			{
 				params: { path: { id: params.submission } },
-				body: { points, feedback: String(form.get('feedback') ?? '').trim() }
+				body: { points, feedback }
 			}
 		);
 

@@ -18,11 +18,17 @@
 	} from '$lib/components';
 	import { ThreadRow } from '$lib/features/forum';
 	import { DURATION, easeOut } from '$lib/motion';
+	import { LIMITS, threadSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	let composing = $state(false);
+
+	// The page's own schema run, and the action's. One reading: whichever spoke last.
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
 	const crumbs = $derived([
 		{ label: 'Community', href: resolve('/forum') },
@@ -51,24 +57,46 @@
 		{/snippet}
 	</PageHeader>
 
+	<!-- A failure of the call, not of a field: it is the page's voice. -->
+	{#if form?.message}
+		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
+	{/if}
+
 	<!-- The composer pushes the thread list down, so it grows rather than appears. -->
 	{#if composing}
 		<div class="mt-6 max-w-2xl" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
-			<form method="POST" action="?/startThread" use:enhance>
+			<form
+				method="POST"
+				action="?/startThread"
+				use:enhance={validated(threadSchema, (next) => (errors = next))}
+			>
 				<Sheet>
 					{#snippet header()}
 						<h2 class="font-medium">Start a thread</h2>
 					{/snippet}
 
 					<div class="space-y-4">
-						<Field id="thread-title" label="Title" error={form?.message}>
-							{#snippet children({ id })}
-								<Input {id} name="title" required maxlength={200} />
+						<Field id="thread-title" label="Title" error={problem('title')}>
+							{#snippet children({ id, describedBy, invalid })}
+								<Input
+									{id}
+									{invalid}
+									name="title"
+									{...LIMITS.threadTitle}
+									aria-describedby={describedBy}
+								/>
 							{/snippet}
 						</Field>
-						<Field id="thread-body" label="Message">
-							{#snippet children({ id })}
-								<Textarea {id} name="body" rows={4} required maxlength={20000} />
+						<Field id="thread-body" label="Message" error={problem('body')}>
+							{#snippet children({ id, describedBy, invalid })}
+								<Textarea
+									{id}
+									{invalid}
+									name="body"
+									rows={4}
+									{...LIMITS.threadBody}
+									aria-describedby={describedBy}
+								/>
 							{/snippet}
 						</Field>
 					</div>

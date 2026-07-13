@@ -1,6 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { replySchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -26,14 +28,16 @@ export const actions: Actions = {
 	reply: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
 
-		const body = String((await request.formData()).get('body') ?? '').trim();
-		if (!body) return fail(400, { message: 'Write a reply first.' });
+		// The same schema the page ran. That one was a courtesy; this one decides.
+		const parsed = parseForm(replySchema, await request.formData());
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/forum/threads/{id}/posts',
-			{ params: { path: { id: params.id } }, body: { body } }
+			{ params: { path: { id: params.id } }, body: { body: parsed.value.body } }
 		);
 
+		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(problem, 'Could not post that reply.')

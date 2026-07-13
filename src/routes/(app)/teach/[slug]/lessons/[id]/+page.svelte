@@ -21,9 +21,14 @@
 	import AiField from '$lib/components/AiField.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
 	import { DURATION, easeOut } from '$lib/motion';
+	import { LIMITS, lessonEditSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
 	const crumbs = $derived(
 		teachTrail(data.slug, data.course.title, data.lesson.id, data.lesson.title)
@@ -118,24 +123,28 @@
 	<form
 		method="POST"
 		class="mt-8"
-		use:enhance={() => {
-			submitting = true;
-			return async ({ update }) => {
-				await update();
-				submitting = false;
-			};
-		}}
+		use:enhance={validated(
+			lessonEditSchema,
+			(next) => (errors = next),
+			() => {
+				submitting = true;
+				return async ({ update }) => {
+					await update();
+					submitting = false;
+				};
+			}
+		)}
 	>
 		<Sheet>
 			<div class="space-y-4">
-				<Field id="title" label="Title" error={form?.titleMessage}>
+				<Field id="title" label="Title" error={problem('title')}>
 					{#snippet children({ id, describedBy, invalid })}
 						<Input
 							{id}
 							{invalid}
 							name="title"
 							value={data.lesson.title}
-							required
+							{...LIMITS.lessonTitle}
 							aria-describedby={describedBy}
 						/>
 					{/snippet}
@@ -157,7 +166,13 @@
 
 				<div class="space-y-2">
 					<Label for="content">Content</Label>
-					<Textarea id="content" name="content" rows={10} bind:value={content} />
+					<Textarea
+						id="content"
+						name="content"
+						rows={10}
+						{...LIMITS.lessonContent}
+						bind:value={content}
+					/>
 					<AiField
 						enabled={data.aiEnabled}
 						label="Draft this lesson"
@@ -196,6 +211,7 @@
 								id="video_url"
 								name="video_url"
 								value={data.lesson.video_url ?? ''}
+								{...LIMITS.videoUrl}
 								aria-describedby="video-url-hint"
 							/>
 							<p id="video-url-hint" class="text-muted text-xs">
@@ -227,7 +243,7 @@
 					<Field
 						id="available_at"
 						label="Opens on"
-						error={form?.availableAtMessage}
+						error={problem('available_at')}
 						hint="The same instant for every learner. Leave blank to keep the current date."
 					>
 						{#snippet children({ id, describedBy, invalid })}
@@ -235,7 +251,7 @@
 								{id}
 								{invalid}
 								name="available_at"
-								type="datetime-local"
+								{...LIMITS.releaseDate}
 								value={localDateTime(data.availableAt)}
 								aria-describedby={describedBy}
 							/>
@@ -245,7 +261,7 @@
 					<Field
 						id="available_after_days"
 						label="Opens this many days after enrolling"
-						error={form?.afterDaysMessage}
+						error={problem('available_after_days')}
 						hint="Counted from each learner's own enrollment, so they see different dates."
 					>
 						{#snippet children({ id, describedBy, invalid })}
@@ -253,9 +269,7 @@
 								{id}
 								{invalid}
 								name="available_after_days"
-								type="number"
-								min="0"
-								step="1"
+								{...LIMITS.dripDays}
 								value={data.availableAfterDays ?? ''}
 								aria-describedby={describedBy}
 							/>
@@ -268,15 +282,13 @@
 					</p>
 				{/if}
 
-				<Field id="duration_seconds" label="Duration (seconds)" error={form?.durationMessage}>
+				<Field id="duration_seconds" label="Duration (seconds)" error={problem('duration_seconds')}>
 					{#snippet children({ id, describedBy, invalid })}
 						<Input
 							{id}
 							{invalid}
 							name="duration_seconds"
-							type="number"
-							min="0"
-							step="1"
+							{...LIMITS.durationSeconds}
 							value={data.lesson.duration_seconds ?? 0}
 							aria-describedby={describedBy}
 						/>

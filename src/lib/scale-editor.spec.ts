@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
 	generalProblems,
-	nameProblem,
 	problemFor,
 	scaleProblems,
 	sortedBands,
@@ -37,28 +36,17 @@ describe('sortedBands', () => {
 
 describe('scaleProblems', () => {
 	it('is happy with a valid scale', () => {
-		expect(scaleProblems('Pass/fail', passFail)).toEqual([]);
-	});
-
-	// The name has a control of its own, so its problem sits under that control and
-	// never in the whole-scale summary.
-	it('wants a name, and pins the problem to the name field', () => {
-		const problems = scaleProblems('  ', passFail);
-
-		expect(nameProblem(problems)).toBe('Give the scale a name.');
-		expect(generalProblems(problems)).not.toContain('Give the scale a name.');
+		expect(scaleProblems(passFail)).toEqual([]);
 	});
 
 	it('wants at least one band', () => {
-		expect(generalProblems(scaleProblems('Empty', []))).toContain(
-			'A scale needs at least one band.'
-		);
+		expect(generalProblems(scaleProblems([]))).toContain('A scale needs at least one band.');
 	});
 
 	// A gap at the bottom leaves a low score with no grade at all.
 	it('insists something covers zero', () => {
 		const gap = [band('Pass', 50, true), band('Fail', 10)];
-		expect(generalProblems(scaleProblems('Gap', gap))).toContain(
+		expect(generalProblems(scaleProblems(gap))).toContain(
 			'One band must start at 0%, or a low score has no grade.'
 		);
 	});
@@ -66,9 +54,7 @@ describe('scaleProblems', () => {
 	// A scale nobody can pass is a scale somebody mistyped.
 	it('insists something passes', () => {
 		const cruel = [band('Fail', 0), band('Also fail', 50)];
-		expect(generalProblems(scaleProblems('Cruel', cruel))).toContain(
-			'Mark at least one band as a pass.'
-		);
+		expect(generalProblems(scaleProblems(cruel))).toContain('Mark at least one band as a pass.');
 	});
 
 	/*
@@ -78,7 +64,7 @@ describe('scaleProblems', () => {
 	*/
 	it('rejects two bands sharing a floor, and points at the later one', () => {
 		const clash = [band('Pass', 50, true), band('Merit', 50, true), band('Fail', 0)];
-		const problems = scaleProblems('Ambiguous', clash);
+		const problems = scaleProblems(clash);
 
 		expect(problemFor(problems, 1)).toBe('Same floor as band 1.');
 		expect(problemFor(problems, 0)).toBeUndefined();
@@ -90,11 +76,11 @@ describe('scaleProblems', () => {
 		['', 'A floor is a number from 0 to 100.']
 	])('rejects a floor of %s', (min, message) => {
 		const bands = [band('Pass', min as number | '', true), band('Fail', 0)];
-		expect(problemFor(scaleProblems('Bad', bands), 0)).toBe(message);
+		expect(problemFor(scaleProblems(bands), 0)).toBe(message);
 	});
 
 	it('wants every band labelled', () => {
 		const bands = [band('  ', 50, true), band('Fail', 0)];
-		expect(problemFor(scaleProblems('Silent', bands), 0)).toBe('This band needs a label.');
+		expect(problemFor(scaleProblems(bands), 0)).toBe('This band needs a label.');
 	});
 });

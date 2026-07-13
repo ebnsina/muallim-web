@@ -1,6 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { awardSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -49,16 +51,13 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const questionId = String(form.get('question_id') ?? '');
 
-		const raw = String(form.get('points') ?? '').trim();
-		const points = Number(raw);
-		// The page renders one marking form per open question, so the refusal names the
-		// question it is about — otherwise it would light up every box on the page.
-		if (raw === '' || !Number.isInteger(points) || points < 0) {
-			return fail(400, {
-				questionId,
-				pointsMessage: 'The award must be a whole number of points, zero or more.'
-			});
-		}
+		// One marking form per open question, so a refusal names the question it is
+		// about — otherwise it would light up every box on the page.
+		const max = Number(form.get('max_points'));
+		const parsed = parseForm(awardSchema(Number.isInteger(max) && max > 0 ? max : 1000), form);
+		if (!parsed.ok) return fail(400, { questionId, errors: parsed.errors });
+
+		const { points } = parsed.value;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
 			'/v1/attempts/{id}/answers/{question_id}/mark',

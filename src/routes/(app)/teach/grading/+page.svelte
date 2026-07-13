@@ -19,12 +19,13 @@
 	import { bandTone } from '$lib/grades';
 	import {
 		generalProblems,
-		nameProblem,
 		problemFor,
 		scaleProblems,
 		sortedBands,
 		type DraftBand
 	} from '$lib/scale-editor';
+	import { LIMITS, scaleNameSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -39,9 +40,13 @@
 		{ label: 'Fail', min: 0, isPass: false }
 	]);
 
-	const problems = $derived(scaleProblems(name, bands));
+	// The name is one field, so it is a schema like every other field on the app. The
+	// bands are rules about each other, which is why they are not.
+	let errors = $state<FieldErrors>({});
+	const nameError = $derived(errors.name ?? form?.errors?.name);
+
+	const problems = $derived(scaleProblems(bands));
 	const general = $derived(generalProblems(problems));
-	const nameError = $derived(nameProblem(problems));
 	const preview = $derived(sortedBands(bands));
 	const canSave = $derived(problems.length === 0);
 
@@ -119,7 +124,12 @@
 
 	<!-- ------------------------------------------------------------ new scale -->
 	<section class="mt-12">
-		<form method="POST" action="?/create" use:enhance class="grid gap-8 lg:grid-cols-2">
+		<form
+			method="POST"
+			action="?/create"
+			use:enhance={validated(scaleNameSchema, (next) => (errors = next))}
+			class="grid gap-8 lg:grid-cols-2"
+		>
 			<Sheet class="lg:self-start">
 				{#snippet header()}
 					<h2 class="font-medium">New scale</h2>
@@ -134,7 +144,7 @@
 							name="name"
 							bind:value={name}
 							placeholder="Honours"
-							required
+							{...LIMITS.scaleName}
 							aria-describedby={describedBy}
 						/>
 					{/snippet}

@@ -18,9 +18,14 @@
 	} from '$lib/components';
 	import { lessonTitle, teachTrail } from '$lib/breadcrumbs';
 	import { formatBytes } from '$lib/upload';
+	import { LIMITS, assignmentSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
 	const crumbs = $derived(
 		teachTrail(
@@ -66,17 +71,22 @@
 		<Alert tone="success" class="mt-6" role="status">Saved.</Alert>
 	{/if}
 
-	<form method="POST" action="?/save" use:enhance class="mt-8 space-y-6">
+	<form
+		method="POST"
+		action="?/save"
+		use:enhance={validated(assignmentSchema, (next) => (errors = next))}
+		class="mt-8 space-y-6"
+	>
 		<input type="hidden" name="exists" value={String(exists)} />
 
-		<Field id="title" label="Title">
-			{#snippet children({ id, invalid })}
+		<Field id="title" label="Title" error={problem('title')}>
+			{#snippet children({ id, describedBy, invalid })}
 				<Input
 					{id}
 					{invalid}
 					name="title"
-					required
-					maxlength={200}
+					{...LIMITS.assignmentTitle}
+					aria-describedby={describedBy}
 					value={assignment?.title ?? ''}
 					placeholder="Essay: the House of Wisdom"
 				/>
@@ -86,6 +96,7 @@
 		<Field
 			id="instructions"
 			label="Instructions"
+			error={problem('instructions')}
 			hint="What to do, and what to hand in. Learners see this above the upload box."
 		>
 			{#snippet children({ id, describedBy, invalid })}
@@ -94,7 +105,7 @@
 					{invalid}
 					name="instructions"
 					rows={8}
-					maxlength={8000}
+					{...LIMITS.assignmentInstructions}
 					aria-describedby={describedBy}
 					value={assignment?.instructions ?? ''}
 				/>
@@ -102,17 +113,15 @@
 		</Field>
 
 		<div class="grid gap-6 sm:grid-cols-2">
-			<Field id="points" label="Points">
-				{#snippet children({ id, invalid })}
+			<Field id="points" label="Points" error={problem('points')}>
+				{#snippet children({ id, describedBy, invalid })}
 					<Input
 						{id}
 						{invalid}
 						name="points"
-						type="number"
-						min={0}
-						max={1000}
-						required
+						{...LIMITS.assignmentPoints}
 						class="numeral"
+						aria-describedby={describedBy}
 						value={assignment?.points ?? 100}
 					/>
 				{/snippet}
@@ -122,16 +131,18 @@
 				The pass mark completes the lesson. A submission marked at or above it
 				closes the lesson in the same transaction that recorded the grade.
 			-->
-			<Field id="passing_points" label="Pass mark" hint="Reaching it completes the lesson.">
+			<Field
+				id="passing_points"
+				label="Pass mark"
+				error={problem('passing_points')}
+				hint="Reaching it completes the lesson."
+			>
 				{#snippet children({ id, describedBy, invalid })}
 					<Input
 						{id}
 						{invalid}
 						name="passing_points"
-						type="number"
-						min={0}
-						max={1000}
-						required
+						{...LIMITS.assignmentPoints}
 						class="numeral"
 						aria-describedby={describedBy}
 						value={assignment?.passing_points ?? 50}
@@ -139,28 +150,27 @@
 				{/snippet}
 			</Field>
 
-			<Field id="max_files" label="Files allowed">
-				{#snippet children({ id, invalid })}
+			<Field id="max_files" label="Files allowed" error={problem('max_files')}>
+				{#snippet children({ id, describedBy, invalid })}
 					<Input
 						{id}
 						{invalid}
 						name="max_files"
-						type="number"
-						min={1}
-						max={20}
-						required
+						{...LIMITS.assignmentFiles}
 						class="numeral"
+						aria-describedby={describedBy}
 						value={assignment?.max_files ?? 3}
 					/>
 				{/snippet}
 			</Field>
 
-			<Field id="max_bytes" label="Largest file">
-				{#snippet children({ id, invalid })}
+			<Field id="max_bytes" label="Largest file" error={problem('max_bytes')}>
+				{#snippet children({ id, describedBy, invalid })}
 					<Select
 						{id}
 						{invalid}
 						name="max_bytes"
+						aria-describedby={describedBy}
 						value={String(assignment?.max_bytes ?? SIZES[2].value)}
 					>
 						{#each SIZES as size (size.value)}
@@ -178,7 +188,7 @@
 		<Field
 			id="due_at"
 			label="Deadline"
-			error={form?.dueMessage}
+			error={problem('due_at')}
 			hint="Leave it empty for no deadline."
 		>
 			{#snippet children({ id, describedBy, invalid })}
@@ -186,7 +196,7 @@
 					{id}
 					{invalid}
 					name="due_at"
-					type="datetime-local"
+					{...LIMITS.deadline}
 					aria-describedby={describedBy}
 					value={data.dueLocal}
 				/>

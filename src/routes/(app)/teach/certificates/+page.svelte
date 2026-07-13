@@ -18,9 +18,14 @@
 		Textarea
 	} from '$lib/components';
 	import { renderPreview, SAMPLE } from '$lib/certificate-preview';
+	import { LIMITS, certificateTemplateSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
 	const crumbs = [{ label: 'Teach', href: resolve('/teach') }, { label: 'Certificate templates' }];
 
@@ -99,7 +104,11 @@
 			form it has the whole page to be the shape it is.
 		-->
 		<div class="max-w-2xl">
-			<form method="POST" action="?/create" use:enhance>
+			<form
+				method="POST"
+				action="?/create"
+				use:enhance={validated(certificateTemplateSchema, (next) => (errors = next))}
+			>
 				<Sheet>
 					{#snippet header()}
 						<h2 class="font-medium">New template</h2>
@@ -107,28 +116,40 @@
 					{/snippet}
 
 					<div class="space-y-5">
-						<Field id="name" label="Name" hint="For your own list. Not printed.">
+						<Field
+							id="name"
+							label="Name"
+							error={problem('name')}
+							hint="For your own list. Not printed."
+						>
 							{#snippet children({ id, describedBy, invalid })}
 								<Input
 									{id}
 									{invalid}
 									name="name"
 									aria-describedby={describedBy}
-									required
-									maxlength={100}
+									{...LIMITS.templateName}
 								/>
 							{/snippet}
 						</Field>
 
-						<Field id="title" label="Heading">
-							{#snippet children({ id, invalid })}
-								<Input {id} {invalid} name="title" bind:value={title} required maxlength={200} />
+						<Field id="title" label="Heading" error={problem('title')}>
+							{#snippet children({ id, describedBy, invalid })}
+								<Input
+									{id}
+									{invalid}
+									name="title"
+									aria-describedby={describedBy}
+									{...LIMITS.templateHeading}
+									bind:value={title}
+								/>
 							{/snippet}
 						</Field>
 
 						<Field
 							id="body"
 							label="Body"
+							error={problem('body')}
 							hint="Use {'{{learner}}'}, {'{{course}}'}, {'{{date}}'} and {'{{serial}}'}. Anything else prints exactly as written."
 						>
 							{#snippet children({ id, describedBy, invalid })}
@@ -138,8 +159,7 @@
 									name="body"
 									rows={7}
 									aria-describedby={describedBy}
-									required
-									maxlength={4000}
+									{...LIMITS.templateBody}
 									bind:value={body}
 								/>
 							{/snippet}
@@ -148,6 +168,7 @@
 						<Field
 							id="signatory"
 							label="Signed by"
+							error={problem('signatory')}
 							hint="Optional. A certificate signed by nobody is a receipt."
 						>
 							{#snippet children({ id, describedBy, invalid })}
@@ -156,7 +177,7 @@
 									{invalid}
 									name="signatory"
 									aria-describedby={describedBy}
-									maxlength={200}
+									{...LIMITS.templateSignatory}
 									bind:value={signatory}
 									placeholder="The Registrar"
 								/>

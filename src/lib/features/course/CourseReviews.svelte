@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import { Delete02Icon, SentIcon } from '@hugeicons/core-free-icons';
 	import { Alert, Button, Card, Icon, Stars, Textarea } from '$lib/components';
+	import { LIMITS, reviewSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { Review, ReviewSummary } from './types';
 
 	type Props = {
@@ -12,11 +14,16 @@
 		enrolled: boolean;
 		/** An API failure from the last submission — about the act, not about a field. */
 		message?: string;
-		/** A refused rating. It belongs under the stars, not in a banner above them. */
-		ratingMessage?: string;
+		/** The action's refused rating. It belongs under the stars, not in a banner above them. */
+		/** The action's field errors, keyed by field. */
+		errors?: FieldErrors;
 	};
 
-	let { reviews, summary, mine, enrolled, message, ratingMessage }: Props = $props();
+	let { reviews, summary, mine, enrolled, message, errors: sent }: Props = $props();
+
+	// This component's own schema run; the action's rating refusal arrives as a prop.
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? sent?.[field];
 
 	const mediumDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 	const hasReviews = $derived(summary.count > 0);
@@ -51,7 +58,15 @@
 	-->
 	{#if enrolled}
 		<Card float class="mt-4 p-5">
-			<form method="POST" action="?/review" use:enhance>
+			<!-- Removing a review submits no rating, so only the review action is validated. -->
+			<form
+				method="POST"
+				action="?/review"
+				use:enhance={(input) =>
+					input.action.search === '?/unreview'
+						? undefined
+						: validated(reviewSchema, (next) => (errors = next))(input)}
+			>
 				<p class="text-sm font-medium">
 					{mine ? 'Your review' : 'Share what you thought'}
 				</p>
@@ -59,9 +74,9 @@
 					<Stars name="rating" bind:value={myRating} />
 
 					<!-- The refusal sits under the control it names, in plain text. -->
-					{#if ratingMessage}
+					{#if problem('rating')}
 						<p id="rating-error" class="text-danger-text mt-2 text-xs font-medium" role="alert">
-							{ratingMessage}
+							{problem('rating')}
 						</p>
 					{/if}
 				</div>
@@ -69,10 +84,18 @@
 					name="body"
 					class="mt-4"
 					rows={3}
-					maxlength={4000}
+					{...LIMITS.reviewBody}
 					placeholder="What would you tell someone deciding whether to take this course? (optional)"
 					value={mine?.body ?? ''}
+					invalid={Boolean(problem('body'))}
+					aria-describedby={problem('body') ? 'review-body-error' : undefined}
 				/>
+
+				{#if problem('body')}
+					<p id="review-body-error" class="text-danger-text mt-2 text-xs font-medium" role="alert">
+						{problem('body')}
+					</p>
+				{/if}
 				<!-- The commit sits at the end of the form, where the eye leaves it. -->
 				<div class="mt-4 flex items-center justify-end gap-3">
 					{#if mine}

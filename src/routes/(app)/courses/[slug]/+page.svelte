@@ -133,7 +133,7 @@
 				mine={data.myReview}
 				{enrolled}
 				message={form?.reviewMessage}
-				ratingMessage={form?.ratingMessage}
+				errors={form?.errors}
 			/>
 		</div>
 	</div>

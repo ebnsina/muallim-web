@@ -2,6 +2,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
+import { lessonEditSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 const CONTENT_TYPES = ['text', 'video', 'quiz', 'assignment', 'live', 'scorm', 'h5p'] as const;
@@ -63,8 +65,9 @@ export const actions: Actions = {
 		if (!locals.accessToken) redirect(303, '/login');
 
 		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { titleMessage: 'A lesson needs a title.' });
+
+		const parsed = parseForm(lessonEditSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
 		const contentType: ContentType = oneOf(
 			CONTENT_TYPES,
@@ -77,39 +80,18 @@ export const actions: Actions = {
 			'none'
 		);
 
-		// Sent only in the mode that reads it. A PATCH omitting a field leaves the
+		// Read only in the mode that shows them. A PATCH omitting a field leaves the
 		// column alone, so an author editing a sequential course cannot silently wipe
 		// the dates they will want back when they switch modes again.
 		const dripMode = String(form.get('drip_mode') ?? 'none');
 
-		const availableAtRaw = String(form.get('available_at') ?? '').trim();
 		const availableAt =
-			dripMode === 'scheduled' && availableAtRaw !== ''
-				? new Date(availableAtRaw).toISOString()
+			dripMode === 'scheduled' && parsed.value.available_at
+				? new Date(parsed.value.available_at).toISOString()
 				: undefined;
 
-		const afterDaysRaw = String(form.get('available_after_days') ?? '').trim();
 		const availableAfterDays =
-			dripMode === 'after_enrolment' && afterDaysRaw !== '' ? Number(afterDaysRaw) : undefined;
-
-		// Each refusal names one control, so each travels under that control's own key.
-		if (
-			availableAfterDays !== undefined &&
-			(!Number.isInteger(availableAfterDays) || availableAfterDays < 0)
-		) {
-			return fail(400, {
-				afterDaysMessage: 'Days after enrolling must be a whole number, zero or more.'
-			});
-		}
-		if (availableAt !== undefined && Number.isNaN(Date.parse(availableAt))) {
-			return fail(400, { availableAtMessage: 'That release date is not a date.' });
-		}
-
-		const durationRaw = String(form.get('duration_seconds') ?? '').trim();
-		const duration = durationRaw === '' ? 0 : Number(durationRaw);
-		if (!Number.isInteger(duration) || duration < 0) {
-			return fail(400, { durationMessage: 'Duration must be a whole number of seconds.' });
-		}
+			dripMode === 'after_enrolment' ? parsed.value.available_after_days : undefined;
 
 		// Every field the form owns is sent, so this PATCH is a complete statement of
 		// what the author last saw and edited. Sending a subset would let a field
@@ -120,12 +102,12 @@ export const actions: Actions = {
 			{
 				params: { path: { id: params.id } },
 				body: {
-					title,
-					content: String(form.get('content') ?? ''),
+					title: parsed.value.title,
+					content: parsed.value.content,
 					content_type: contentType,
 					video_source: videoSource,
-					video_url: String(form.get('video_url') ?? '').trim(),
-					duration_seconds: duration,
+					video_url: parsed.value.video_url,
+					duration_seconds: parsed.value.duration_seconds,
 					is_preview: form.get('is_preview') === 'on',
 					...(availableAt !== undefined ? { available_at: availableAt } : {}),
 					...(availableAfterDays !== undefined ? { available_after_days: availableAfterDays } : {})

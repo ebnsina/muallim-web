@@ -2,6 +2,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
+import { questionSchema, quizSettingsSchema, quizTitleSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 const TYPES = [
@@ -23,14 +25,6 @@ type QuestionType = (typeof TYPES)[number];
 /** Narrows a submitted enum rather than asserting it: a form field is user input. */
 function oneOf<T extends string>(allowed: readonly T[], value: string, fallback: T): T {
 	return (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
-}
-
-function wholeNumber(raw: FormDataEntryValue | null, fallback: number): number {
-	const value = String(raw ?? '').trim();
-	if (value === '') return fallback;
-
-	const parsed = Number(value);
-	return Number.isInteger(parsed) && parsed >= 0 ? parsed : NaN;
 }
 
 /**
@@ -120,13 +114,12 @@ export const actions: Actions = {
 	create: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
 
-		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { titleMessage: 'A quiz needs a title.' });
+		const parsed = parseForm(quizTitleSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'create', errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/lessons/{id}/quiz',
-			{ params: { path: { id: params.id } }, body: { title } }
+			{ params: { path: { id: params.id } }, body: { title: parsed.value.title } }
 		);
 
 		if (problem) {
@@ -139,40 +132,14 @@ export const actions: Actions = {
 	settings: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
 
-		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		if (!title) return fail(400, { titleMessage: 'A quiz needs a title.' });
-
-		const timeLimit = wholeNumber(form.get('time_limit_seconds'), 0);
-		const maxAttempts = wholeNumber(form.get('max_attempts'), 0);
-		const passing = wholeNumber(form.get('passing_percent'), 0);
-
-		// One refusal per box. "The limits must be whole numbers" named three inputs at
+		// One refusal per box: "the limits must be whole numbers" named three inputs at
 		// once, so it could not sit under any of them.
-		if (Number.isNaN(passing) || passing > 100) {
-			return fail(400, { passingMessage: 'The passing grade is a percentage, 0 to 100.' });
-		}
-		if (Number.isNaN(timeLimit)) {
-			return fail(400, {
-				timeLimitMessage: 'The time limit is a whole number of seconds, zero or more.'
-			});
-		}
-		if (Number.isNaN(maxAttempts)) {
-			return fail(400, { attemptsMessage: 'Attempts must be a whole number, zero or more.' });
-		}
+		const parsed = parseForm(quizSettingsSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'settings', errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
 			'/v1/lessons/{id}/quiz',
-			{
-				params: { path: { id: params.id } },
-				body: {
-					title,
-					description: String(form.get('description') ?? ''),
-					time_limit_seconds: timeLimit,
-					max_attempts: maxAttempts,
-					passing_percent: passing
-				}
-			}
+			{ params: { path: { id: params.id } }, body: parsed.value }
 		);
 
 		if (problem) {
@@ -197,13 +164,10 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const type: QuestionType = oneOf(TYPES, String(form.get('type') ?? ''), 'single_choice');
 
-		const prompt = String(form.get('prompt') ?? '').trim();
-		if (!prompt) return fail(400, { promptMessage: 'A question needs a prompt.' });
+		const parsed = parseForm(questionSchema, form);
+		if (!parsed.ok) return fail(400, { scope: 'question', errors: parsed.errors });
 
-		const points = wholeNumber(form.get('points'), 1);
-		if (Number.isNaN(points)) {
-			return fail(400, { pointsMessage: 'Points must be a whole number, zero or more.' });
-		}
+		const { prompt, points, explanation } = parsed.value;
 
 		const typed = type === 'short_answer' || type === 'fill_blanks';
 		const chooses = type !== 'open_ended' && type !== 'range' && !typed;
@@ -227,7 +191,7 @@ export const actions: Actions = {
 					type,
 					prompt,
 					points,
-					explanation: String(form.get('explanation') ?? '').trim(),
+					explanation,
 					case_sensitive: form.get('case_sensitive') === 'on',
 
 					// Sent only for the types that read them. An `accepted` array on a

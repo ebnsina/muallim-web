@@ -1,6 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { apiAs, authedApi } from '$lib/server/api';
+import { answerSchema, questionAskSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -189,8 +191,10 @@ export const actions: Actions = {
 	askQuestion: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-		const body = String((await request.formData()).get('body') ?? '').trim();
-		if (!body) return fail(400, { qaMessage: 'Write your question first.' });
+		const parsed = parseForm(questionAskSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { qaMessage: parsed.errors.body });
+
+		const { body } = parsed.value;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/lessons/{id}/questions',
@@ -211,8 +215,11 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const questionId = String(form.get('question_id') ?? '');
-		const body = String(form.get('body') ?? '').trim();
-		if (!body) return fail(400, { qaMessage: 'Write your answer first.' });
+
+		const parsed = parseForm(answerSchema, form);
+		if (!parsed.ok) return fail(400, { qaMessage: parsed.errors.body });
+
+		const { body } = parsed.value;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/lesson-questions/{id}/answers',

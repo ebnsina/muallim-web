@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { awardSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import { resolve } from '$app/paths';
 	import { CancelCircleIcon, CheckmarkCircle02Icon, Task01Icon } from '@hugeicons/core-free-icons';
 	import {
@@ -20,6 +22,13 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// One marking form per question, so the errors are bagged by question: a bad box
+	// marks its own question and no other.
+	let errors = $state<Record<string, FieldErrors>>({});
+	const problem = (questionId: string, field: string) =>
+		errors[questionId]?.[field] ??
+		(form?.questionId === questionId ? form?.errors?.[field] : undefined);
 
 	const crumbs = $derived(
 		teachTrail(
@@ -115,13 +124,21 @@
 								{#if answer.feedback}<span class="text-muted">{answer.feedback}</span>{/if}
 							</p>
 						{:else}
-							<form method="POST" class="mt-4 space-y-3" use:enhance>
+							<form
+								method="POST"
+								class="mt-4 space-y-3"
+								use:enhance={validated(
+									awardSchema(question.points),
+									(next) => (errors = { ...errors, [question.id]: next })
+								)}
+							>
 								<input type="hidden" name="question_id" value={question.id} />
+								<input type="hidden" name="max_points" value={question.points} />
 
 								<Field
 									id={`points-${question.id}`}
 									label="Points"
-									error={form?.questionId === question.id ? form.pointsMessage : undefined}
+									error={problem(question.id, 'points')}
 								>
 									{#snippet children({ id, describedBy, invalid })}
 										<Input

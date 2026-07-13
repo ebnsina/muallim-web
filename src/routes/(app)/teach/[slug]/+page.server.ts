@@ -2,6 +2,14 @@ import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
+import {
+	announcementSchema,
+	lessonSchema,
+	prerequisiteSchema,
+	renameSectionSchema,
+	sectionSchema
+} from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
@@ -83,12 +91,12 @@ export const actions: Actions = {
 	addTopic: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 
-		const title = String((await request.formData()).get('title') ?? '').trim();
-		if (!title) return fail(400, { newTopicMessage: 'Give the section a title.' });
+		const parsed = parseForm(sectionSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'addTopic', errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/topics',
-			{ params: { path: { slug: params.slug } }, body: { title } }
+			{ params: { path: { slug: params.slug } }, body: { title: parsed.value.title } }
 		);
 
 		if (problem) {
@@ -103,14 +111,16 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const id = String(form.get('id') ?? '');
-		const title = String(form.get('title') ?? '').trim();
 
 		// Every section has a rename box, so the refusal names the one it came from.
-		if (!title) return fail(400, { topicId: id, renameMessage: 'A section needs a title.' });
+		const parsed = parseForm(renameSectionSchema, form);
+		if (!parsed.ok) {
+			return fail(400, { scope: 'rename', topicId: id, errors: parsed.errors });
+		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PATCH(
 			'/v1/topics/{id}',
-			{ params: { path: { id } }, body: { title } }
+			{ params: { path: { id } }, body: { title: parsed.value.title } }
 		);
 
 		if (problem) {
@@ -168,10 +178,12 @@ export const actions: Actions = {
 
 		const form = await request.formData();
 		const topicId = String(form.get('topic_id') ?? '');
-		const title = String(form.get('title') ?? '').trim();
 
 		// Likewise: one "add a lesson" box per section, so the refusal names its section.
-		if (!title) return fail(400, { topicId, addLessonMessage: 'Give the lesson a title.' });
+		const parsed = parseForm(lessonSchema, form);
+		if (!parsed.ok) {
+			return fail(400, { scope: 'addLesson', topicId, errors: parsed.errors });
+		}
 
 		// A new lesson starts as text with no video. muallim-api defaults to exactly
 		// this, but the generated client requires both fields, and stating them is
@@ -180,7 +192,7 @@ export const actions: Actions = {
 			'/v1/topics/{id}/lessons',
 			{
 				params: { path: { id: topicId } },
-				body: { title, content_type: 'text', video_source: 'none' }
+				body: { title: parsed.value.title, content_type: 'text', video_source: 'none' }
 			}
 		);
 
@@ -302,12 +314,15 @@ export const actions: Actions = {
 	addPrerequisite: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 
-		const requiresSlug = String((await request.formData()).get('requires_slug') ?? '');
-		if (!requiresSlug) return fail(400, { prerequisiteMessage: 'Choose a course to require.' });
+		const parsed = parseForm(prerequisiteSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'prerequisite', errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/prerequisites',
-			{ params: { path: { slug: params.slug } }, body: { requires_slug: requiresSlug } }
+			{
+				params: { path: { slug: params.slug } },
+				body: { requires_slug: parsed.value.requires_slug }
+			}
 		);
 
 		if (problem) {
@@ -361,21 +376,21 @@ export const actions: Actions = {
 	postAnnouncement: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 
-		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const body = String(form.get('body') ?? '').trim();
-		if (!title || !body) {
-			return fail(400, { announcementMessage: 'An announcement needs a title and a body.' });
-		}
+		const parsed = parseForm(announcementSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'announcement', errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/courses/{slug}/announcements',
-			{ params: { path: { slug: params.slug } }, body: { title, body } }
+			{
+				params: { path: { slug: params.slug } },
+				body: { title: parsed.value.title, body: parsed.value.body }
+			}
 		);
 
+		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				announcementMessage: problemMessage(problem, 'Could not post that announcement.')
+				message: problemMessage(problem, 'Could not post that announcement.')
 			});
 		}
 		return { announcementPosted: true };
@@ -393,7 +408,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				announcementMessage: problemMessage(problem, 'Could not remove that announcement.')
+				message: problemMessage(problem, 'Could not remove that announcement.')
 			});
 		}
 	}

@@ -1,6 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { threadSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -31,9 +33,12 @@ export const actions: Actions = {
 		if (!locals.accessToken) redirect(303, '/login');
 
 		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const body = String(form.get('body') ?? '').trim();
-		if (!title || !body) return fail(400, { message: 'A thread needs a title and a body.' });
+
+		// The same schema the page ran. That one was a courtesy; this one decides.
+		const parsed = parseForm(threadSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
+
+		const { title, body } = parsed.value;
 
 		const {
 			data,
@@ -44,6 +49,7 @@ export const actions: Actions = {
 			body: { title, body }
 		});
 
+		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
 				message: problemMessage(problem, 'Could not start that thread.')

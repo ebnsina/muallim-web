@@ -9,14 +9,20 @@
 		SquareLock01Icon,
 		SquareUnlock01Icon
 	} from '@hugeicons/core-free-icons';
-	import { Badge, Breadcrumbs, Button, Card, Icon, Page, Textarea } from '$lib/components';
+	import { Alert, Badge, Breadcrumbs, Button, Card, Icon, Page, Textarea } from '$lib/components';
 	import { exactTime, relativeTime, ReplyRow } from '$lib/features/forum';
 	import { canModerate } from '$lib/roles';
+	import { LIMITS, replySchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	const moderator = $derived(canModerate(data.user));
+
+	// The page's own schema run, and the action's. One reading: whichever spoke last.
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
 
 	// A locked thread takes no replies, except from a moderator.
 	const canReply = $derived(!data.thread.locked || moderator);
@@ -42,6 +48,11 @@
 
 <Page width="wide">
 	<Breadcrumbs {crumbs} />
+
+	<!-- A failure of the call — a reply, a pin, a deletion — is the page's voice, not a field's. -->
+	{#if form?.message}
+		<Alert tone="danger" class="mt-4" role="alert">{form.message}</Alert>
+	{/if}
 
 	<!-- The opening post floats above the replies: it is the thing the page is about, and
 	     the replies below it are one list, not a scatter of cards. -->
@@ -131,28 +142,27 @@
 
 		<!-- Reply box, or a note that the thread is closed. -->
 		{#if canReply}
-			<form method="POST" action="?/reply" class="mt-6" use:enhance>
+			<form
+				method="POST"
+				action="?/reply"
+				class="mt-6"
+				use:enhance={validated(replySchema, (next) => (errors = next))}
+			>
+				<!-- No Field: the box is its own label ("Write a reply"), so the refusal is
+				     rendered under it by hand rather than by a heading nobody needs. -->
 				<Textarea
 					name="body"
 					rows={3}
-					maxlength={20000}
+					{...LIMITS.reply}
 					aria-label="Write a reply"
 					placeholder="Write a reply…"
-					invalid={Boolean(form?.message)}
-					aria-describedby={form?.message ? 'reply-error' : undefined}
+					invalid={Boolean(problem('body'))}
+					aria-describedby={problem('body') ? 'reply-error' : undefined}
 				/>
 
-				<!--
-					The refusal sits under the field it is about, in plain text.
-
-					It was an Alert above the replies: a red banner the width of the page, eight
-					rows away from the box it was talking about, so the eye had to travel back
-					down and guess the connection. A validation message is a sentence about one
-					field, and it belongs where the field is.
-				-->
-				{#if form?.message}
+				{#if problem('body')}
 					<p id="reply-error" class="mt-2 text-xs font-medium text-danger-text" role="alert">
-						{form.message}
+						{problem('body')}
 					</p>
 				{/if}
 				<!-- The submit sits at the right end of the field it submits: the eye finishes a

@@ -48,19 +48,46 @@
 		Textarea
 	} from '$lib/components';
 	import AiOutline from '$lib/components/AiOutline.svelte';
+	import {
+		LIMITS,
+		announcementSchema,
+		lessonSchema,
+		prerequisiteSchema,
+		renameSectionSchema,
+		sectionSchema
+	} from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import { Pill } from '$lib/pill.svelte';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
-	// Every section carries a rename box and an "add a lesson" box, so a refusal from
-	// either has to say which section it came from — otherwise one bad title would
-	// mark every box on the page.
-	const renameError = (topicId: string) =>
-		form?.topicId === topicId ? form?.renameMessage : undefined;
-	const addLessonError = (topicId: string) =>
-		form?.topicId === topicId ? form?.addLessonMessage : undefined;
+	/*
+		Every section carries a rename box and an "add a lesson" box, so an error has to
+		name both the form it came from and the section it came from — otherwise one bad
+		title would mark every box on the page. One bag of field errors per form, keyed
+		by scope and section; the action keys its own fails the same way.
+	*/
+	let errors = $state<Record<string, FieldErrors>>({});
+
+	const bag = (scope: string, topicId?: string) => (topicId ? `${scope}:${topicId}` : scope);
+
+	const setErrors = (scope: string, topicId?: string) => (next: FieldErrors) => {
+		errors = { ...errors, [bag(scope, topicId)]: next };
+	};
+
+	const problem = (scope: string, field: string, topicId?: string) => {
+		const server =
+			form?.scope === scope && (form?.topicId ?? undefined) === topicId
+				? form?.errors?.[field]
+				: undefined;
+
+		return errors[bag(scope, topicId)]?.[field] ?? server;
+	};
+
+	const renameError = (topicId: string) => problem('rename', 'title', topicId);
+	const addLessonError = (topicId: string) => problem('addLesson', 'title', topicId);
 
 	/*
 		Four tools, one at a time.
@@ -466,7 +493,13 @@
 										</button>
 									</div>
 
-									<form method="POST" action="?/renameTopic" use:enhance>
+									<!-- A row, not a `Field`: the button beside the box is the box's height, and
+									     only this layout keeps it there. -->
+									<form
+										method="POST"
+										action="?/renameTopic"
+										use:enhance={validated(renameSectionSchema, setErrors('rename', topic.id))}
+									>
 										<input type="hidden" name="id" value={topic.id} />
 										<div class="flex items-center gap-2">
 											<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
@@ -475,6 +508,7 @@
 												name="title"
 												value={topic.title}
 												class="w-64"
+												{...LIMITS.sectionTitle}
 												invalid={Boolean(renameError(topic.id))}
 												aria-describedby={renameError(topic.id)
 													? `topic-${topic.id}-error`
@@ -621,7 +655,12 @@
 								{/each}
 							</ul>
 
-							<form method="POST" action="?/addLesson" class="mt-4" use:enhance>
+							<form
+								method="POST"
+								action="?/addLesson"
+								class="mt-4"
+								use:enhance={validated(lessonSchema, setErrors('addLesson', topic.id))}
+							>
 								<input type="hidden" name="topic_id" value={topic.id} />
 								<div class="flex items-center gap-2">
 									<Label class="sr-only" for="lesson-title-{topic.id}">New lesson title</Label>
@@ -630,7 +669,7 @@
 										name="title"
 										placeholder="New lesson"
 										class="w-64"
-										required
+										{...LIMITS.lessonTitle}
 										invalid={Boolean(addLessonError(topic.id))}
 										aria-describedby={addLessonError(topic.id)
 											? `lesson-title-${topic.id}-error`
@@ -657,7 +696,12 @@
 				{/each}
 			</ol>
 
-			<form method="POST" action="?/addTopic" class="mt-8" use:enhance>
+			<form
+				method="POST"
+				action="?/addTopic"
+				class="mt-8"
+				use:enhance={validated(sectionSchema, setErrors('addTopic'))}
+			>
 				<div class="flex items-center gap-2">
 					<Label class="sr-only" for="new-topic">New section title</Label>
 					<Input
@@ -665,9 +709,9 @@
 						name="title"
 						placeholder="New section"
 						class="w-64"
-						required
-						invalid={Boolean(form?.newTopicMessage)}
-						aria-describedby={form?.newTopicMessage ? 'new-topic-error' : undefined}
+						{...LIMITS.sectionTitle}
+						invalid={Boolean(problem('addTopic', 'title'))}
+						aria-describedby={problem('addTopic', 'title') ? 'new-topic-error' : undefined}
 					/>
 					<Button type="submit">
 						<Icon icon={PlusSignIcon} class="size-4" />
@@ -675,9 +719,9 @@
 					</Button>
 				</div>
 
-				{#if form?.newTopicMessage}
+				{#if problem('addTopic', 'title')}
 					<p id="new-topic-error" class="text-danger-text mt-2 text-xs font-medium" role="alert">
-						{form.newTopicMessage}
+						{problem('addTopic', 'title')}
 					</p>
 				{/if}
 			</form>
@@ -722,24 +766,45 @@
 						action="?/postAnnouncement"
 						class="mt-4"
 						transition:slide={{ duration: DURATION.base, easing: easeOut }}
-						use:enhance={() => {
+						use:enhance={validated(announcementSchema, setErrors('announcement'), () => {
 							return async ({ update, result }) => {
 								await update();
 								if (result.type === 'success') composing = false;
 							};
-						}}
+						})}
 					>
 						<Sheet>
 							<div class="space-y-4">
-								<Field id="announcement-title" label="Title" error={form?.announcementMessage}>
-									{#snippet children({ id, invalid })}
-										<Input {id} {invalid} name="title" required maxlength={200} />
+								<Field
+									id="announcement-title"
+									label="Title"
+									error={problem('announcement', 'title')}
+								>
+									{#snippet children({ id, describedBy, invalid })}
+										<Input
+											{id}
+											{invalid}
+											name="title"
+											{...LIMITS.announcementTitle}
+											aria-describedby={describedBy}
+										/>
 									{/snippet}
 								</Field>
 
-								<Field id="announcement-body" label="Message">
-									{#snippet children({ id, invalid })}
-										<Textarea {id} {invalid} name="body" rows={4} required maxlength={5000} />
+								<Field
+									id="announcement-body"
+									label="Message"
+									error={problem('announcement', 'body')}
+								>
+									{#snippet children({ id, describedBy, invalid })}
+										<Textarea
+											{id}
+											{invalid}
+											name="body"
+											rows={4}
+											{...LIMITS.announcementBody}
+											aria-describedby={describedBy}
+										/>
 									{/snippet}
 								</Field>
 							</div>
@@ -1007,14 +1072,22 @@
 						{/if}
 
 						{#if data.candidates.length > 0}
-							<form method="POST" action="?/addPrerequisite" class="mt-4" use:enhance>
+							<form
+								method="POST"
+								action="?/addPrerequisite"
+								class="mt-4"
+								use:enhance={validated(prerequisiteSchema, setErrors('prerequisite'))}
+							>
 								<div class="flex items-center gap-2">
 									<Label class="sr-only" for="requires-slug">Course to require</Label>
 									<Select
 										id="requires-slug"
 										name="requires_slug"
-										invalid={Boolean(form?.prerequisiteMessage)}
-										aria-describedby={form?.prerequisiteMessage ? 'requires-slug-error' : undefined}
+										{...LIMITS.prerequisite}
+										invalid={Boolean(problem('prerequisite', 'requires_slug'))}
+										aria-describedby={problem('prerequisite', 'requires_slug')
+											? 'requires-slug-error'
+											: undefined}
 									>
 										{#each data.candidates as candidate (candidate.id)}
 											<option value={candidate.slug}>{candidate.title}</option>
@@ -1026,13 +1099,13 @@
 									</Button>
 								</div>
 
-								{#if form?.prerequisiteMessage}
+								{#if problem('prerequisite', 'requires_slug')}
 									<p
 										id="requires-slug-error"
 										class="text-danger-text mt-2 text-xs font-medium"
 										role="alert"
 									>
-										{form.prerequisiteMessage}
+										{problem('prerequisite', 'requires_slug')}
 									</p>
 								{/if}
 							</form>

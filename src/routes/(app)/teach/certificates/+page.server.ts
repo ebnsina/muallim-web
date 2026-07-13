@@ -1,6 +1,8 @@
 import { error, fail } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
+import { certificateTemplateSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -35,18 +37,12 @@ export const actions: Actions = {
 	create: async ({ request, locals, url }) => {
 		if (!locals.accessToken) error(401, 'Sign in to manage certificate templates.');
 
-		const form = await request.formData();
+		const parsed = parseForm(certificateTemplateSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
 			'/v1/certificate-templates',
-			{
-				body: {
-					name: String(form.get('name') ?? '').trim(),
-					title: String(form.get('title') ?? '').trim(),
-					body: String(form.get('body') ?? '').trim(),
-					signatory: String(form.get('signatory') ?? '').trim()
-				}
-			}
+			{ body: parsed.value }
 		);
 
 		if (problem) {
@@ -55,7 +51,7 @@ export const actions: Actions = {
 			});
 		}
 
-		return { created: String(form.get('name') ?? '') };
+		return { created: parsed.value.name };
 	},
 
 	/** Courses printing it fall back to the default; certificates already issued

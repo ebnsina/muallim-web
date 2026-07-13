@@ -1,6 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { apiAs, authedApi } from '$lib/server/api';
+import { reviewSchema } from '$lib/schemas';
+import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
@@ -112,20 +114,19 @@ export const actions: Actions = {
 	review: async ({ request, locals, params, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
 
-		const form = await request.formData();
-		const rating = Number(form.get('rating') ?? 0);
-		const body = String(form.get('body') ?? '').trim();
-		// About the stars, so it renders under the stars. `reviewMessage` stays the
-		// section's voice for an API failure.
-		if (!rating || rating < 1 || rating > 5) {
-			return fail(400, { ratingMessage: 'Choose a rating from 1 to 5 stars.' });
-		}
+		// The same schema the section ran. That one was a courtesy; this one decides.
+		const parsed = parseForm(reviewSchema, await request.formData());
+		// About the stars, so it renders under the stars — the page routes it there.
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
+
+		const { rating, body } = parsed.value;
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
 			'/v1/courses/{slug}/reviews',
 			{ params: { path: { slug: params.slug } }, body: { rating, body } }
 		);
 
+		// A failure of the call, not of a field: `reviewMessage` is the section's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				reviewMessage: problemMessage(problem, 'Could not save your review.')
