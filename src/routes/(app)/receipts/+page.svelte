@@ -48,7 +48,7 @@
 		</div>
 	{:else}
 		<div class="mt-8 overflow-x-auto rounded-card bg-surface-raised shadow-card">
-			<table class="w-full min-w-max border-collapse text-sm">
+			<table class="w-full border-collapse text-sm">
 				<caption class="sr-only">Your orders: the course, what it cost, and how it ended.</caption>
 
 				<thead>

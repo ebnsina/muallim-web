@@ -34,7 +34,7 @@
 
 <svelte:head><title>Sales — Muallim</title></svelte:head>
 
-<Page width="wide">
+<Page width="full">
 	<PageHeader
 		title="Sales"
 		description="Every order this workspace has taken. You are the merchant: the money is yours, and so is the refund."
@@ -58,20 +58,22 @@
 		</div>
 	{:else}
 		<div class="mt-8 overflow-x-auto rounded-card bg-surface-raised shadow-card">
-			<table class="w-full min-w-max border-collapse text-sm">
+			<table class="w-full border-collapse text-sm">
 				<caption class="sr-only">
 					Every order: the course, its price, how it ended, the gateway that took it, and when.
 				</caption>
 
 				<thead>
 					<tr class="border-b border-border bg-surface-sunken text-left">
-						<th scope="col" class="px-4 py-3 font-medium">Course</th>
+						<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Course</th>
 						<th scope="col" class="px-4 py-3 font-medium">Price</th>
 						<th scope="col" class="px-4 py-3 font-medium">Status</th>
 						<th scope="col" class="px-4 py-3 font-medium">Gateway</th>
 						<th scope="col" class="px-4 py-3 font-medium">Placed</th>
 						<th scope="col" class="px-4 py-3 font-medium">Paid</th>
-						<th scope="col" class="px-4 py-3 text-right font-medium">
+						<!-- Wide enough for the question the button turns into: asking must not
+						     widen the table under the reader. -->
+						<th scope="col" class="w-48 px-4 py-3 text-right font-medium">
 							<span class="sr-only">Refund</span>
 						</th>
 					</tr>
@@ -80,7 +82,7 @@
 				<tbody>
 					{#each data.orders as order (order.id)}
 						<tr class="border-b border-border last:border-0 hover:bg-surface-sunken">
-							<th scope="row" class="px-4 py-3 text-left font-normal">
+							<th scope="row" class="px-4 py-3 text-left font-normal whitespace-nowrap">
 								{#if order.course}
 									<a
 										class="underline-grow font-medium"
@@ -133,19 +135,18 @@
 										>
 											<input type="hidden" name="id" value={order.id} />
 
-											<span class="text-muted text-xs">
-												Refund {formatMoney(order.price)}?
-											</span>
-
+											<!-- The sum it names is the one in this row, two cells to the left; the
+											     label stays short so asking cannot widen the table. -->
 											<Button
 												type="submit"
 												variant="danger"
 												size="sm"
 												loading={refunding === order.id}
 												disabled={refunding === order.id}
+												aria-label="Yes, refund {formatMoney(order.price)}"
 											>
 												<Icon icon={ArrowTurnBackwardIcon} class="size-4" />
-												Refund
+												Yes, refund
 											</Button>
 
 											<Button

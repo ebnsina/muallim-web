@@ -28,7 +28,7 @@
 	import { toast } from '$lib/toast.svelte';
 	import { auroraFor, cn } from '$lib/utils';
 	import { span } from './duration';
-	import type { CourseDetail, EnrolmentSource, Prerequisite, Progress, TopicView } from './types';
+	import type { CourseDetail, Enrolment, Prerequisite, Progress, TopicView } from './types';
 
 	type Props = {
 		course: CourseDetail;
@@ -36,26 +36,30 @@
 		progress: Progress | null;
 		prerequisites: Prerequisite[];
 		signedIn: boolean;
-		/** How this reader's enrollment was come by, when they have one. */
-		source: EnrolmentSource | null;
+		/** This reader's own enrolment, when they have one: how it was come by, and its state. */
+		enrolment: Enrolment | null;
 		/** The gateways the workspace has ready — empty for a reader who may not ask. */
 		gateways: string[];
 		/** Where to return to after signing in. */
 		next: string;
 	};
 
-	let { course, topics, progress, prerequisites, signedIn, source, gateways, next }: Props =
+	let { course, topics, progress, prerequisites, signedIn, enrolment, gateways, next }: Props =
 		$props();
 
 	// A bought enrolment is not cancellable: muallim-api answers 409, and rightly —
 	// cancelling would not return the money. The workspace refunds it.
-	const bought = $derived(source === 'purchase');
+	const bought = $derived(enrolment?.source === 'purchase');
 
 	// A preview plays when it is asked to: an autoplaying clip on a page somebody is
 	// reading is a clip they did not ask for.
 	let playing = $state(false);
 
-	const enrolled = $derived(progress !== null);
+	// The enrolment says so, not the progress: a course bought a second ago has an
+	// enrolment and no progress row yet, and offering to sell it again would be a lie.
+	const enrolled = $derived(
+		progress !== null || enrolment?.status === 'active' || enrolment?.status === 'completed'
+	);
 	const openPrerequisites = $derived(prerequisites.filter((p) => !p.done));
 
 	// The two acts that change what this reader may do, and both reach the API.

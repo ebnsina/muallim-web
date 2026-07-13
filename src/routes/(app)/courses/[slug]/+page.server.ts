@@ -90,9 +90,10 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 		// all, and muallim-api is the only thing that knows which lesson comes next.
 		enrolledAt: mine?.enrolled_at ?? null,
 
-		// How the enrollment was come by. A bought one cannot be cancelled — the API
-		// answers 409 — so the panel offers a refund to ask for rather than a button.
-		source: mine?.source ?? null,
+		// The reader's own enrolment: its state, and how it was come by. A bought one
+		// cannot be cancelled — the API answers 409 — so the panel offers a refund to
+		// ask for rather than a button that fails.
+		enrolment: mine ? { status: mine.status, source: mine.source } : null,
 		gateways,
 
 		// A reader who is not enrolled has no progress, and that is an ordinary

@@ -19,6 +19,7 @@
 		TeachingIcon,
 		UserIcon,
 		UserGroupIcon,
+		UserMultiple02Icon,
 		DashboardSquare01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { IconSvgElement } from '@hugeicons/svelte';
@@ -43,13 +44,21 @@
 		user?: { name: string; email: string; role: string };
 		/** Shown only to somebody who may author. Hiding it is a courtesy, not a control. */
 		canAuthor?: boolean;
+		/** Shown only to somebody who holds `user:manage`. The same courtesy. */
+		canManagePeople?: boolean;
 		/** Unread notification count for the bell badge. */
 		unread?: number;
 		/** The few notices behind the bell. Loaded with the page; see the layout. */
 		notifications?: Notice[];
 	};
 
-	let { user, canAuthor = false, unread = 0, notifications = [] }: Props = $props();
+	let {
+		user,
+		canAuthor = false,
+		canManagePeople = false,
+		unread = 0,
+		notifications = []
+	}: Props = $props();
 
 	const noticeDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
@@ -413,6 +422,19 @@
 								<Icon icon={Invoice01Icon} class="text-muted size-4" />
 								Purchases
 							</a>
+
+							<!-- The workspace's people, for whoever may manage them. Beside Settings:
+							     both are the workspace's own business, not a section of the product. -->
+							{#if canManagePeople}
+								<a
+									role="menuitem"
+									href={resolve('/people')}
+									class="hover:bg-surface-hover flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+								>
+									<Icon icon={UserMultiple02Icon} class="text-muted size-4" />
+									People
+								</a>
+							{/if}
 
 							<a
 								role="menuitem"

@@ -8,6 +8,8 @@ import { z } from 'zod';
 
 /** The HTML constraints, as attributes. Spread them onto the control. */
 export const LIMITS = {
+	name: { required: true, maxlength: 120 },
+	password: { required: true, minlength: 12, maxlength: 1000 },
 	courseTitle: { required: true, maxlength: 200 },
 	courseSummary: { maxlength: 500 },
 	courseSlug: { maxlength: 200 },
@@ -49,7 +51,12 @@ export const LIMITS = {
 	// The gateway's own keys. `public_id` is the API's 200; every secret part is kept
 	// well under its 4000, because bKash's three are packed into that one field.
 	gatewayPublicId: { required: true, maxlength: 200 },
-	gatewaySecret: { required: true, maxlength: 500 }
+	gatewaySecret: { required: true, maxlength: 500 },
+
+	inviteEmail: { required: true, type: 'email', maxlength: 320 },
+	memberRole: { required: true },
+	certificateSerial: { required: true, minlength: 4, maxlength: 64 },
+	revokeReason: { required: true, maxlength: 500 }
 } as const;
 
 // `.trim()` before `.min(1)`: the browser's `required` asks whether a character was
@@ -296,4 +303,60 @@ export const answerSchema = z.object({
 export const reviewSchema = z.object({
 	rating: wholeNumber(1, 5, 'Choose a rating from 1 to 5 stars.'),
 	body: optionalText(4000)
+});
+
+// ------------------------------------------------------------------ people
+
+/** The roles muallim-api knows. An unknown one is refused here as it is there. */
+export const ROLES = ['owner', 'admin', 'instructor', 'student'] as const;
+export type Role = (typeof ROLES)[number];
+
+const role = z.enum(ROLES, { error: 'Choose a role.' });
+
+export const invitationSchema = z.object({
+	email: z.email('Enter a valid email address.').max(320, 'That is longer than 320 characters.'),
+	role
+});
+
+export const memberRoleSchema = z.object({ role });
+
+/** Your own name. Trimmed here as the API trims it there. */
+export const renameSchema = z.object({
+	name: text(120, 'A name cannot be empty.')
+});
+
+/*
+	Your own password.
+
+	The current one is asked for because the API asks for it: a token alone cannot
+	set a new password, or a stolen session would be a lost account. The new one is
+	confirmed here and not there — the API has no second field to compare, and a
+	typo in a password nobody can see is a lockout.
+*/
+export const changePasswordSchema = z
+	.object({
+		current_password: text(1000, 'Your current password is missing.'),
+		new_password: z
+			.string()
+			.min(12, 'A password must be at least 12 characters.')
+			.max(1000, 'That is longer than 1000 characters.'),
+		confirm_password: z.string()
+	})
+	.refine((v) => v.new_password === v.confirm_password, {
+		path: ['confirm_password'],
+		message: 'The two passwords do not match.'
+	});
+
+// ------------------------------------------------------- certificate revocation
+
+/** The number a certificate carries. muallim-api takes 4 to 64 characters. */
+export const certificateLookupSchema = z.object({
+	serial: text(64, 'Enter the certificate number.').min(
+		4,
+		'A certificate number is at least 4 characters.'
+	)
+});
+
+export const revokeCertificateSchema = certificateLookupSchema.extend({
+	reason: text(500, 'Say why the certificate is being withdrawn.')
 });

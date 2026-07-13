@@ -14,6 +14,9 @@ export type Review = components['schemas']['ReviewView'];
 export type Progress = components['schemas']['ProgressView'];
 export type EnrolmentSource = components['schemas']['EnrolmentView']['source'];
 
+/** This reader's own enrolment on the course, as the panel needs it. */
+export type Enrolment = Pick<components['schemas']['EnrolmentView'], 'status' | 'source'>;
+
 export type ReviewSummary = { count: number; average: number };
 
 /** A course this one requires, and whether this reader has finished it. */

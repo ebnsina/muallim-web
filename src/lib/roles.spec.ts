@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canAuthor } from './roles';
+import { canAuthor, canManagePeople } from './roles';
 
 describe('canAuthor', () => {
 	it.each(['owner', 'admin', 'instructor'])('%s may author', (role) => {
@@ -33,5 +33,26 @@ describe('canAuthor', () => {
 	// a rule that quietly disagreed with the one enforcing it.
 	it('does not guess at capitalisation', () => {
 		expect(canAuthor({ role: 'Owner' })).toBe(false);
+	});
+});
+
+describe('canManagePeople', () => {
+	it.each(['owner', 'admin'])('%s holds user:manage', (role) => {
+		expect(canManagePeople({ role })).toBe(true);
+	});
+
+	// An instructor may read the member list — muallim-api grants user:read — but not
+	// invite, promote, or remove. /people is the manage page, so it is not for them.
+	it('an instructor may not', () => {
+		expect(canManagePeople({ role: 'instructor' })).toBe(false);
+	});
+
+	it('a student, a stranger, and an unknown role may not', () => {
+		expect(canManagePeople({ role: 'student' })).toBe(false);
+		expect(canManagePeople(null)).toBe(false);
+		expect(canManagePeople(undefined)).toBe(false);
+		expect(canManagePeople({})).toBe(false);
+		expect(canManagePeople({ role: 'auditor' })).toBe(false);
+		expect(canManagePeople({ role: 'Owner' })).toBe(false);
 	});
 });

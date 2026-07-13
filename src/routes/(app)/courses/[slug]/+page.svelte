@@ -80,7 +80,7 @@
 					progress={data.progress}
 					prerequisites={data.prerequisites}
 					signedIn={data.signedIn}
-					source={data.source}
+					enrolment={data.enrolment}
 					gateways={data.gateways}
 					next={data.next}
 				/>

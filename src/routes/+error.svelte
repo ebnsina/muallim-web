@@ -5,11 +5,16 @@
 		ArrowLeft01Icon,
 		Compass01Icon,
 		RefreshIcon,
-		ServerStack01Icon
+		ServerStack01Icon,
+		ShieldKeyIcon
 	} from '@hugeicons/core-free-icons';
 	import { Icon } from '$lib/components';
 
 	const isNotFound = $derived(page.status === 404);
+
+	// A refusal is not a fault. muallim-api said why, in one sentence, and that sentence
+	// is the whole of the answer — "we have been notified" would be a lie.
+	const isDenied = $derived(page.status === 403);
 	const correlationId = $derived(page.error?.correlationId);
 
 	function reload() {
@@ -18,11 +23,17 @@
 </script>
 
 <svelte:head>
-	<title>{page.status} — {isNotFound ? 'Page not found' : 'Something went wrong'}</title>
+	<title>
+		{page.status} — {isNotFound
+			? 'Page not found'
+			: isDenied
+				? 'Not allowed'
+				: 'Something went wrong'}
+	</title>
 </svelte:head>
 
 <!--
-	An error page that only apologizes is a dead end. Both branches offer a way
+	An error page that only apologizes is a dead end. Every branch offers a way
 	out: a route home always, and a retry when retrying could plausibly work.
 -->
 <main class="flex min-h-dvh items-center justify-center px-6 py-16">
@@ -33,6 +44,8 @@
 		>
 			{#if isNotFound}
 				<Icon icon={Compass01Icon} class="size-8 text-muted" />
+			{:else if isDenied}
+				<Icon icon={ShieldKeyIcon} class="size-8 text-muted" />
 			{:else}
 				<Icon icon={ServerStack01Icon} class="size-8 text-danger-text" />
 			{/if}
@@ -43,12 +56,19 @@
 		</p>
 
 		<h1 class="mt-2 text-2xl font-semibold text-balance">
-			{isNotFound ? 'We could not find that page' : 'Something went wrong on our end'}
+			{isNotFound
+				? 'We could not find that page'
+				: isDenied
+					? 'This page is not yours to open'
+					: 'Something went wrong on our end'}
 		</h1>
 
 		<p class="text-muted mt-3 text-pretty">
 			{#if isNotFound}
 				The page may have moved, or the link that brought you here may be out of date.
+			{:else if isDenied}
+				<!-- muallim-api's own sentence: it is the one that made the decision. -->
+				{page.error?.message ?? 'Your role does not permit this.'}
 			{:else}
 				{page.error?.message ?? 'An unexpected error occurred.'} We have been notified.
 			{/if}
@@ -65,7 +85,8 @@
 				Back to home
 			</a>
 
-			{#if !isNotFound}
+			<!-- Not offered to a refusal: pressing it again earns the same answer. -->
+			{#if !isNotFound && !isDenied}
 				<button
 					type="button"
 					onclick={reload}

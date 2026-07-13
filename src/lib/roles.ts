@@ -26,3 +26,13 @@ const MODERATORS = new Set(['owner', 'admin', 'instructor']);
 export function canModerate(user: { role?: string } | null | undefined): boolean {
 	return user?.role !== undefined && MODERATORS.has(user.role);
 }
+
+// `user:manage` — invite, promote, remove — belongs to these two. An instructor may
+// read the member list and nothing else, so /people would refuse them the invitations
+// half of the page; a link to it is a link that 403s.
+const MANAGERS = new Set(['owner', 'admin']);
+
+/** Whether to draw the "People" link. Instructor, student, and unknown all deny. */
+export function canManagePeople(user: { role?: string } | null | undefined): boolean {
+	return user?.role !== undefined && MANAGERS.has(user.role);
+}

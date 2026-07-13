@@ -122,6 +122,17 @@ Reserve, or animate. Never snap.
 
 **Theme is a three-way choice, and Auto keeps following.** `$lib/theme.svelte.ts` holds it: `system` | `light` | `dark`, where `system` is stored as the *absence* of the key — which is exactly what the boot script in `app.html` reads, so the two agree without sharing code. The media query is *listened to*, not read once: a reader on Auto whose Mac turns dark at sunset turns dark too. `ThemeToggle` renders either a cycling icon button (app header) or a segmented Auto/Light/Dark control (`segmented`, in the footer and in settings).
 
+## Commerce
+
+The workspace sells; Muallim never holds the money — so every page here says the workspace is the merchant, and a refund comes from it. Four surfaces:
+
+- **`/receipts`** — a learner's own orders (`GET /v1/me/orders`), reached from the account menu. An order names its course by **id only**, so the catalog is loaded beside it and the two are stitched by id; a course that is no longer listed keeps its row and simply has no title to link.
+- **`/teach/sales`** — the workspace's orders (`GET /v1/orders`, course:write) with a refund per paid order. The learner is **not** in the response and is not rendered. The confirmation is a question in the button's own cell — never `window.confirm`, which is blocked — and its column is width-reserved so asking cannot widen the table.
+- **`/teach/payments`** — the gateways. **Credentials are write-only**: `PUT /v1/billing/credentials` takes them and *nothing* reads one back, so the page shows only whether a gateway is connected (`GET /v1/billing/account?gateway=…`) and never a stored value, masked or otherwise. bKash's three secrets are packed by the web into one JSON string (`packBkashSecret`, `src/lib/billing.ts`) because that is the one field the API seals. Stripe onboards instead of taking keys.
+- **`EnrolPanel`** — a purchased enrolment (`source === 'purchase'`) cannot be cancelled; muallim-api answers 409. It shows the paid state and points at the refund, rather than a button that earns the 409.
+
+**There is no endpoint that lists a workspace's gateways to a buyer.** `GET /v1/billing/account` answers one gateway at a time and requires course:write, so a learner is refused. The course page therefore shows a picker only to a reader who may ask, and `?/buy` otherwise tries the gateways in order and takes the first checkout that opens — a gateway with no account refuses in one transaction and leaves no order behind. With one connected gateway that is a single request, which is every workspace today.
+
 ## AI Studio
 
 Generation runs **here, in `muallim-web`'s server**, never in the Go API — so provider keys stay server-side and the OpenAPI contract carries no streaming-LLM surface other clients can't honour. The pieces:

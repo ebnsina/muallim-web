@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppHeader } from '$lib/components';
-	import { canAuthor } from '$lib/roles';
+	import { canAuthor, canManagePeople } from '$lib/roles';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -29,6 +29,7 @@
 	<AppHeader
 		user={data.user ?? undefined}
 		canAuthor={canAuthor(data.user)}
+		canManagePeople={canManagePeople(data.user)}
 		unread={data.unread ?? 0}
 		notifications={data.notifications ?? []}
 	/>

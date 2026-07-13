@@ -218,9 +218,7 @@ describe('design tokens', () => {
 	describe.each(SCHEMES)('%s: a field is visible at rest', (_scheme, tokens) => {
 		it('its fill differs from the page it sits on', () => {
 			const ratio = contrast(resolve(tokens, '--surface-raised'), resolve(tokens, '--surface'));
-			expect(ratio, 'a field the same color as the page has only its border').toBeGreaterThan(
-				1.04
-			);
+			expect(ratio, 'a field the same color as the page has only its border').toBeGreaterThan(1.04);
 		});
 	});
 
@@ -234,9 +232,7 @@ describe('design tokens', () => {
 			const danger = luminance(resolve(tokens, '--danger'));
 
 			const ratio = (Math.max(success, danger) + 0.05) / (Math.min(success, danger) + 0.05);
-			expect(ratio, 'success and danger are indistinguishable without color').toBeGreaterThan(
-				1.15
-			);
+			expect(ratio, 'success and danger are indistinguishable without color').toBeGreaterThan(1.15);
 		});
 	});
 

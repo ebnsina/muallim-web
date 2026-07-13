@@ -8,6 +8,7 @@
 		Notification02Icon,
 		PaintBoardIcon,
 		SentIcon,
+		SquareLock01Icon,
 		UserIcon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -17,25 +18,36 @@
 		Button,
 		Card,
 		Checkbox,
+		Field,
 		Icon,
+		Input,
 		Page,
 		PageHeader,
 		ThemeToggle
 	} from '$lib/components';
+	import { LIMITS, changePasswordSchema, renameSchema } from '$lib/schemas';
+	import { type FieldErrors, validated } from '$lib/validation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// The server's errors until the client finds its own; the client's after that.
+	let nameErrors = $state<FieldErrors>({});
+	let passwordErrors = $state<FieldErrors>({});
+
+	const nameProblems = $derived(
+		form?.scope === 'name' ? { ...form.errors, ...nameErrors } : nameErrors
+	);
+	const passwordProblems = $derived(
+		form?.scope === 'password' ? { ...form.errors, ...passwordErrors } : passwordErrors
+	);
 </script>
 
 <svelte:head><title>Settings — Muallim</title></svelte:head>
 
 <!--
-	Only what muallim-api can actually change.
-
-	No name field and no password field: there is no endpoint behind either, and a
-	form that quietly discards what somebody typed is worse than no form at all. The
-	theme is the browser's own and never leaves it; the digest is a real preference
-	with a real endpoint behind it.
+	Only what muallim-api can actually change. The theme is the browser's own and
+	never leaves it; everything else here has an endpoint behind it.
 -->
 <Page width="wide">
 	<PageHeader title="Settings" description="How Muallim looks, and when it writes to you." />
@@ -128,11 +140,6 @@
 		<Card float class="mt-4 p-5 sm:p-6">
 			<dl class="grid gap-5 sm:grid-cols-2">
 				<div>
-					<dt class="text-muted text-xs tracking-wide uppercase">Name</dt>
-					<dd class="mt-1 font-medium">{data.user.name}</dd>
-				</div>
-
-				<div>
 					<dt class="text-muted text-xs tracking-wide uppercase">Role in this workspace</dt>
 					<dd class="mt-1 font-medium capitalize">{data.user.role}</dd>
 				</div>
@@ -163,18 +170,120 @@
 				</form>
 			{/if}
 
-			<!--
-				No name field, and no password field. muallim-api has no endpoint that changes
-				either from a signed-in session — a password is changed through the reset flow,
-				which proves the address — so there is nothing here to type into. When the
-				endpoints exist, the forms belong here.
-			-->
+			<form
+				method="POST"
+				action="?/rename"
+				use:enhance={validated(renameSchema, (e) => (nameErrors = e))}
+				class="mt-5 border-t border-border pt-5"
+			>
+				<Field id="name" label="Name" error={nameProblems.name}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							name="name"
+							value={data.user.name}
+							autocomplete="name"
+							aria-describedby={describedBy}
+							aria-invalid={invalid}
+							{...LIMITS.name}
+						/>
+					{/snippet}
+				</Field>
+
+				<div class="mt-4 flex justify-end">
+					<Button type="submit" variant="secondary" size="sm">Save name</Button>
+				</div>
+			</form>
+		</Card>
+	</section>
+
+	<!-- -------------------------------------------------------------- password -->
+	<section class="mt-10">
+		<h2 class="flex items-center gap-2.5 text-lg font-semibold">
+			<span
+				class="flex size-8 items-center justify-center rounded-control bg-surface-sunken text-muted"
+			>
+				<Icon icon={SquareLock01Icon} class="size-4.5" strokeWidth={2} />
+			</span>
+			Password
+		</h2>
+
+		<Card float class="mt-4 p-5 sm:p-6">
+			<!-- Fifteen minutes, and not "at once": an access token is signed and stateless,
+			     and this system does not check one against the database on every request. -->
+			<p class="text-muted text-sm">
+				Your current password is required — being signed in is not enough on its own. Every other
+				browser is signed out and cannot renew itself, within fifteen minutes at the latest. This
+				one stays signed in.
+			</p>
+
+			<form
+				method="POST"
+				action="?/changePassword"
+				use:enhance={validated(changePasswordSchema, (e) => (passwordErrors = e))}
+				class="mt-5 grid gap-4 sm:grid-cols-2"
+			>
+				<div class="sm:col-span-2">
+					<Field
+						id="current_password"
+						label="Current password"
+						error={passwordProblems.current_password}
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								name="current_password"
+								type="password"
+								autocomplete="current-password"
+								aria-describedby={describedBy}
+								aria-invalid={invalid}
+								required
+							/>
+						{/snippet}
+					</Field>
+				</div>
+
+				<Field id="new_password" label="New password" error={passwordProblems.new_password}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							name="new_password"
+							type="password"
+							autocomplete="new-password"
+							aria-describedby={describedBy}
+							aria-invalid={invalid}
+							{...LIMITS.password}
+						/>
+					{/snippet}
+				</Field>
+
+				<Field
+					id="confirm_password"
+					label="New password again"
+					error={passwordProblems.confirm_password}
+				>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							name="confirm_password"
+							type="password"
+							autocomplete="new-password"
+							aria-describedby={describedBy}
+							aria-invalid={invalid}
+							{...LIMITS.password}
+						/>
+					{/snippet}
+				</Field>
+
+				<div class="flex justify-end sm:col-span-2">
+					<Button type="submit" variant="secondary" size="sm">Change password</Button>
+				</div>
+			</form>
+
 			<p class="text-muted mt-5 border-t border-border pt-4 text-sm">
-				To change your password, sign out and use
-				<a class="underline-grow text-accent-text" href={resolve('/forgot-password')}>
-					forgot password
-				</a>
-				— it proves the address before it changes anything.
+				Forgotten it? <a class="underline-grow text-accent-text" href={resolve('/forgot-password')}>
+					Reset it by email
+				</a> — that proves the address before it changes anything.
 			</p>
 		</Card>
 	</section>
