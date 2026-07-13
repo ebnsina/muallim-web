@@ -42,7 +42,7 @@
 			the word "Error" for anyone who cannot see that it is red.
 			https://design-system.service.gov.uk/components/error-message/
 		-->
-		<p id={errorId} class="text-sm font-medium text-danger-text">
+		<p id={errorId} class="text-xs font-medium text-danger-text">
 			<span class="sr-only">Error:</span>
 			{error}
 		</p>

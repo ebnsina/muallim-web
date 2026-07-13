@@ -78,6 +78,8 @@ pnpm build
 
 **Create and edit forms get their own route.** A form is a page (`/teach/new`, `/teach/{slug}`), reached by a button from the list — not an inline panel stacked above the list it belongs to. The list stays a list.
 
+**A button beside a field is the field's height.** `Input` and `Select` are `h-10` and `rounded-control`; `Button` at `md` is the same, which is what makes a control row read as one control row. `size="sm"` is for a button standing alone — a row action, a card footer — and is wrong the moment a field is next to it.
+
 **Forms: reach for `Sheet`.** `src/lib/components/Sheet.svelte` splits a card into a `header` snippet, `children` (the content), and a `footer` snippet, ruled between. Wrap it in a `<form>` and put the submit `Button` in the footer. Use it for form-shaped pages rather than a bare `Card` with a trailing button.
 
 **Badges: default style, capitalized, with an icon.** The `Badge` component sets `capitalize` (so an API's `draft` reads as `Draft`) and takes an `icon` — a status wears a mark, not a colour alone. No `font-mono`; that was tried and dropped.

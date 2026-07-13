@@ -9,6 +9,7 @@
 	import {
 		Analytics01Icon,
 		ArrowDown01Icon,
+		StarIcon,
 		ArrowUp01Icon,
 		Cancel01Icon,
 		CheckmarkCircle02Icon,
@@ -40,6 +41,7 @@
 		Numeral,
 		Page,
 		PageHeader,
+		Progress,
 		Select,
 		Sheet,
 		Stars,
@@ -465,7 +467,7 @@
 										<input type="hidden" name="id" value={topic.id} />
 										<Label class="sr-only" for="topic-{topic.id}">Section title</Label>
 										<Input id="topic-{topic.id}" name="title" value={topic.title} class="w-64" />
-										<Button type="submit" variant="secondary" size="sm">
+										<Button type="submit" variant="secondary">
 											<Icon icon={PencilEdit02Icon} class="size-4" />
 											Rename
 										</Button>
@@ -610,7 +612,7 @@
 									class="w-64"
 									required
 								/>
-								<Button type="submit" variant="secondary" size="sm">
+								<Button type="submit" variant="secondary">
 									<Icon icon={PlusSignIcon} class="size-4" />
 									Add lesson
 								</Button>
@@ -745,93 +747,138 @@
 					{ key: 'completed', label: 'Completed', value: a.completed, tone: 'text-chart-2' },
 					{ key: 'inactive', label: 'Lapsed', value: a.inactive, tone: 'text-chart-3' }
 				]}
+				<!--
+				The dashboard's own shape, because it is the same statement: a part-to-whole
+				on the left, the figures it cannot carry beside it, ruled apart by a dashed
+				line. It was a sunken slab with a small-caps heading and no marks on its
+				numbers — the one summary in the product that did not look like the others.
+			-->
 				<section class="mt-8">
-					<!-- Sunken: a summary is read, not worked in. The editor below is the plane
-			     an instructor acts on, and it stays white. -->
-					<Card surface="sunken" class="p-5 sm:p-6">
-						<h2 class="text-sm font-medium tracking-wide uppercase">At a glance</h2>
+					<h2 class="flex items-center gap-2.5 text-lg font-semibold">
+						<span
+							class="flex size-8 items-center justify-center rounded-control bg-accent-surface text-accent-text"
+						>
+							<Icon icon={Analytics01Icon} class="size-4.5" strokeWidth={2} />
+						</span>
+						At a glance
+					</h2>
 
-						<div class="mt-5">
-							<div class="flex flex-col gap-8 lg:flex-row lg:items-center">
-								<!--
+					<Card float class="mt-4 p-5 sm:p-6">
+						<div class="grid gap-8 lg:grid-cols-3 lg:gap-0">
+							<!--
 							The mix is a part-to-whole, so it is drawn as one: three states of an
 							enrollment, summing to everybody who ever started. Hovering a slice lights
 							its row and hovering a row lights its slice — one bound value, so the two
 							cannot disagree about what is highlighted.
 						-->
-								<div class="flex items-center gap-6">
-									{#if a.total_enrolments === 0}
-										<!--
-									An empty ring and a zero, rather than a hidden chart. The shape stays
-									where a reader learned to look for it, and the sentence beside it says
-									why it is empty — which "0 / enrolled" alone would not.
-								-->
-										<Donut {segments} centreLabel="enrolled" bind:hovered />
-										<p class="text-muted min-w-40 text-sm">
-											Nobody has enrolled yet. The mix fills in with the first learner.
-										</p>
-									{:else}
-										<Donut {segments} centreLabel="enrolled" bind:hovered />
-										<div class="min-w-40">
-											<DonutLegend {segments} bind:hovered caption="Enrollments by status" />
-										</div>
-									{/if}
+							<div class="flex items-center justify-center gap-6 lg:pr-8">
+								<Donut {segments} centreLabel="enrolled" bind:hovered size={140} />
+
+								{#if a.total_enrolments === 0}
+									<!-- An empty ring and a zero, not a hidden chart: the shape stays where a
+								     reader learned to look for it, and the sentence says why it is empty. -->
+									<p class="text-muted min-w-40 text-sm">
+										Nobody has enrolled yet. The mix fills in with the first learner.
+									</p>
+								{:else}
+									<div class="min-w-40">
+										<DonutLegend {segments} bind:hovered caption="Enrollments by status" />
+									</div>
+								{/if}
+							</div>
+
+							<!--
+							The two numbers a donut cannot carry — they are not parts of that whole —
+							each with the bar that says what the empty half of it is.
+						-->
+							<dl
+								class="grid content-center gap-6 border-dashed border-border max-lg:border-t max-lg:pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 lg:border-l lg:border-r lg:px-8"
+							>
+								<div class="flex flex-col">
+									<dt class="text-muted order-2 mt-1.5 flex items-center gap-2 text-xs">
+										<span
+											class="flex size-5 items-center justify-center rounded-md bg-success-surface text-success-text"
+										>
+											<Icon icon={CheckmarkCircle02Icon} class="size-3" strokeWidth={2} />
+										</span>
+										Completion
+									</dt>
+									<dd class="order-1">
+										<Numeral
+											countUp
+											value={Math.round(a.completion_rate * 100)}
+											suffix="%"
+											class="text-success-text text-4xl font-semibold tracking-tight"
+										/>
+									</dd>
+									<dd class="order-3 mt-3">
+										<Progress
+											value={Math.round(a.completion_rate * 100)}
+											tone="completed"
+											class="h-1.5"
+											label="{Math.round(a.completion_rate * 100)}% of everyone who started"
+										/>
+									</dd>
 								</div>
 
-								<!--
-							The three numbers a donut cannot carry: they are not parts of that whole.
-							A stat tile is the right form for a lone headline figure.
-						-->
-								<dl
-									class="grid flex-1 grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:border-l lg:border-border lg:pl-8"
-								>
-									<div>
-										<dt class="text-muted text-xs tracking-wide uppercase">Completion</dt>
-										<dd class="mt-1.5">
-											<!-- The figure this tile is about, so it rolls up on arrival. The rating
-									     beside it does not: it is printed to one decimal, and a roll would
-									     have to renumber the place after the point to say the same thing. -->
-											<Numeral
-												countUp
-												value={Math.round(a.completion_rate * 100)}
-												suffix="%"
-												class="text-2xl font-semibold"
-											/>
-										</dd>
-										<p class="text-muted mt-1 text-xs">of everyone who started</p>
-									</div>
+								<div class="flex flex-col">
+									<dt class="text-muted order-2 mt-1.5 flex items-center gap-2 text-xs">
+										<span
+											class="flex size-5 items-center justify-center rounded-md bg-accent-surface text-accent-text"
+										>
+											<Icon icon={Analytics01Icon} class="size-3" strokeWidth={2} />
+										</span>
+										Average progress
+									</dt>
+									<dd class="order-1">
+										<Numeral
+											countUp
+											value={Math.round(a.average_progress)}
+											suffix="%"
+											class="text-accent-text text-4xl font-semibold tracking-tight"
+										/>
+									</dd>
+									<dd class="order-3 mt-3">
+										<Progress
+											value={Math.round(a.average_progress)}
+											tone="active"
+											class="h-1.5"
+											label="{Math.round(a.average_progress)}% across the course"
+										/>
+									</dd>
+								</div>
+							</dl>
 
-									<div>
-										<dt class="text-muted text-xs tracking-wide uppercase">Avg. progress</dt>
-										<dd class="mt-1.5">
-											<Numeral
-												countUp
-												value={Math.round(a.average_progress)}
-												suffix="%"
-												class="text-2xl font-semibold"
-											/>
-										</dd>
-										<p class="text-muted mt-1 text-xs">across the course</p>
-									</div>
+							<!-- The rating does not roll: it is printed to one decimal, and a roll would
+						     have to renumber the place after the point to say the same thing. -->
+							<div
+								class="flex flex-col justify-center border-dashed border-border max-lg:border-t max-lg:pt-8 lg:pl-8"
+							>
+								<p class="text-muted flex items-center gap-2 text-xs">
+									<span
+										class="flex size-5 items-center justify-center rounded-md bg-warning-surface text-warning-text"
+									>
+										<Icon icon={StarIcon} class="size-3" strokeWidth={2} />
+									</span>
+									Rating
+								</p>
 
-									<div>
-										<dt class="text-muted text-xs tracking-wide uppercase">Rating</dt>
-										{#if a.reviews.count > 0}
-											<dd class="mt-1.5 flex items-center gap-2">
-												<span class="text-2xl font-semibold">
-													<span class="numeral">{a.reviews.average.toFixed(1)}</span>
-												</span>
-												<Stars value={a.reviews.average} size="sm" />
-											</dd>
-											<p class="text-muted mt-1 text-xs">
-												from <span class="numeral">{a.reviews.count}</span>
-												{a.reviews.count === 1 ? 'review' : 'reviews'}
-											</p>
-										{:else}
-											<dd class="text-muted mt-1.5 text-sm">No reviews yet.</dd>
-										{/if}
-									</div>
-								</dl>
+								{#if a.reviews.count > 0}
+									<p class="mt-1.5 flex items-baseline gap-2.5">
+										<span class="text-warning-text numeral text-4xl font-semibold tracking-tight">
+											{a.reviews.average.toFixed(1)}
+										</span>
+										<Stars value={a.reviews.average} size="sm" />
+									</p>
+									<p class="text-muted mt-2 text-xs">
+										from <span class="numeral">{a.reviews.count}</span>
+										{a.reviews.count === 1 ? 'review' : 'reviews'}
+									</p>
+								{:else}
+									<p class="text-muted mt-1.5 text-sm">
+										No reviews yet. A learner may leave one once they finish.
+									</p>
+								{/if}
 							</div>
 						</div>
 					</Card>
@@ -866,7 +913,7 @@
 									</option>
 								{/each}
 							</Select>
-							<Button type="submit" variant="secondary" size="sm">
+							<Button type="submit" variant="secondary">
 								<Icon icon={FloppyDiskIcon} class="size-4" />
 								Save
 							</Button>
@@ -921,7 +968,7 @@
 										<option value={candidate.slug}>{candidate.title}</option>
 									{/each}
 								</Select>
-								<Button type="submit" variant="secondary" size="sm">
+								<Button type="submit" variant="secondary">
 									<Icon icon={PlusSignIcon} class="size-4" />
 									Require
 								</Button>
@@ -958,7 +1005,7 @@
 									{/each}
 								</Select>
 							</div>
-							<Button type="submit" variant="secondary" size="sm">
+							<Button type="submit" variant="secondary">
 								<Icon icon={Tick02Icon} class="size-4" />
 								Apply
 							</Button>

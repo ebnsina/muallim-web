@@ -151,7 +151,7 @@
 					field, and it belongs where the field is.
 				-->
 				{#if form?.message}
-					<p id="reply-error" class="mt-2 text-sm text-danger-text" role="alert">
+					<p id="reply-error" class="mt-2 text-xs font-medium text-danger-text" role="alert">
 						{form.message}
 					</p>
 				{/if}

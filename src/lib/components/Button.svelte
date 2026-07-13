@@ -62,6 +62,14 @@
 			'bg-on-solid/15 text-on-solid backdrop-blur-sm hover:bg-on-solid/25 active:bg-on-solid/30'
 	};
 
+	/*
+		`md` is the field's own height, and a button standing beside an Input or a Select
+		must be one — a 32px button against a 40px field is two things that were meant to
+		be one control row and are not.
+
+		`sm` is for a button on its own: a row action, a card footer, a toolbar. If there
+		is a field beside it, it is the wrong size.
+	*/
 	const SIZES: Record<ButtonSize, string> = {
 		sm: 'h-8 gap-1.5 px-3 text-sm',
 		md: 'h-10 gap-2 px-4 text-sm',
