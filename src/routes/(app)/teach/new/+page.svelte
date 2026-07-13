@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { LIMITS, newCourseSchema } from '$lib/schemas';
+	import { validated, type FieldErrors } from '$lib/validation';
 	import { resolve } from '$app/paths';
 	import { Cancel01Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 	import {
@@ -21,6 +23,13 @@
 	let submitting = $state(false);
 
 	// Bound so the AI assist can read the title as context and write its drafts back.
+	/*
+		The page's own errors (the schema, before the request left) and the action's
+		(the schema again, on the server). One reading: whichever spoke last.
+	*/
+	let errors = $state<FieldErrors>({});
+	const problem = (field: string) => errors[field] ?? form?.errors?.[field];
+
 	// Client state survives an enhanced submit, so it needs no repopulation from `form`.
 	let title = $state('');
 	let summary = $state('');
@@ -51,25 +60,31 @@
 	{/if}
 
 	<div class="mt-6 max-w-2xl">
+		<!-- The schema runs here before the request leaves, and again in the action,
+		     which is the one that decides. -->
 		<form
 			method="POST"
-			use:enhance={() => {
-				submitting = true;
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
+			use:enhance={validated(
+				newCourseSchema,
+				(next) => (errors = next),
+				() => {
+					submitting = true;
+					return async ({ update }) => {
+						await update();
+						submitting = false;
+					};
+				}
+			)}
 		>
 			<Sheet>
 				<div class="space-y-5">
-					<Field id="title" label="Title" error={form?.titleMessage}>
+					<Field id="title" label="Title" error={problem('title')}>
 						{#snippet children({ id, describedBy, invalid })}
 							<Input
 								{id}
 								{invalid}
 								name="title"
-								required
+								{...LIMITS.courseTitle}
 								aria-describedby={describedBy}
 								bind:value={title}
 							/>
@@ -83,9 +98,9 @@
 						{/snippet}
 					</Field>
 
-					<Field id="summary" label="Summary">
+					<Field id="summary" label="Summary" error={problem('summary')}>
 						{#snippet children({ id, invalid })}
-							<Input {id} {invalid} name="summary" bind:value={summary} />
+							<Input {id} {invalid} name="summary" {...LIMITS.courseSummary} bind:value={summary} />
 							<AiField
 								enabled={data.aiEnabled}
 								label="Draft a summary"

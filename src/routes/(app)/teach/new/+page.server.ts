@@ -2,6 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { aiEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
+import { newCourseSchema } from '$lib/schemas';
+import { parseForm, type FieldErrors } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -38,23 +40,22 @@ export const actions: Actions = {
 		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach%2Fnew');
 
 		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const summary = String(form.get('summary') ?? '').trim();
 		const difficulty = toDifficulty(String(form.get('difficulty') ?? ''));
 
-		// The author may override the slug, but never has to supply one. It is part
-		// of the course's public URL, so it is derived once and then frozen.
-		const slug = String(form.get('slug') ?? '').trim() || slugify(title);
+		// The same schema the page ran. That one was a courtesy; this one decides.
+		const parsed = parseForm(newCourseSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
 
-		// Both refusals are about the title, so they travel under their own key and
-		// render beneath that field. `message` stays the page's voice for an API failure.
-		if (!title) return fail(400, { title, summary, titleMessage: 'Give the course a title.' });
+		const { title, summary } = parsed.value;
+
+		// The author may override the slug, but never has to supply one. It is part of
+		// the course's public URL, so it is derived once and then frozen.
+		const slug = parsed.value.slug || slugify(title);
 		if (!slug) {
-			return fail(400, {
-				title,
-				summary,
-				titleMessage: 'That title produces no usable web address. Set one explicitly.'
-			});
+			const errors: FieldErrors = {
+				title: 'That title produces no usable web address. Set one explicitly.'
+			};
+			return fail(400, { errors });
 		}
 
 		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
@@ -64,10 +65,9 @@ export const actions: Actions = {
 			}
 		);
 
+		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				title,
-				summary,
 				message: problemMessage(problem, 'Could not create that course.')
 			});
 		}

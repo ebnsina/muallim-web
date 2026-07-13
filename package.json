@@ -58,6 +58,7 @@
 		"@tanstack/ai-anthropic": "^0.16.1",
 		"@tanstack/ai-svelte": "^0.14.3",
 		"@thisux/sveltednd": "^0.4.1",
-		"openapi-fetch": "^0.17.0"
+		"openapi-fetch": "^0.17.0",
+		"zod": "^4.4.3"
 	}
 }
