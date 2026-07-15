@@ -4,6 +4,12 @@
  * Exactly one field is meaningful per type. Sending the wrong one is not an
  * error: it is a wrong answer, which is also what sending nothing is.
  */
+/** A coordinate a learner clicked (pin) or plotted (graph). */
+export interface Point {
+	x: number;
+	y: number;
+}
+
 export interface QuizResponse {
 	choices?: string[];
 	text?: string;
@@ -11,6 +17,12 @@ export interface QuizResponse {
 	order?: string[];
 	pairs?: Record<string, string>;
 	number?: number;
+	/** Where a marker was placed, in the base image's own coordinates: pin. */
+	point?: Point;
+	/** The coordinates plotted on the plane: graph. */
+	points?: Point[];
+	/** The object-store key of an uploaded drawing: draw_image. */
+	upload?: string;
 }
 
 export interface Answer {
@@ -78,6 +90,8 @@ function answerFor(form: FormData, id: string, type: string): QuizResponse {
 			return { blanks: indexed(form, `q:${id}:blank:`) };
 
 		case 'ordering':
+		case 'puzzle':
+			// A puzzle is ordering with tiles for pieces: same answer, same reading.
 			return { order: ordered(form, `q:${id}:rank:`) };
 
 		case 'matching':
@@ -89,6 +103,24 @@ function answerFor(form: FormData, id: string, type: string): QuizResponse {
 			const raw = String(form.get(`q:${id}:number`) ?? '').trim();
 			const n = Number(raw);
 			return raw !== '' && Number.isFinite(n) ? { number: n } : {};
+		}
+
+		case 'pin': {
+			// The canvas writes the click as JSON into a hidden field. A missing or
+			// malformed one is an unplaced pin, which is unanswered.
+			const point = parsePoint(form.get(`q:${id}:point`));
+			return point ? { point } : {};
+		}
+
+		case 'graph': {
+			const points = parsePoints(form.get(`q:${id}:points`));
+			return points.length > 0 ? { points } : {};
+		}
+
+		case 'draw_image': {
+			// The learner uploaded the drawing straight to the store; this is its key.
+			const key = String(form.get(`q:${id}:upload`) ?? '').trim();
+			return key ? { upload: key } : {};
 		}
 
 		default:
@@ -130,6 +162,37 @@ function ordered(form: FormData, prefix: string): string[] {
 	}
 
 	return ranked.sort((a, b) => a.rank - b.rank).map((r) => r.id);
+}
+
+/** One `{x, y}` out of a hidden field, or null when it is missing or malformed. */
+function parsePoint(raw: FormDataEntryValue | null): Point | null {
+	const point = parseJson(raw);
+	return isPoint(point) ? point : null;
+}
+
+/** An array of `{x, y}`, dropping anything that is not a point. */
+function parsePoints(raw: FormDataEntryValue | null): Point[] {
+	const value = parseJson(raw);
+	return Array.isArray(value) ? value.filter(isPoint) : [];
+}
+
+function parseJson(raw: FormDataEntryValue | null): unknown {
+	const text = String(raw ?? '').trim();
+	if (!text) return null;
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
+
+function isPoint(value: unknown): value is Point {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		Number.isFinite((value as Point).x) &&
+		Number.isFinite((value as Point).y)
+	);
 }
 
 /** Each option id against the match the learner put beside it. */

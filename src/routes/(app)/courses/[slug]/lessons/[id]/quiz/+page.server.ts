@@ -55,6 +55,43 @@ export const actions: Actions = {
 	},
 
 	/**
+	 * Sign a URL for a drawing answer's PNG.
+	 *
+	 * A draw_image answer's bytes go straight to the object store, like an assignment
+	 * file: this signs the URL, the browser PUTs the canvas to it, and the key comes
+	 * back as the answer. The API refuses this for anything but a live draw_image
+	 * question of the caller's own open attempt.
+	 */
+	presignDrawing: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const questionId = String(form.get('question_id') ?? '');
+		const bytes = Number(form.get('bytes'));
+
+		if (!questionId || !Number.isSafeInteger(bytes) || bytes < 1) {
+			return fail(422, { message: 'That drawing could not be read.' });
+		}
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/lessons/{id}/quiz/attempts/current/answers/{question_id}/drawing',
+			{ params: { path: { id: params.id, question_id: questionId } }, body: { bytes } }
+		);
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, 'That drawing could not be uploaded.')
+			});
+		}
+
+		return { upload: data };
+	},
+
+	/**
 	 * Save every answer, then submit.
 	 *
 	 * One request per question, because that is the shape of the contract: an

@@ -128,12 +128,84 @@ describe('readResponse', () => {
 	it('says nothing about a question type it does not know', () => {
 		const answers = readResponse(
 			form([
-				['q:a:type', 'draw_image'],
+				['q:a:type', 'no_such_type'],
 				['q:a:text', 'a scribble']
 			])
 		);
 
 		expect(answers).toEqual([{ questionId: 'a', response: {} }]);
+	});
+
+	it('reads a puzzle like ordering, by the ranks its tiles were dropped into', () => {
+		const answers = readResponse(
+			form([
+				['q:a:type', 'puzzle'],
+				['q:a:rank:piece-x', '2'],
+				['q:a:rank:piece-y', '1'],
+				['q:a:rank:piece-z', '3']
+			])
+		);
+
+		expect(answers[0].response.order).toEqual(['piece-y', 'piece-x', 'piece-z']);
+	});
+
+	it('reads a pin as the point placed, and a missing or malformed one as unanswered', () => {
+		const answers = readResponse(
+			form([
+				['q:a:type', 'pin'],
+				['q:a:point', '{"x":12.5,"y":30}'],
+				['q:b:type', 'pin'],
+				['q:b:point', ''],
+				['q:c:type', 'pin'],
+				['q:c:point', 'not json']
+			])
+		);
+
+		expect(answers).toEqual([
+			{ questionId: 'a', response: { point: { x: 12.5, y: 30 } } },
+			{ questionId: 'b', response: {} },
+			{ questionId: 'c', response: {} }
+		]);
+	});
+
+	it('reads a graph as the points plotted, dropping anything that is not a point', () => {
+		const answers = readResponse(
+			form([
+				['q:a:type', 'graph'],
+				['q:a:points', '[{"x":1,"y":1},{"x":2,"y":2},{"bad":true}]'],
+				['q:b:type', 'graph'],
+				['q:b:points', '[]']
+			])
+		);
+
+		expect(answers).toEqual([
+			{
+				questionId: 'a',
+				response: {
+					points: [
+						{ x: 1, y: 1 },
+						{ x: 2, y: 2 }
+					]
+				}
+			},
+			{ questionId: 'b', response: {} }
+		]);
+	});
+
+	it('reads a drawing as its upload key, and no key as unanswered', () => {
+		const answers = readResponse(
+			form([
+				['q:a:type', 'draw_image'],
+				['q:a:upload', 't/w/courses/c/u/x.png'],
+				['q:b:type', 'draw_image'],
+				['q:b:upload', '']
+			])
+		);
+
+		expect(answers).toEqual([
+			{ questionId: 'a', response: { upload: 't/w/courses/c/u/x.png' } },
+			{ questionId: 'b', response: {} }
+		]);
 	});
 
 	// Field names are namespaced by question. One question's answer must never be

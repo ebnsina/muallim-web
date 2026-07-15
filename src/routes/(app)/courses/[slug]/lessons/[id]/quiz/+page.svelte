@@ -26,10 +26,41 @@
 		Select,
 		Textarea
 	} from '$lib/components';
+	import DrawInput from '$lib/components/DrawInput.svelte';
+	import GraphInput from '$lib/components/GraphInput.svelte';
+	import PinInput from '$lib/components/PinInput.svelte';
 	import { lessonTitle, lessonTrail } from '$lib/breadcrumbs';
+	import { actionMessage, callAction } from '$lib/form';
+	import { putToStore, type SignedUpload } from '$lib/upload';
+	import { toast } from '$lib/toast.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	/**
+	 * Attach a drawing: sign a URL for it, PUT the PNG to the store, and hand back
+	 * the key. The DrawInput puts the key in its hidden field, and submitting the
+	 * quiz saves it as the answer — the same path every other answer takes.
+	 */
+	async function uploadDrawing(questionId: string, blob: Blob): Promise<string | null> {
+		const signed = await callAction('?/presignDrawing', {
+			question_id: questionId,
+			bytes: blob.size
+		});
+		if (signed.type !== 'success') {
+			toast.danger(actionMessage(signed, 'That drawing could not be uploaded.'));
+			return null;
+		}
+
+		const upload = signed.data?.upload as SignedUpload;
+		try {
+			await putToStore(upload, new File([blob], 'drawing.png', { type: 'image/png' }));
+		} catch {
+			toast.danger('That drawing could not be uploaded.');
+			return null;
+		}
+		return upload.key;
+	}
 
 	const crumbs = $derived(
 		lessonTrail(
@@ -272,6 +303,35 @@
 								class="w-40"
 								aria-label={question.prompt}
 								placeholder="A number"
+							/>
+						{:else if question.type === 'puzzle'}
+							<p class="text-muted text-xs">Number the pieces into the right order, from 1.</p>
+							{#each question.options ?? [] as option (option.id)}
+								<div class="flex items-center gap-2">
+									<Input
+										id={option.id}
+										name={`q:${id}:rank:${option.id}`}
+										type="number"
+										min="1"
+										max={(question.options ?? []).length}
+										class="w-20"
+									/>
+									<Label for={option.id}>{option.content}</Label>
+								</div>
+							{/each}
+						{:else if question.type === 'pin'}
+							{#if question.image}
+								<PinInput image={question.image} name={`q:${id}:point`} />
+							{:else}
+								<p class="text-muted text-sm">This question is missing its image.</p>
+							{/if}
+						{:else if question.type === 'graph'}
+							<GraphInput name={`q:${id}:points`} />
+						{:else if question.type === 'draw_image'}
+							<DrawInput
+								name={`q:${id}:upload`}
+								backdrop={question.image}
+								upload={(blob) => uploadDrawing(question.id, blob)}
 							/>
 						{:else}
 							<p class="text-muted text-sm">
