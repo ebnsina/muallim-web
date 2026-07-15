@@ -171,6 +171,7 @@
 						ratingAverage={course.rating_average}
 						ratingCount={course.rating_count}
 						price={course.price}
+						imageUrl={course.image_url ? `/api${course.image_url}` : undefined}
 						seed={course.slug}
 						href={resolve(`/courses/${course.slug}`)}
 					/>

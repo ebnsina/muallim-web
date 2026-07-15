@@ -36,6 +36,11 @@
 		 * inside an anchor is not a thing HTML has an answer for.
 		 */
 		actions?: Snippet;
+		/**
+		 * The course's own thumbnail, when it has one. Absent falls back to the cover
+		 * light, so a course with no picture is a set of things and not a broken image.
+		 */
+		imageUrl?: string;
 		href: string;
 		/**
 		 * What the card's cover light is drawn from — the slug, so a course wears the
@@ -57,6 +62,7 @@
 		price,
 		status,
 		actions,
+		imageUrl,
 		href,
 		seed
 	}: Props = $props();
@@ -131,7 +137,30 @@
 		the paper below now carries a rating and a byline, the card's height is the sum
 		of both, and the cover is the half that could afford to give.
 	-->
-	<div class={cn('relative flex aspect-square flex-col rounded-[14px] p-4', cover)}>
+	<div
+		class={cn(
+			'relative flex aspect-square flex-col rounded-[14px] p-4',
+			imageUrl ? 'bg-surface-sunken' : cover
+		)}
+	>
+		{#if imageUrl}
+			<!--
+				The course's own picture, under the same title and meta the light carried.
+				A scrim so the on-solid ink stays legible over any image — a pale photo would
+				otherwise lose the white title into itself. `alt=""` because the title beside
+				it already names the course; the image is decoration, not a second label.
+			-->
+			<img
+				src={imageUrl}
+				alt=""
+				loading="lazy"
+				class="absolute inset-0 size-full rounded-[14px] object-cover"
+			/>
+			<div
+				class="absolute inset-0 rounded-[14px] bg-gradient-to-t from-black/60 via-black/25 to-black/35"
+			></div>
+		{/if}
+
 		{#if status}
 			<!--
 				Glass, not a filled badge. A solid amber lozenge on the cover is a sticker
@@ -151,14 +180,16 @@
 			</span>
 		{/if}
 
-		<h2 class="line-clamp-2 pr-20 text-lg font-semibold text-on-solid text-pretty">{title}</h2>
+		<h2 class="relative z-10 line-clamp-2 pr-20 text-lg font-semibold text-on-solid text-pretty">
+			{title}
+		</h2>
 
 		<!--
 			The meta, in the cover's own ink. `inverse` on the bars for the same reason the
 			button on the aurora is glass: the accent is a blue chosen against white paper,
 			and on the brand's light it is a mark nobody sees.
 		-->
-		<div class="mt-auto flex items-center justify-between gap-3 pt-4">
+		<div class="relative z-10 mt-auto flex items-center justify-between gap-3 pt-4">
 			<Difficulty level={difficulty} tone="inverse" />
 
 			{#if lessonCount != null}

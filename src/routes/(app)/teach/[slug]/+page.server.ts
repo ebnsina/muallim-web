@@ -373,6 +373,63 @@ export const actions: Actions = {
 		return { priceSaved: true };
 	},
 
+	/**
+	 * Sign a URL for the course thumbnail. The browser PUTs the image to it, then
+	 * confirms — same three-step flow an assignment file uses, and for the same
+	 * reason: the bytes never pass through this server or the API, and the access
+	 * token stays in its httpOnly cookie.
+	 */
+	presignImage: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const form = await request.formData();
+		const contentType = String(form.get('content_type') ?? '');
+		const bytes = Number(form.get('bytes'));
+
+		if (!Number.isSafeInteger(bytes) || bytes < 1) {
+			return fail(422, { scope: 'image', message: 'That image could not be read.' });
+		}
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).POST('/v1/courses/{slug}/image/uploads', {
+			params: { path: { slug: params.slug } },
+			body: { content_type: contentType as 'image/png' | 'image/jpeg' | 'image/webp', bytes }
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				scope: 'image',
+				message: problemMessage(problem, 'That image could not be uploaded.')
+			});
+		}
+
+		return { imageUpload: data };
+	},
+
+	/** Record a thumbnail now in the bucket. The API verifies it before writing. */
+	confirmImage: async ({ request, locals, params, url }) => {
+		guard(locals.accessToken);
+
+		const key = String((await request.formData()).get('key') ?? '');
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).PUT(
+			'/v1/courses/{slug}/image',
+			{ params: { path: { slug: params.slug } }, body: { key } }
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				scope: 'image',
+				message: problemMessage(problem, 'That image could not be saved.')
+			});
+		}
+
+		return { imageSaved: true };
+	},
+
 	setPreview: async ({ request, locals, params, url }) => {
 		guard(locals.accessToken);
 

@@ -80,9 +80,63 @@
 	import { Pill } from '$lib/pill.svelte';
 	import { formatMoney } from '$lib/money';
 	import { cn } from '$lib/utils';
+	import { actionMessage, callAction } from '$lib/form';
+	import { putToStore, type SignedUpload } from '$lib/upload';
+	import { toast } from '$lib/toast.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// The course thumbnail. Sign, PUT to the store, confirm — the same three steps an
+	// assignment file takes, and for the same reason: the bytes never touch this
+	// server, and the session cookie never leaves it.
+	let imageInput = $state<HTMLInputElement | null>(null);
+	let uploadingImage = $state(false);
+	const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+	const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+	async function uploadImage(file: File) {
+		if (!IMAGE_TYPES.includes(file.type)) {
+			toast.danger('A thumbnail must be a PNG, JPEG, or WebP.');
+			return;
+		}
+		if (file.size < 1 || file.size > MAX_IMAGE_BYTES) {
+			toast.danger('A thumbnail must be under 5 MB.');
+			return;
+		}
+
+		uploadingImage = true;
+		try {
+			const signed = await callAction('?/presignImage', {
+				content_type: file.type,
+				bytes: file.size
+			});
+			if (signed.type !== 'success') {
+				toast.danger(actionMessage(signed, 'That image could not be uploaded.'));
+				return;
+			}
+
+			await putToStore(signed.data?.imageUpload as SignedUpload, file);
+
+			const confirmed = await callAction('?/confirmImage', {
+				key: (signed.data?.imageUpload as SignedUpload).key
+			});
+			if (confirmed.type !== 'success') {
+				toast.danger(actionMessage(confirmed, 'That image could not be saved.'));
+				return;
+			}
+
+			await invalidateAll();
+			toast.success('Thumbnail updated.');
+		} catch (problem) {
+			toast.danger(problem instanceof Error ? problem.message : 'That upload failed.');
+		} finally {
+			uploadingImage = false;
+			// A file input fires no change event when its value has not changed; clearing
+			// it lets the same file be chosen again after a failure.
+			if (imageInput) imageInput.value = '';
+		}
+	}
 
 	/*
 		Every section carries a rename box and an "add a lesson" box, so an error has to
@@ -1333,6 +1387,57 @@
 								<p class="text-muted mt-2 text-xs">Free. Anybody may enroll.</p>
 							{/if}
 						{/if}
+					</div>
+
+					<div class="border-t border-border pt-6">
+						<h2 class="font-medium">Thumbnail</h2>
+						<p class="text-muted mt-1 text-sm">
+							The picture a catalog card and the course page show. A square image reads best; PNG,
+							JPEG, or WebP, up to 5&nbsp;MB.
+						</p>
+
+						<div class="mt-3 flex items-center gap-4">
+							{#if data.course.image_url}
+								<img
+									src={`/api${data.course.image_url}`}
+									alt=""
+									class="size-20 shrink-0 rounded-xl border border-border object-cover"
+								/>
+							{:else}
+								<div
+									class="text-muted flex size-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-border text-xs"
+								>
+									None
+								</div>
+							{/if}
+
+							<!-- An off-screen real input; the label is the button, so it stays keyboard
+							     reachable and in the tab order where `display:none` would drop it. -->
+							<input
+								bind:this={imageInput}
+								id="course-thumbnail"
+								type="file"
+								accept="image/png,image/jpeg,image/webp"
+								class="sr-only"
+								disabled={uploadingImage}
+								onchange={(event) => {
+									const chosen = event.currentTarget.files?.[0];
+									if (chosen) uploadImage(chosen);
+								}}
+							/>
+							<label
+								for="course-thumbnail"
+								class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-surface-sunken focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+								aria-disabled={uploadingImage}
+							>
+								<Icon icon={PlusSignIcon} class="size-4" />
+								{uploadingImage
+									? 'Uploading…'
+									: data.course.image_url
+										? 'Replace image'
+										: 'Add image'}
+							</label>
+						</div>
 					</div>
 
 					<div class="border-t border-border pt-6">

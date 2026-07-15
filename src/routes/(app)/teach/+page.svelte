@@ -81,6 +81,7 @@
 						ratingCount={course.rating_count}
 						learnerCount={course.learner_count}
 						status={course.status}
+						imageUrl={course.image_url ? `/api${course.image_url}` : undefined}
 						seed={course.slug}
 						href={resolve(`/teach/${course.slug}`)}
 					>
