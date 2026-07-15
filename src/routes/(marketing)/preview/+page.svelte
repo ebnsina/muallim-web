@@ -1,36 +1,84 @@
 <script lang="ts">
 	/**
-	 * A live, in-app preview of the fresh marketing direction — light, clean, with an
-	 * emerald accent (deliberately not the app's blue). Mona Sans for language, Geist
-	 * Mono for figures — the app's own faces. Content is English; money is
-	 * Bangladeshi, the taka glyph ৳ with lakh/crore grouping (৳18,42,500). Light only:
-	 * marketing does not theme. Run the app and visit /preview.
+	 * A live, in-app preview of the fresh marketing direction — light only, on Mona
+	 * Sans with Geist Mono for figures (the app's own faces). A refined token set:
+	 * a deep emerald brand (education, and deliberately not the app's blue), a warm
+	 * gold for accents, warm-neutral paper and ink. English content; money is the
+	 * taka glyph ৳ with lakh/crore grouping. Run the app and visit /preview.
 	 */
+	import { Icon } from '$lib/components';
+	import {
+		ArrowRight01Icon,
+		ArrowUpRight01Icon,
+		Mortarboard01Icon,
+		School01Icon,
+		Building01Icon,
+		Mosque01Icon,
+		UserGroupIcon,
+		UserMultipleIcon,
+		MagicWand01Icon,
+		Message02Icon,
+		Wallet01Icon,
+		Task01Icon,
+		Coins01Icon
+	} from '@hugeicons/core-free-icons';
 
-	// ৳ with English digits and lakh/crore grouping. English currency locales print
-	// the letters "BDT", so the glyph is composed onto an en-IN number instead.
 	const taka = (minor: number) =>
 		'৳' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(minor / 100);
 	const num = (n: number) => new Intl.NumberFormat('en-IN').format(n);
 
 	const solutions = [
-		['School', 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'],
-		['College', 'Streams, semesters, transcripts, admissions.'],
-		['Madrasa', 'Ebtedayee → Kamil, Hifz tracking, Arabic (RTL) curriculum.'],
-		['Coaching', 'Batches, model-test leaderboards, pay-per-course.']
+		{
+			icon: School01Icon,
+			name: 'School',
+			line: 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'
+		},
+		{
+			icon: Building01Icon,
+			name: 'College',
+			line: 'Streams, semesters, transcripts, admissions.'
+		},
+		{
+			icon: Mosque01Icon,
+			name: 'Madrasa',
+			line: 'Ebtedayee → Kamil, Hifz tracking, Arabic (RTL) curriculum.'
+		},
+		{
+			icon: UserGroupIcon,
+			name: 'Coaching',
+			line: 'Batches, model-test leaderboards, pay-per-course.'
+		}
 	];
 
 	const pillars = [
-		['Create', 'Courses, 16 quiz types, certificates, AI Studio.'],
-		['Engage', 'Forum, Q&A, reviews, gamification, notifications.'],
-		['Earn', 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'],
-		['Manage', 'Attendance, exams, report cards, timetable, staff.']
+		{
+			icon: MagicWand01Icon,
+			name: 'Create',
+			line: 'Courses, 16 quiz types, certificates, AI Studio.'
+		},
+		{
+			icon: Message02Icon,
+			name: 'Engage',
+			line: 'Forum, Q&A, reviews, gamification, notifications.'
+		},
+		{
+			icon: Wallet01Icon,
+			name: 'Earn',
+			line: 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'
+		},
+		{ icon: Task01Icon, name: 'Manage', line: 'Attendance, exams, report cards, timetable, staff.' }
 	];
 
-	// The fee-gateway split and a few recent payments, for the dashboard section.
+	const kpis = [
+		{ icon: Coins01Icon, label: 'Fees collected', value: taka(184250000), tone: 'brand' },
+		{ icon: Wallet01Icon, label: 'Outstanding', value: taka(31200000), tone: 'gold' },
+		{ icon: UserGroupIcon, label: 'Attendance', value: `${num(92)}%`, tone: 'ink' },
+		{ icon: UserMultipleIcon, label: 'New admissions', value: `${num(18)}`, tone: 'ink' }
+	];
+
 	const gateways = [
 		['bKash', 62, '#e2136e'],
-		['SSLCommerz', 24, 'var(--jade)'],
+		['SSLCommerz', 24, 'var(--brand)'],
 		['Cash', 14, 'var(--muted)']
 	] as const;
 	const payments = [
@@ -39,7 +87,6 @@
 		['Rahim Uddin', 'bKash', 90000]
 	] as const;
 
-	// The GPA-5 gauge: a semicircle whose value arc ends at 4.83 of 5.
 	const gpa = 4.83;
 	const gaugeEnd = (() => {
 		const theta = ((180 - (gpa / 5) * 180) * Math.PI) / 180;
@@ -52,8 +99,10 @@
 <div class="rd">
 	<div class="rd-paper">
 		<header class="rd-bar">
-			<span class="rd-brand">Muallim</span>
-			<a class="rd-btn rd-btn-solid rd-btn-sm" href="#start">Start free</a>
+			<span class="rd-brand"><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</span>
+			<a class="rd-btn rd-btn-solid rd-btn-sm" href="#start">
+				Start free <Icon icon={ArrowRight01Icon} class="size-4" />
+			</a>
 		</header>
 
 		<!-- Hero -->
@@ -69,8 +118,12 @@
 					college, a madrasa, or a coaching center.
 				</p>
 				<div class="rd-cta">
-					<a class="rd-btn rd-btn-solid" href="#start">Start free</a>
-					<a class="rd-btn rd-btn-ghost" href="#demo">See a live demo</a>
+					<a class="rd-btn rd-btn-solid" href="#start">
+						Start free <Icon icon={ArrowRight01Icon} class="size-5" />
+					</a>
+					<a class="rd-btn rd-btn-ghost" href="#demo">
+						See a live demo <Icon icon={ArrowUpRight01Icon} class="size-5" />
+					</a>
 				</div>
 			</div>
 
@@ -84,11 +137,11 @@
 				<div class="rd-stats">
 					<div class="rd-stat">
 						<span class="rd-stat-label">Fees collected</span>
-						<span class="rd-stat-fig rd-jade">{taka(184250000)}</span>
+						<span class="rd-stat-fig rd-brand">{taka(184250000)}</span>
 					</div>
 					<div class="rd-stat">
 						<span class="rd-stat-label">Outstanding dues</span>
-						<span class="rd-stat-fig rd-marigold">{taka(31200000)}</span>
+						<span class="rd-stat-fig rd-gold">{taka(31200000)}</span>
 					</div>
 				</div>
 
@@ -112,11 +165,11 @@
 		<section class="rd-section">
 			<h2 class="rd-h2">Made for every kind of institution</h2>
 			<div class="rd-grid">
-				{#each solutions as [name, line] (name)}
+				{#each solutions as s (s.name)}
 					<article class="rd-tile">
-						<span class="rd-tile-dot" aria-hidden="true"></span>
-						<h3 class="rd-tile-title">{name}</h3>
-						<p class="rd-tile-line">{line}</p>
+						<span class="rd-ic rd-ic-brand"><Icon icon={s.icon} class="size-5" /></span>
+						<h3 class="rd-tile-title">{s.name}</h3>
+						<p class="rd-tile-line">{s.line}</p>
 					</article>
 				{/each}
 			</div>
@@ -126,11 +179,12 @@
 		<section class="rd-section">
 			<h2 class="rd-h2">Everything under one roof</h2>
 			<div class="rd-grid">
-				{#each pillars as [name, line], i (name)}
-					<article class="rd-tile rd-tile-pillar">
+				{#each pillars as p, i (p.name)}
+					<article class="rd-tile">
+						<span class="rd-ic rd-ic-gold"><Icon icon={p.icon} class="size-5" /></span>
 						<span class="rd-mono rd-tile-num">0{i + 1}</span>
-						<h3 class="rd-tile-title">{name}</h3>
-						<p class="rd-tile-line">{line}</p>
+						<h3 class="rd-tile-title">{p.name}</h3>
+						<p class="rd-tile-line">{p.line}</p>
 					</article>
 				{/each}
 			</div>
@@ -143,22 +197,13 @@
 
 			<div class="rd-dash">
 				<div class="rd-kpis">
-					<div class="rd-kpi">
-						<span class="rd-stat-label">Fees collected</span>
-						<span class="rd-kpi-fig rd-jade rd-mono">{taka(184250000)}</span>
-					</div>
-					<div class="rd-kpi">
-						<span class="rd-stat-label">Outstanding</span>
-						<span class="rd-kpi-fig rd-marigold rd-mono">{taka(31200000)}</span>
-					</div>
-					<div class="rd-kpi">
-						<span class="rd-stat-label">Attendance</span>
-						<span class="rd-kpi-fig rd-mono">{num(92)}%</span>
-					</div>
-					<div class="rd-kpi">
-						<span class="rd-stat-label">New admissions</span>
-						<span class="rd-kpi-fig rd-mono">{num(18)}</span>
-					</div>
+					{#each kpis as k (k.label)}
+						<div class="rd-kpi">
+							<span class="rd-ic rd-ic-{k.tone}"><Icon icon={k.icon} class="size-5" /></span>
+							<span class="rd-stat-label">{k.label}</span>
+							<span class="rd-kpi-fig rd-mono rd-{k.tone}">{k.value}</span>
+						</div>
+					{/each}
 				</div>
 
 				<div class="rd-panels">
@@ -200,7 +245,7 @@
 							<li>
 								<span class="rd-pay-who">{who}</span>
 								<span class="rd-pay-via">via {via}</span>
-								<span class="rd-mono rd-jade">{taka(amount)}</span>
+								<span class="rd-mono rd-brand">{taka(amount)}</span>
 							</li>
 						{/each}
 					</ul>
@@ -216,32 +261,46 @@
 </div>
 
 <style>
-	/* Scoped, light-only palette — clean neutrals with an emerald accent, chosen to
-	   sit apart from the app's blue. Mona Sans and Geist Mono are the app's own faces,
-	   loaded globally. Nothing here leaks past .rd, and it never themes to dark. */
+	/*
+		Design tokens — light only, scoped to .rd. Two brand hues (a deep emerald and a
+		warm gold), warm-neutral paper and ink, and shape/shadow tokens so radii and
+		elevation are named once. Nothing here leaks past .rd, and it never themes dark.
+	*/
 	.rd {
-		--paper: #fafaf8;
+		/* Brand — deep emerald: education, calm, and deliberately not the app's blue. */
+		--brand: #0d7d5e;
+		--brand-strong: #0a5f47;
+		--brand-tint: #e7f4ef;
+
+		/* Gold — a warm second accent, for badges and the "attention" figure. */
+		--gold: #b7791f;
+		--gold-tint: #f7efda;
+
+		/* Neutrals — warm, faintly green, so the grays read considered not default. */
+		--ink: #16211c;
+		--muted: #59635d;
+		--line: #e6eae6;
+		--bg: #f6f8f6;
 		--surface: #ffffff;
-		--ink: #17190f;
-		--muted: #64655c;
-		--line: #ecebe5;
-		--jade: #047857; /* emerald — the primary accent */
-		--jade-bright: #059669;
-		--marigold: #c2410c; /* a warm terracotta, used sparingly */
+		--surface-2: #eef2ef;
+
+		/* Shape & elevation. */
+		--r-sm: 10px;
+		--r: 16px;
+		--r-lg: 22px;
+		--pill: 999px;
+		--shadow: 0 1px 2px rgba(22, 33, 28, 0.04), 0 18px 40px -26px rgba(10, 95, 71, 0.22);
 
 		--body: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
-		--display: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
 		--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
 
 		color: var(--ink);
 		font-family: var(--body);
 	}
 
-	/* A whisper of a dotted ground — barely there, so the page reads as clean light
-	   rather than textured. */
 	.rd-paper {
 		min-height: 100vh;
-		background-color: var(--paper);
+		background-color: var(--bg);
 		background-image: radial-gradient(var(--line) 1px, transparent 1px);
 		background-size: 26px 26px;
 		padding-bottom: 4rem;
@@ -255,19 +314,63 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.9rem 1.5rem;
-		background: color-mix(in oklab, var(--paper) 86%, transparent);
+		background: color-mix(in oklab, var(--bg) 84%, transparent);
 		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--line);
 	}
 	.rd-brand {
-		font-family: var(--display);
-		font-weight: 600;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 700;
 		font-size: 1.2rem;
 		letter-spacing: -0.01em;
+		color: var(--brand);
+	}
+
+	/* Buttons — larger and more prominent: pill, real padding, an icon, and a soft
+	   brand-tinted lift on the primary. */
+	.rd-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.95rem 1.9rem;
+		border-radius: var(--pill);
+		font-weight: 600;
+		font-size: 1.02rem;
+		line-height: 1;
+		text-decoration: none;
+		transition:
+			transform 0.12s ease,
+			box-shadow 0.12s ease,
+			background 0.12s ease,
+			border-color 0.12s ease,
+			color 0.12s ease;
+	}
+	.rd-btn-solid {
+		background: var(--brand);
+		color: #fff;
+		box-shadow: 0 12px 26px -12px var(--brand);
+	}
+	.rd-btn-solid:hover {
+		background: var(--brand-strong);
+		transform: translateY(-1px);
+		box-shadow: 0 16px 30px -12px var(--brand);
+	}
+	.rd-btn-ghost {
+		background: var(--surface);
+		color: var(--ink);
+		border: 1px solid var(--line);
+	}
+	.rd-btn-ghost:hover {
+		border-color: var(--brand);
+		color: var(--brand);
+		transform: translateY(-1px);
 	}
 	.rd-btn-sm {
-		padding: 0.45rem 1rem;
-		font-size: 0.85rem;
+		padding: 0.55rem 1.1rem;
+		font-size: 0.9rem;
+		box-shadow: none;
 	}
 
 	.rd-hero {
@@ -287,19 +390,18 @@
 	.rd-tag {
 		display: inline-block;
 		font-size: 0.82rem;
-		color: var(--marigold);
+		color: var(--gold);
 		font-weight: 600;
-		border: 1px solid color-mix(in oklab, var(--marigold) 40%, var(--line));
-		border-radius: 999px;
+		border: 1px solid color-mix(in oklab, var(--gold) 35%, var(--line));
+		border-radius: var(--pill);
 		padding: 0.35rem 0.85rem;
-		background: color-mix(in oklab, var(--marigold) 8%, var(--surface));
+		background: var(--gold-tint);
 	}
 	.rd-h1 {
-		font-family: var(--display);
-		font-weight: 600;
-		font-size: clamp(2.4rem, 5.5vw, 4rem);
-		line-height: 1.02;
-		letter-spacing: -0.02em;
+		font-weight: 700;
+		font-size: clamp(2.5rem, 5.5vw, 4.1rem);
+		line-height: 1.03;
+		letter-spacing: -0.03em;
 		margin: 1.4rem 0 0;
 	}
 	.rd-h1a {
@@ -307,45 +409,28 @@
 	}
 	.rd-h1b {
 		display: block;
-		color: var(--marigold);
+		color: var(--brand);
 	}
 	.rd-sub {
 		margin-top: 1.3rem;
 		max-width: 34rem;
-		font-size: 1.1rem;
+		font-size: 1.12rem;
 		line-height: 1.6;
 		color: var(--muted);
 	}
 	.rd-cta {
-		margin-top: 1.9rem;
+		margin-top: 2rem;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
-	}
-	.rd-btn {
-		display: inline-block;
-		padding: 0.7rem 1.4rem;
-		border-radius: 999px;
-		font-weight: 600;
-		font-size: 0.95rem;
-		text-decoration: none;
-	}
-	.rd-btn-solid {
-		background: var(--jade);
-		color: #fff;
-	}
-	.rd-btn-ghost {
-		border: 1px solid var(--line);
-		color: var(--ink);
-		background: var(--surface);
+		gap: 0.9rem;
 	}
 
 	.rd-card {
 		background: var(--surface);
 		border: 1px solid var(--line);
-		border-radius: 20px;
+		border-radius: var(--r-lg);
 		padding: 1.5rem;
-		box-shadow: 0 20px 50px -30px rgba(28, 34, 48, 0.4);
+		box-shadow: var(--shadow);
 	}
 	.rd-card-head {
 		display: flex;
@@ -354,8 +439,7 @@
 		gap: 1rem;
 	}
 	.rd-card-name {
-		font-family: var(--display);
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 1.05rem;
 	}
 	.rd-card-kicker {
@@ -369,9 +453,9 @@
 		gap: 0.9rem;
 	}
 	.rd-stat {
-		background: var(--paper);
+		background: var(--surface-2);
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: var(--r-sm);
 		padding: 0.85rem;
 		display: flex;
 		flex-direction: column;
@@ -387,11 +471,14 @@
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 	}
-	.rd-jade {
-		color: var(--jade);
+	.rd-brand {
+		color: var(--brand);
 	}
-	.rd-marigold {
-		color: var(--marigold);
+	.rd-gold {
+		color: var(--gold);
+	}
+	.rd-ink {
+		color: var(--ink);
 	}
 	.rd-row {
 		margin-top: 0.9rem;
@@ -402,7 +489,7 @@
 	.rd-meter {
 		flex: 1;
 		height: 8px;
-		border-radius: 999px;
+		border-radius: var(--pill);
 		background: var(--line);
 		overflow: hidden;
 		display: block;
@@ -410,7 +497,7 @@
 	.rd-meter span {
 		display: block;
 		height: 100%;
-		background: var(--jade);
+		background: var(--brand);
 	}
 	.rd-mono {
 		font-family: var(--mono);
@@ -435,8 +522,8 @@
 		font-weight: 400;
 	}
 	.rd-gpa-grade {
-		background: color-mix(in oklab, var(--jade) 15%, var(--surface));
-		color: var(--jade);
+		background: var(--brand-tint);
+		color: var(--brand);
 		font-weight: 700;
 		border-radius: 8px;
 		padding: 0.2rem 0.5rem;
@@ -454,10 +541,9 @@
 		padding: 0 1.5rem;
 	}
 	.rd-h2 {
-		font-family: var(--display);
-		font-weight: 600;
-		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		letter-spacing: -0.01em;
+		font-weight: 700;
+		font-size: clamp(1.7rem, 3vw, 2.3rem);
+		letter-spacing: -0.02em;
 	}
 	.rd-lead {
 		margin-top: 0.5rem;
@@ -482,29 +568,48 @@
 	.rd-tile {
 		background: var(--surface);
 		border: 1px solid var(--line);
-		border-radius: 16px;
-		padding: 1.4rem;
-		transition: transform 0.15s ease;
+		border-radius: var(--r);
+		padding: 1.5rem;
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 	.rd-tile:hover {
 		transform: translateY(-3px);
+		box-shadow: var(--shadow);
 	}
-	.rd-tile-dot {
-		display: inline-block;
-		width: 12px;
-		height: 12px;
-		border-radius: 999px;
-		background: var(--marigold);
+
+	/* The icon chip — a rounded tinted square, brand or gold. */
+	.rd-ic {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 12px;
 	}
-	.rd-tile-pillar .rd-tile-num {
-		color: var(--marigold);
+	.rd-ic-brand {
+		background: var(--brand-tint);
+		color: var(--brand);
+	}
+	.rd-ic-gold {
+		background: var(--gold-tint);
+		color: var(--gold);
+	}
+	.rd-ic-ink {
+		background: var(--surface-2);
+		color: var(--ink);
+	}
+	.rd-tile-num {
+		display: block;
+		margin-top: 0.9rem;
+		color: var(--muted);
 		font-weight: 600;
 	}
 	.rd-tile-title {
-		font-family: var(--display);
-		font-weight: 600;
-		font-size: 1.15rem;
-		margin: 0.7rem 0 0.4rem;
+		font-weight: 700;
+		font-size: 1.2rem;
+		margin: 0.5rem 0 0.4rem;
 	}
 	.rd-tile-line {
 		font-size: 0.9rem;
@@ -518,9 +623,9 @@
 		margin-top: 1.5rem;
 		background: var(--surface);
 		border: 1px solid var(--line);
-		border-radius: 20px;
+		border-radius: var(--r-lg);
 		padding: 1.5rem;
-		box-shadow: 0 20px 50px -34px rgba(28, 34, 48, 0.4);
+		box-shadow: var(--shadow);
 	}
 	.rd-kpis {
 		display: grid;
@@ -533,16 +638,16 @@
 		}
 	}
 	.rd-kpi {
-		background: var(--paper);
+		background: var(--surface-2);
 		border: 1px solid var(--line);
-		border-radius: 12px;
-		padding: 0.9rem;
+		border-radius: var(--r-sm);
+		padding: 1rem;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
+		gap: 0.5rem;
 	}
 	.rd-kpi-fig {
-		font-size: 1.25rem;
+		font-size: 1.3rem;
 		font-weight: 700;
 	}
 	.rd-panels {
@@ -558,9 +663,9 @@
 	}
 	.rd-panel {
 		margin-top: 0.9rem;
-		background: var(--paper);
+		background: var(--surface-2);
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: var(--r-sm);
 		padding: 1.1rem;
 	}
 	.rd-panels .rd-panel {
@@ -575,7 +680,7 @@
 		margin-top: 0.8rem;
 		display: flex;
 		height: 12px;
-		border-radius: 999px;
+		border-radius: var(--pill);
 		overflow: hidden;
 		gap: 2px;
 	}
@@ -600,7 +705,7 @@
 	.rd-dot {
 		width: 10px;
 		height: 10px;
-		border-radius: 999px;
+		border-radius: var(--pill);
 		display: inline-block;
 	}
 	.rd-panel-gauge {
@@ -622,7 +727,7 @@
 	}
 	.rd-gauge-fill {
 		fill: none;
-		stroke: var(--jade);
+		stroke: var(--brand);
 		stroke-width: 10;
 		stroke-linecap: round;
 	}
@@ -671,7 +776,8 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.rd-tile {
+		.rd-tile,
+		.rd-btn {
 			transition: none;
 		}
 	}
