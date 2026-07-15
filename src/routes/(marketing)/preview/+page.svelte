@@ -279,14 +279,14 @@
 		elevation are named once. Nothing here leaks past .rd, and it never themes dark.
 	*/
 	.rd {
-		/* Brand — deep teal: premium and calm, pairs with the gold, and clearly not the
-		   app's blue. (Swap these three to retheme: emerald #047857, plum #9d174d,
-		   terracotta #b4491f, or forest #15803d are the alternates on the table.) */
-		--brand: #0f766e;
-		--brand-strong: #0b5a53;
-		--brand-tint: #e0f2ef;
+		/* Brand — berry: premium and modern, and — unlike a green — it never collides
+		   with the success/correct green a quiz app already spends. (Swap these three to
+		   retheme: forest #15803d, teal #0f766e, or terracotta #b4491f.) */
+		--brand: #9d174d;
+		--brand-strong: #831843;
+		--brand-tint: #fbe3ee;
 
-		/* Gold — a warm second accent; teal and gold is a classic, calm pair. */
+		/* Gold — a warm second accent; berry and gold is a rich, classic pair. */
 		--gold: #b7791f;
 		--gold-tint: #f7efda;
 
@@ -303,13 +303,13 @@
 		--rose: #be185d;
 		--rose-tint: #fbe4ee;
 
-		/* Neutrals — warm, faintly green, so the grays sit with the teal not against it. */
-		--ink: #17211d;
-		--muted: #5b655f;
-		--line: #e6eae7;
-		--bg: #f6f8f6;
+		/* Neutrals — faintly warm/mauve, so the grays sit with the berry not against it. */
+		--ink: #211820;
+		--muted: #6b5f66;
+		--line: #ece7ea;
+		--bg: #faf7f9;
 		--surface: #ffffff;
-		--surface-2: #eef2f0;
+		--surface-2: #f4eff2;
 
 		/* Shape & elevation. */
 		--r-sm: 10px;
