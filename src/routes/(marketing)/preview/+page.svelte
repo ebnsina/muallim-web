@@ -31,21 +31,25 @@
 		{
 			icon: School01Icon,
 			name: 'School',
+			tone: 'brand',
 			line: 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'
 		},
 		{
 			icon: Building01Icon,
 			name: 'College',
+			tone: 'teal',
 			line: 'Streams, semesters, transcripts, admissions.'
 		},
 		{
 			icon: Mosque01Icon,
 			name: 'Madrasa',
+			tone: 'violet',
 			line: 'Ebtedayee → Kamil, Hifz tracking, Arabic (RTL) curriculum.'
 		},
 		{
 			icon: UserGroupIcon,
 			name: 'Coaching',
+			tone: 'amber',
 			line: 'Batches, model-test leaderboards, pay-per-course.'
 		}
 	];
@@ -54,26 +58,34 @@
 		{
 			icon: MagicWand01Icon,
 			name: 'Create',
+			tone: 'brand',
 			line: 'Courses, 16 quiz types, certificates, AI Studio.'
 		},
 		{
 			icon: Message02Icon,
 			name: 'Engage',
+			tone: 'rose',
 			line: 'Forum, Q&A, reviews, gamification, notifications.'
 		},
 		{
 			icon: Wallet01Icon,
 			name: 'Earn',
+			tone: 'teal',
 			line: 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'
 		},
-		{ icon: Task01Icon, name: 'Manage', line: 'Attendance, exams, report cards, timetable, staff.' }
+		{
+			icon: Task01Icon,
+			name: 'Manage',
+			tone: 'amber',
+			line: 'Attendance, exams, report cards, timetable, staff.'
+		}
 	];
 
 	const kpis = [
-		{ icon: Coins01Icon, label: 'Fees collected', value: taka(184250000), tone: 'brand' },
-		{ icon: Wallet01Icon, label: 'Outstanding', value: taka(31200000), tone: 'gold' },
-		{ icon: UserGroupIcon, label: 'Attendance', value: `${num(92)}%`, tone: 'ink' },
-		{ icon: UserMultipleIcon, label: 'New admissions', value: `${num(18)}`, tone: 'ink' }
+		{ icon: Coins01Icon, label: 'Fees collected', value: taka(184250000), tone: 'teal' },
+		{ icon: Wallet01Icon, label: 'Outstanding', value: taka(31200000), tone: 'amber' },
+		{ icon: UserGroupIcon, label: 'Attendance', value: `${num(92)}%`, tone: 'violet' },
+		{ icon: UserMultipleIcon, label: 'New admissions', value: `${num(18)}`, tone: 'rose' }
 	];
 
 	const gateways = [
@@ -167,7 +179,7 @@
 			<div class="rd-grid">
 				{#each solutions as s (s.name)}
 					<article class="rd-tile">
-						<span class="rd-ic rd-ic-brand"><Icon icon={s.icon} class="size-5" /></span>
+						<span class="rd-ic rd-ic-{s.tone}"><Icon icon={s.icon} class="size-5" /></span>
 						<h3 class="rd-tile-title">{s.name}</h3>
 						<p class="rd-tile-line">{s.line}</p>
 					</article>
@@ -181,7 +193,7 @@
 			<div class="rd-grid">
 				{#each pillars as p, i (p.name)}
 					<article class="rd-tile">
-						<span class="rd-ic rd-ic-gold"><Icon icon={p.icon} class="size-5" /></span>
+						<span class="rd-ic rd-ic-{p.tone}"><Icon icon={p.icon} class="size-5" /></span>
 						<span class="rd-mono rd-tile-num">0{i + 1}</span>
 						<h3 class="rd-tile-title">{p.name}</h3>
 						<p class="rd-tile-line">{p.line}</p>
@@ -276,6 +288,17 @@
 		--gold: #b7791f;
 		--gold-tint: #f7efda;
 
+		/* A small spectrum for icon chips, so a grid of them reads as variety, not a
+		   wall of one color. Each is a saturated ink over a pale tint of itself. */
+		--teal: #0f766e;
+		--teal-tint: #ddf1ee;
+		--violet: #7c3aed;
+		--violet-tint: #efe8fd;
+		--amber: #c2620c;
+		--amber-tint: #fbebd9;
+		--rose: #be185d;
+		--rose-tint: #fbe4ee;
+
 		/* Neutrals — faintly cool, so the grays sit with the brand rather than against it. */
 		--ink: #1a1830;
 		--muted: #605c74;
@@ -289,7 +312,6 @@
 		--r: 16px;
 		--r-lg: 22px;
 		--pill: 999px;
-		--shadow: 0 1px 2px rgba(26, 24, 48, 0.04), 0 18px 40px -26px rgba(69, 55, 150, 0.24);
 
 		--body: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
 		--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
@@ -298,11 +320,28 @@
 		font-family: var(--body);
 	}
 
+	/* An aurora wash — soft indigo and gold blooms near the top that fade into the
+	   plain page below. No repeat, so lower sections sit on clean paper. */
 	.rd-paper {
 		min-height: 100vh;
 		background-color: var(--bg);
-		background-image: radial-gradient(var(--line) 1px, transparent 1px);
-		background-size: 26px 26px;
+		background-image:
+			radial-gradient(
+				60rem 42rem at 12% -12%,
+				color-mix(in oklab, var(--brand) 24%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				52rem 36rem at 100% -6%,
+				color-mix(in oklab, var(--gold) 20%, transparent),
+				transparent 55%
+			),
+			radial-gradient(
+				46rem 40rem at 55% 6%,
+				color-mix(in oklab, var(--brand) 12%, transparent),
+				transparent 62%
+			);
+		background-repeat: no-repeat;
 		padding-bottom: 4rem;
 	}
 
@@ -328,21 +367,20 @@
 		color: var(--brand);
 	}
 
-	/* Buttons — larger and more prominent: pill, real padding, an icon, and a soft
-	   brand-tinted lift on the primary. */
+	/* Buttons — large, rounded‑xl, flat. Separation is a border's job, not a shadow's;
+	   the only motion is a small lift on hover. */
 	.rd-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.95rem 1.9rem;
-		border-radius: var(--pill);
+		border-radius: 0.75rem;
 		font-weight: 600;
 		font-size: 1.02rem;
 		line-height: 1;
 		text-decoration: none;
 		transition:
 			transform 0.12s ease,
-			box-shadow 0.12s ease,
 			background 0.12s ease,
 			border-color 0.12s ease,
 			color 0.12s ease;
@@ -350,12 +388,10 @@
 	.rd-btn-solid {
 		background: var(--brand);
 		color: #fff;
-		box-shadow: 0 12px 26px -12px var(--brand);
 	}
 	.rd-btn-solid:hover {
 		background: var(--brand-strong);
 		transform: translateY(-1px);
-		box-shadow: 0 16px 30px -12px var(--brand);
 	}
 	.rd-btn-ghost {
 		background: var(--surface);
@@ -370,7 +406,6 @@
 	.rd-btn-sm {
 		padding: 0.55rem 1.1rem;
 		font-size: 0.9rem;
-		box-shadow: none;
 	}
 
 	.rd-hero {
@@ -430,7 +465,6 @@
 		border: 1px solid var(--line);
 		border-radius: var(--r-lg);
 		padding: 1.5rem;
-		box-shadow: var(--shadow);
 	}
 	.rd-card-head {
 		display: flex;
@@ -479,6 +513,18 @@
 	}
 	.rd-ink {
 		color: var(--ink);
+	}
+	.rd-teal {
+		color: var(--teal);
+	}
+	.rd-violet {
+		color: var(--violet);
+	}
+	.rd-amber {
+		color: var(--amber);
+	}
+	.rd-rose {
+		color: var(--rose);
 	}
 	.rd-row {
 		margin-top: 0.9rem;
@@ -572,11 +618,11 @@
 		padding: 1.5rem;
 		transition:
 			transform 0.15s ease,
-			box-shadow 0.15s ease;
+			border-color 0.15s ease;
 	}
 	.rd-tile:hover {
 		transform: translateY(-3px);
-		box-shadow: var(--shadow);
+		border-color: color-mix(in oklab, var(--brand) 35%, var(--line));
 	}
 
 	/* The icon chip — a rounded tinted square, brand or gold. */
@@ -599,6 +645,22 @@
 	.rd-ic-ink {
 		background: var(--surface-2);
 		color: var(--ink);
+	}
+	.rd-ic-teal {
+		background: var(--teal-tint);
+		color: var(--teal);
+	}
+	.rd-ic-violet {
+		background: var(--violet-tint);
+		color: var(--violet);
+	}
+	.rd-ic-amber {
+		background: var(--amber-tint);
+		color: var(--amber);
+	}
+	.rd-ic-rose {
+		background: var(--rose-tint);
+		color: var(--rose);
 	}
 	.rd-tile-num {
 		display: block;
@@ -625,7 +687,6 @@
 		border: 1px solid var(--line);
 		border-radius: var(--r-lg);
 		padding: 1.5rem;
-		box-shadow: var(--shadow);
 	}
 	.rd-kpis {
 		display: grid;
