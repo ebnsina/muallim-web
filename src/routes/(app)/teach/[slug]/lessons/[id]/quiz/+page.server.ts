@@ -17,10 +17,94 @@ const TYPES = [
 	'open_ended',
 	'range',
 	'image_answering',
-	'image_matching'
+	'image_matching',
+	'puzzle',
+	'pin',
+	'graph',
+	'draw_image'
 ] as const;
 
 type QuestionType = (typeof TYPES)[number];
+
+interface Point {
+	x: number;
+	y: number;
+}
+
+/** One `{x, y}` out of a hidden field, or null when missing or malformed. */
+function readPoint(raw: FormDataEntryValue | null): Point | null {
+	const value = readJson(raw);
+	return isPoint(value) ? value : null;
+}
+
+/** An array of `{x, y}`, dropping anything that is not a point. */
+function readPoints(raw: FormDataEntryValue | null): Point[] {
+	const value = readJson(raw);
+	return Array.isArray(value) ? value.filter(isPoint) : [];
+}
+
+function readJson(raw: FormDataEntryValue | null): unknown {
+	const text = String(raw ?? '').trim();
+	if (!text) return null;
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
+
+function isPoint(value: unknown): value is Point {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		Number.isFinite((value as Point).x) &&
+		Number.isFinite((value as Point).y)
+	);
+}
+
+const clamp = (n: number) => Math.min(100, Math.max(0, n));
+
+/**
+ * The pin/graph/draw configuration, or null for a type that carries none.
+ *
+ * A pin's target click and tolerance become one hotspot rectangle here, in the
+ * same percentage units the learner's click is measured in. A missing click leaves
+ * the regions empty, and muallim-api refuses the question — the one place that can.
+ */
+function buildSpec(form: FormData, type: QuestionType): Record<string, unknown> | null {
+	if (type === 'pin') {
+		const image = String(form.get('pin_image') ?? '').trim();
+		const point = readPoint(form.get('pin_point'));
+		const tolerance = Math.min(50, Math.max(1, Number(form.get('pin_tolerance')) || 8));
+
+		const regions = point
+			? [
+					{
+						x: clamp(point.x - tolerance),
+						y: clamp(point.y - tolerance),
+						w: clamp(point.x + tolerance) - clamp(point.x - tolerance),
+						h: clamp(point.y + tolerance) - clamp(point.y - tolerance)
+					}
+				]
+			: [];
+		return { image, regions };
+	}
+
+	if (type === 'graph') {
+		const tolerance = Number(form.get('graph_tolerance'));
+		return {
+			points: readPoints(form.get('graph_points')),
+			tolerance: Number.isFinite(tolerance) ? tolerance : 0
+		};
+	}
+
+	if (type === 'draw_image') {
+		const backdrop = String(form.get('draw_backdrop') ?? '').trim();
+		return backdrop ? { image: backdrop } : null;
+	}
+
+	return null;
+}
 
 /** Narrows a submitted enum rather than asserting it: a form field is user input. */
 function oneOf<T extends string>(allowed: readonly T[], value: string, fallback: T): T {
@@ -170,7 +254,11 @@ export const actions: Actions = {
 		const { prompt, points, explanation } = parsed.value;
 
 		const typed = type === 'short_answer' || type === 'fill_blanks';
-		const chooses = type !== 'open_ended' && type !== 'range' && !typed;
+		// puzzle composes options (its pieces); the canvas/coordinate types carry a
+		// spec instead, and open_ended/range carry neither.
+		const spec = buildSpec(form, type);
+		const chooses =
+			type !== 'open_ended' && type !== 'range' && !typed && spec === null && type !== 'draw_image';
 
 		// A range's bounds ride in `accepted` as a single [low, high] pair.
 		const range =
@@ -198,7 +286,10 @@ export const actions: Actions = {
 					// choice question is an answer nothing reads, and muallim-api says so.
 					...(typed ? { accepted: acceptedAnswers(String(form.get('accepted') ?? '')) } : {}),
 					...(range ? { accepted: range } : {}),
-					...(chooses ? { options: options(form) } : {})
+					...(chooses ? { options: options(form) } : {}),
+
+					// The pin/graph/draw configuration; only these types carry one.
+					...(spec ? { spec } : {})
 				}
 			}
 		);

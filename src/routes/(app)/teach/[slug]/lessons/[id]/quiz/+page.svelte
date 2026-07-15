@@ -24,6 +24,8 @@
 		Textarea
 	} from '$lib/components';
 	import AiQuiz from '$lib/components/AiQuiz.svelte';
+	import GraphInput from '$lib/components/GraphInput.svelte';
+	import PinInput from '$lib/components/PinInput.svelte';
 	import { teachTrail } from '$lib/breadcrumbs';
 	import { DURATION, easeOut } from '$lib/motion';
 	import { LIMITS, questionSchema, quizSettingsSchema, quizTitleSchema } from '$lib/schemas';
@@ -58,7 +60,11 @@
 		'open_ended',
 		'range',
 		'image_answering',
-		'image_matching'
+		'image_matching',
+		'puzzle',
+		'pin',
+		'graph',
+		'draw_image'
 	];
 
 	let type = $state('single_choice');
@@ -70,16 +76,30 @@
 		{ content: '', match: '' }
 	]);
 
-	const chooses = $derived(!['open_ended', 'short_answer', 'fill_blanks', 'range'].includes(type));
+	// The pin question's base image, typed before it can be clicked to set the target.
+	let pinImage = $state('');
+
+	const isPuzzle = $derived(type === 'puzzle');
+	const isPin = $derived(type === 'pin');
+	const isGraph = $derived(type === 'graph');
+	const isDraw = $derived(type === 'draw_image');
+
+	// The canvas/coordinate types carry a spec, not options; puzzle is ordering with
+	// tiles, so it still composes rows.
+	const chooses = $derived(
+		!['open_ended', 'short_answer', 'fill_blanks', 'range', 'pin', 'graph', 'draw_image'].includes(
+			type
+		)
+	);
 	const typed = $derived(type === 'short_answer' || type === 'fill_blanks');
 	const matches = $derived(type === 'matching' || type === 'image_matching');
 	const isRange = $derived(type === 'range');
 	// Image types carry an image URL where the others carry text.
 	const isImage = $derived(type === 'image_answering' || type === 'image_matching');
 
-	// An ordering question's answer is the order the rows are in. Marking one
-	// "correct" would set an answer the grader never reads, and muallim-api refuses it.
-	const marksCorrect = $derived(chooses && type !== 'ordering');
+	// An ordering or puzzle answer is the order the rows are in. Marking one "correct"
+	// would set an answer the grader never reads, and muallim-api refuses it.
+	const marksCorrect = $derived(chooses && type !== 'ordering' && !isPuzzle);
 
 	function typeLabel(t: string): string {
 		return t.replaceAll('_', ' ');
@@ -456,6 +476,8 @@
 								Pairs
 							{:else if type === 'ordering'}
 								Items, in the right order
+							{:else if isPuzzle}
+								Pieces, in the right order
 							{:else}
 								Options
 							{/if}
@@ -554,6 +576,82 @@
 							<Checkbox id="case_sensitive" name="case_sensitive" />
 							<Label for="case_sensitive">Case must match</Label>
 						</div>
+					</div>
+				{/if}
+
+				{#if isPin}
+					<!-- The author types the image, then clicks the spot the learner must find.
+					     The click is the target; the tolerance widens it into the hotspot the
+					     server records — a click near enough to the target counts. -->
+					<div class="space-y-3" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+						<div class="space-y-2">
+							<Label for="pin_image">Image URL</Label>
+							<Input
+								id="pin_image"
+								name="pin_image"
+								bind:value={pinImage}
+								placeholder="https://…"
+							/>
+						</div>
+
+						{#if pinImage}
+							<div class="space-y-2">
+								<Label>Click the correct spot</Label>
+								<PinInput
+									image={pinImage}
+									name="pin_point"
+									label="Click the spot the learner must find"
+								/>
+							</div>
+
+							<div class="space-y-2">
+								<Label for="pin_tolerance">How close counts (percent)</Label>
+								<Input
+									id="pin_tolerance"
+									name="pin_tolerance"
+									type="number"
+									min="1"
+									max="50"
+									value="8"
+									class="w-32"
+								/>
+							</div>
+						{:else}
+							<p class="text-muted text-xs">Paste an image URL to place the target on it.</p>
+						{/if}
+					</div>
+				{/if}
+
+				{#if isGraph}
+					<div class="space-y-3" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+						<Label>Plot the expected points</Label>
+						<GraphInput name="graph_points" />
+						<div class="space-y-2">
+							<Label for="graph_tolerance">Tolerance</Label>
+							<Input
+								id="graph_tolerance"
+								name="graph_tolerance"
+								type="number"
+								step="any"
+								min="0"
+								value="0.5"
+								class="w-32"
+							/>
+							<p class="text-muted text-xs">
+								How far a learner's point may fall from an expected one and still count.
+							</p>
+						</div>
+					</div>
+				{/if}
+
+				{#if isDraw}
+					<div class="space-y-2" transition:slide={{ duration: DURATION.base, easing: easeOut }}>
+						<Label for="draw_backdrop">Backdrop image URL (optional)</Label>
+						<Input id="draw_backdrop" name="draw_backdrop" placeholder="https://… (optional)" />
+						<p class="text-muted text-xs">
+							A picture the learner draws over. Leave blank for a blank canvas. An instructor marks
+							each drawing by hand.
+						</p>
 					</div>
 				{/if}
 
