@@ -1,219 +1,127 @@
 <script lang="ts">
 	/**
 	 * A live, in-app preview of the fresh design direction — ink + marigold + jade on
-	 * manuscript paper, with a tri-script hero that re-renders (and re-flows RTL) in
-	 * English, Bengali, and Arabic. Self-contained: its own scoped palette and fonts,
-	 * so it neither touches nor depends on the app's tested token system. Run the app
-	 * and visit /preview to see it; nothing here ships to the live landing yet.
+	 * manuscript paper. Content is English; money is Bangladeshi, shown with the taka
+	 * glyph ৳ and lakh/crore grouping (the way ৳18,42,500 is actually read here).
+	 * Self-contained: its own scoped palette and fonts, touching none of the app's
+	 * tested token system. Run the app and visit /preview; nothing ships to the live
+	 * landing yet.
 	 */
-	import { formatMoney } from '$lib/money';
-
-	type Lang = 'en' | 'bn' | 'ar';
-
-	let lang = $state<Lang>('en');
 	let dark = $state(false);
 
-	const T = {
-		en: {
-			dir: 'ltr' as const,
-			locale: 'en-BD',
-			label: 'English',
-			tag: 'New — sell a course from your own bKash or SSLCommerz account',
-			h1a: 'Run the whole institution.',
-			h1b: 'Teach the whole world.',
-			sub: 'From roll-call to result card, bKash to certificate — one platform for a school, a college, a madrasa, or a coaching center.',
-			cta1: 'Start free',
-			cta2: 'See a live demo',
-			card: {
-				name: 'Baitul Ilm Dakhil Madrasa',
-				kicker: 'This month',
-				fees: 'Fees collected',
-				due: 'Outstanding dues',
-				attend: 'Attendance today',
-				gpa: 'Dakhil result',
-				ladder: 'Ebtedayee · Dakhil · Alim · Fazil · Kamil'
-			},
-			solTitle: 'Made for every kind of institution',
-			solutions: [
-				['School', 'Sections, GPA-5, transfer certificates, guardian SMS.'],
-				['College', 'Streams, semesters, transcripts, admissions.'],
-				['Madrasa', 'Ebtedayee→Kamil, Hifz tracking, Arabic RTL curriculum.'],
-				['Coaching', 'Batches, model-test leaderboards, pay-per-course.']
-			],
-			pillTitle: 'Everything under one roof',
-			pillars: [
-				['Create', 'Courses, 16 quiz types, certificates, AI Studio.'],
-				['Engage', 'Forum, Q&A, reviews, gamification, notifications.'],
-				['Earn', 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'],
-				['Manage', 'Attendance, exams, report cards, timetable, staff.']
-			],
-			foot: '0% platform fee. The school is the merchant of record — you own your money, your refunds, your students.'
-		},
-		bn: {
-			dir: 'ltr' as const,
-			locale: 'bn-BD',
-			label: 'বাংলা',
-			tag: 'নতুন — নিজের বিকাশ বা এসএসএলকমার্স অ্যাকাউন্টে কোর্স বিক্রি করুন',
-			h1a: 'পুরো প্রতিষ্ঠান এক জায়গা থেকে।',
-			h1b: 'পৌঁছে দিন সারা বিশ্বে।',
-			sub: 'হাজিরা থেকে ফলাফল, বিকাশ থেকে সার্টিফিকেট — স্কুল, কলেজ, মাদ্রাসা বা কোচিং, সব এক প্ল্যাটফর্মে।',
-			cta1: 'ফ্রি শুরু করুন',
-			cta2: 'ডেমো দেখুন',
-			card: {
-				name: 'বাইতুল ইলম দাখিল মাদ্রাসা',
-				kicker: 'এই মাসে',
-				fees: 'আদায়কৃত ফি',
-				due: 'বকেয়া',
-				attend: 'আজকের উপস্থিতি',
-				gpa: 'দাখিল ফলাফল',
-				ladder: 'ইবতিদায়ী · দাখিল · আলিম · ফাযিল · কামিল'
-			},
-			solTitle: 'প্রতিটি প্রতিষ্ঠানের জন্য তৈরি',
-			solutions: [
-				['স্কুল', 'শাখা, জিপিএ-৫, ছাড়পত্র, অভিভাবক এসএমএস।'],
-				['কলেজ', 'বিভাগ, সেমিস্টার, ট্রান্সক্রিপ্ট, ভর্তি।'],
-				['মাদ্রাসা', 'ইবতিদায়ী→কামিল, হিফয ট্র্যাকিং, আরবি আরটিএল।'],
-				['কোচিং', 'ব্যাচ, মডেল টেস্ট লিডারবোর্ড, কোর্স বিক্রি।']
-			],
-			pillTitle: 'সবকিছু এক ছাদের নিচে',
-			pillars: [
-				['তৈরি করুন', 'কোর্স, ১৬ ধরনের কুইজ, সার্টিফিকেট, এআই স্টুডিও।'],
-				['যুক্ত করুন', 'ফোরাম, প্রশ্নোত্তর, রিভিউ, গেমিফিকেশন।'],
-				['আয় করুন', 'বিকাশ ও এসএসএলকমার্স — ০% ফি। আপনিই মার্চেন্ট।'],
-				['পরিচালনা', 'হাজিরা, পরীক্ষা, ফলাফল, রুটিন, স্টাফ।']
-			],
-			foot: '০% প্ল্যাটফর্ম ফি। প্রতিষ্ঠানই মার্চেন্ট — আপনার টাকা, রিফান্ড, শিক্ষার্থী সব আপনার।'
-		},
-		ar: {
-			dir: 'rtl' as const,
-			locale: 'ar',
-			label: 'العربية',
-			tag: 'جديد — بِع دورة من حسابك الخاص',
-			h1a: 'أدِر المؤسسة كاملةً.',
-			h1b: 'وعلِّم العالم كله.',
-			sub: 'من الحضور إلى كشف الدرجات، ومن الدفع إلى الشهادة — منصة واحدة لمدرسة أو كلية أو مدرسة دينية أو مركز تدريب.',
-			cta1: 'ابدأ مجانًا',
-			cta2: 'شاهد العرض',
-			card: {
-				name: 'مدرسة بيت العلم',
-				kicker: 'هذا الشهر',
-				fees: 'الرسوم المحصّلة',
-				due: 'المتأخرات',
-				attend: 'حضور اليوم',
-				gpa: 'نتيجة الدخيل',
-				ladder: 'ابتدائي · دخيل · عالِم · فاضل · كامل'
-			},
-			solTitle: 'مصمَّمة لكل نوع من المؤسسات',
-			solutions: [
-				['مدرسة', 'شُعب، معدّل GPA-5، شهادات نقل، رسائل لأولياء الأمور.'],
-				['كلية', 'تخصصات، فصول، كشوف درجات، قبول.'],
-				['مدرسة دينية', 'من الابتدائي إلى الكامل، تتبّع الحفظ، منهج عربي RTL.'],
-				['مركز تدريب', 'دفعات، لوحات صدارة للاختبارات، بيع الدورات.']
-			],
-			pillTitle: 'كل شيء تحت سقف واحد',
-			pillars: [
-				['أنشئ', 'دورات، ١٦ نوع اختبار، شهادات، استوديو ذكاء.'],
-				['تفاعل', 'منتدى، أسئلة، تقييمات، تحفيز.'],
-				['اربح', 'bKash و SSLCommerz أولًا — رسوم ٠٪. أنت التاجر.'],
-				['أدِر', 'حضور، امتحانات، نتائج، جداول، موظفون.']
-			],
-			foot: 'رسوم منصة ٠٪. المؤسسة هي التاجر — أموالك ومستردّاتك وطلابك ملكك.'
-		}
-	} satisfies Record<Lang, unknown>;
+	// ৳ with English digits and lakh/crore grouping. English currency locales print
+	// the letters "BDT", so the glyph is composed onto an en-IN number instead.
+	const taka = (minor: number) =>
+		'৳' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(minor / 100);
+	const num = (n: number) => new Intl.NumberFormat('en-IN').format(n);
 
-	const t = $derived(T[lang]);
+	const solutions = [
+		['School', 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'],
+		['College', 'Streams, semesters, transcripts, admissions.'],
+		['Madrasa', 'Ebtedayee → Kamil, Hifz tracking, Arabic (RTL) curriculum.'],
+		['Coaching', 'Batches, model-test leaderboards, pay-per-course.']
+	];
 
-	// The ৳ figures reformat per locale: lakh/crore grouping in English, Bengali
-	// numerals in বাংলা, Arabic-Indic in العربية — the glyph ৳ always, never "BDT".
-	const taka = (minor: number) => formatMoney({ amount_minor: minor, currency: 'BDT' }, t.locale);
-	const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
+	const pillars = [
+		['Create', 'Courses, 16 quiz types, certificates, AI Studio.'],
+		['Engage', 'Forum, Q&A, reviews, gamification, notifications.'],
+		['Earn', 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'],
+		['Manage', 'Attendance, exams, report cards, timetable, staff.']
+	];
+
+	// The fee-gateway split and a few recent payments, for the dashboard section.
+	const gateways = [
+		['bKash', 62, '#e2136e'],
+		['SSLCommerz', 24, 'var(--jade)'],
+		['Cash', 14, 'var(--muted)']
+	] as const;
+	const payments = [
+		['Ayesha Siddiqua', 'bKash', 120000],
+		['Ibrahim Khalil', 'SSLCommerz', 240000],
+		['Rahim Uddin', 'bKash', 90000]
+	] as const;
+
+	// The GPA-5 gauge: a semicircle whose value arc ends at 4.83 of 5.
+	const gpa = 4.83;
+	const gaugeEnd = (() => {
+		const theta = ((180 - (gpa / 5) * 180) * Math.PI) / 180;
+		return { x: 60 + 54 * Math.cos(theta), y: 60 - 54 * Math.sin(theta) };
+	})();
 </script>
 
 <svelte:head><title>Muallim — design preview</title></svelte:head>
 
-<div class="rd" class:rd-dark={dark} dir={t.dir} {lang}>
+<div class="rd" class:rd-dark={dark}>
 	<div class="rd-paper">
-		<!-- Control bar -->
 		<header class="rd-bar">
-			<span class="rd-brand">মু · Muallim</span>
-			<div class="rd-controls">
-				<div class="rd-seg" role="group" aria-label="Language">
-					{#each Object.entries(T) as [key, v] (key)}
-						<button
-							type="button"
-							class="rd-chip"
-							class:on={lang === key}
-							onclick={() => (lang = key as Lang)}
-						>
-							{v.label}
-						</button>
-					{/each}
-				</div>
-				<button
-					type="button"
-					class="rd-chip rd-theme"
-					onclick={() => (dark = !dark)}
-					aria-pressed={dark}
-				>
-					{dark ? '☾' : '☀'}
-				</button>
-			</div>
+			<span class="rd-brand">Muallim</span>
+			<button
+				type="button"
+				class="rd-chip rd-theme"
+				onclick={() => (dark = !dark)}
+				aria-pressed={dark}
+			>
+				{dark ? '☾ Dark' : '☀ Light'}
+			</button>
 		</header>
 
 		<!-- Hero -->
 		<section class="rd-hero">
-			<div class="rd-hero-copy">
-				<span class="rd-tag">{t.tag}</span>
+			<div>
+				<span class="rd-tag">New — sell a course from your own bKash or SSLCommerz account</span>
 				<h1 class="rd-h1">
-					<span class="rd-h1a">{t.h1a}</span>
-					<span class="rd-h1b">{t.h1b}</span>
+					<span class="rd-h1a">Run the whole institution.</span>
+					<span class="rd-h1b">Teach the whole world.</span>
 				</h1>
-				<p class="rd-sub">{t.sub}</p>
+				<p class="rd-sub">
+					From roll-call to result card, bKash to certificate — one platform for a school, a
+					college, a madrasa, or a coaching center.
+				</p>
 				<div class="rd-cta">
-					<a class="rd-btn rd-btn-solid" href="#start">{t.cta1}</a>
-					<a class="rd-btn rd-btn-ghost" href="#demo">{t.cta2}</a>
+					<a class="rd-btn rd-btn-solid" href="#start">Start free</a>
+					<a class="rd-btn rd-btn-ghost" href="#demo">See a live demo</a>
 				</div>
 			</div>
 
-			<!-- The live institution card: a madrasa owner's month, in the chosen script. -->
+			<!-- The live institution card: a madrasa principal's month. -->
 			<div class="rd-card">
 				<div class="rd-card-head">
-					<span class="rd-card-name">{t.card.name}</span>
-					<span class="rd-card-kicker">{t.card.kicker}</span>
+					<span class="rd-card-name">Baitul Ilm Dakhil Madrasa</span>
+					<span class="rd-card-kicker">This month</span>
 				</div>
 
 				<div class="rd-stats">
 					<div class="rd-stat">
-						<span class="rd-stat-label">{t.card.fees}</span>
+						<span class="rd-stat-label">Fees collected</span>
 						<span class="rd-stat-fig rd-jade">{taka(184250000)}</span>
 					</div>
 					<div class="rd-stat">
-						<span class="rd-stat-label">{t.card.due}</span>
+						<span class="rd-stat-label">Outstanding dues</span>
 						<span class="rd-stat-fig rd-marigold">{taka(31200000)}</span>
 					</div>
 				</div>
 
 				<div class="rd-row">
-					<span class="rd-stat-label">{t.card.attend}</span>
+					<span class="rd-stat-label">Attendance today</span>
 					<span class="rd-meter" aria-hidden="true"><span style="width: 92%"></span></span>
 					<span class="rd-mono">{num(92)}%</span>
 				</div>
 
 				<div class="rd-gpa">
-					<span class="rd-stat-label">{t.card.gpa}</span>
+					<span class="rd-stat-label">Dakhil result</span>
 					<span class="rd-gpa-fig rd-mono">{num(4.83)}<small>/{num(5)}</small></span>
 					<span class="rd-gpa-grade">A+</span>
 				</div>
 
-				<div class="rd-ladder">{t.card.ladder}</div>
+				<div class="rd-ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
 			</div>
 		</section>
 
 		<!-- Four institutions -->
 		<section class="rd-section">
-			<h2 class="rd-h2">{t.solTitle}</h2>
+			<h2 class="rd-h2">Made for every kind of institution</h2>
 			<div class="rd-grid">
-				{#each t.solutions as [name, line] (name)}
+				{#each solutions as [name, line] (name)}
 					<article class="rd-tile">
 						<span class="rd-tile-dot" aria-hidden="true"></span>
 						<h3 class="rd-tile-title">{name}</h3>
@@ -225,9 +133,9 @@
 
 		<!-- Four pillars -->
 		<section class="rd-section">
-			<h2 class="rd-h2">{t.pillTitle}</h2>
+			<h2 class="rd-h2">Everything under one roof</h2>
 			<div class="rd-grid">
-				{#each t.pillars as [name, line], i (name)}
+				{#each pillars as [name, line], i (name)}
 					<article class="rd-tile rd-tile-pillar">
 						<span class="rd-mono rd-tile-num">0{i + 1}</span>
 						<h3 class="rd-tile-title">{name}</h3>
@@ -237,13 +145,88 @@
 			</div>
 		</section>
 
-		<footer class="rd-foot">{t.foot}</footer>
+		<!-- The dashboard, as it renders: the "see it manage" moment. -->
+		<section class="rd-section">
+			<h2 class="rd-h2">See it run a madrasa</h2>
+			<p class="rd-lead">A principal's month, at a glance.</p>
+
+			<div class="rd-dash">
+				<div class="rd-kpis">
+					<div class="rd-kpi">
+						<span class="rd-stat-label">Fees collected</span>
+						<span class="rd-kpi-fig rd-jade rd-mono">{taka(184250000)}</span>
+					</div>
+					<div class="rd-kpi">
+						<span class="rd-stat-label">Outstanding</span>
+						<span class="rd-kpi-fig rd-marigold rd-mono">{taka(31200000)}</span>
+					</div>
+					<div class="rd-kpi">
+						<span class="rd-stat-label">Attendance</span>
+						<span class="rd-kpi-fig rd-mono">{num(92)}%</span>
+					</div>
+					<div class="rd-kpi">
+						<span class="rd-stat-label">New admissions</span>
+						<span class="rd-kpi-fig rd-mono">{num(18)}</span>
+					</div>
+				</div>
+
+				<div class="rd-panels">
+					<div class="rd-panel">
+						<span class="rd-panel-title">How fees came in</span>
+						<div class="rd-split" aria-hidden="true">
+							{#each gateways as [, pct, color] (color)}
+								<span style="width: {pct}%; background: {color}"></span>
+							{/each}
+						</div>
+						<ul class="rd-legend">
+							{#each gateways as [name, pct, color] (name)}
+								<li>
+									<span class="rd-dot" style="background: {color}"></span>
+									{name}
+									<span class="rd-mono">{num(pct)}%</span>
+								</li>
+							{/each}
+						</ul>
+					</div>
+
+					<div class="rd-panel rd-panel-gauge">
+						<span class="rd-panel-title">Dakhil board result</span>
+						<svg viewBox="0 0 120 70" class="rd-gauge" role="img" aria-label="GPA 4.83 of 5">
+							<path d="M 6 60 A 54 54 0 0 1 114 60" class="rd-gauge-track" />
+							<path
+								d="M 6 60 A 54 54 0 0 1 {gaugeEnd.x.toFixed(2)} {gaugeEnd.y.toFixed(2)}"
+								class="rd-gauge-fill"
+							/>
+						</svg>
+						<span class="rd-gauge-fig rd-mono">{num(4.83)}<small> / {num(5)}</small></span>
+					</div>
+				</div>
+
+				<div class="rd-panel">
+					<span class="rd-panel-title">Recent payments</span>
+					<ul class="rd-payments">
+						{#each payments as [who, via, amount] (who)}
+							<li>
+								<span class="rd-pay-who">{who}</span>
+								<span class="rd-pay-via">via {via}</span>
+								<span class="rd-mono rd-jade">{taka(amount)}</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<footer class="rd-foot">
+			0% platform fee. The school is the merchant of record — you own your money, your refunds, your
+			students.
+		</footer>
 	</div>
 </div>
 
 <style>
 	/* Scoped palette — ink + marigold + jade on manuscript paper. Light by default;
-	   the .rd-dark class flips it. Nothing here leaks past .rd. */
+	   .rd-dark flips it. Nothing here leaks past .rd. */
 	.rd {
 		--paper: #f6f1e7;
 		--surface: #fffdf8;
@@ -253,11 +236,8 @@
 		--marigold: #c77a06;
 		--jade: #0f7a64;
 
-		--display:
-			'Fraunces', 'Noto Serif Bengali', 'Amiri', ui-serif, Georgia, 'Times New Roman', serif;
-		--body:
-			'Hind Siliguri', 'Noto Sans Bengali', 'Noto Naskh Arabic', system-ui, -apple-system,
-			sans-serif;
+		--display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+		--body: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
 		--mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
 		color: var(--ink);
@@ -298,38 +278,18 @@
 	.rd-brand {
 		font-family: var(--display);
 		font-weight: 600;
-		font-size: 1.15rem;
-	}
-	.rd-controls {
-		display: flex;
-		gap: 0.5rem;
-	}
-	.rd-seg {
-		display: flex;
-		gap: 0.25rem;
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		padding: 0.2rem;
+		font-size: 1.2rem;
+		letter-spacing: -0.01em;
 	}
 	.rd-chip {
-		border: 0;
-		background: transparent;
+		border: 1px solid var(--line);
+		background: var(--surface);
 		color: var(--muted);
 		font: inherit;
 		font-size: 0.85rem;
-		padding: 0.3rem 0.75rem;
+		padding: 0.35rem 0.85rem;
 		border-radius: 999px;
 		cursor: pointer;
-	}
-	.rd-chip.on {
-		background: var(--marigold);
-		color: #fff;
-		font-weight: 600;
-	}
-	.rd-theme {
-		background: var(--surface);
-		border: 1px solid var(--line);
 	}
 
 	.rd-hero {
@@ -461,9 +421,6 @@
 		align-items: center;
 		gap: 0.75rem;
 	}
-	.rd-row .rd-stat-label {
-		flex: 0 0 auto;
-	}
 	.rd-meter {
 		flex: 1;
 		height: 8px;
@@ -511,7 +468,6 @@
 		margin-top: 1rem;
 		font-size: 0.78rem;
 		color: var(--muted);
-		letter-spacing: 0.01em;
 	}
 
 	.rd-section {
@@ -524,6 +480,10 @@
 		font-weight: 600;
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
 		letter-spacing: -0.01em;
+	}
+	.rd-lead {
+		margin-top: 0.5rem;
+		color: var(--muted);
 	}
 	.rd-grid {
 		margin-top: 1.5rem;
@@ -573,6 +533,153 @@
 		line-height: 1.55;
 		color: var(--muted);
 		margin: 0;
+	}
+
+	/* Dashboard section */
+	.rd-dash {
+		margin-top: 1.5rem;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 20px;
+		padding: 1.5rem;
+		box-shadow: 0 20px 50px -34px rgba(28, 34, 48, 0.4);
+	}
+	.rd-kpis {
+		display: grid;
+		gap: 0.9rem;
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@media (min-width: 720px) {
+		.rd-kpis {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+	.rd-kpi {
+		background: var(--paper);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 0.9rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.rd-kpi-fig {
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+	.rd-panels {
+		margin-top: 0.9rem;
+		display: grid;
+		gap: 0.9rem;
+		grid-template-columns: 1fr;
+	}
+	@media (min-width: 720px) {
+		.rd-panels {
+			grid-template-columns: 1.4fr 1fr;
+		}
+	}
+	.rd-panel {
+		margin-top: 0.9rem;
+		background: var(--paper);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 1.1rem;
+	}
+	.rd-panels .rd-panel {
+		margin-top: 0;
+	}
+	.rd-panel-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+	.rd-split {
+		margin-top: 0.8rem;
+		display: flex;
+		height: 12px;
+		border-radius: 999px;
+		overflow: hidden;
+		gap: 2px;
+	}
+	.rd-split span {
+		display: block;
+	}
+	.rd-legend {
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.82rem;
+	}
+	.rd-legend li {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--muted);
+	}
+	.rd-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+		display: inline-block;
+	}
+	.rd-panel-gauge {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.rd-gauge {
+		width: 160px;
+		max-width: 100%;
+		margin-top: 0.4rem;
+	}
+	.rd-gauge-track {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 10;
+		stroke-linecap: round;
+	}
+	.rd-gauge-fill {
+		fill: none;
+		stroke: var(--jade);
+		stroke-width: 10;
+		stroke-linecap: round;
+	}
+	.rd-gauge-fig {
+		font-size: 1.3rem;
+		font-weight: 700;
+		margin-top: -0.4rem;
+	}
+	.rd-gauge-fig small {
+		color: var(--muted);
+		font-weight: 400;
+	}
+	.rd-payments {
+		margin: 0.8rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.rd-payments li {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.6rem 0;
+		border-top: 1px solid var(--line);
+	}
+	.rd-payments li:first-child {
+		border-top: 0;
+	}
+	.rd-pay-who {
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+	.rd-pay-via {
+		font-size: 0.8rem;
+		color: var(--muted);
+		margin-inline-end: auto;
 	}
 
 	.rd-foot {
