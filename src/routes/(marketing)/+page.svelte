@@ -255,7 +255,7 @@
 	</section>
 
 	<section class="section">
-		<Card class="pricing">
+		<Card class="grid items-center gap-6 md:grid-cols-[1.4fr_0.8fr]">
 			<div>
 				<h2 class="h2">You sell. We take nothing.</h2>
 				<p class="lead">
@@ -269,7 +269,7 @@
 					>
 				</div>
 			</div>
-			<Card subtle class="pricing-figure">
+			<Card subtle class="flex flex-col items-center justify-center gap-2 text-center">
 				<span class="label">Platform fee</span>
 				<span class="big mono c-brand">0%</span>
 				<span class="muted-xs">on every taka you collect</span>
@@ -604,24 +604,6 @@
 		background: var(--brand);
 	}
 
-	.pricing {
-		display: grid;
-		gap: 1.5rem;
-		align-items: center;
-	}
-	@media (min-width: 780px) {
-		.pricing {
-			grid-template-columns: 1.4fr 0.8fr;
-		}
-	}
-	.pricing-figure {
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-		align-items: center;
-		justify-content: center;
-	}
 	.big {
 		font-size: 3.5rem;
 		font-weight: 800;

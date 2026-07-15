@@ -1,18 +1,30 @@
 <script lang="ts">
+	/**
+	 * A per-audience solution page, in the locked marketing design — composed from the
+	 * UI kit over a fixed aurora. The segment data (headline, blurb, the "today" list,
+	 * the highlight) is preserved; only the presentation is the new design.
+	 */
 	import { resolve } from '$app/paths';
-	import { ArrowRight01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
-	import { Button, Card, Icon, MarketingFooter, MarketingHeader } from '$lib/components';
-	import { Capabilities, Closing, ProductShot, Section } from '$lib/features/marketing';
-	import { inview } from '$lib/actions/inview';
+	import { Icon, MarketingFooter } from '$lib/components';
+	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
+	import {
+		ArrowRight01Icon,
+		ArrowUpRight01Icon,
+		Tick02Icon,
+		Mortarboard01Icon
+	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	const segment = $derived(data.segment);
 
-	// Two-tone headline: the first sentence solid, the rest receding.
+	// Two-tone headline: the first sentence solid, the rest in brand.
 	const parts = $derived(segment.headline.split(/(?<=\.)\s+/));
 	const headA = $derived(parts[0]);
 	const headB = $derived(parts.slice(1).join(' '));
+
+	// A rotating tone per card, so a grid reads as variety.
+	const TONES = ['indigo', 'teal', 'violet', 'amber', 'rose'] as const;
 </script>
 
 <svelte:head>
@@ -20,119 +32,235 @@
 	<meta name="description" content={segment.blurb} />
 </svelte:head>
 
-<MarketingHeader />
+<div class="page">
+	<header class="menu">
+		<a class="brand" href={resolve('/')}><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</a
+		>
+		<div class="menu-actions">
+			<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
+			<Button href={resolve('/register')} size="sm">
+				Start free <Icon icon={ArrowRight01Icon} class="size-4" />
+			</Button>
+		</div>
+	</header>
 
-<main>
-	<!-- The landing's hero, and the same rule: the picture is the product. -->
-	<section class="hero-wash relative isolate overflow-hidden">
-		<div
-			class="grain pointer-events-none absolute inset-0 -z-10 opacity-[0.035] dark:opacity-[0.06]"
-			aria-hidden="true"
-		></div>
-
-		<div class="mx-auto max-w-6xl px-6 pt-28 text-center sm:pt-36">
-			<div use:inview>
-				<span
-					class="inline-flex items-center gap-2 rounded-pill bg-surface-raised px-3.5 py-1.5 text-sm text-muted ring-1 ring-border"
-				>
-					<Icon icon={segment.heroIcon} class="size-4 text-accent-text" />
-					{segment.eyebrow}
-				</span>
-
-				<h1
-					class="mx-auto mt-8 max-w-4xl text-[clamp(2.25rem,5.5vw,4rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-balance"
-				>
-					{headA}
-					{#if headB}<span class="text-muted">{headB}</span>{/if}
-				</h1>
-
-				<p class="mx-auto mt-7 max-w-2xl text-lg text-pretty text-muted">{segment.blurb}</p>
-
-				<div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-					<Button href={resolve('/register')} size="lg" pill>
-						Create a workspace
-						<Icon icon={ArrowRight01Icon} class="size-4" />
-					</Button>
-					<Button href="{resolve('/')}#capabilities" variant="secondary" size="lg" pill>
-						See everything it does
-					</Button>
-				</div>
-			</div>
-
-			<div class="mt-16 pb-24 sm:mt-20 sm:pb-28" use:inview={{ delay: 120 }}>
-				<ProductShot
-					eager
-					src={segment.shot.src}
-					alt={segment.shot.alt}
-					path={segment.shot.path}
-					class="mx-auto max-w-5xl"
-				/>
-			</div>
+	<section class="hero">
+		<Tag>{segment.eyebrow}</Tag>
+		<h1 class="h1">
+			{headA}
+			{#if headB}<span class="accent">{headB}</span>{/if}
+		</h1>
+		<p class="sub">{segment.blurb}</p>
+		<div class="cta">
+			<Button href={resolve('/register')}>
+				Create a workspace <Icon icon={ArrowRight01Icon} class="size-5" />
+			</Button>
+			<Button href={resolve('/')} variant="ghost">
+				See everything it does <Icon icon={ArrowUpRight01Icon} class="size-5" />
+			</Button>
 		</div>
 	</section>
 
-	<!-- ------------------------------------------------------------ the offer -->
-	<Section
-		eyebrow="What you get"
-		title="Built for the way {segment.nav.toLowerCase()} actually work"
-		lead={segment.tagline}
-		class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-	>
-		{#each segment.today as item, i (item.title)}
-			<div use:inview={{ delay: (i % 3) * 70 }}>
-				<Card float class="lift h-full p-7">
-					<span
-						class="flex size-10 items-center justify-center rounded-control bg-accent-surface text-accent-text"
-					>
-						<Icon icon={item.icon} class="size-5" />
-					</span>
-
-					<h3 class="mt-5 font-semibold">{item.title}</h3>
-					<p class="mt-2.5 leading-relaxed text-muted">{item.body}</p>
+	<section class="section">
+		<h2 class="h2">Built for the way {segment.nav.toLowerCase()} actually work</h2>
+		<p class="lead">{segment.tagline}</p>
+		<div class="grid">
+			{#each segment.today as item, i (item.title)}
+				<Card class="tile">
+					<IconChip icon={item.icon} tone={TONES[i % TONES.length]} />
+					<h3 class="tile-title">{item.title}</h3>
+					<p class="tile-line">{item.body}</p>
 				</Card>
-			</div>
-		{/each}
-	</Section>
-
-	<!-- ------------------------------------------------------------- highlight -->
-	<section class="px-6 py-16 sm:py-20">
-		<div class="hero-panel squircle mx-auto max-w-6xl overflow-hidden ring-1 ring-border">
-			<div class="grid items-center gap-12 px-6 py-16 sm:px-12 lg:grid-cols-[1fr_0.8fr] lg:gap-20">
-				<div use:inview>
-					<p class="text-xs font-semibold tracking-[0.14em] text-accent-text uppercase">
-						{segment.highlight.label}
-					</p>
-					<h2 class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-						{segment.highlight.title}
-					</h2>
-					<p class="mt-5 text-lg leading-relaxed text-pretty text-muted">
-						{segment.highlight.body}
-					</p>
-				</div>
-
-				<div use:inview={{ delay: 120 }}>
-					<Card float class="p-7">
-						<ul class="space-y-4">
-							{#each segment.highlight.points as point (point)}
-								<li class="flex items-start gap-3 text-[0.9375rem] leading-relaxed">
-									<Icon
-										icon={Tick02Icon}
-										strokeWidth={2.5}
-										class="mt-1 size-3.5 shrink-0 text-accent"
-									/>
-									{point}
-								</li>
-							{/each}
-						</ul>
-					</Card>
-				</div>
-			</div>
+			{/each}
 		</div>
 	</section>
 
-	<!-- The rest of the product, in the same index the landing uses. -->
-	<Capabilities />
-	<Closing />
-</main>
+	<section class="section">
+		<Card class="grid items-center gap-6 md:grid-cols-[1.2fr_0.9fr]">
+			<div>
+				<p class="eyebrow">{segment.highlight.label}</p>
+				<h2 class="h2">{segment.highlight.title}</h2>
+				<p class="lead">{segment.highlight.body}</p>
+			</div>
+			<Card subtle class="!p-6">
+				<ul class="points">
+					{#each segment.highlight.points as point (point)}
+						<li>
+							<Icon icon={Tick02Icon} strokeWidth={2.5} class="tick size-4" />
+							<span>{point}</span>
+						</li>
+					{/each}
+				</ul>
+			</Card>
+		</Card>
+	</section>
+
+	<section class="section closing">
+		<h2 class="h2">Bring your institution online.</h2>
+		<div class="cta">
+			<Button href={resolve('/register')}
+				>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
+			>
+			<Button href={resolve('/login')} variant="ghost">Sign in</Button>
+		</div>
+	</section>
+</div>
 
 <MarketingFooter />
+
+<style>
+	.page {
+		background-color: var(--bg);
+		background-image:
+			radial-gradient(
+				50rem 40rem at 8% 4%,
+				color-mix(in oklab, var(--brand) 24%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				46rem 38rem at 94% 8%,
+				color-mix(in oklab, var(--gold) 20%, transparent),
+				transparent 58%
+			),
+			radial-gradient(
+				46rem 40rem at 88% 82%,
+				color-mix(in oklab, var(--indigo) 16%, transparent),
+				transparent 60%
+			);
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		padding-bottom: 5rem;
+	}
+	.menu {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: 76rem;
+		margin: 0 auto;
+		padding: 1.4rem 1.5rem 0;
+	}
+	.menu-actions {
+		display: flex;
+		gap: 0.6rem;
+	}
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 700;
+		font-size: 1.2rem;
+		letter-spacing: -0.01em;
+		color: var(--brand);
+		text-decoration: none;
+	}
+
+	.hero {
+		max-width: 52rem;
+		margin: 0 auto;
+		padding: 4rem 1.5rem 2rem;
+		text-align: center;
+	}
+	.h1 {
+		font-weight: 700;
+		font-size: clamp(2.25rem, 5vw, 3.8rem);
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		margin: 1.4rem 0 0;
+	}
+	.h1 .accent {
+		color: var(--brand);
+	}
+	.sub {
+		margin: 1.3rem auto 0;
+		max-width: 40rem;
+		font-size: 1.12rem;
+		line-height: 1.6;
+		color: var(--muted);
+	}
+	.cta {
+		margin-top: 2rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9rem;
+		justify-content: center;
+	}
+
+	.section {
+		max-width: 76rem;
+		margin: 4rem auto 0;
+		padding: 0 1.5rem;
+	}
+	.h2 {
+		font-weight: 700;
+		font-size: clamp(1.7rem, 3vw, 2.3rem);
+		letter-spacing: -0.02em;
+	}
+	.lead {
+		margin-top: 0.5rem;
+		color: var(--muted);
+		line-height: 1.6;
+		max-width: 44rem;
+	}
+	.eyebrow {
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--brand);
+	}
+	.grid {
+		margin-top: 1.5rem;
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(1, 1fr);
+	}
+	@media (min-width: 640px) {
+		.grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (min-width: 980px) {
+		.grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+	.tile-title {
+		font-weight: 700;
+		font-size: 1.15rem;
+		margin: 0.7rem 0 0.4rem;
+	}
+	.tile-line {
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--muted);
+		margin: 0;
+	}
+
+	.points {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+	.points li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+	}
+	.points :global(.tick) {
+		margin-top: 0.15rem;
+		flex-shrink: 0;
+		color: var(--brand);
+	}
+
+	.closing {
+		text-align: center;
+	}
+	.closing .cta {
+		justify-content: center;
+	}
+</style>
