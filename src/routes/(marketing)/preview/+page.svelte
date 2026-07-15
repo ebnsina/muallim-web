@@ -1,12 +1,12 @@
 <script lang="ts">
 	/**
-	 * A live, in-app preview of the fresh marketing direction — light only, on Mona
-	 * Sans with Geist Mono for figures (the app's own faces). A refined token set:
-	 * an indigo-violet brand (modern, and deliberately not the app's blue), a warm
-	 * gold for accents, cool-neutral paper and ink. English content; money is the
-	 * taka glyph ৳ with lakh/crore grouping. Run the app and visit /preview.
+	 * The marketing preview, composed from the UI kit — frosted Card, Button, IconChip,
+	 * Tag — over a fixed aurora. Tokens come from the (marketing) layout; the only CSS
+	 * here is the page's own layout and the bespoke dashboard viz (meter, gauge, split).
+	 * Light only. English content, ৳ pricing. Live at /preview.
 	 */
 	import { Icon } from '$lib/components';
+	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
 	import {
 		ArrowRight01Icon,
 		ArrowUpRight01Icon,
@@ -30,63 +30,63 @@
 	const solutions = [
 		{
 			icon: School01Icon,
-			name: 'School',
 			tone: 'indigo',
+			name: 'School',
 			line: 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'
 		},
 		{
 			icon: Building01Icon,
-			name: 'College',
 			tone: 'teal',
+			name: 'College',
 			line: 'Streams, semesters, transcripts, admissions.'
 		},
 		{
 			icon: Mosque01Icon,
-			name: 'Madrasa',
 			tone: 'violet',
-			line: 'Ebtedayee → Kamil, Hifz tracking, Arabic (RTL) curriculum.'
+			name: 'Madrasa',
+			line: 'Ebtedayee to Kamil, Hifz tracking, Arabic (RTL) curriculum.'
 		},
 		{
 			icon: UserGroupIcon,
-			name: 'Coaching',
 			tone: 'amber',
+			name: 'Coaching',
 			line: 'Batches, model-test leaderboards, pay-per-course.'
 		}
-	];
+	] as const;
 
 	const pillars = [
 		{
 			icon: MagicWand01Icon,
-			name: 'Create',
 			tone: 'indigo',
+			name: 'Create',
 			line: 'Courses, 16 quiz types, certificates, AI Studio.'
 		},
 		{
 			icon: Message02Icon,
-			name: 'Engage',
 			tone: 'rose',
+			name: 'Engage',
 			line: 'Forum, Q&A, reviews, gamification, notifications.'
 		},
 		{
 			icon: Wallet01Icon,
-			name: 'Earn',
 			tone: 'teal',
+			name: 'Earn',
 			line: 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'
 		},
 		{
 			icon: Task01Icon,
-			name: 'Manage',
 			tone: 'amber',
+			name: 'Manage',
 			line: 'Attendance, exams, report cards, timetable, staff.'
 		}
-	];
+	] as const;
 
 	const kpis = [
-		{ icon: Coins01Icon, label: 'Fees collected', value: taka(184250000), tone: 'teal' },
-		{ icon: Wallet01Icon, label: 'Outstanding', value: taka(31200000), tone: 'amber' },
-		{ icon: UserGroupIcon, label: 'Attendance', value: `${num(92)}%`, tone: 'violet' },
-		{ icon: UserMultipleIcon, label: 'New admissions', value: `${num(18)}`, tone: 'rose' }
-	];
+		{ icon: Coins01Icon, tone: 'teal', label: 'Fees collected', value: taka(184250000) },
+		{ icon: Wallet01Icon, tone: 'amber', label: 'Outstanding', value: taka(31200000) },
+		{ icon: UserGroupIcon, tone: 'violet', label: 'Attendance', value: `${num(92)}%` },
+		{ icon: UserMultipleIcon, tone: 'rose', label: 'New admissions', value: `${num(18)}` }
+	] as const;
 
 	const gateways = [
 		['bKash', 62, '#e2136e'],
@@ -108,251 +108,193 @@
 
 <svelte:head><title>Muallim — design preview</title></svelte:head>
 
-<div class="rd">
-	<div class="rd-paper">
-		<header class="rd-bar">
-			<span class="rd-brand"><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</span>
-			<a class="rd-btn rd-btn-solid rd-btn-sm" href="#start">
-				Start free <Icon icon={ArrowRight01Icon} class="size-4" />
-			</a>
-		</header>
+<div class="page">
+	<header class="menu">
+		<span class="brand"><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</span>
+		<Button href="#start" size="sm"
+			>Start free <Icon icon={ArrowRight01Icon} class="size-4" /></Button
+		>
+	</header>
 
-		<!-- Hero -->
-		<section class="rd-hero">
-			<div>
-				<span class="rd-tag">New — sell a course from your own bKash or SSLCommerz account</span>
-				<h1 class="rd-h1">
-					<span class="rd-h1a">Run the whole institution.</span>
-					<span class="rd-h1b">Teach the whole world.</span>
-				</h1>
-				<p class="rd-sub">
-					From roll-call to result card, bKash to certificate — one platform for a school, a
-					college, a madrasa, or a coaching center.
-				</p>
-				<div class="rd-cta">
-					<a class="rd-btn rd-btn-solid" href="#start">
-						Start free <Icon icon={ArrowRight01Icon} class="size-5" />
-					</a>
-					<a class="rd-btn rd-btn-ghost" href="#demo">
-						See a live demo <Icon icon={ArrowUpRight01Icon} class="size-5" />
-					</a>
-				</div>
+	<section class="hero">
+		<div>
+			<Tag>New — sell a course from your own bKash or SSLCommerz account</Tag>
+			<h1 class="h1">
+				<span>Run the whole institution.</span>
+				<span class="accent">Teach the whole world.</span>
+			</h1>
+			<p class="sub">
+				From roll-call to result card, bKash to certificate — one platform for a school, a college,
+				a madrasa, or a coaching center.
+			</p>
+			<div class="cta">
+				<Button href="#start">Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button>
+				<Button href="#demo" variant="ghost">
+					See a live demo <Icon icon={ArrowUpRight01Icon} class="size-5" />
+				</Button>
+			</div>
+		</div>
+
+		<Card>
+			<div class="cardhead">
+				<span class="cardname">Baitul Ilm Dakhil Madrasa</span>
+				<span class="muted-xs">This month</span>
 			</div>
 
-			<!-- The live institution card: a madrasa principal's month. -->
-			<div class="rd-card">
-				<div class="rd-card-head">
-					<span class="rd-card-name">Baitul Ilm Dakhil Madrasa</span>
-					<span class="rd-card-kicker">This month</span>
-				</div>
-
-				<div class="rd-stats">
-					<div class="rd-stat">
-						<span class="rd-stat-label">Fees collected</span>
-						<span class="rd-stat-fig rd-brand">{taka(184250000)}</span>
-					</div>
-					<div class="rd-stat">
-						<span class="rd-stat-label">Outstanding dues</span>
-						<span class="rd-stat-fig rd-gold">{taka(31200000)}</span>
-					</div>
-				</div>
-
-				<div class="rd-row">
-					<span class="rd-stat-label">Attendance today</span>
-					<span class="rd-meter" aria-hidden="true"><span style="width: 92%"></span></span>
-					<span class="rd-mono">{num(92)}%</span>
-				</div>
-
-				<div class="rd-gpa">
-					<span class="rd-stat-label">Dakhil result</span>
-					<span class="rd-gpa-fig rd-mono">{num(4.83)}<small>/{num(5)}</small></span>
-					<span class="rd-gpa-grade">A+</span>
-				</div>
-
-				<div class="rd-ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
+			<div class="stats">
+				<Card subtle class="flex flex-col gap-1.5">
+					<span class="label">Fees collected</span>
+					<span class="fig c-brand">{taka(184250000)}</span>
+				</Card>
+				<Card subtle class="flex flex-col gap-1.5">
+					<span class="label">Outstanding dues</span>
+					<span class="fig c-amber">{taka(31200000)}</span>
+				</Card>
 			</div>
-		</section>
 
-		<!-- Four institutions -->
-		<section class="rd-section">
-			<h2 class="rd-h2">Made for every kind of institution</h2>
-			<div class="rd-grid">
-				{#each solutions as s (s.name)}
-					<article class="rd-tile">
-						<span class="rd-ic rd-ic-{s.tone}"><Icon icon={s.icon} class="size-5" /></span>
-						<h3 class="rd-tile-title">{s.name}</h3>
-						<p class="rd-tile-line">{s.line}</p>
-					</article>
+			<div class="row">
+				<span class="label">Attendance today</span>
+				<span class="meter" aria-hidden="true"><span style="width: 92%"></span></span>
+				<span class="mono">{num(92)}%</span>
+			</div>
+
+			<div class="gpa">
+				<span class="label">Dakhil result</span>
+				<span class="gpa-fig mono">{num(4.83)}<small>/{num(5)}</small></span>
+				<span class="grade">A+</span>
+			</div>
+
+			<div class="ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
+		</Card>
+	</section>
+
+	<section class="section">
+		<h2 class="h2">Made for every kind of institution</h2>
+		<div class="grid">
+			{#each solutions as s (s.name)}
+				<Card class="tile">
+					<IconChip icon={s.icon} tone={s.tone} />
+					<h3 class="tile-title">{s.name}</h3>
+					<p class="tile-line">{s.line}</p>
+				</Card>
+			{/each}
+		</div>
+	</section>
+
+	<section class="section">
+		<h2 class="h2">Everything under one roof</h2>
+		<div class="grid">
+			{#each pillars as p, i (p.name)}
+				<Card class="tile">
+					<IconChip icon={p.icon} tone={p.tone} />
+					<span class="mono tile-num">0{i + 1}</span>
+					<h3 class="tile-title">{p.name}</h3>
+					<p class="tile-line">{p.line}</p>
+				</Card>
+			{/each}
+		</div>
+	</section>
+
+	<section class="section">
+		<h2 class="h2">See it run a madrasa</h2>
+		<p class="lead">A principal's month, at a glance.</p>
+
+		<Card class="mt-6">
+			<div class="kpis">
+				{#each kpis as k (k.label)}
+					<Card subtle class="flex flex-col gap-2">
+						<IconChip icon={k.icon} tone={k.tone} />
+						<span class="label">{k.label}</span>
+						<span class="kpi-fig mono c-{k.tone}">{k.value}</span>
+					</Card>
 				{/each}
 			</div>
-		</section>
 
-		<!-- Four pillars -->
-		<section class="rd-section">
-			<h2 class="rd-h2">Everything under one roof</h2>
-			<div class="rd-grid">
-				{#each pillars as p, i (p.name)}
-					<article class="rd-tile">
-						<span class="rd-ic rd-ic-{p.tone}"><Icon icon={p.icon} class="size-5" /></span>
-						<span class="rd-mono rd-tile-num">0{i + 1}</span>
-						<h3 class="rd-tile-title">{p.name}</h3>
-						<p class="rd-tile-line">{p.line}</p>
-					</article>
-				{/each}
-			</div>
-		</section>
-
-		<!-- The dashboard, as it renders: the "see it manage" moment. -->
-		<section class="rd-section">
-			<h2 class="rd-h2">See it run a madrasa</h2>
-			<p class="rd-lead">A principal's month, at a glance.</p>
-
-			<div class="rd-dash">
-				<div class="rd-kpis">
-					{#each kpis as k (k.label)}
-						<div class="rd-kpi">
-							<span class="rd-ic rd-ic-{k.tone}"><Icon icon={k.icon} class="size-5" /></span>
-							<span class="rd-stat-label">{k.label}</span>
-							<span class="rd-kpi-fig rd-mono rd-{k.tone}">{k.value}</span>
-						</div>
-					{/each}
-				</div>
-
-				<div class="rd-panels">
-					<div class="rd-panel">
-						<span class="rd-panel-title">How fees came in</span>
-						<div class="rd-split" aria-hidden="true">
-							{#each gateways as [, pct, color] (color)}
-								<span style="width: {pct}%; background: {color}"></span>
-							{/each}
-						</div>
-						<ul class="rd-legend">
-							{#each gateways as [name, pct, color] (name)}
-								<li>
-									<span class="rd-dot" style="background: {color}"></span>
-									{name}
-									<span class="rd-mono">{num(pct)}%</span>
-								</li>
-							{/each}
-						</ul>
+			<div class="panels">
+				<Card subtle class="!p-[1.1rem]">
+					<span class="panel-title">How fees came in</span>
+					<div class="split" aria-hidden="true">
+						{#each gateways as [, pct, color] (color)}
+							<span style="width: {pct}%; background: {color}"></span>
+						{/each}
 					</div>
-
-					<div class="rd-panel rd-panel-gauge">
-						<span class="rd-panel-title">Dakhil board result</span>
-						<svg viewBox="0 0 120 70" class="rd-gauge" role="img" aria-label="GPA 4.83 of 5">
-							<path d="M 6 60 A 54 54 0 0 1 114 60" class="rd-gauge-track" />
-							<path
-								d="M 6 60 A 54 54 0 0 1 {gaugeEnd.x.toFixed(2)} {gaugeEnd.y.toFixed(2)}"
-								class="rd-gauge-fill"
-							/>
-						</svg>
-						<span class="rd-gauge-fig rd-mono">{num(4.83)}<small> / {num(5)}</small></span>
-					</div>
-				</div>
-
-				<div class="rd-panel">
-					<span class="rd-panel-title">Recent payments</span>
-					<ul class="rd-payments">
-						{#each payments as [who, via, amount] (who)}
+					<ul class="legend">
+						{#each gateways as [name, pct, color] (name)}
 							<li>
-								<span class="rd-pay-who">{who}</span>
-								<span class="rd-pay-via">via {via}</span>
-								<span class="rd-mono rd-brand">{taka(amount)}</span>
+								<span class="dot" style="background: {color}"></span>{name}
+								<span class="mono">{num(pct)}%</span>
 							</li>
 						{/each}
 					</ul>
-				</div>
-			</div>
-		</section>
+				</Card>
 
-		<footer class="rd-foot">
-			0% platform fee. The school is the merchant of record — you own your money, your refunds, your
-			students.
-		</footer>
-	</div>
+				<Card subtle class="!p-[1.1rem] flex flex-col items-center justify-center">
+					<span class="panel-title">Dakhil board result</span>
+					<svg viewBox="0 0 120 70" class="gauge" role="img" aria-label="GPA 4.83 of 5">
+						<path d="M 6 60 A 54 54 0 0 1 114 60" class="gauge-track" />
+						<path
+							d="M 6 60 A 54 54 0 0 1 {gaugeEnd.x.toFixed(2)} {gaugeEnd.y.toFixed(2)}"
+							class="gauge-fill"
+						/>
+					</svg>
+					<span class="gauge-fig mono">{num(4.83)}<small> / {num(5)}</small></span>
+				</Card>
+			</div>
+
+			<Card subtle class="mt-[0.9rem] !p-[1.1rem]">
+				<span class="panel-title">Recent payments</span>
+				<ul class="payments">
+					{#each payments as [who, via, amount] (who)}
+						<li>
+							<span class="pay-who">{who}</span>
+							<span class="pay-via">via {via}</span>
+							<span class="mono c-brand">{taka(amount)}</span>
+						</li>
+					{/each}
+				</ul>
+			</Card>
+		</Card>
+	</section>
+
+	<footer class="foot">
+		0% platform fee. The school is the merchant of record — you own your money, your refunds, your
+		students.
+	</footer>
 </div>
 
 <style>
-	/*
-		Design tokens — light only, scoped to .rd. Two brand hues (an indigo-violet and
-		a warm gold), cool-neutral paper and ink, and shape/shadow tokens so radii and
-		elevation are named once. Nothing here leaks past .rd, and it never themes dark.
-	*/
-	.rd {
-		/* Brand — berry: premium and modern, and — unlike a green — it never collides
-		   with the success/correct green a quiz app already spends. (Swap these three to
-		   retheme: forest #15803d, teal #0f766e, or terracotta #b4491f.) */
-		--brand: #9d174d;
-		--brand-strong: #831843;
-		--brand-tint: #fbe3ee;
-
-		/* Gold — a warm second accent; berry and gold is a rich, classic pair. */
-		--gold: #b7791f;
-		--gold-tint: #f7efda;
-
-		/* A small spectrum for icon chips, so a grid of them reads as variety, not a
-		   wall of one color. Each is a saturated ink over a pale tint of itself. */
-		--indigo: #4f46e5;
-		--indigo-tint: #e8e7fb;
-		--teal: #0d9488;
-		--teal-tint: #d8f2ee;
-		--violet: #7c3aed;
-		--violet-tint: #efe8fd;
-		--amber: #c2620c;
-		--amber-tint: #fbebd9;
-		--rose: #be185d;
-		--rose-tint: #fbe4ee;
-
-		/* Neutrals — faintly warm/mauve, so the grays sit with the berry not against it. */
-		--ink: #211820;
-		--muted: #6b5f66;
-		--line: #ece7ea;
-		--bg: #faf7f9;
-		--surface: #ffffff;
-		--surface-2: #f4eff2;
-
-		/* Shape & elevation. */
-		--r-sm: 10px;
-		--r: 16px;
-		--r-lg: 22px;
-		--pill: 999px;
-
-		--body: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
-		--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
-
-		color: var(--ink);
-		font-family: var(--body);
-	}
-
-	/* An aurora wash — soft indigo and gold blooms near the top that fade into the
-	   plain page below. No repeat, so lower sections sit on clean paper. */
-	.rd-paper {
+	/* A full-viewport aurora, held fixed so every frosted card scrolls over the same
+	   wash of color, top to bottom. */
+	.page {
 		min-height: 100vh;
 		background-color: var(--bg);
 		background-image:
 			radial-gradient(
-				60rem 42rem at 12% -12%,
+				50rem 40rem at 8% 6%,
 				color-mix(in oklab, var(--brand) 24%, transparent),
 				transparent 60%
 			),
 			radial-gradient(
-				52rem 36rem at 100% -6%,
+				46rem 38rem at 94% 10%,
 				color-mix(in oklab, var(--gold) 20%, transparent),
-				transparent 55%
+				transparent 58%
 			),
 			radial-gradient(
-				46rem 40rem at 55% 6%,
-				color-mix(in oklab, var(--brand) 12%, transparent),
-				transparent 62%
+				46rem 40rem at 88% 88%,
+				color-mix(in oklab, var(--indigo) 18%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				42rem 38rem at 10% 90%,
+				color-mix(in oklab, var(--teal) 15%, transparent),
+				transparent 60%
 			);
 		background-repeat: no-repeat;
+		background-attachment: fixed;
 		padding-bottom: 4rem;
 	}
 
-	/* The menu blends into the hero — no bar, no border, no blur. It sits on the
-	   aurora at the top of the page, aligned to the hero's own width, and scrolls
-	   away with it rather than pinning as a separate strip. */
-	.rd-bar {
+	.menu {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -360,7 +302,7 @@
 		margin: 0 auto;
 		padding: 1.4rem 1.5rem 0;
 	}
-	.rd-brand {
+	.brand {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -370,48 +312,7 @@
 		color: var(--brand);
 	}
 
-	/* Buttons — large, rounded‑xl, flat. Separation is a border's job, not a shadow's;
-	   the only motion is a small lift on hover. */
-	.rd-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.95rem 1.9rem;
-		border-radius: 0.75rem;
-		font-weight: 600;
-		font-size: 1.02rem;
-		line-height: 1;
-		text-decoration: none;
-		transition:
-			transform 0.12s ease,
-			background 0.12s ease,
-			border-color 0.12s ease,
-			color 0.12s ease;
-	}
-	.rd-btn-solid {
-		background: var(--brand);
-		color: #fff;
-	}
-	.rd-btn-solid:hover {
-		background: var(--brand-strong);
-		transform: translateY(-1px);
-	}
-	.rd-btn-ghost {
-		background: var(--surface);
-		color: var(--ink);
-		border: 1px solid var(--line);
-	}
-	.rd-btn-ghost:hover {
-		border-color: var(--brand);
-		color: var(--brand);
-		transform: translateY(-1px);
-	}
-	.rd-btn-sm {
-		padding: 0.55rem 1.1rem;
-		font-size: 0.9rem;
-	}
-
-	.rd-hero {
+	.hero {
 		max-width: 76rem;
 		margin: 0 auto;
 		padding: 3rem 1.5rem 3rem;
@@ -420,143 +321,109 @@
 		align-items: center;
 	}
 	@media (min-width: 900px) {
-		.rd-hero {
+		.hero {
 			grid-template-columns: 1.1fr 0.9fr;
 		}
 	}
-
-	.rd-tag {
-		display: inline-block;
-		font-size: 0.82rem;
-		color: var(--gold);
-		font-weight: 600;
-		border: 1px solid color-mix(in oklab, var(--gold) 35%, var(--line));
-		border-radius: var(--pill);
-		padding: 0.35rem 0.85rem;
-		background: var(--gold-tint);
-	}
-	.rd-h1 {
+	.h1 {
 		font-weight: 700;
 		font-size: clamp(2.5rem, 5.5vw, 4.1rem);
 		line-height: 1.03;
 		letter-spacing: -0.03em;
 		margin: 1.4rem 0 0;
 	}
-	.rd-h1a {
+	.h1 span {
 		display: block;
 	}
-	.rd-h1b {
-		display: block;
+	.h1 .accent {
 		color: var(--brand);
 	}
-	.rd-sub {
+	.sub {
 		margin-top: 1.3rem;
 		max-width: 34rem;
 		font-size: 1.12rem;
 		line-height: 1.6;
 		color: var(--muted);
 	}
-	.rd-cta {
+	.cta {
 		margin-top: 2rem;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.9rem;
 	}
 
-	.rd-card {
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: var(--r-lg);
-		padding: 1.5rem;
+	/* Shared typography helpers. */
+	.label {
+		font-size: 0.75rem;
+		color: var(--muted);
 	}
-	.rd-card-head {
+	.muted-xs {
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
+	.mono {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		font-size: 0.85rem;
+	}
+	.c-brand {
+		color: var(--brand);
+	}
+	.c-teal {
+		color: var(--teal);
+	}
+	.c-amber {
+		color: var(--amber);
+	}
+	.c-violet {
+		color: var(--violet);
+	}
+	.c-rose {
+		color: var(--rose);
+	}
+	.fig {
+		font-family: var(--font-mono);
+		font-size: 1.15rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.cardhead {
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
 		gap: 1rem;
 	}
-	.rd-card-name {
+	.cardname {
 		font-weight: 700;
 		font-size: 1.05rem;
 	}
-	.rd-card-kicker {
-		font-size: 0.78rem;
-		color: var(--muted);
-	}
-	.rd-stats {
+	.stats {
 		margin-top: 1.2rem;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 0.9rem;
 	}
-	.rd-stat {
-		background: var(--surface-2);
-		border: 1px solid var(--line);
-		border-radius: var(--r-sm);
-		padding: 0.85rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.35rem;
-	}
-	.rd-stat-label {
-		font-size: 0.75rem;
-		color: var(--muted);
-	}
-	.rd-stat-fig {
-		font-family: var(--mono);
-		font-size: 1.15rem;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-	}
-	.rd-brand {
-		color: var(--brand);
-	}
-	.rd-gold {
-		color: var(--gold);
-	}
-	.rd-ink {
-		color: var(--ink);
-	}
-	.rd-indigo {
-		color: var(--indigo);
-	}
-	.rd-teal {
-		color: var(--teal);
-	}
-	.rd-violet {
-		color: var(--violet);
-	}
-	.rd-amber {
-		color: var(--amber);
-	}
-	.rd-rose {
-		color: var(--rose);
-	}
-	.rd-row {
+	.row {
 		margin-top: 0.9rem;
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
 	}
-	.rd-meter {
+	.meter {
 		flex: 1;
 		height: 8px;
-		border-radius: var(--pill);
+		border-radius: 999px;
 		background: var(--line);
 		overflow: hidden;
 		display: block;
 	}
-	.rd-meter span {
+	.meter span {
 		display: block;
 		height: 100%;
 		background: var(--brand);
 	}
-	.rd-mono {
-		font-family: var(--mono);
-		font-variant-numeric: tabular-nums;
-		font-size: 0.85rem;
-	}
-	.rd-gpa {
+	.gpa {
 		margin-top: 1rem;
 		display: flex;
 		align-items: center;
@@ -564,16 +431,16 @@
 		padding-top: 1rem;
 		border-top: 1px solid var(--line);
 	}
-	.rd-gpa-fig {
+	.gpa-fig {
 		font-size: 1.4rem;
 		font-weight: 700;
 		margin-inline-start: auto;
 	}
-	.rd-gpa-fig small {
+	.gpa-fig small {
 		color: var(--muted);
 		font-weight: 400;
 	}
-	.rd-gpa-grade {
+	.grade {
 		background: var(--brand-tint);
 		color: var(--brand);
 		font-weight: 700;
@@ -581,184 +448,103 @@
 		padding: 0.2rem 0.5rem;
 		font-size: 0.9rem;
 	}
-	.rd-ladder {
+	.ladder {
 		margin-top: 1rem;
 		font-size: 0.78rem;
 		color: var(--muted);
 	}
 
-	.rd-section {
+	.section {
 		max-width: 76rem;
 		margin: 3.5rem auto 0;
 		padding: 0 1.5rem;
 	}
-	.rd-h2 {
+	.h2 {
 		font-weight: 700;
 		font-size: clamp(1.7rem, 3vw, 2.3rem);
 		letter-spacing: -0.02em;
 	}
-	.rd-lead {
+	.lead {
 		margin-top: 0.5rem;
 		color: var(--muted);
 	}
-	.rd-grid {
+	.grid {
 		margin-top: 1.5rem;
 		display: grid;
 		gap: 1rem;
 		grid-template-columns: repeat(1, 1fr);
 	}
 	@media (min-width: 640px) {
-		.rd-grid {
+		.grid {
 			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 	@media (min-width: 980px) {
-		.rd-grid {
+		.grid {
 			grid-template-columns: repeat(4, 1fr);
 		}
 	}
-	.rd-tile {
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: var(--r);
-		padding: 1.5rem;
-		transition:
-			transform 0.15s ease,
-			border-color 0.15s ease;
-	}
-	.rd-tile:hover {
-		transform: translateY(-3px);
-		border-color: color-mix(in oklab, var(--brand) 35%, var(--line));
-	}
-
-	/* The icon chip — a rounded tinted square, brand or gold. */
-	.rd-ic {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.5rem;
-		height: 2.5rem;
-		border-radius: 12px;
-	}
-	.rd-ic-brand {
-		background: var(--brand-tint);
-		color: var(--brand);
-	}
-	.rd-ic-gold {
-		background: var(--gold-tint);
-		color: var(--gold);
-	}
-	.rd-ic-ink {
-		background: var(--surface-2);
-		color: var(--ink);
-	}
-	.rd-ic-indigo {
-		background: var(--indigo-tint);
-		color: var(--indigo);
-	}
-	.rd-ic-teal {
-		background: var(--teal-tint);
-		color: var(--teal);
-	}
-	.rd-ic-violet {
-		background: var(--violet-tint);
-		color: var(--violet);
-	}
-	.rd-ic-amber {
-		background: var(--amber-tint);
-		color: var(--amber);
-	}
-	.rd-ic-rose {
-		background: var(--rose-tint);
-		color: var(--rose);
-	}
-	.rd-tile-num {
+	/* The tile is a frosted Card; these style its content. */
+	.tile-num {
 		display: block;
 		margin-top: 0.9rem;
 		color: var(--muted);
 		font-weight: 600;
 	}
-	.rd-tile-title {
+	.tile-title {
 		font-weight: 700;
 		font-size: 1.2rem;
 		margin: 0.5rem 0 0.4rem;
 	}
-	.rd-tile-line {
+	.tile-line {
 		font-size: 0.9rem;
 		line-height: 1.55;
 		color: var(--muted);
 		margin: 0;
 	}
 
-	/* Dashboard section */
-	.rd-dash {
-		margin-top: 1.5rem;
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: var(--r-lg);
-		padding: 1.5rem;
-	}
-	.rd-kpis {
+	.kpis {
 		display: grid;
 		gap: 0.9rem;
 		grid-template-columns: repeat(2, 1fr);
 	}
 	@media (min-width: 720px) {
-		.rd-kpis {
+		.kpis {
 			grid-template-columns: repeat(4, 1fr);
 		}
 	}
-	.rd-kpi {
-		background: var(--surface-2);
-		border: 1px solid var(--line);
-		border-radius: var(--r-sm);
-		padding: 1rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-	.rd-kpi-fig {
+	.kpi-fig {
 		font-size: 1.3rem;
 		font-weight: 700;
 	}
-	.rd-panels {
+	.panels {
 		margin-top: 0.9rem;
 		display: grid;
 		gap: 0.9rem;
 		grid-template-columns: 1fr;
 	}
 	@media (min-width: 720px) {
-		.rd-panels {
+		.panels {
 			grid-template-columns: 1.4fr 1fr;
 		}
 	}
-	.rd-panel {
-		margin-top: 0.9rem;
-		background: var(--surface-2);
-		border: 1px solid var(--line);
-		border-radius: var(--r-sm);
-		padding: 1.1rem;
-	}
-	.rd-panels .rd-panel {
-		margin-top: 0;
-	}
-	.rd-panel-title {
+	.panel-title {
 		font-size: 0.8rem;
 		font-weight: 600;
 		color: var(--muted);
 	}
-	.rd-split {
+	.split {
 		margin-top: 0.8rem;
 		display: flex;
 		height: 12px;
-		border-radius: var(--pill);
+		border-radius: 999px;
 		overflow: hidden;
 		gap: 2px;
 	}
-	.rd-split span {
+	.split span {
 		display: block;
 	}
-	.rd-legend {
+	.legend {
 		margin: 0.9rem 0 0;
 		padding: 0;
 		list-style: none;
@@ -767,76 +553,70 @@
 		gap: 1rem;
 		font-size: 0.82rem;
 	}
-	.rd-legend li {
+	.legend li {
 		display: flex;
 		align-items: center;
 		gap: 0.4rem;
 		color: var(--muted);
 	}
-	.rd-dot {
+	.dot {
 		width: 10px;
 		height: 10px;
-		border-radius: var(--pill);
+		border-radius: 999px;
 		display: inline-block;
 	}
-	.rd-panel-gauge {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-	.rd-gauge {
+	.gauge {
 		width: 160px;
 		max-width: 100%;
 		margin-top: 0.4rem;
 	}
-	.rd-gauge-track {
+	.gauge-track {
 		fill: none;
 		stroke: var(--line);
 		stroke-width: 10;
 		stroke-linecap: round;
 	}
-	.rd-gauge-fill {
+	.gauge-fill {
 		fill: none;
 		stroke: var(--brand);
 		stroke-width: 10;
 		stroke-linecap: round;
 	}
-	.rd-gauge-fig {
+	.gauge-fig {
 		font-size: 1.3rem;
 		font-weight: 700;
 		margin-top: -0.4rem;
 	}
-	.rd-gauge-fig small {
+	.gauge-fig small {
 		color: var(--muted);
 		font-weight: 400;
 	}
-	.rd-payments {
+	.payments {
 		margin: 0.8rem 0 0;
 		padding: 0;
 		list-style: none;
 	}
-	.rd-payments li {
+	.payments li {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.6rem 0;
 		border-top: 1px solid var(--line);
 	}
-	.rd-payments li:first-child {
+	.payments li:first-child {
 		border-top: 0;
 	}
-	.rd-pay-who {
+	.pay-who {
 		font-weight: 600;
 		font-size: 0.9rem;
 	}
-	.rd-pay-via {
+	.pay-via {
 		font-size: 0.8rem;
 		color: var(--muted);
 		margin-inline-end: auto;
 	}
 
-	.rd-foot {
+	.foot {
 		max-width: 76rem;
 		margin: 3.5rem auto 0;
 		padding: 1.75rem 1.5rem 0;
@@ -844,12 +624,5 @@
 		font-size: 0.95rem;
 		color: var(--muted);
 		max-inline-size: 46rem;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.rd-tile,
-		.rd-btn {
-			transition: none;
-		}
 	}
 </style>
