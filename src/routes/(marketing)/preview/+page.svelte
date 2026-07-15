@@ -2,8 +2,8 @@
 	/**
 	 * A live, in-app preview of the fresh marketing direction — light only, on Mona
 	 * Sans with Geist Mono for figures (the app's own faces). A refined token set:
-	 * a deep emerald brand (education, and deliberately not the app's blue), a warm
-	 * gold for accents, warm-neutral paper and ink. English content; money is the
+	 * an indigo-violet brand (modern, and deliberately not the app's blue), a warm
+	 * gold for accents, cool-neutral paper and ink. English content; money is the
 	 * taka glyph ৳ with lakh/crore grouping. Run the app and visit /preview.
 	 */
 	import { Icon } from '$lib/components';
@@ -262,34 +262,34 @@
 
 <style>
 	/*
-		Design tokens — light only, scoped to .rd. Two brand hues (a deep emerald and a
-		warm gold), warm-neutral paper and ink, and shape/shadow tokens so radii and
+		Design tokens — light only, scoped to .rd. Two brand hues (an indigo-violet and
+		a warm gold), cool-neutral paper and ink, and shape/shadow tokens so radii and
 		elevation are named once. Nothing here leaks past .rd, and it never themes dark.
 	*/
 	.rd {
-		/* Brand — deep emerald: education, calm, and deliberately not the app's blue. */
-		--brand: #0d7d5e;
-		--brand-strong: #0a5f47;
-		--brand-tint: #e7f4ef;
+		/* Brand — indigo-violet: modern and premium, and deliberately not the app's blue. */
+		--brand: #5b4bc4;
+		--brand-strong: #453796;
+		--brand-tint: #edebfb;
 
-		/* Gold — a warm second accent, for badges and the "attention" figure. */
+		/* Gold — a warm second accent; violet and gold is a classic premium pair. */
 		--gold: #b7791f;
 		--gold-tint: #f7efda;
 
-		/* Neutrals — warm, faintly green, so the grays read considered not default. */
-		--ink: #16211c;
-		--muted: #59635d;
-		--line: #e6eae6;
-		--bg: #f6f8f6;
+		/* Neutrals — faintly cool, so the grays sit with the brand rather than against it. */
+		--ink: #1a1830;
+		--muted: #605c74;
+		--line: #e7e5f0;
+		--bg: #f7f6fb;
 		--surface: #ffffff;
-		--surface-2: #eef2ef;
+		--surface-2: #f0eef8;
 
 		/* Shape & elevation. */
 		--r-sm: 10px;
 		--r: 16px;
 		--r-lg: 22px;
 		--pill: 999px;
-		--shadow: 0 1px 2px rgba(22, 33, 28, 0.04), 0 18px 40px -26px rgba(10, 95, 71, 0.22);
+		--shadow: 0 1px 2px rgba(26, 24, 48, 0.04), 0 18px 40px -26px rgba(69, 55, 150, 0.24);
 
 		--body: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
 		--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
