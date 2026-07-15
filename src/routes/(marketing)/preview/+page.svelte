@@ -31,7 +31,7 @@
 		{
 			icon: School01Icon,
 			name: 'School',
-			tone: 'brand',
+			tone: 'indigo',
 			line: 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'
 		},
 		{
@@ -58,7 +58,7 @@
 		{
 			icon: MagicWand01Icon,
 			name: 'Create',
-			tone: 'brand',
+			tone: 'indigo',
 			line: 'Courses, 16 quiz types, certificates, AI Studio.'
 		},
 		{
@@ -279,19 +279,23 @@
 		elevation are named once. Nothing here leaks past .rd, and it never themes dark.
 	*/
 	.rd {
-		/* Brand — indigo-violet: modern and premium, and deliberately not the app's blue. */
-		--brand: #5b4bc4;
-		--brand-strong: #453796;
-		--brand-tint: #edebfb;
+		/* Brand — deep teal: premium and calm, pairs with the gold, and clearly not the
+		   app's blue. (Swap these three to retheme: emerald #047857, plum #9d174d,
+		   terracotta #b4491f, or forest #15803d are the alternates on the table.) */
+		--brand: #0f766e;
+		--brand-strong: #0b5a53;
+		--brand-tint: #e0f2ef;
 
-		/* Gold — a warm second accent; violet and gold is a classic premium pair. */
+		/* Gold — a warm second accent; teal and gold is a classic, calm pair. */
 		--gold: #b7791f;
 		--gold-tint: #f7efda;
 
 		/* A small spectrum for icon chips, so a grid of them reads as variety, not a
 		   wall of one color. Each is a saturated ink over a pale tint of itself. */
-		--teal: #0f766e;
-		--teal-tint: #ddf1ee;
+		--indigo: #4f46e5;
+		--indigo-tint: #e8e7fb;
+		--teal: #0d9488;
+		--teal-tint: #d8f2ee;
 		--violet: #7c3aed;
 		--violet-tint: #efe8fd;
 		--amber: #c2620c;
@@ -299,13 +303,13 @@
 		--rose: #be185d;
 		--rose-tint: #fbe4ee;
 
-		/* Neutrals — faintly cool, so the grays sit with the brand rather than against it. */
-		--ink: #1a1830;
-		--muted: #605c74;
-		--line: #e7e5f0;
-		--bg: #f7f6fb;
+		/* Neutrals — warm, faintly green, so the grays sit with the teal not against it. */
+		--ink: #17211d;
+		--muted: #5b655f;
+		--line: #e6eae7;
+		--bg: #f6f8f6;
 		--surface: #ffffff;
-		--surface-2: #f0eef8;
+		--surface-2: #eef2f0;
 
 		/* Shape & elevation. */
 		--r-sm: 10px;
@@ -345,17 +349,16 @@
 		padding-bottom: 4rem;
 	}
 
+	/* The menu blends into the hero — no bar, no border, no blur. It sits on the
+	   aurora at the top of the page, aligned to the hero's own width, and scrolls
+	   away with it rather than pinning as a separate strip. */
 	.rd-bar {
-		position: sticky;
-		top: 0;
-		z-index: 10;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.9rem 1.5rem;
-		background: color-mix(in oklab, var(--bg) 84%, transparent);
-		backdrop-filter: blur(10px);
-		border-bottom: 1px solid var(--line);
+		max-width: 76rem;
+		margin: 0 auto;
+		padding: 1.4rem 1.5rem 0;
 	}
 	.rd-brand {
 		display: inline-flex;
@@ -411,7 +414,7 @@
 	.rd-hero {
 		max-width: 76rem;
 		margin: 0 auto;
-		padding: 4.5rem 1.5rem 3rem;
+		padding: 3rem 1.5rem 3rem;
 		display: grid;
 		gap: 3rem;
 		align-items: center;
@@ -513,6 +516,9 @@
 	}
 	.rd-ink {
 		color: var(--ink);
+	}
+	.rd-indigo {
+		color: var(--indigo);
 	}
 	.rd-teal {
 		color: var(--teal);
@@ -645,6 +651,10 @@
 	.rd-ic-ink {
 		background: var(--surface-2);
 		color: var(--ink);
+	}
+	.rd-ic-indigo {
+		background: var(--indigo-tint);
+		color: var(--indigo);
 	}
 	.rd-ic-teal {
 		background: var(--teal-tint);
