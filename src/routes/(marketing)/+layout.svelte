@@ -55,14 +55,16 @@
 		--r: 16px;
 		--r-lg: 22px;
 
-		/* Frosted glass, named once so a card and a panel agree. */
-		--glass: color-mix(in oklab, var(--surface) 55%, transparent);
-		--glass-border: color-mix(in oklab, #ffffff 60%, transparent);
-		--glass-blur: blur(22px) saturate(1.4);
+		/* A whisper of glass, named once so a card and a panel agree. Mostly a solid
+		   surface with just a hint of the aurora bleeding through and a gentle blur —
+		   halfway between a standard card and a frosted one, not the full frost. */
+		--glass: color-mix(in oklab, var(--surface) 86%, transparent);
+		--glass-border: color-mix(in oklab, #ffffff 45%, var(--line));
+		--glass-blur: blur(10px) saturate(1.15);
 		--glass-shadow:
-			0 14px 36px -30px rgba(33, 24, 32, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-		--tint: color-mix(in oklab, #ffffff 45%, transparent);
-		--tint-border: color-mix(in oklab, #ffffff 55%, transparent);
+			0 12px 30px -28px rgba(33, 24, 32, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+		--tint: color-mix(in oklab, var(--surface-2) 82%, transparent);
+		--tint-border: var(--line);
 
 		color: var(--ink);
 	}

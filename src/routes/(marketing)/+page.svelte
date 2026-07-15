@@ -1,101 +1,726 @@
 <script lang="ts">
-	import { MarketingFooter } from '$lib/components';
+	/**
+	 * The landing, in the locked marketing design — frosted glass, berry brand, over a
+	 * fixed aurora — composed from the UI kit. Light only. English content, ৳ pricing.
+	 * The real footer carries the nav; CTAs point at the real routes.
+	 */
+	import { resolve } from '$app/paths';
+	import { Icon, MarketingFooter } from '$lib/components';
+	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
 	import {
-		Capabilities,
-		Certificates,
-		Closing,
-		Hero,
-		Nav,
-		Platform,
-		QUESTION_TYPES,
-		Sales,
-		Segments,
-		Showcase
-	} from '$lib/features/marketing';
+		ArrowRight01Icon,
+		ArrowUpRight01Icon,
+		Mortarboard01Icon,
+		School01Icon,
+		Building01Icon,
+		Mosque01Icon,
+		UserGroupIcon,
+		UserMultipleIcon,
+		MagicWand01Icon,
+		Message02Icon,
+		Wallet01Icon,
+		Task01Icon,
+		Coins01Icon,
+		PenTool03Icon,
+		CheckmarkBadge01Icon,
+		BookOpen01Icon
+	} from '@hugeicons/core-free-icons';
+
+	const taka = (minor: number) =>
+		'৳' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(minor / 100);
+	const num = (n: number) => new Intl.NumberFormat('en-IN').format(n);
+
+	const solutions = [
+		{
+			icon: School01Icon,
+			tone: 'indigo',
+			name: 'School',
+			line: 'Sections, GPA-5 report cards, transfer certificates, guardian SMS.'
+		},
+		{
+			icon: Building01Icon,
+			tone: 'teal',
+			name: 'College',
+			line: 'Streams, semesters, transcripts, admissions.'
+		},
+		{
+			icon: Mosque01Icon,
+			tone: 'violet',
+			name: 'Madrasa',
+			line: 'Ebtedayee to Kamil, Hifz tracking, Arabic (RTL) curriculum.'
+		},
+		{
+			icon: UserGroupIcon,
+			tone: 'amber',
+			name: 'Coaching',
+			line: 'Batches, model-test leaderboards, pay-per-course.'
+		}
+	] as const;
+
+	const pillars = [
+		{
+			icon: MagicWand01Icon,
+			tone: 'indigo',
+			name: 'Create',
+			line: 'Courses, 16 quiz types, certificates, AI Studio.'
+		},
+		{
+			icon: Message02Icon,
+			tone: 'rose',
+			name: 'Engage',
+			line: 'Forum, Q&A, reviews, gamification, notifications.'
+		},
+		{
+			icon: Wallet01Icon,
+			tone: 'teal',
+			name: 'Earn',
+			line: 'bKash & SSLCommerz first — 0% platform fee. You are the merchant.'
+		},
+		{
+			icon: Task01Icon,
+			tone: 'amber',
+			name: 'Manage',
+			line: 'Attendance, exams, report cards, timetable, staff.'
+		}
+	] as const;
+
+	const showcases = [
+		{
+			icon: PenTool03Icon,
+			tone: 'indigo',
+			title: 'Author, in the order you build',
+			lead: 'Topics, then lessons, then the work. Reorder by drag or by keyboard; nothing unpublished is visible to anyone.',
+			points: [
+				'Text and video lessons, with a free preview clip',
+				'Drip by date, by days after enrolling, or one lesson at a time',
+				'Prerequisites gate a course on finishing another'
+			]
+		},
+		{
+			icon: CheckmarkBadge01Icon,
+			tone: 'rose',
+			title: 'Assess and mark, on your scale',
+			lead: '16 question types, graded the moment they are submitted — except the ones only a person can judge, which queue and wait.',
+			points: [
+				'A question bank: write once, reuse anywhere',
+				'Assignments with file upload, late work allowed or refused',
+				'A gradebook: every learner, every graded item, one table'
+			]
+		},
+		{
+			icon: BookOpen01Icon,
+			tone: 'teal',
+			title: 'A course page worth an evening',
+			lead: 'A learner sees the preview, who teaches it, how hard it is, and what those who finished made of it.',
+			points: [
+				'Private notes and highlights against the lesson',
+				'Progress recomputed the moment a lesson completes',
+				'Reviews and ratings from learners who took it'
+			]
+		}
+	] as const;
+
+	const kpis = [
+		{ icon: Coins01Icon, tone: 'teal', label: 'Fees collected', value: taka(184250000) },
+		{ icon: Wallet01Icon, tone: 'amber', label: 'Outstanding', value: taka(31200000) },
+		{ icon: UserGroupIcon, tone: 'violet', label: 'Attendance', value: `${num(92)}%` },
+		{ icon: UserMultipleIcon, tone: 'rose', label: 'New admissions', value: `${num(18)}` }
+	] as const;
+
+	const gateways = [
+		['bKash', 62, '#e2136e'],
+		['SSLCommerz', 24, 'var(--brand)'],
+		['Cash', 14, 'var(--muted)']
+	] as const;
+
+	const gpa = 4.83;
+	const gaugeEnd = (() => {
+		const theta = ((180 - (gpa / 5) * 180) * Math.PI) / 180;
+		return { x: 60 + 54 * Math.cos(theta), y: 60 - 54 * Math.sin(theta) };
+	})();
 </script>
 
 <svelte:head>
-	<title>Muallim — teach it, mark it, certify it, sell it</title>
+	<title>Muallim — run the whole institution, teach the whole world</title>
 	<meta
 		name="description"
-		content="A learning platform for schools and creators: courses, quizzes, assignments, a gradebook, a forum, verifiable certificates, and course sales through your own payment account."
+		content="One platform for a school, a college, a madrasa, or a coaching center: courses, 16 quiz types, certificates, attendance, exams and report cards, fees through your own bKash or SSLCommerz account — 0% platform fee."
 	/>
 </svelte:head>
 
-<Nav />
+<div class="page">
+	<header class="menu">
+		<span class="brand"><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</span>
+		<div class="menu-actions">
+			<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
+			<Button href={resolve('/register')} size="sm"
+				>Start free <Icon icon={ArrowRight01Icon} class="size-4" /></Button
+			>
+		</div>
+	</header>
 
-<main>
-	<Hero />
-
-	<Showcase
-		id="author"
-		index={1}
-		eyebrow="Author"
-		title="A course, in the order you actually build one"
-		lead="Topics, then lessons, then the work. Reorder by drag, by keyboard, or by the arrows beside a row — and nothing you have not published is visible to anybody."
-		points={[
-			'Text and video lessons, with a preview that plays before anyone enrolls',
-			'Drip a course: on a date, so many days after enrolling, or one lesson at a time',
-			'A course can require another course first',
-			'A draft is filtered out of the catalog, not merely hidden from a menu'
-		]}
-		src="/marketing/editor.webp"
-		alt="The course editor: topics with their lessons, each row draggable, each lesson labelled and previewable."
-		path="muallim.app/teach/medicine-the-canon"
-	/>
-
-	<Showcase
-		id="assess"
-		index={2}
-		eyebrow="Assess and mark"
-		title="Grade it against your scale, not ours"
-		lead="Eleven question types, graded the moment they are submitted — except the ones only a person can judge, which queue up and wait for you."
-		points={[
-			'A question bank: write a question once, reuse it in any quiz',
-			'Attempts resume where the learner left them',
-			'Assignments with file upload, and late work allowed or refused',
-			'A gradebook: every learner, every graded item, one table'
-		]}
-		src="/marketing/grading.webp"
-		alt="The grading scales page: the workspace's default scale, and a new scale being built band by band with a live preview."
-		path="muallim.app/teach/grading"
-		flip
-		tinted
-	>
-		<div class="flex flex-wrap gap-1.5">
-			{#each QUESTION_TYPES as type (type)}
-				<span
-					class="squircle-sm bg-surface px-2.5 py-1 text-xs font-medium text-muted ring-1 ring-border"
+	<section class="hero">
+		<div>
+			<Tag>New — sell a course from your own bKash or SSLCommerz account</Tag>
+			<h1 class="h1">
+				<span>Run the whole institution.</span>
+				<span class="accent">Teach the whole world.</span>
+			</h1>
+			<p class="sub">
+				From roll-call to result card, bKash to certificate — one platform for a school, a college,
+				a madrasa, or a coaching center.
+			</p>
+			<div class="cta">
+				<Button href={resolve('/register')}
+					>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
 				>
-					{type}
-				</span>
+				<Button href={resolve('/courses')} variant="ghost">
+					Browse courses <Icon icon={ArrowUpRight01Icon} class="size-5" />
+				</Button>
+			</div>
+		</div>
+
+		<Card>
+			<div class="cardhead">
+				<span class="cardname">Baitul Ilm Dakhil Madrasa</span>
+				<span class="muted-xs">This month</span>
+			</div>
+			<div class="stats">
+				<Card subtle class="flex flex-col gap-1.5">
+					<span class="label">Fees collected</span>
+					<span class="fig c-brand">{taka(184250000)}</span>
+				</Card>
+				<Card subtle class="flex flex-col gap-1.5">
+					<span class="label">Outstanding dues</span>
+					<span class="fig c-amber">{taka(31200000)}</span>
+				</Card>
+			</div>
+			<div class="row">
+				<span class="label">Attendance today</span>
+				<span class="meter" aria-hidden="true"><span style="width: 92%"></span></span>
+				<span class="mono">{num(92)}%</span>
+			</div>
+			<div class="gpa">
+				<span class="label">Dakhil result</span>
+				<span class="gpa-fig mono">{num(4.83)}<small>/{num(5)}</small></span>
+				<span class="grade">A+</span>
+			</div>
+			<div class="ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
+		</Card>
+	</section>
+
+	<section class="section">
+		<h2 class="h2">Made for every kind of institution</h2>
+		<div class="grid">
+			{#each solutions as s (s.name)}
+				<Card class="tile">
+					<IconChip icon={s.icon} tone={s.tone} />
+					<h3 class="tile-title">{s.name}</h3>
+					<p class="tile-line">{s.line}</p>
+				</Card>
 			{/each}
 		</div>
-	</Showcase>
+	</section>
 
-	<Showcase
-		id="learn"
-		index={3}
-		eyebrow="Learn"
-		title="A course page worth an evening"
-		lead="Before a learner commits, they see the preview video, who teaches it, how hard it is, and what the people who finished it made of it."
-		points={[
-			'Private notes and highlights, kept against the lesson they were made in',
-			'Progress recomputed the moment a lesson is completed',
-			'Deadlines on the dashboard: what is owed, and when it is late',
-			'Reviews and star ratings, written by learners who took the course'
-		]}
-		src="/marketing/course.webp"
-		alt="A course page: the preview video, the level, the rating, the instructor, and the panel a learner enrolls from."
-		path="muallim.app/courses/medicine-the-canon"
-	/>
+	<section class="section">
+		<h2 class="h2">Everything under one roof</h2>
+		<div class="grid">
+			{#each pillars as p, i (p.name)}
+				<Card class="tile">
+					<IconChip icon={p.icon} tone={p.tone} />
+					<span class="mono tile-num">0{i + 1}</span>
+					<h3 class="tile-title">{p.name}</h3>
+					<p class="tile-line">{p.line}</p>
+				</Card>
+			{/each}
+		</div>
+	</section>
 
-	<Sales />
-	<Certificates />
-	<Capabilities />
-	<Segments />
-	<Platform />
-	<Closing />
-</main>
+	<section class="section">
+		<h2 class="h2">From the first lesson to the last mark</h2>
+		<div class="grid grid-3">
+			{#each showcases as sc (sc.title)}
+				<Card class="tile">
+					<IconChip icon={sc.icon} tone={sc.tone} />
+					<h3 class="tile-title">{sc.title}</h3>
+					<p class="tile-line">{sc.lead}</p>
+					<ul class="points">
+						{#each sc.points as pt (pt)}
+							<li>{pt}</li>
+						{/each}
+					</ul>
+				</Card>
+			{/each}
+		</div>
+	</section>
+
+	<section class="section">
+		<Card class="pricing">
+			<div>
+				<h2 class="h2">You sell. We take nothing.</h2>
+				<p class="lead">
+					The school is the merchant of record — you own your money, your refunds, your students.
+					Price a course in ৳, take fees through your own bKash or SSLCommerz account, and keep
+					<strong>100%</strong>. No platform cut, no contact caps.
+				</p>
+				<div class="cta">
+					<Button href={resolve('/register')}
+						>Create a workspace <Icon icon={ArrowRight01Icon} class="size-5" /></Button
+					>
+				</div>
+			</div>
+			<Card subtle class="pricing-figure">
+				<span class="label">Platform fee</span>
+				<span class="big mono c-brand">0%</span>
+				<span class="muted-xs">on every taka you collect</span>
+			</Card>
+		</Card>
+	</section>
+
+	<section class="section">
+		<h2 class="h2">See it run a madrasa</h2>
+		<p class="lead">A principal's month, at a glance.</p>
+		<Card class="mt-6">
+			<div class="kpis">
+				{#each kpis as k (k.label)}
+					<Card subtle class="flex flex-col gap-2">
+						<IconChip icon={k.icon} tone={k.tone} />
+						<span class="label">{k.label}</span>
+						<span class="kpi-fig mono c-{k.tone}">{k.value}</span>
+					</Card>
+				{/each}
+			</div>
+			<div class="panels">
+				<Card subtle class="!p-[1.1rem]">
+					<span class="panel-title">How fees came in</span>
+					<div class="split" aria-hidden="true">
+						{#each gateways as [, pct, color] (color)}
+							<span style="width: {pct}%; background: {color}"></span>
+						{/each}
+					</div>
+					<ul class="legend">
+						{#each gateways as [name, pct, color] (name)}
+							<li>
+								<span class="dot" style="background: {color}"></span>{name}
+								<span class="mono">{num(pct)}%</span>
+							</li>
+						{/each}
+					</ul>
+				</Card>
+				<Card subtle class="!p-[1.1rem] flex flex-col items-center justify-center">
+					<span class="panel-title">Dakhil board result</span>
+					<svg viewBox="0 0 120 70" class="gauge" role="img" aria-label="GPA 4.83 of 5">
+						<path d="M 6 60 A 54 54 0 0 1 114 60" class="gauge-track" />
+						<path
+							d="M 6 60 A 54 54 0 0 1 {gaugeEnd.x.toFixed(2)} {gaugeEnd.y.toFixed(2)}"
+							class="gauge-fill"
+						/>
+					</svg>
+					<span class="gauge-fig mono">{num(4.83)}<small> / {num(5)}</small></span>
+				</Card>
+			</div>
+		</Card>
+	</section>
+
+	<section class="section closing">
+		<h2 class="h2">Bring your whole institution online.</h2>
+		<div class="cta">
+			<Button href={resolve('/register')}
+				>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
+			>
+			<Button href={resolve('/login')} variant="ghost">Sign in</Button>
+		</div>
+	</section>
+</div>
 
 <MarketingFooter />
+
+<style>
+	.page {
+		background-color: var(--bg);
+		background-image:
+			radial-gradient(
+				50rem 40rem at 8% 4%,
+				color-mix(in oklab, var(--brand) 24%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				46rem 38rem at 94% 8%,
+				color-mix(in oklab, var(--gold) 20%, transparent),
+				transparent 58%
+			),
+			radial-gradient(
+				46rem 40rem at 88% 70%,
+				color-mix(in oklab, var(--indigo) 16%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				42rem 38rem at 8% 92%,
+				color-mix(in oklab, var(--teal) 14%, transparent),
+				transparent 60%
+			);
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		padding-bottom: 5rem;
+	}
+
+	.menu {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: 76rem;
+		margin: 0 auto;
+		padding: 1.4rem 1.5rem 0;
+	}
+	.menu-actions {
+		display: flex;
+		gap: 0.6rem;
+	}
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 700;
+		font-size: 1.2rem;
+		letter-spacing: -0.01em;
+		color: var(--brand);
+	}
+
+	.hero {
+		max-width: 76rem;
+		margin: 0 auto;
+		padding: 3rem 1.5rem 3rem;
+		display: grid;
+		gap: 3rem;
+		align-items: center;
+	}
+	@media (min-width: 900px) {
+		.hero {
+			grid-template-columns: 1.1fr 0.9fr;
+		}
+	}
+	.h1 {
+		font-weight: 700;
+		font-size: clamp(2.5rem, 5.5vw, 4.1rem);
+		line-height: 1.03;
+		letter-spacing: -0.03em;
+		margin: 1.4rem 0 0;
+	}
+	.h1 span {
+		display: block;
+	}
+	.h1 .accent {
+		color: var(--brand);
+	}
+	.sub {
+		margin-top: 1.3rem;
+		max-width: 34rem;
+		font-size: 1.12rem;
+		line-height: 1.6;
+		color: var(--muted);
+	}
+	.cta {
+		margin-top: 2rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9rem;
+	}
+
+	.label {
+		font-size: 0.75rem;
+		color: var(--muted);
+	}
+	.muted-xs {
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
+	.mono {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		font-size: 0.85rem;
+	}
+	.c-brand {
+		color: var(--brand);
+	}
+	.c-teal {
+		color: var(--teal);
+	}
+	.c-amber {
+		color: var(--amber);
+	}
+	.c-violet {
+		color: var(--violet);
+	}
+	.c-rose {
+		color: var(--rose);
+	}
+	.fig {
+		font-family: var(--font-mono);
+		font-size: 1.15rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.cardhead {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.cardname {
+		font-weight: 700;
+		font-size: 1.05rem;
+	}
+	.stats {
+		margin-top: 1.2rem;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.9rem;
+	}
+	.row {
+		margin-top: 0.9rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.meter {
+		flex: 1;
+		height: 8px;
+		border-radius: 999px;
+		background: var(--line);
+		overflow: hidden;
+		display: block;
+	}
+	.meter span {
+		display: block;
+		height: 100%;
+		background: var(--brand);
+	}
+	.gpa {
+		margin-top: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--line);
+	}
+	.gpa-fig {
+		font-size: 1.4rem;
+		font-weight: 700;
+		margin-inline-start: auto;
+	}
+	.gpa-fig small {
+		color: var(--muted);
+		font-weight: 400;
+	}
+	.grade {
+		background: var(--brand-tint);
+		color: var(--brand);
+		font-weight: 700;
+		border-radius: 8px;
+		padding: 0.2rem 0.5rem;
+		font-size: 0.9rem;
+	}
+	.ladder {
+		margin-top: 1rem;
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
+
+	.section {
+		max-width: 76rem;
+		margin: 4rem auto 0;
+		padding: 0 1.5rem;
+	}
+	.h2 {
+		font-weight: 700;
+		font-size: clamp(1.7rem, 3vw, 2.3rem);
+		letter-spacing: -0.02em;
+	}
+	.lead {
+		margin-top: 0.5rem;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+	.grid {
+		margin-top: 1.5rem;
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(1, 1fr);
+	}
+	@media (min-width: 640px) {
+		.grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (min-width: 980px) {
+		.grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+		.grid-3 {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+	.tile-num {
+		display: block;
+		margin-top: 0.9rem;
+		color: var(--muted);
+		font-weight: 600;
+	}
+	.tile-title {
+		font-weight: 700;
+		font-size: 1.2rem;
+		margin: 0.5rem 0 0.4rem;
+	}
+	.tile-line {
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--muted);
+		margin: 0;
+	}
+	.points {
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.points li {
+		position: relative;
+		padding-inline-start: 1.1rem;
+		font-size: 0.86rem;
+		color: var(--muted);
+		line-height: 1.45;
+	}
+	.points li::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 0;
+		top: 0.45rem;
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: var(--brand);
+	}
+
+	.pricing {
+		display: grid;
+		gap: 1.5rem;
+		align-items: center;
+	}
+	@media (min-width: 780px) {
+		.pricing {
+			grid-template-columns: 1.4fr 0.8fr;
+		}
+	}
+	.pricing-figure {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		align-items: center;
+		justify-content: center;
+	}
+	.big {
+		font-size: 3.5rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.kpis {
+		display: grid;
+		gap: 0.9rem;
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@media (min-width: 720px) {
+		.kpis {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+	.kpi-fig {
+		font-size: 1.3rem;
+		font-weight: 700;
+	}
+	.panels {
+		margin-top: 0.9rem;
+		display: grid;
+		gap: 0.9rem;
+		grid-template-columns: 1fr;
+	}
+	@media (min-width: 720px) {
+		.panels {
+			grid-template-columns: 1.4fr 1fr;
+		}
+	}
+	.panel-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--muted);
+	}
+	.split {
+		margin-top: 0.8rem;
+		display: flex;
+		height: 12px;
+		border-radius: 999px;
+		overflow: hidden;
+		gap: 2px;
+	}
+	.split span {
+		display: block;
+	}
+	.legend {
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.82rem;
+	}
+	.legend li {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--muted);
+	}
+	.dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+		display: inline-block;
+	}
+	.gauge {
+		width: 160px;
+		max-width: 100%;
+		margin-top: 0.4rem;
+	}
+	.gauge-track {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 10;
+		stroke-linecap: round;
+	}
+	.gauge-fill {
+		fill: none;
+		stroke: var(--brand);
+		stroke-width: 10;
+		stroke-linecap: round;
+	}
+	.gauge-fig {
+		font-size: 1.3rem;
+		font-weight: 700;
+		margin-top: -0.4rem;
+	}
+	.gauge-fig small {
+		color: var(--muted);
+		font-weight: 400;
+	}
+
+	.closing {
+		text-align: center;
+	}
+	.closing .cta {
+		justify-content: center;
+	}
+</style>
