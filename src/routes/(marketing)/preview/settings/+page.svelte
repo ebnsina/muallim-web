@@ -120,25 +120,38 @@
 		background-color: var(--bg);
 		background-image:
 			radial-gradient(
-				40rem 30rem at 25% 0%,
-				color-mix(in oklab, var(--brand) 16%, transparent),
+				38rem 30rem at 18% 6%,
+				color-mix(in oklab, var(--brand) 30%, transparent),
 				transparent 60%
 			),
 			radial-gradient(
-				34rem 26rem at 100% 100%,
-				color-mix(in oklab, var(--indigo) 12%, transparent),
+				34rem 28rem at 100% 96%,
+				color-mix(in oklab, var(--indigo) 26%, transparent),
+				transparent 60%
+			),
+			radial-gradient(
+				30rem 24rem at 78% 12%,
+				color-mix(in oklab, var(--amber) 18%, transparent),
 				transparent 60%
 			);
 		background-repeat: no-repeat;
 	}
 
+	/* Frosted glass — a translucent surface over the aurora, blurred so the color
+	   behind it softens through. The white inner hairline is the lit top edge of the
+	   glass; the soft shadow floats it off the page. */
 	.st-card {
 		width: 100%;
 		max-width: 30rem;
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 22px;
+		background: color-mix(in oklab, var(--surface) 58%, transparent);
+		backdrop-filter: blur(28px) saturate(1.5);
+		-webkit-backdrop-filter: blur(28px) saturate(1.5);
+		border: 1px solid color-mix(in oklab, #ffffff 65%, transparent);
+		border-radius: 24px;
 		padding: 1.75rem;
+		box-shadow:
+			0 24px 60px -30px rgba(33, 24, 32, 0.4),
+			inset 0 1px 0 rgba(255, 255, 255, 0.65);
 	}
 
 	.st-title {
