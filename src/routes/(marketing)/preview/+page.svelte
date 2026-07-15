@@ -1,13 +1,11 @@
 <script lang="ts">
 	/**
-	 * A live, in-app preview of the fresh design direction — ink + marigold + jade on
-	 * manuscript paper. Content is English; money is Bangladeshi, shown with the taka
-	 * glyph ৳ and lakh/crore grouping (the way ৳18,42,500 is actually read here).
-	 * Self-contained: its own scoped palette and fonts, touching none of the app's
-	 * tested token system. Run the app and visit /preview; nothing ships to the live
-	 * landing yet.
+	 * A live, in-app preview of the fresh marketing direction — light, clean, with an
+	 * emerald accent (deliberately not the app's blue). Mona Sans for language, Geist
+	 * Mono for figures — the app's own faces. Content is English; money is
+	 * Bangladeshi, the taka glyph ৳ with lakh/crore grouping (৳18,42,500). Light only:
+	 * marketing does not theme. Run the app and visit /preview.
 	 */
-	let dark = $state(false);
 
 	// ৳ with English digits and lakh/crore grouping. English currency locales print
 	// the letters "BDT", so the glyph is composed onto an en-IN number instead.
@@ -51,18 +49,11 @@
 
 <svelte:head><title>Muallim — design preview</title></svelte:head>
 
-<div class="rd" class:rd-dark={dark}>
+<div class="rd">
 	<div class="rd-paper">
 		<header class="rd-bar">
 			<span class="rd-brand">Muallim</span>
-			<button
-				type="button"
-				class="rd-chip rd-theme"
-				onclick={() => (dark = !dark)}
-				aria-pressed={dark}
-			>
-				{dark ? '☾ Dark' : '☀ Light'}
-			</button>
+			<a class="rd-btn rd-btn-solid rd-btn-sm" href="#start">Start free</a>
 		</header>
 
 		<!-- Hero -->
@@ -225,41 +216,34 @@
 </div>
 
 <style>
-	/* Scoped palette — ink + marigold + jade on manuscript paper. Light by default;
-	   .rd-dark flips it. Nothing here leaks past .rd. */
+	/* Scoped, light-only palette — clean neutrals with an emerald accent, chosen to
+	   sit apart from the app's blue. Mona Sans and Geist Mono are the app's own faces,
+	   loaded globally. Nothing here leaks past .rd, and it never themes to dark. */
 	.rd {
-		--paper: #f6f1e7;
-		--surface: #fffdf8;
-		--ink: #1c2230;
-		--muted: #5c5647;
-		--line: #e6decd;
-		--marigold: #c77a06;
-		--jade: #0f7a64;
+		--paper: #fafaf8;
+		--surface: #ffffff;
+		--ink: #17190f;
+		--muted: #64655c;
+		--line: #ecebe5;
+		--jade: #047857; /* emerald — the primary accent */
+		--jade-bright: #059669;
+		--marigold: #c2410c; /* a warm terracotta, used sparingly */
 
-		--display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
-		--body: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
-		--mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+		--body: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+		--display: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+		--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
 
 		color: var(--ink);
 		font-family: var(--body);
 	}
 
-	.rd-dark {
-		--paper: #111420;
-		--surface: #191d2a;
-		--ink: #eee7d7;
-		--muted: #9a9585;
-		--line: #2a2f3e;
-		--marigold: #f2a93b;
-		--jade: #38b79c;
-	}
-
-	/* The alpana dots: a faint dotted ground, the rice-paste floor art abstracted. */
+	/* A whisper of a dotted ground — barely there, so the page reads as clean light
+	   rather than textured. */
 	.rd-paper {
 		min-height: 100vh;
 		background-color: var(--paper);
 		background-image: radial-gradient(var(--line) 1px, transparent 1px);
-		background-size: 22px 22px;
+		background-size: 26px 26px;
 		padding-bottom: 4rem;
 	}
 
@@ -281,15 +265,9 @@
 		font-size: 1.2rem;
 		letter-spacing: -0.01em;
 	}
-	.rd-chip {
-		border: 1px solid var(--line);
-		background: var(--surface);
-		color: var(--muted);
-		font: inherit;
+	.rd-btn-sm {
+		padding: 0.45rem 1rem;
 		font-size: 0.85rem;
-		padding: 0.35rem 0.85rem;
-		border-radius: 999px;
-		cursor: pointer;
 	}
 
 	.rd-hero {

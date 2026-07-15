@@ -50,7 +50,7 @@
 					<div class="rounded-overlay border border-border bg-surface-raised p-2 shadow-lg">
 						{#each SEGMENTS as s (s.slug)}
 							<a
-								href={resolve('/solutions/[slug]', { slug: s.slug })}
+								href={resolve('/(marketing)/solutions/[slug]', { slug: s.slug })}
 								class="block rounded-control px-3 py-2.5 transition-colors hover:bg-surface"
 							>
 								<span class="font-medium">{s.nav}</span>

@@ -28,7 +28,7 @@
 						<li>
 							<a
 								class="underline-offset-4 hover:underline"
-								href={resolve('/solutions/[slug]', { slug: s.slug })}
+								href={resolve('/(marketing)/solutions/[slug]', { slug: s.slug })}
 							>
 								{s.nav}
 							</a>

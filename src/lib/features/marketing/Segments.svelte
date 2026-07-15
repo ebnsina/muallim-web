@@ -19,7 +19,7 @@
 		{#each SEGMENTS as segment, i (segment.slug)}
 			<li use:inview={{ delay: i * 60 }}>
 				<a
-					href={resolve('/solutions/[slug]', { slug: segment.slug })}
+					href={resolve('/(marketing)/solutions/[slug]', { slug: segment.slug })}
 					class="group flex items-center gap-6 border-b border-border py-6 transition-colors hover:bg-surface-sunken"
 				>
 					<Icon icon={segment.heroIcon} class="size-5 shrink-0 text-accent-text" />
