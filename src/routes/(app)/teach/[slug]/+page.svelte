@@ -80,6 +80,7 @@
 	} from '$lib/schemas';
 	import { validated, type FieldErrors } from '$lib/validation';
 	import { Pill } from '$lib/pill.svelte';
+	import { accountStatusLabel } from '$lib/billing';
 	import { formatMoney } from '$lib/money';
 	import { cn } from '$lib/utils';
 	import { actionMessage, callAction } from '$lib/form';
@@ -1308,7 +1309,9 @@
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<h2 class="font-medium">Payments</h2>
 							<!-- The gateways themselves are the workspace's, not this course's. -->
-							<ActionLink href={resolve('/teach/payments')} tone="muted">All payment methods</ActionLink>
+							<ActionLink href={resolve('/teach/payments')} tone="muted"
+								>All payment methods</ActionLink
+							>
 						</div>
 
 						{#if !data.account}
@@ -1324,10 +1327,10 @@
 							</form>
 						{:else if !data.account.ready}
 							<p class="text-muted mt-1 text-sm">
-								Your account is connected, but it can’t take payments yet. Finish setting it up on the
-							Payments page.
+								Your account is connected, but it can’t take payments yet. Finish setting it up on
+								the Payments page.
 							</p>
-							<Badge tone="warning" class="mt-3">{data.account.status}</Badge>
+							<Badge tone="warning" class="mt-3">{accountStatusLabel(data.account.status)}</Badge>
 						{:else}
 							<p class="text-muted mt-1 text-sm">
 								What a learner pays for this course. Leave it empty to give it away.

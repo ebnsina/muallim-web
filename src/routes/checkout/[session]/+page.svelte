@@ -27,7 +27,9 @@
 		<p class="text-muted text-xs tracking-wide uppercase">Amount due</p>
 		<p class="numeral mt-1 text-4xl font-semibold tracking-tight">{formatMoney(data.price)}</p>
 
-		<p class="text-muted numeral mt-4 text-xs">{data.session}</p>
+		<!-- Labelled, because a bare string of characters tells the reader nothing about
+		     what it is or why they might ever need it. -->
+		<p class="text-muted numeral mt-4 text-xs">Reference: {data.session}</p>
 
 		<div class="mt-8 flex flex-col gap-3">
 			<form method="POST" action="?/pay" use:enhance>

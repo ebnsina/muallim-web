@@ -10,7 +10,7 @@
 	} from '@hugeicons/core-free-icons';
 	import type { IconSvgElement } from '@hugeicons/svelte';
 	import { Alert, Badge, Button, EmptyState, Icon, Page, PageHeader } from '$lib/components';
-	import { orderLabel, orderTone, type OrderStatus } from '$lib/billing';
+	import { gatewayLabel, orderLabel, orderTone, type OrderStatus } from '$lib/billing';
 	import { formatMoney } from '$lib/money';
 	import { toast } from '$lib/toast.svelte';
 	import type { PageProps } from './$types';
@@ -104,7 +104,7 @@
 								</Badge>
 							</td>
 
-							<td class="text-muted px-4 py-3 capitalize">{order.gateway}</td>
+							<td class="text-muted px-4 py-3">{gatewayLabel(order.gateway)}</td>
 
 							<td class="text-muted numeral px-4 py-3 whitespace-nowrap">
 								{when.format(new Date(order.created_at))}

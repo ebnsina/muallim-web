@@ -36,6 +36,40 @@ export function orderLabel(status: OrderStatus): string {
 	}
 }
 
+/*
+	What each gateway is called by the people who use it. The API's identifiers are
+	lowercase keys — printing them capitalised gives "Sslcommerz" and "Bkash", which
+	is not what either company is called. A gateway this list has not heard of is
+	shown as it came, since a made-up name would be worse than an unfamiliar one.
+*/
+const GATEWAY_LABEL: Record<string, string> = {
+	stripe: 'Stripe',
+	sslcommerz: 'SSLCommerz',
+	bkash: 'bKash',
+	// The driver that signs real events and takes no money — a rehearsal, not a brand.
+	fake: 'Practice payments'
+};
+
+/** What a gateway is called on screen. */
+export function gatewayLabel(gateway: string): string {
+	return GATEWAY_LABEL[gateway] ?? gateway;
+}
+
+/*
+	Where a workspace's own payment account stands, said plainly. "restricted" is the
+	gateway's word for it and tells the reader neither what is wrong nor what to do.
+*/
+export function accountStatusLabel(status: Account['status']): string {
+	switch (status) {
+		case 'active':
+			return 'Ready to take payments';
+		case 'pending':
+			return 'Waiting on the payment provider';
+		case 'restricted':
+			return 'Needs more details before it can take payments';
+	}
+}
+
 /**
  * bKash's three secrets, as the driver expects them: one JSON string in `secret`.
  *
