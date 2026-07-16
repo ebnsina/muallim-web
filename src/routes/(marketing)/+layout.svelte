@@ -12,9 +12,9 @@
 		of them agreed, and /solutions and /features had no footer at all. A page's job
 		is its content. The chrome is the shell's.
 
-		The landing floats its header over a hero photograph and everything else sits on
-		cream, so the tone follows the route — one header, two backdrops, rather than
-		two headers that drift.
+		Every page now opens on a dark hero band — the landing's photograph, a PageHero
+		gradient everywhere else — so the header floats over all of them. The `cream`
+		tone stays on SiteHeader for a page that ever opens on paper again.
 	*/
 	import { page } from '$app/state';
 	import { SiteFooter, SiteHeader } from '$lib/features/marketing/ui';
@@ -25,7 +25,7 @@
 </script>
 
 <div class="marketing" class:landing={onLanding}>
-	<SiteHeader tone={onLanding ? 'photo' : 'cream'} />
+	<SiteHeader tone="photo" />
 	{@render children()}
 	<SiteFooter />
 </div>
@@ -67,6 +67,27 @@
 		/* The second voice, for when one accent is not enough to separate two ideas. */
 		--lav: #dedbf6;
 		--lav-ink: #5b4fc4;
+
+		/* The dark hero band. The landing lays a photograph over this; every other page
+		   wears it plain, which is why it is a gradient and not an asset. White is the
+		   only ink that reads on it. */
+		--hero-backdrop:
+			linear-gradient(180deg, rgba(24, 20, 14, 0) 42%, rgba(18, 15, 10, 0.66) 100%),
+			linear-gradient(100deg, rgba(18, 15, 10, 0.44), rgba(18, 15, 10, 0) 55%),
+			radial-gradient(120% 100% at 62% 22%, #dccbb7, #bfae9c 62%, #8f8073);
+		--on-hero: #ffffff;
+
+		/* The closing CTA's gradient runs cream → this → --accent-band, landing on the
+		   band the footer sits in. Only the middle stop needed a name. */
+		--cta-mid: #eef2d4;
+		/* Body copy on that gradient: olive, but lighter than --ink-soft under lime. */
+		--cta-ink: #4a4d38;
+
+		/* Placeholder faces. Warm and deliberately off-palette — they stand in for
+		   photographs, not for the system's colours. */
+		--face-1: #c9b7a4;
+		--face-2: #8fae7a;
+		--face-3: #b9a0c6;
 
 		/* The spectrum, warm. Names kept from the old berry system so a page that
 		   asks for one still gets a colour, but every value now sits on cream. */

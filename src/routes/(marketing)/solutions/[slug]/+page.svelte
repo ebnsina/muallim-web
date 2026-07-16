@@ -6,7 +6,16 @@
 	 */
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
+	import {
+		Card,
+		Button,
+		Tag,
+		PageHero,
+		SiteCta,
+		TONES,
+		QUIET,
+		SCRIM
+	} from '$lib/features/marketing/ui';
 	import { ArrowRight01Icon, ArrowUpRight01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -18,8 +27,9 @@
 	const headA = $derived(parts[0]);
 	const headB = $derived(parts.slice(1).join(' '));
 
-	// A rotating tone per card, so a grid reads as variety.
-	const TONES = ['indigo', 'teal', 'violet', 'amber', 'rose'] as const;
+	// The first point leads: wider, taller, and carrying the segment's own
+	// screenshot. The rest stay quiet so the lead keeps the eye.
+	const restTone = (i: number) => QUIET[(i - 1) % QUIET.length];
 </script>
 
 <svelte:head>
@@ -28,33 +38,58 @@
 </svelte:head>
 
 <div class="page">
-	<section class="hero">
-		<Tag>{segment.eyebrow}</Tag>
-		<h1 class="h1">
+	<PageHero>
+		{#snippet eyebrow()}
+			<Tag>{segment.eyebrow}</Tag>
+		{/snippet}
+		{#snippet title()}
 			{headA}
 			{#if headB}<span class="accent">{headB}</span>{/if}
-		</h1>
-		<p class="sub">{segment.blurb}</p>
-		<div class="cta">
-			<Button href={resolve('/register')}>
+		{/snippet}
+		{#snippet subtitle()}{segment.blurb}{/snippet}
+		{#snippet actions()}
+			<Button href={resolve('/register')} variant="lime">
 				Create a workspace <Icon icon={ArrowRight01Icon} class="size-5" />
 			</Button>
 			<Button href={resolve('/')} variant="ghost">
 				See everything it does <Icon icon={ArrowUpRight01Icon} class="size-5" />
 			</Button>
-		</div>
-	</section>
+		{/snippet}
+	</PageHero>
 
 	<section class="section">
 		<h2 class="h2">Built for the way {segment.nav.toLowerCase()} actually work</h2>
 		<p class="lead">{segment.tagline}</p>
 		<div class="grid">
 			{#each segment.today as item, i (item.title)}
-				<Card class="tile">
-					<IconChip icon={item.icon} tone={TONES[i % TONES.length]} />
-					<h3 class="tile-title">{item.title}</h3>
-					<p class="tile-line">{item.body}</p>
-				</Card>
+				{@const tone = i === 0 ? TONES.photo : restTone(i)}
+				<div
+					class="flex flex-col rounded-[var(--r-lg)] p-6 {tone.card} {i === 0
+						? 'min-h-[18rem] sm:col-span-2'
+						: 'min-h-[15rem]'}"
+				>
+					{#if i === 0}
+						<!-- The segment's own screenshot as the panel's backdrop. Blurred on purpose:
+						     unblurred, its headings land on the card's and the two argue. It is
+						     texture here — the page shows the product properly further down. -->
+						<img
+							src={segment.shot.src}
+							alt=""
+							loading="lazy"
+							class="absolute inset-0 h-full w-full scale-110 object-cover blur-[3px]"
+						/>
+						<div class={SCRIM}></div>
+					{/if}
+					<span class="relative grid size-11 place-items-center rounded-xl {tone.icon}">
+						<Icon icon={item.icon} class="size-5" />
+					</span>
+					<h3 class="relative mt-4 font-bold {tone.title} {i === 0 ? 'text-2xl' : 'text-lg'}">
+						{item.title}
+					</h3>
+					<p class="relative mt-1 leading-relaxed {tone.body} {i === 0 ? 'text-base' : 'text-sm'}">
+						{item.body}
+					</p>
+				</div>
 			{/each}
 		</div>
 	</section>
@@ -79,52 +114,12 @@
 		</Card>
 	</section>
 
-	<section class="section closing">
-		<h2 class="h2">Bring your institution online.</h2>
-		<div class="cta">
-			<Button href={resolve('/register')}
-				>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
-			>
-			<Button href={resolve('/login')} variant="ghost">Sign in</Button>
-		</div>
-	</section>
+	<SiteCta />
 </div>
 
 <style>
 	.page {
 		background: var(--cream);
-		padding-bottom: 5rem;
-	}
-
-	.hero {
-		max-width: 52rem;
-		margin: 0 auto;
-		padding: 4rem 1.5rem 2rem;
-		text-align: center;
-	}
-	.h1 {
-		font-weight: 700;
-		font-size: clamp(2.25rem, 5vw, 3.8rem);
-		line-height: 1.05;
-		letter-spacing: -0.03em;
-		margin: 1.4rem 0 0;
-	}
-	.h1 .accent {
-		color: var(--brand);
-	}
-	.sub {
-		margin: 1.3rem auto 0;
-		max-width: 40rem;
-		font-size: 1.12rem;
-		line-height: 1.6;
-		color: var(--muted);
-	}
-	.cta {
-		margin-top: 2rem;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9rem;
-		justify-content: center;
 	}
 
 	.section {
@@ -168,18 +163,6 @@
 			grid-template-columns: repeat(3, 1fr);
 		}
 	}
-	.tile-title {
-		font-weight: 700;
-		font-size: 1.15rem;
-		margin: 0.7rem 0 0.4rem;
-	}
-	.tile-line {
-		font-size: 0.9rem;
-		line-height: 1.55;
-		color: var(--muted);
-		margin: 0;
-	}
-
 	.points {
 		margin: 0;
 		padding: 0;
@@ -199,12 +182,5 @@
 		margin-top: 0.15rem;
 		flex-shrink: 0;
 		color: var(--brand);
-	}
-
-	.closing {
-		text-align: center;
-	}
-	.closing .cta {
-		justify-content: center;
 	}
 </style>

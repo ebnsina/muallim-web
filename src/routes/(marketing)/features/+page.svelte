@@ -1,15 +1,29 @@
 <script lang="ts">
 	/**
 	 * The feature index — every feature, grouped, so the breadth is visible without
-	 * scrolling for it. Flat cream and paper cards, the same look as the landing.
+	 * scrolling for it. The landing's tones and its dark hero band, not a flat grid.
 	 */
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
+	import {
+		Button,
+		IconChip,
+		Tag,
+		PageHero,
+		SiteCta,
+		QUIET,
+		LEAD
+	} from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS, featuresIn } from '$lib/content/features';
 	import { ArrowRight01Icon, ArrowUpRight01Icon } from '@hugeicons/core-free-icons';
 
-	const TONES = ['indigo', 'teal', 'violet', 'amber', 'rose'] as const;
+	// Each group leads with its first feature — wider, taller, and the loud tone.
+	// The lead's tone rotates by group so all four get an outing and the dark one
+	// lands once; the rest stay quiet so the lead keeps the eye. Offsetting the rest
+	// by the group index keeps the lead's neighbour off the lead's own tone —
+	// otherwise the two touch and read as one shape.
+	const leadTone = (gi: number) => LEAD[gi % LEAD.length];
+	const restTone = (i: number, gi: number) => QUIET[(i + gi) % QUIET.length];
 </script>
 
 <svelte:head>
@@ -21,24 +35,26 @@
 </svelte:head>
 
 <div class="page">
-	<section class="hero">
-		<Tag>{FEATURES.length} features, all of them shipping</Tag>
-		<h1 class="h1">
+	<PageHero>
+		{#snippet eyebrow()}
+			<Tag>{FEATURES.length} features, all of them shipping</Tag>
+		{/snippet}
+		{#snippet title()}
 			Everything Muallim does. <span class="accent">Nothing it doesn’t.</span>
-		</h1>
-		<p class="sub">
+		{/snippet}
+		{#snippet subtitle()}
 			One platform for teaching a course and running an institution — from the morning register to
 			the certificate at the end. Every line on these pages is something the product does today.
-		</p>
-		<div class="cta">
-			<Button href={resolve('/register')}>
+		{/snippet}
+		{#snippet actions()}
+			<Button href={resolve('/register')} variant="lime">
 				Start free <Icon icon={ArrowRight01Icon} class="size-5" />
 			</Button>
 			<Button href={resolve('/')} variant="ghost">
 				Back to the overview <Icon icon={ArrowUpRight01Icon} class="size-5" />
 			</Button>
-		</div>
-	</section>
+		{/snippet}
+	</PageHero>
 
 	<!-- A jump list, so the breadth registers before any scrolling happens. -->
 	<nav class="section jump" aria-label="Feature groups">
@@ -54,7 +70,7 @@
 		</ul>
 	</nav>
 
-	{#each GROUPS as group (group.key)}
+	{#each GROUPS as group, gi (group.key)}
 		{@const features = featuresIn(group.key)}
 		<section class="section" id={group.key}>
 			<div class="group-head">
@@ -66,70 +82,43 @@
 			</div>
 			<div class="grid">
 				{#each features as feature, i (feature.slug)}
+					{@const tone = i === 0 ? leadTone(gi) : restTone(i, gi)}
 					<a
-						class="tile-link"
+						class="tile-link {i === 0 ? 'sm:col-span-2' : ''}"
 						href={resolve('/(marketing)/features/[slug]', { slug: feature.slug })}
 					>
-						<Card class="tile">
-							<IconChip icon={feature.icon} tone={TONES[i % TONES.length]} />
-							<h3 class="tile-title">{feature.name}</h3>
-							<p class="tile-line">{feature.tagline}</p>
-							<span class="tile-more">
+						<div
+							class="flex h-full flex-col rounded-[var(--r-lg)] p-6 {tone.card} {i === 0
+								? 'min-h-[18rem]'
+								: 'min-h-[15rem]'}"
+						>
+							<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
+								<Icon icon={feature.icon} class="size-5" />
+							</span>
+							<h3 class="mt-4 font-bold {tone.title} {i === 0 ? 'text-2xl' : 'text-lg'}">
+								{feature.name}
+							</h3>
+							<p class="mt-1 leading-relaxed {tone.body} {i === 0 ? 'text-base' : 'text-sm'}">
+								{feature.tagline}
+							</p>
+							<span
+								class="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-bold {tone.more}"
+							>
 								Read more <Icon icon={ArrowRight01Icon} class="size-4" />
 							</span>
-						</Card>
+						</div>
 					</a>
 				{/each}
 			</div>
 		</section>
 	{/each}
 
-	<section class="section closing">
-		<h2 class="h2">Bring your institution online.</h2>
-		<div class="cta">
-			<Button href={resolve('/register')}
-				>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
-			>
-			<Button href={resolve('/login')} variant="ghost">Sign in</Button>
-		</div>
-	</section>
+	<SiteCta />
 </div>
 
 <style>
 	.page {
 		background: var(--cream);
-		padding-bottom: 5rem;
-	}
-
-	.hero {
-		max-width: 52rem;
-		margin: 0 auto;
-		padding: 4rem 1.5rem 2rem;
-		text-align: center;
-	}
-	.h1 {
-		font-weight: 700;
-		font-size: clamp(2.25rem, 5vw, 3.8rem);
-		line-height: 1.05;
-		letter-spacing: -0.03em;
-		margin: 1.4rem 0 0;
-	}
-	.h1 .accent {
-		color: var(--brand);
-	}
-	.sub {
-		margin: 1.3rem auto 0;
-		max-width: 40rem;
-		font-size: 1.12rem;
-		line-height: 1.6;
-		color: var(--muted);
-	}
-	.cta {
-		margin-top: 2rem;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9rem;
-		justify-content: center;
 	}
 
 	.section {
@@ -223,34 +212,6 @@
 		outline: 2px solid var(--brand);
 		outline-offset: 3px;
 	}
-	.tile-title {
-		font-weight: 700;
-		font-size: 1.15rem;
-		margin: 0.7rem 0 0.4rem;
-	}
-	.tile-line {
-		font-size: 0.9rem;
-		line-height: 1.55;
-		color: var(--muted);
-		margin: 0;
-	}
-	.tile-more {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		margin-top: 0.9rem;
-		font-size: 0.84rem;
-		font-weight: 600;
-		color: var(--brand);
-	}
-
-	.closing {
-		text-align: center;
-	}
-	.closing .cta {
-		justify-content: center;
-	}
-
 	@media (prefers-reduced-motion: reduce) {
 		.tile-link,
 		.jump a {

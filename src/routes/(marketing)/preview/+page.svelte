@@ -6,7 +6,7 @@
 	 * bespoke dashboard viz (meter, gauge, split). Light only. ৳ pricing.
 	 */
 	import { Icon } from '$lib/components';
-	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
+	import { Card, Button, IconChip, Tag, PageHero, SiteCta } from '$lib/features/marketing/ui';
 	import {
 		ArrowRight01Icon,
 		ArrowUpRight01Icon,
@@ -110,58 +110,58 @@
 <svelte:head><title>Muallim — design preview</title></svelte:head>
 
 <div class="page">
-
-	<section class="hero">
-		<div>
+	<PageHero>
+		{#snippet eyebrow()}
 			<Tag>New — sell a course from your own bKash or SSLCommerz account</Tag>
-			<h1 class="h1">
-				<span>Run the whole institution.</span>
-				<span class="accent">Teach the whole world.</span>
-			</h1>
-			<p class="sub">
-				From roll-call to result card, bKash to certificate — one platform for a school, a college,
-				a madrasa, or a coaching center.
-			</p>
-			<div class="cta">
-				<Button href="#start">Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button>
-				<Button href="#demo" variant="ghost">
-					See a live demo <Icon icon={ArrowUpRight01Icon} class="size-5" />
-				</Button>
-			</div>
-		</div>
+		{/snippet}
+		{#snippet title()}
+			<span class="line">Run the whole institution.</span>
+			<span class="line accent">Teach the whole world.</span>
+		{/snippet}
+		{#snippet subtitle()}
+			From roll-call to result card, bKash to certificate — one platform for a school, a college, a
+			madrasa, or a coaching center.
+		{/snippet}
+		{#snippet actions()}
+			<Button href="#start">Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button>
+			<Button href="#demo" variant="ghost">
+				See a live demo <Icon icon={ArrowUpRight01Icon} class="size-5" />
+			</Button>
+		{/snippet}
+		{#snippet aside()}
+			<Card>
+				<div class="cardhead">
+					<span class="cardname">Baitul Ilm Dakhil Madrasa</span>
+					<span class="muted-xs">This month</span>
+				</div>
 
-		<Card>
-			<div class="cardhead">
-				<span class="cardname">Baitul Ilm Dakhil Madrasa</span>
-				<span class="muted-xs">This month</span>
-			</div>
+				<div class="stats">
+					<Card subtle class="flex flex-col gap-1.5">
+						<span class="label">Fees collected</span>
+						<span class="fig c-brand">{taka(184250000)}</span>
+					</Card>
+					<Card subtle class="flex flex-col gap-1.5">
+						<span class="label">Outstanding dues</span>
+						<span class="fig c-amber">{taka(31200000)}</span>
+					</Card>
+				</div>
 
-			<div class="stats">
-				<Card subtle class="flex flex-col gap-1.5">
-					<span class="label">Fees collected</span>
-					<span class="fig c-brand">{taka(184250000)}</span>
-				</Card>
-				<Card subtle class="flex flex-col gap-1.5">
-					<span class="label">Outstanding dues</span>
-					<span class="fig c-amber">{taka(31200000)}</span>
-				</Card>
-			</div>
+				<div class="row">
+					<span class="label">Attendance today</span>
+					<span class="meter" aria-hidden="true"><span style="width: 92%"></span></span>
+					<span class="mono">{num(92)}%</span>
+				</div>
 
-			<div class="row">
-				<span class="label">Attendance today</span>
-				<span class="meter" aria-hidden="true"><span style="width: 92%"></span></span>
-				<span class="mono">{num(92)}%</span>
-			</div>
+				<div class="gpa">
+					<span class="label">Dakhil result</span>
+					<span class="gpa-fig mono">{num(4.83)}<small>/{num(5)}</small></span>
+					<span class="grade">A+</span>
+				</div>
 
-			<div class="gpa">
-				<span class="label">Dakhil result</span>
-				<span class="gpa-fig mono">{num(4.83)}<small>/{num(5)}</small></span>
-				<span class="grade">A+</span>
-			</div>
-
-			<div class="ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
-		</Card>
-	</section>
+				<div class="ladder">Ebtedayee · Dakhil · Alim · Fazil · Kamil</div>
+			</Card>
+		{/snippet}
+	</PageHero>
 
 	<section class="section">
 		<h2 class="h2">Made for every kind of institution</h2>
@@ -250,71 +250,20 @@
 			</Card>
 		</Card>
 	</section>
+
+	<SiteCta />
 </div>
 
 <style>
 	.page {
 		min-height: 100vh;
 		background: var(--cream);
-		padding-bottom: 4rem;
 	}
 
-	.menu {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		max-width: 76rem;
-		margin: 0 auto;
-		padding: 1.4rem 1.5rem 0;
-	}
-	.brand {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-weight: 700;
-		font-size: 1.2rem;
-		letter-spacing: -0.01em;
-		color: var(--brand);
-	}
-
-	.hero {
-		max-width: 76rem;
-		margin: 0 auto;
-		padding: 3rem 1.5rem 3rem;
-		display: grid;
-		gap: 3rem;
-		align-items: center;
-	}
-	@media (min-width: 900px) {
-		.hero {
-			grid-template-columns: 1.1fr 0.9fr;
-		}
-	}
-	.h1 {
-		font-weight: 700;
-		font-size: clamp(2.5rem, 5.5vw, 4.1rem);
-		line-height: 1.03;
-		letter-spacing: -0.03em;
-		margin: 1.4rem 0 0;
-	}
-	.h1 span {
+	/* The headline breaks after each sentence; PageHero owns the h1, so the lines
+	   carry the rule. */
+	.line {
 		display: block;
-	}
-	.h1 .accent {
-		color: var(--brand);
-	}
-	.sub {
-		margin-top: 1.3rem;
-		max-width: 34rem;
-		font-size: 1.12rem;
-		line-height: 1.6;
-		color: var(--muted);
-	}
-	.cta {
-		margin-top: 2rem;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9rem;
 	}
 
 	/* Shared typography helpers. */

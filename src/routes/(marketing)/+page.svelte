@@ -12,6 +12,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
+	import { SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -789,41 +790,7 @@
 		</div>
 	</section>
 
-	<!-- CONTACT CTA on a lime gradient (Tailwind) -->
-	<section
-		class="mt-24 bg-gradient-to-b from-[#f3f1ea] via-[#eef2d4] to-[#dfeaa6] px-6 py-24 text-center"
-	>
-		<h2
-			class="mx-auto max-w-[15ch] text-4xl font-bold leading-[1.05] tracking-tight text-[#2e3320] sm:text-5xl"
-		>
-			Talk to a real person
-		</h2>
-		<p class="mx-auto mt-5 max-w-xl leading-relaxed text-[#4a4d38]">
-			Getting an institution online is a big step. Our team helps you set up, bring in your
-			students, and take your first fee — no bots, no runaround.
-		</p>
-		<div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-			<div class="flex items-center gap-3">
-				<span class="text-sm font-semibold text-[#2e3320]">Our team</span>
-				<div class="flex items-center">
-					<span class="size-8 rounded-full border-2 border-[#dfeaa6] bg-[#c9b7a4]"></span>
-					<span class="-ml-2 size-8 rounded-full border-2 border-[#dfeaa6] bg-[#8fae7a]"></span>
-					<span class="-ml-2 size-8 rounded-full border-2 border-[#dfeaa6] bg-[#b9a0c6]"></span>
-					<span
-						class="-ml-2 grid size-8 place-items-center rounded-full border-2 border-[#dfeaa6] bg-[#2e3320] text-xs font-bold text-[#c4e84b]"
-						>3+</span
-					>
-				</div>
-			</div>
-			<span class="hidden h-8 w-px bg-[#2e3320]/20 sm:block"></span>
-			<a
-				href="mailto:hello@muallim.app"
-				class="inline-flex items-center gap-2 rounded-full bg-[#2e3320] px-6 py-3 font-semibold text-[#eaf5cf] transition hover:-translate-y-0.5 hover:bg-[#3a4029]"
-			>
-				Talk to us <Icon icon={ArrowRight02Icon} class="size-4" />
-			</a>
-		</div>
-	</section>
+	<SiteCta />
 
 	<!-- FOOTER: dark-olive rounded card, on the same lime the CTA gradient ends on -->
 </div>

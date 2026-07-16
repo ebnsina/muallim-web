@@ -3,13 +3,14 @@
 
 	/**
 	 * The marketing button — a pill, as on the landing. Solid is olive carrying the
-	 * weight; ghost is white paper behind a hairline border. The only motion is a
-	 * small lift. Renders an <a> when given href, a <button> otherwise.
+	 * weight; ghost is white paper behind a hairline border; lime is the call to
+	 * action on a dark band, where olive on olive cannot be read. The only motion is
+	 * a small lift. Renders an <a> when given href, a <button> otherwise.
 	 */
 	type Props = {
 		children: Snippet;
 		href?: string;
-		variant?: 'solid' | 'ghost';
+		variant?: 'solid' | 'ghost' | 'lime';
 		size?: 'md' | 'sm';
 		type?: 'button' | 'submit';
 		onclick?: () => void;
@@ -62,6 +63,17 @@
 	.solid:hover {
 		background: var(--brand-soft);
 		transform: translateY(-1px);
+	}
+	/* The landing's hero pill: lime with olive on it, the one thing that carries a
+	   dark hero. */
+	.lime {
+		background: var(--accent);
+		color: var(--brand);
+		font-weight: 700;
+	}
+	.lime:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 10px 30px -12px rgba(23, 23, 15, 0.5);
 	}
 	.ghost {
 		background: var(--surface);

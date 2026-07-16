@@ -6,7 +6,8 @@
 	 */
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
+	import { Card, Button, Tag, PageHero, SiteCta, QUIET, LEAD } from '$lib/features/marketing/ui';
+	import { GROUPS } from '$lib/content/features';
 	import { ArrowRight01Icon, ArrowLeft01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -15,13 +16,19 @@
 	const group = $derived(data.group);
 	const related = $derived(data.related);
 
+	// The first related feature leads — wider and louder; the rest stay quiet. The
+	// lead's tone follows the group, so a feature page and its siblings on the index
+	// agree. The rest are offset by the same index to keep the lead's neighbour off
+	// the lead's own tone.
+	const groupIndex = $derived(GROUPS.findIndex((g) => g.key === group.key));
+	const leadTone = $derived(LEAD[groupIndex % LEAD.length]);
+	const restTone = (i: number) => QUIET[(i + groupIndex) % QUIET.length];
+
 	// Two-tone headline: the first sentence solid, the rest in brand — as on a
 	// solution page, so the two read as one family.
 	const parts = $derived(feature.headline.split(/(?<=\.)\s+/));
 	const headA = $derived(parts[0]);
 	const headB = $derived(parts.slice(1).join(' '));
-
-	const TONES = ['indigo', 'teal', 'violet', 'amber', 'rose'] as const;
 </script>
 
 <svelte:head>
@@ -30,22 +37,24 @@
 </svelte:head>
 
 <div class="page">
-	<section class="hero">
-		<Tag>{group.name}</Tag>
-		<h1 class="h1">
+	<PageHero>
+		{#snippet eyebrow()}
+			<Tag>{group.name}</Tag>
+		{/snippet}
+		{#snippet title()}
 			{headA}
 			{#if headB}<span class="accent">{headB}</span>{/if}
-		</h1>
-		<p class="sub">{feature.blurb}</p>
-		<div class="cta">
-			<Button href={resolve('/register')}>
+		{/snippet}
+		{#snippet subtitle()}{feature.blurb}{/snippet}
+		{#snippet actions()}
+			<Button href={resolve('/register')} variant="lime">
 				Start free <Icon icon={ArrowRight01Icon} class="size-5" />
 			</Button>
 			<Button href={resolve('/(marketing)/features')} variant="ghost">
 				<Icon icon={ArrowLeft01Icon} class="size-5" /> All features
 			</Button>
-		</div>
-	</section>
+		{/snippet}
+	</PageHero>
 
 	<section class="section">
 		<h2 class="h2">What it does today</h2>
@@ -70,64 +79,36 @@
 			</p>
 			<div class="grid">
 				{#each related as item, i (item.slug)}
-					<a class="tile-link" href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}>
-						<Card class="tile">
-							<IconChip icon={item.icon} tone={TONES[i % TONES.length]} />
-							<h3 class="tile-title">{item.name}</h3>
-							<p class="tile-line">{item.tagline}</p>
-						</Card>
+					{@const tone = i === 0 ? leadTone : restTone(i)}
+					<a
+						class="tile-link {i === 0 ? 'sm:col-span-2' : ''}"
+						href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
+					>
+						<!-- The lead leads on width and type size; with no "read more" to anchor a
+						     taller card, height would only buy it empty space. -->
+						<div class="flex h-full min-h-[15rem] flex-col rounded-[var(--r-lg)] p-6 {tone.card}">
+							<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
+								<Icon icon={item.icon} class="size-5" />
+							</span>
+							<h3 class="mt-4 font-bold {tone.title} {i === 0 ? 'text-2xl' : 'text-lg'}">
+								{item.name}
+							</h3>
+							<p class="mt-1 leading-relaxed {tone.body} {i === 0 ? 'text-base' : 'text-sm'}">
+								{item.tagline}
+							</p>
+						</div>
 					</a>
 				{/each}
 			</div>
 		</section>
 	{/if}
 
-	<section class="section closing">
-		<h2 class="h2">Bring your institution online.</h2>
-		<div class="cta">
-			<Button href={resolve('/register')}
-				>Start free <Icon icon={ArrowRight01Icon} class="size-5" /></Button
-			>
-			<Button href={resolve('/login')} variant="ghost">Sign in</Button>
-		</div>
-	</section>
+	<SiteCta />
 </div>
 
 <style>
 	.page {
 		background: var(--cream);
-		padding-bottom: 5rem;
-	}
-
-	.hero {
-		max-width: 52rem;
-		margin: 0 auto;
-		padding: 4rem 1.5rem 2rem;
-		text-align: center;
-	}
-	.h1 {
-		font-weight: 700;
-		font-size: clamp(2.25rem, 5vw, 3.8rem);
-		line-height: 1.05;
-		letter-spacing: -0.03em;
-		margin: 1.4rem 0 0;
-	}
-	.h1 .accent {
-		color: var(--brand);
-	}
-	.sub {
-		margin: 1.3rem auto 0;
-		max-width: 40rem;
-		font-size: 1.12rem;
-		line-height: 1.6;
-		color: var(--muted);
-	}
-	.cta {
-		margin-top: 2rem;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9rem;
-		justify-content: center;
 	}
 
 	.section {
@@ -177,18 +158,6 @@
 		outline: 2px solid var(--brand);
 		outline-offset: 3px;
 	}
-	.tile-title {
-		font-weight: 700;
-		font-size: 1.15rem;
-		margin: 0.7rem 0 0.4rem;
-	}
-	.tile-line {
-		font-size: 0.9rem;
-		line-height: 1.55;
-		color: var(--muted);
-		margin: 0;
-	}
-
 	.points {
 		margin: 0;
 		padding: 0;
@@ -213,13 +182,6 @@
 		margin-top: 0.25rem;
 		flex-shrink: 0;
 		color: var(--brand);
-	}
-
-	.closing {
-		text-align: center;
-	}
-	.closing .cta {
-		justify-content: center;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
