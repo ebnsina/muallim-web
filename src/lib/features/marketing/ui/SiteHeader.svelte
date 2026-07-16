@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { Mortarboard01Icon } from '@hugeicons/core-free-icons';
 	import { Icon } from '$lib/components';
+	import { fade, fly } from 'svelte/transition';
 	import { GROUPS, featuresIn } from '$lib/content/features';
 	import { SEGMENTS } from '$lib/content/segments';
 
@@ -23,22 +24,46 @@
 
 		And every one of those sixteen linked to /register. A menu whose every door is
 		the signup form is not navigation, it is a wall with labels painted on it. Each
-		item now goes to the page that describes it.
+		item now goes to the page that describes it, and every link in this header
+		resolves to something that exists — that is the whole rule.
 	*/
 	let menuOpen = $state(false);
-	let megaOpen = $state(false);
 	let activeCat = $state(0);
-	// A short close-delay so moving the cursor across the gap into the panel — or
-	// between the trigger and the panel — doesn't dismiss the menu mid-flight.
-	let megaCloseTimer: ReturnType<typeof setTimeout>;
-	const openMega = () => {
-		clearTimeout(megaCloseTimer);
-		megaOpen = true;
-	};
-	const scheduleCloseMega = () => {
-		clearTimeout(megaCloseTimer);
-		megaCloseTimer = setTimeout(() => (megaOpen = false), 140);
-	};
+
+	/*
+		One open menu, not one flag each, and one card they share.
+
+		Each panel used to live inside its own trigger and bridge the gap up to it with
+		a pseudo-element. Moving the pointer diagonally — which is how a pointer moves —
+		left that strip and the menu shut in your face. The fix is structural: the
+		region that listens for the pointer now wraps the pill *and* the card, so going
+		from one to the other never leaves it and there is no gap to bridge.
+	*/
+	type Menu = 'products' | 'solutions';
+	let open = $state<Menu | null>(null);
+	let closeTimer: ReturnType<typeof setTimeout>;
+
+	// Which way the card should slide when moving between menus, by the order they
+	// sit in the pill.
+	const ORDER: Menu[] = ['products', 'solutions'];
+	let direction = $state(1);
+
+	function show(menu: Menu) {
+		clearTimeout(closeTimer);
+		if (open && open !== menu) direction = ORDER.indexOf(menu) > ORDER.indexOf(open) ? 1 : -1;
+		open = menu;
+	}
+	const hold = () => clearTimeout(closeTimer);
+	function scheduleClose() {
+		clearTimeout(closeTimer);
+		closeTimer = setTimeout(() => (open = null), 140);
+	}
+
+	// The card takes the size of whatever panel is in it, and animates between the
+	// two — measured rather than declared, so the card cannot disagree with its own
+	// contents when one of them grows a feature.
+	let panelW = $state(0);
+	let panelH = $state(0);
 
 	const megaCats = GROUPS.map((g) => ({
 		key: g.key,
@@ -66,154 +91,146 @@
 	};
 </script>
 
+<!--
+	The hover region is the shell, not the trigger: it holds the pill and the card,
+	so moving between them never leaves it.
+-->
 <header class="site-header">
-	<div class="pill">
-		<a class="logo" href={resolve('/')}>
-			<span class="mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
-			Muallim
-		</a>
+	<div class="shell" onmouseleave={scheduleClose} onmouseenter={hold} role="none">
+		<div class="pill">
+			<a class="logo" href={resolve('/')}>
+				<span class="mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
+				Muallim
+			</a>
 
-		<nav class="links" class:open={menuOpen} aria-label="Main">
-			<div class="relative" onmouseenter={openMega} onmouseleave={scheduleCloseMega} role="none">
-				<button
-					type="button"
-					class="mega-trigger"
-					aria-haspopup="true"
-					aria-expanded={megaOpen}
-					onclick={() => (megaOpen = !megaOpen)}
+			<nav class="links" class:open={menuOpen} aria-label="Main">
+				{#each ORDER as menu (menu)}
+					<button
+						type="button"
+						class="mega-trigger"
+						aria-haspopup="true"
+						aria-expanded={open === menu}
+						onmouseenter={() => show(menu)}
+						onfocus={() => show(menu)}
+						onclick={() => (open = open === menu ? null : menu)}
+					>
+						{menu === 'products' ? 'Products' : 'Solutions'}
+						<svg
+							class="size-3.5 transition-transform duration-200 {open === menu ? 'rotate-180' : ''}"
+							viewBox="0 0 12 12"
+							fill="none"
+						>
+							<path
+								d="M2.5 4.5 6 8l3.5-3.5"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+				{/each}
+				<a href="/#pricing" onclick={() => (menuOpen = false)}>Pricing</a>
+				<a href="/#faq" onclick={() => (menuOpen = false)}>FAQ</a>
+				<a href="mailto:hello@muallim.app" onclick={() => (menuOpen = false)}>Support</a>
+				<a href={resolve('/(marketing)/demo')} onclick={() => (menuOpen = false)}>Try demo</a>
+				<a class="links-signin" href={resolve('/login')} onclick={() => (menuOpen = false)}
+					>Sign in</a
 				>
-					Products
-					<svg
-						class="size-3.5 transition-transform duration-200 {megaOpen ? 'rotate-180' : ''}"
-						viewBox="0 0 12 12"
-						fill="none"
-					>
-						<path
-							d="M2.5 4.5 6 8l3.5-3.5"
-							stroke="currentColor"
-							stroke-width="1.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</button>
-				{#if megaOpen}
-					<div
-						role="none"
-						onmouseenter={openMega}
-						onmouseleave={scheduleCloseMega}
-						class="absolute top-[calc(100%+0.5rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
-					>
-						<div class="grid grid-cols-[1.15fr_1fr] gap-2">
-							<div class="flex flex-col gap-1">
-								{#each megaCats as c, i (c.title)}
-									<button
-										type="button"
-										onmouseenter={() => (activeCat = i)}
-										onfocus={() => (activeCat = i)}
-										class="flex items-start gap-3 rounded-xl p-3 text-left transition {activeCat ===
-										i
-											? 'bg-[var(--accent-tint)]'
-											: 'hover:bg-[var(--surface-2)]'}"
-									>
-										<span
-											class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent-tint)] text-[var(--brand)]"
-										>
-											<Icon icon={c.icon} class="size-5" />
-										</span>
-										<span>
-											<span class="block text-sm font-bold text-[var(--ink)]">{c.title}</span>
-											<span class="mt-0.5 block text-xs text-[var(--muted)]">{c.sub}</span>
-										</span>
-									</button>
-								{/each}
-							</div>
-							<div class="flex flex-col rounded-xl bg-[var(--surface-2)] p-2">
-								{#each megaCats[activeCat].items as item (item.slug)}
-									<a
-										href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
-										onclick={() => (megaOpen = false)}
-										class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
-									>
-										<Icon icon={item.icon} class="size-4 shrink-0 text-[var(--teal)]" />
-										{item.name}
-									</a>
-								{/each}
-								<a
-									href={resolve('/(marketing)/features')}
-									onclick={() => (megaOpen = false)}
-									class="mt-auto rounded-lg border-t border-[var(--line)] px-3 pt-3 pb-1 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
-								>
-									Look through all of it
-								</a>
-							</div>
-						</div>
-					</div>
-				{/if}
-			</div>
-			<div class="relative" onmouseenter={openSol} onmouseleave={scheduleCloseSol} role="none">
-				<button
-					type="button"
-					class="mega-trigger"
-					aria-haspopup="true"
-					aria-expanded={solOpen}
-					onclick={() => (solOpen = !solOpen)}
-				>
-					Solutions
-					<svg
-						class="size-3.5 transition-transform duration-200 {solOpen ? 'rotate-180' : ''}"
-						viewBox="0 0 12 12"
-						fill="none"
-					>
-						<path
-							d="M2.5 4.5 6 8l3.5-3.5"
-							stroke="currentColor"
-							stroke-width="1.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</button>
-				{#if solOpen}
-					<div
-						role="none"
-						onmouseenter={openSol}
-						onmouseleave={scheduleCloseSol}
-						class="absolute top-[calc(100%+0.5rem)] left-0 z-20 w-[19rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
-					>
-						{#each segmentLinks as sg (sg.slug)}
-							<a
-								href={resolve('/(marketing)/solutions/[slug]', { slug: sg.slug })}
-								onclick={() => {
-									solOpen = false;
-									menuOpen = false;
-								}}
-								class="block rounded-xl p-3 transition hover:bg-[var(--surface-2)]"
-							>
-								<span class="block text-sm font-bold text-[var(--ink)]">{sg.name}</span>
-								<span class="mt-0.5 block text-xs text-[var(--muted)]">{sg.kicker}</span>
-							</a>
-						{/each}
-					</div>
-				{/if}
-			</div>
-			<a href="/#pricing" onclick={() => (menuOpen = false)}>Pricing</a>
-			<a href="/#faq" onclick={() => (menuOpen = false)}>FAQ</a>
-			<a href="mailto:hello@muallim.app" onclick={() => (menuOpen = false)}>Support</a>
-			<a class="links-signin" href={resolve('/login')} onclick={() => (menuOpen = false)}>Sign in</a
+			</nav>
+
+			<a class="cta" href={resolve('/register')}>Get started</a>
+
+			<button
+				class="burger"
+				aria-label="Menu"
+				aria-expanded={menuOpen}
+				onclick={() => (menuOpen = !menuOpen)}
 			>
-		</nav>
+				<span></span>
+			</button>
+		</div>
 
-		<a class="cta" href={resolve('/register')}>Get started</a>
-
-		<button
-			class="burger"
-			aria-label="Menu"
-			aria-expanded={menuOpen}
-			onclick={() => (menuOpen = !menuOpen)}
-		>
-			<span></span>
-		</button>
+		{#if open}
+			<!-- The gap between pill and card is this element's padding, so it is inside
+			     the hover region: there is nothing to fall through. -->
+			<div class="mega" transition:fade={{ duration: 120 }}>
+				<div class="mega-card" style="--w:{panelW}px; --h:{panelH}px">
+					{#key open}
+						<div
+							class="mega-body"
+							bind:clientWidth={panelW}
+							bind:clientHeight={panelH}
+							in:fly={{ x: direction * 24, duration: 220, opacity: 0 }}
+							out:fly={{ x: direction * -24, duration: 160, opacity: 0 }}
+						>
+							{#if open === 'products'}
+								<div class="grid w-[42rem] max-w-[90vw] grid-cols-[1.15fr_1fr] gap-2 p-2">
+									<div class="flex flex-col gap-1">
+										{#each megaCats as c, i (c.key)}
+											<button
+												type="button"
+												onmouseenter={() => (activeCat = i)}
+												onfocus={() => (activeCat = i)}
+												class="flex items-start gap-3 rounded-xl p-3 text-left transition {activeCat ===
+												i
+													? 'bg-[var(--brand-tint)]'
+													: 'hover:bg-[var(--surface-2)]'}"
+											>
+												<span
+													class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--brand-tint)] text-[var(--brand)]"
+												>
+													<Icon icon={c.icon} class="size-5" />
+												</span>
+												<span>
+													<span class="block text-sm font-bold text-[var(--ink)]">{c.title}</span>
+													<span class="mt-0.5 block text-xs text-[var(--muted)]">{c.sub}</span>
+												</span>
+											</button>
+										{/each}
+									</div>
+									<div class="flex flex-col rounded-xl bg-[var(--surface-2)] p-2">
+										{#each megaCats[activeCat].items as item (item.slug)}
+											<a
+												href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
+												onclick={() => (open = null)}
+												class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
+											>
+												<Icon icon={item.icon} class="size-4 shrink-0 text-[var(--teal)]" />
+												{item.name}
+											</a>
+										{/each}
+										<a
+											href={resolve('/(marketing)/features')}
+											onclick={() => (open = null)}
+											class="mt-auto rounded-lg border-t border-[var(--line)] px-3 pt-3 pb-1 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
+										>
+											Look through all of it
+										</a>
+									</div>
+								</div>
+							{:else}
+								<div class="w-[21rem] max-w-[90vw] p-2">
+									{#each segmentLinks as sg (sg.slug)}
+										<a
+											href={resolve('/(marketing)/solutions/[slug]', { slug: sg.slug })}
+											onclick={() => {
+												open = null;
+												menuOpen = false;
+											}}
+											class="block rounded-xl p-3 transition hover:bg-[var(--surface-2)]"
+										>
+											<span class="block text-sm font-bold text-[var(--ink)]">{sg.name}</span>
+											<span class="mt-0.5 block text-xs text-[var(--muted)]">{sg.kicker}</span>
+										</a>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/key}
+				</div>
+			</div>
+		{/if}
 	</div>
 </header>
 
@@ -252,6 +269,59 @@
 		the hierarchy comes from weight instead. Re-measure before opening it further.
 		The blur is what stops a screenshot's text ghosting through the words on top.
 	*/
+	/*
+		The shell is the hover region: pill, gap and card in one box, so the pointer
+		can move between them without ever leaving it. The old panels hung inside
+		their triggers and bridged the gap with a pseudo-element, which a diagonal
+		pointer missed.
+	*/
+	.shell {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		max-width: 100%;
+	}
+	/* The gap is padding, not margin: padding is inside the element, so it is inside
+	   the hover region. Margin would be the hole all over again. */
+	.mega {
+		position: absolute;
+		top: 100%;
+		padding-top: 0.55rem;
+		z-index: 20;
+	}
+	/*
+		One card for both menus, sized to whatever is in it and animated between the
+		two — the panels are different shapes, and a card that jumped from one to the
+		other would read as two cards rather than one menu moving.
+	*/
+	.mega-card {
+		position: relative;
+		width: var(--w);
+		height: var(--h);
+		overflow: hidden;
+		border-radius: 16px;
+		border: 1px solid var(--line);
+		background: var(--surface);
+		box-shadow: 0 30px 70px -30px rgba(23, 23, 15, 0.45);
+		transition:
+			width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+			height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+	/* Absolute so the outgoing panel and the incoming one overlap while they cross,
+	   instead of stacking and shoving the card open. */
+	.mega-body {
+		position: absolute;
+		top: 0;
+		left: 0;
+		text-align: left;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.mega-card {
+			transition: none;
+		}
+	}
+
 	.pill {
 		display: flex;
 		align-items: center;
