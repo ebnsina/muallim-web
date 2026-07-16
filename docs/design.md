@@ -72,6 +72,15 @@ A section whose cards are each a call to action does not also get a button. The
 build block had a "Start free" above the grid, which made five doors on one screen
 and drew the eye away from the four that say what the product does.
 
+`ShotCard` is the other half of that section's job: a screenshot of the running app
+with a caption saying what is in it. **Show a window at half scale, not the whole
+screen shrunk to fit.** The captures are 2360px wide precisely so that 1180 is
+legible; three of them squeezed into a third of the page each were grey mush, and
+`object-cover` cropped the nav off for good measure. So the card clips a window onto
+the image at its half-scale width, offset past the chrome to where the content is,
+and fades the cut edge — **the fade goes on the window, not the picture**, or it
+lands 800px along where the card has already clipped it.
+
 The object names a real thing — a clipboard is the register, a medal a result, a
 banknote with ৳ a fee, a paper plane a course sold abroad. The abstract ring and
 globe that came before made a reader decode them, which is a picture doing no work.

@@ -7,6 +7,7 @@ export { default as IconChip } from './IconChip.svelte';
 export { default as Tag } from './Tag.svelte';
 export { default as CardArt } from './CardArt.svelte';
 export { default as FeatureCard } from './FeatureCard.svelte';
+export { default as ShotCard } from './ShotCard.svelte';
 export { default as SiteHeader } from './SiteHeader.svelte';
 export { default as SiteFooter } from './SiteFooter.svelte';
 export { default as SiteCta } from './SiteCta.svelte';

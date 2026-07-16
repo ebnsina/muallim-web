@@ -13,7 +13,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Button, FeatureCard, SiteCta } from '$lib/features/marketing/ui';
+	import { Button, FeatureCard, ShotCard, SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -85,6 +85,30 @@
 			tone: 'dark',
 			href: resolve('/(marketing)/features/[slug]', { slug: 'payments' }),
 			label: 'Learn more about selling courses'
+		}
+	] as const;
+
+	// Screens of the running app, captioned with what is actually in them. Every
+	// caption was written from the picture, not from the plan — the landing this
+	// replaced invented a GPA and a register nobody had ever marked.
+	const SHOTS = [
+		{
+			src: '/marketing/course.webp',
+			alt: "A course page in Muallim: “Medicine: The Canon”, marked Expert, rated 4.0 from 2 ratings with 12 learners, created by Ibn al-Haytham. A “Preview this course” panel sits beside the learner's progress at 0 of 12 lessons.",
+			title: 'Every course, its own page',
+			line: 'A preview before enrolling, progress, notes and highlights, and lessons that open on their own dates.'
+		},
+		{
+			src: '/marketing/grading.webp',
+			alt: 'The Grading scales screen: a built-in Default scale banding A at 90%, B at 80%, C at 70%, D at 60% and F at 0%, beside a form building a new scale with a live Pass/Fail preview.',
+			title: 'Grade on your own scale',
+			line: 'Turn a percentage into a letter. A course grades by the workspace default until you point it at a scale you named yourself.'
+		},
+		{
+			src: '/marketing/forum.webp',
+			alt: 'The General discussion forum: two threads — “Welcome to the community” with 3 replies and “Anyone up for a study group?” with 2 — each showing its author and when it was last answered.',
+			title: 'A room to ask in',
+			line: 'Threaded discussion across the workspace and inside every course, so a question gets answered once.'
 		}
 	] as const;
 
@@ -423,82 +447,24 @@
 		</div>
 	</section>
 
-	<!-- OVERVIEW: headline + three cards (Tailwind, no scoped CSS) -->
+	<!-- SEE IT RUNNING: real screenshots, one call to action. The three cards this
+	     replaced drew the UI in HTML — a GPA nobody earned, a register nobody teaches —
+	     behind a stock photo of strangers, and repeated the build block's topics besides. -->
 	<section class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<div class="flex flex-wrap items-center justify-between gap-4">
-			<h2
-				class="text-3xl font-bold leading-[1.05] tracking-tight text-[#2e3320] sm:text-4xl lg:text-[3.2rem]"
-			>
-				The whole institution, at a glance
-			</h2>
+			<h2 class="h2">See it running</h2>
 			<a
 				href="#capabilities"
-				class="inline-flex items-center gap-2 rounded-full border border-[#e7e4d8] bg-white px-5 py-2.5 text-sm font-semibold text-[#17170f] transition hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(23,23,15,0.08)]"
+				class="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 py-2.5 text-sm font-semibold text-[var(--ink)] transition duration-200 hover:bg-[var(--brand-tint)] motion-reduce:transition-none"
 			>
 				Learn more <Icon icon={ArrowRight02Icon} class="size-4" />
 			</a>
 		</div>
 
 		<div class="mt-8 grid gap-4 md:grid-cols-3">
-			<!-- Roster card -->
-			<div
-				class="flex min-h-[22rem] flex-col justify-center rounded-3xl border border-[#e2eeca] bg-[radial-gradient(120%_90%_at_30%_0%,#eaf5cf,#ffffff_70%)] p-6"
-			>
-				<div class="rounded-2xl bg-white p-5 shadow-[0_14px_36px_-18px_rgba(23,23,15,0.35)]">
-					<p class="font-semibold text-[#17170f]">Today's register</p>
-					<div class="mt-3 flex flex-wrap gap-2">
-						<span class="rounded-full bg-[#2e3320] px-3 py-1 text-xs font-semibold text-[#c4e84b]"
-							>Class 6A</span
-						>
-						<span class="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-[#3f4a2b]"
-							>Dakhil-A</span
-						>
-						<span class="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-[#3f4a2b]"
-							>Alim-B</span
-						>
-						<span class="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-[#3f4a2b]"
-							>Coaching · Physics</span
-						>
-					</div>
-					<p class="mt-4 text-sm leading-snug text-[#6b6a5e]">
-						Mark every class in a tap — nobody slips the roll.
-					</p>
-				</div>
-			</div>
-
-			<!-- Results card -->
-			<div class="flex min-h-[22rem] flex-col rounded-3xl bg-[#dedbf6] p-6">
-				<h3 class="text-2xl font-bold tracking-tight text-[#17170f]">Results,<br />rolled up.</h3>
-				<div class="mt-auto rounded-2xl bg-white p-5">
-					<p class="text-xs font-semibold text-[#6b6a5e]">Report card · Dakhil</p>
-					<p class="mt-1 text-3xl font-bold tracking-tight text-[#17170f]">
-						4.83 <span class="text-sm font-semibold text-[#6b6a5e]">/5.00 GPA</span>
-					</p>
-					<div class="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#6b6a5e]">
-						<span>Quran <b class="text-[#3f4a2b]">A+</b></span>
-						<span>Arabic <b class="text-[#3f4a2b]">A+</b></span>
-						<span>Bangla <b class="text-[#3f4a2b]">A</b></span>
-					</div>
-				</div>
-			</div>
-
-			<!-- Fees photo card -->
-			<div
-				class="relative flex min-h-[22rem] flex-col justify-between overflow-hidden rounded-3xl bg-[#2e3320] p-6 text-white"
-			>
-				<img
-					src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=700&q=75"
-					alt=""
-					loading="lazy"
-					class="absolute inset-0 h-full w-full object-cover"
-				/>
-				<div class="absolute inset-0 bg-gradient-to-b from-black/20 to-black/75"></div>
-				<h3 class="relative text-2xl font-bold tracking-tight">Fees, your way</h3>
-				<p class="relative max-w-[22rem] text-sm leading-relaxed text-white/90">
-					Collect fees in your own bKash or SSLCommerz — 0% platform fee, every taka yours, with a
-					receipt trail.
-				</p>
-			</div>
+			{#each SHOTS as s (s.src)}
+				<ShotCard src={s.src} alt={s.alt} title={s.title} line={s.line} />
+			{/each}
 		</div>
 	</section>
 
