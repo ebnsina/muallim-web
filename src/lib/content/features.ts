@@ -170,7 +170,7 @@ export const FEATURES: Feature[] = [
 	{
 		slug: 'drip-and-prerequisites',
 		group: 'teaching',
-		name: 'Drip & prerequisites',
+		name: 'Lessons that open on time',
 		tagline: 'Release it when they are ready for it',
 		icon: Clock01Icon,
 		headline: 'Nobody learns lesson nine on day one.',

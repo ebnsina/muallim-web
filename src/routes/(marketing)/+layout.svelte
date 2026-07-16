@@ -98,12 +98,6 @@
 		/* Body copy on that gradient: olive, but lighter than --ink-soft under lime. */
 		--cta-ink: #4a4d38;
 
-		/* Placeholder faces. Warm and deliberately off-palette — they stand in for
-		   photographs, not for the system's colours. */
-		--face-1: #c9b7a4;
-		--face-2: #8fae7a;
-		--face-3: #b9a0c6;
-
 		/* The spectrum, warm. Names kept from the old berry system so a page that
 		   asks for one still gets a colour, but every value now sits on cream. */
 		--indigo: #5b4fc4;

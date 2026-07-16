@@ -81,6 +81,20 @@ the image at its half-scale width, offset past the chrome to where the content i
 and fades the cut edge — **the fade goes on the window, not the picture**, or it
 lands 800px along where the card has already clipped it.
 
+**A grid of identical cells says every item is the same size, and they are not.**
+The breadth section is a bento on six columns: wide/narrow, narrow/wide, wide/narrow,
+and the platform closing the full width in olive, laid on its side so a short card
+does not rattle around in a six-column box. Compose the cells by hand — a bento is
+composed, not computed, and a rule derived from a count is a worse way of saying the
+same seven things. **No cell spans two rows**: a 4×2 lead has to stretch to whatever
+its neighbours stack to, no group has the content to fill that, and the card becomes
+a void with a link at the bottom. A row a card cannot fill is worse than a row it
+does not have.
+
+**Tick the list; do not pill it.** A pill reads as a label somebody filed this
+under. A tick reads as a thing that is already there, which is what these sections
+claim. Wide cells run the list in two columns.
+
 The object names a real thing — a clipboard is the register, a medal a result, a
 banknote with ৳ a fee, a paper plane a course sold abroad. The abstract ring and
 globe that came before made a reader decode them, which is a picture doing no work.

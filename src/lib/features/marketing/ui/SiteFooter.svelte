@@ -10,6 +10,12 @@
 
 		Its section links point at the landing's anchors absolutely (`/#faq`), because
 		from any other page a bare `#faq` scrolls to nothing.
+
+		The flag is drawn, not an emoji: 🇧🇩 renders as the letters "BD" on Windows,
+		which is a worse way to say Bangladesh than saying Bangladesh. Its two colours
+		are the flag's own and belong to no palette of ours — the same exception the
+		hero photograph gets. Proportions are the official ones: 3:5, the disc at 9/20
+		across so it sits true when the flag flies.
 	*/
 </script>
 
@@ -64,7 +70,18 @@
 			class="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-[var(--on-brand)]/60"
 		>
 			<span>© 2026 Muallim · All rights reserved</span>
-			<span>Made for people who teach</span>
+			<span class="flex items-center gap-2">
+				<svg
+					viewBox="0 0 30 18"
+					class="h-3.5 w-auto rounded-[2px]"
+					role="img"
+					aria-label="Flag of Bangladesh"
+				>
+					<rect width="30" height="18" fill="#006a4e" />
+					<circle cx="13.5" cy="9" r="3.6" fill="#f42a41" />
+				</svg>
+				Made in Bangladesh · for people who teach
+			</span>
 		</div>
 	</div>
 </footer>

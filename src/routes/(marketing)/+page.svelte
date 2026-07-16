@@ -336,6 +336,29 @@
 	let openFaq = $state(0);
 	const toggleFaq = (i: number) => (openFaq = openFaq === i ? -1 : i);
 
+	// The bento's cells, in GROUPS order, on a six-column grid: wide/narrow, then
+	// narrow/wide, then wide/narrow again, and the platform closing the full width in
+	// olive. The zigzag is the composition — seven identical cells in rows said every
+	// group is the same size, and they are not.
+	//
+	// No cell spans two rows. It tried: a 4×2 lead had to stretch to whatever its
+	// neighbours stacked to, and no group has the content to fill that, so the card
+	// was mostly a void with a link at the bottom. A row a card cannot fill is worse
+	// than a row it does not have.
+	//
+	// Index-keyed on purpose — a bento is composed, not computed, and a rule derived
+	// from a count would be a worse way of saying the same seven things. A group added
+	// past the end falls back to a plain 2-cell rather than breaking the row.
+	const BENTO = [
+		'lg:col-span-4',
+		'lg:col-span-2',
+		'lg:col-span-2',
+		'lg:col-span-4',
+		'lg:col-span-4',
+		'lg:col-span-2',
+		'lg:col-span-6'
+	];
+
 	// The breadth strip: every feature group, counted from the content file so the
 	// number on the page can never drift from the pages behind it.
 	const breadth = FEATURE_GROUPS.map((g) => ({
@@ -650,51 +673,85 @@
 		</div>
 	</section>
 
-	<!-- BREADTH: every feature group, linking into /features. Counts come from the
-	     content file, so the page cannot claim more than there are pages for. -->
+	<!-- BREADTH: every feature group, linking into /features. The list is built from the
+	     content file, so the page cannot tick more than there are pages for. -->
 	<section id="everything" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
 			Everything in it
 		</p>
 		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
 			<h2 class="max-w-[24ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-				Four sides, and {FEATURES.length} features behind them.
+				From the first lesson to the last receipt.
 			</h2>
 			<a
 				href={resolve('/(marketing)/features')}
 				class="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
 			>
-				See all {FEATURES.length} features <Icon icon={ArrowRight02Icon} class="size-4" />
+				Look through all of it <Icon icon={ArrowRight02Icon} class="size-4" />
 			</a>
 		</div>
 		<p class="mt-3 max-w-2xl leading-relaxed text-[var(--muted)]">
-			The list below is the whole product, not a highlight reel — and every one of them has a page
-			saying plainly what it does today.
+			Everything ticked below is running today — not a plan, not a roadmap. Each one has a page that
+			says plainly what it does.
 		</p>
 
-		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+		<!-- A bento rather than seven identical cells in rows: the groups are not the
+		     same size, so the grid should not pretend they are. Teaching leads wide,
+		     the composition zigzags, and the platform — the thing under all of it —
+		     closes the full width in olive, laid on its side so a short card does not
+		     rattle around in a six-column box. -->
+		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
 			{#each breadth as g, i (g.key)}
 				{@const tone = toneAt(i, breadth.length)}
-				<div class="flex flex-col rounded-[var(--r-lg)] p-6 {tone.card}">
-					<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
-						<Icon icon={g.icon} class="size-5" />
-					</span>
-					<h3 class="mt-4 text-lg font-bold {tone.title}">{g.name}</h3>
-					<p class="mt-1 text-sm leading-relaxed {tone.body}">{g.blurb}</p>
-					<ul class="mt-4 flex flex-wrap gap-1.5">
-						{#each g.names as name (name)}
-							<li class="rounded-full {tone.chip} px-2.5 py-1 text-xs font-semibold {tone.body}">
-								{name}
-							</li>
-						{/each}
-					</ul>
-					<a
-						href="{resolve('/(marketing)/features')}#{g.key}"
-						class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold {tone.tick} hover:underline"
-					>
-						Explore {g.name.toLowerCase()}
-						<Icon icon={ArrowRight02Icon} class="size-4" />
-					</a>
+				{@const cell = BENTO[i] ?? 'lg:col-span-2'}
+				{@const lead = i === 0}
+				{@const closer = i === breadth.length - 1}
+				{@const wide = cell.includes('span-4') || cell.includes('span-6')}
+				<div
+					class="flex flex-col rounded-[var(--r-lg)] p-6 {tone.card} {cell} {closer
+						? 'lg:flex-row lg:items-center lg:gap-12'
+						: ''}"
+				>
+					<!-- `contents` dissolves the wrapper everywhere but the closer, so every
+					     other card keeps its plain column and its foot still pins itself. -->
+					<div class={closer ? 'lg:w-80 lg:shrink-0' : 'contents'}>
+						<span
+							class="grid place-items-center rounded-xl {tone.icon} {lead ? 'size-14' : 'size-11'}"
+						>
+							<Icon icon={g.icon} class={lead ? 'size-7' : 'size-5'} />
+						</span>
+						<h3 class="mt-4 font-bold tracking-tight {tone.title} {lead ? 'text-2xl' : 'text-lg'}">
+							{g.name}
+						</h3>
+						<p class="mt-1 leading-relaxed {tone.body} {lead ? 'max-w-lg text-base' : 'text-sm'}">
+							{g.blurb}
+						</p>
+					</div>
+
+					<div class={closer ? 'flex flex-1 flex-col' : 'contents'}>
+						<!-- A ticked list, not a row of pills. A pill reads as a label somebody
+						     filed this under; a tick reads as a thing that is already there, which
+						     is exactly what this section is claiming. -->
+						<ul class="mt-4 grid gap-2 {wide ? 'sm:grid-cols-2' : ''} {closer ? 'lg:mt-0' : ''}">
+							{#each g.names as name (name)}
+								<li class="flex items-center gap-2 text-sm leading-snug {tone.body}">
+									<Icon
+										icon={CheckmarkBadge01Icon}
+										strokeWidth={2}
+										class="size-4 shrink-0 {tone.tick}"
+									/>
+									<span>{name}</span>
+								</li>
+							{/each}
+						</ul>
+						<a
+							href="{resolve('/(marketing)/features')}#{g.key}"
+							class="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-bold {tone.tick} hover:underline"
+						>
+							Explore {g.name.toLowerCase()}
+							<Icon icon={ArrowRight02Icon} class="size-4" />
+						</a>
+					</div>
 				</div>
 			{/each}
 		</div>
@@ -997,14 +1054,6 @@
 	.build-p strong {
 		color: var(--ink);
 		font-weight: 700;
-	}
-
-	/* Feature-card widgets. */
-	.ava:nth-child(2) {
-		background: var(--face-2);
-	}
-	.fw-panel .fw-label {
-		color: color-mix(in oklab, var(--on-brand) 68%, var(--brand));
 	}
 
 	@media (prefers-reduced-motion: reduce) {
