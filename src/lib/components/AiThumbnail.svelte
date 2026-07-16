@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SparklesIcon } from '@hugeicons/core-free-icons';
+	import AiOff from './AiOff.svelte';
 	import Alert from './Alert.svelte';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
@@ -9,7 +10,7 @@
 		/** Hands the accepted image to the page, which uploads it through the same
 		 *  presign → PUT → confirm flow the file picker uses. */
 		onaccept: (file: File) => void | Promise<void>;
-		/** Off unless the server has an image-provider key; then the control is hidden. */
+		/** Off unless the server has an image-provider key; then the control says so. */
 		enabled?: boolean;
 	};
 
@@ -163,4 +164,6 @@
 			{/if}
 		</div>
 	{/if}
+{:else}
+	<AiOff label="Generate with AI" envKey="AI_IMAGE_API_KEY" />
 {/if}

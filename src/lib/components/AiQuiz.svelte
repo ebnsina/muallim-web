@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { createChat, fetchServerSentEvents } from '@tanstack/ai-svelte';
 	import { SparklesIcon } from '@hugeicons/core-free-icons';
+	import AiOff from './AiOff.svelte';
 	import Alert from './Alert.svelte';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
@@ -158,5 +159,15 @@
 				{/if}
 			</div>
 		{/if}
+	</div>
+{:else}
+	<div class="rounded-card border border-border bg-surface-raised p-5">
+		<p class="font-medium">Generate with AI</p>
+		<p class="mt-0.5 text-sm text-muted">
+			Draft questions from this lesson, then pick what to keep.
+		</p>
+		<div class="mt-3">
+			<AiOff label="Generate" />
+		</div>
 	</div>
 {/if}

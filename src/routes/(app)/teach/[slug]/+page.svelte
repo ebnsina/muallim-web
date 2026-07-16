@@ -853,11 +853,9 @@
 				{/if}
 			</form>
 
-			{#if data.aiEnabled}
-				<div class="mt-8">
-					<AiOutline enabled={data.aiEnabled} courseTitle={data.course.title} />
-				</div>
-			{/if}
+			<div class="mt-8">
+				<AiOutline enabled={data.aiEnabled} courseTitle={data.course.title} />
+			</div>
 		</div>
 	{/if}
 

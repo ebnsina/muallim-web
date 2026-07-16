@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { createChat, fetchServerSentEvents } from '@tanstack/ai-svelte';
 	import { SparklesIcon } from '@hugeicons/core-free-icons';
+	import AiOff from './AiOff.svelte';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
@@ -10,7 +11,7 @@
 		prompt: () => string;
 		/** Fills the target field with the accepted draft. */
 		onaccept: (text: string) => void;
-		/** Off unless the server has a provider key; then the control is hidden. */
+		/** Off unless the server has a provider key; then the control says so. */
 		enabled?: boolean;
 		label?: string;
 	};
@@ -81,5 +82,9 @@
 				</div>
 			</div>
 		{/if}
+	</div>
+{:else}
+	<div class="mt-2">
+		<AiOff {label} />
 	</div>
 {/if}

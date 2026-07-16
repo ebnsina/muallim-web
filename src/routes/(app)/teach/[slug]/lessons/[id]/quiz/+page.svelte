@@ -393,15 +393,13 @@
 			{/if}
 		</section>
 
-		{#if data.aiEnabled}
-			<section class="mt-12">
-				<AiQuiz
-					enabled={data.aiEnabled}
-					lessonTitle={data.lessonTitle}
-					lessonContent={data.lessonContent}
-				/>
-			</section>
-		{/if}
+		<section class="mt-12">
+			<AiQuiz
+				enabled={data.aiEnabled}
+				lessonTitle={data.lessonTitle}
+				lessonContent={data.lessonContent}
+			/>
+		</section>
 
 		<section class="mt-12">
 			<h2 class="text-lg font-medium">Add a question</h2>
