@@ -19,6 +19,7 @@
 		CourseIcon,
 		DashboardSquare01Icon,
 		DiplomaIcon,
+		FolderLibraryIcon,
 		IdentityCardIcon,
 		LibraryIcon,
 		Megaphone01Icon,
@@ -26,6 +27,7 @@
 		PackageIcon,
 		Route02Icon,
 		Tag01Icon,
+		Tag02Icon,
 		TaskDaily01Icon,
 		TeachingIcon,
 		UserAdd01Icon,
@@ -148,9 +150,21 @@
 							show: canAuthor
 						},
 						{
-							href: resolve('/teach/taxonomy'),
-							label: 'Categories & tags',
+							href: resolve('/teach/categories'),
+							label: 'Categories',
+							icon: FolderLibraryIcon,
+							show: canAuthor
+						},
+						{
+							href: resolve('/teach/tags'),
+							label: 'Tags',
 							icon: Tag01Icon,
+							show: canAuthor
+						},
+						{
+							href: resolve('/teach/course-taxonomy'),
+							label: 'Course taxonomy',
+							icon: Tag02Icon,
 							show: canAuthor
 						}
 					]
