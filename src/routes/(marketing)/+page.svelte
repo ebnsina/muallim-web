@@ -230,7 +230,7 @@
 			lead: 'Start from a prompt instead of a blank page, then edit everything the studio drafts for you.',
 			points: [
 				'Draft a course outline from a topic',
-				'Generate quiz questions across the 16 types',
+				'Generate quiz questions across the 15 types',
 				'Everything AI writes stays yours to edit',
 				'You publish nothing until you approve it'
 			]
@@ -239,44 +239,29 @@
 
 	let monthly = $state(184250);
 
-	// Rotating card tones — brand, lavender, teal, olive — every one of them mixed
-	// from the layout's tokens. This was a private palette of nine hand-picked hexes
-	// that belonged to no system and could not be themed. `chip` is the pill
-	// background, which has to lift off the dark card rather than sink into it.
-	const tones = [
-		{
-			card: 'border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--brand-tint)]',
-			icon: 'bg-[var(--surface)] text-[var(--brand)]',
-			title: 'text-[var(--ink)]',
-			body: 'text-[color-mix(in_oklab,var(--ink-soft)_72%,var(--surface))]',
-			tick: 'text-[var(--brand)]',
-			chip: 'bg-[color-mix(in_oklab,var(--ink)_6%,transparent)]'
-		},
-		{
-			card: 'bg-[var(--lav)]',
-			icon: 'bg-[var(--surface)] text-[var(--lav-ink)]',
-			title: 'text-[var(--ink)]',
-			body: 'text-[color-mix(in_oklab,var(--lav-ink)_42%,var(--ink))]',
-			tick: 'text-[var(--lav-ink)]',
-			chip: 'bg-[color-mix(in_oklab,var(--surface)_60%,transparent)]'
-		},
-		{
-			card: 'bg-[var(--teal-tint)]',
-			icon: 'bg-[var(--surface)] text-[var(--teal)]',
-			title: 'text-[var(--ink)]',
-			body: 'text-[color-mix(in_oklab,var(--teal)_42%,var(--ink))]',
-			tick: 'text-[var(--teal)]',
-			chip: 'bg-[color-mix(in_oklab,var(--surface)_60%,transparent)]'
-		},
-		{
-			card: 'bg-[var(--brand)] text-[var(--on-brand)]',
-			icon: 'bg-[var(--accent)] text-[var(--brand)]',
-			title: 'text-[var(--accent)]',
-			body: 'text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]',
-			tick: 'text-[var(--accent)]',
-			chip: 'bg-[color-mix(in_oklab,var(--surface)_12%,transparent)]'
-		}
-	];
+	// A set gets its rhythm from one bold step, not a colour each: paper cards, and
+	// the last one olive. This rotated through four tints — brand, lavender, teal,
+	// olive — so a card's colour was decided by its index and meant nothing; a reader
+	// looks for the rule and there isn't one. It is the same lesson the build block's
+	// cards were rebuilt on, and the olive card is where lime gets spent.
+	// `chip` is the pill background, which has to lift off its card rather than sink.
+	const PAPER = {
+		card: 'border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--surface)]',
+		icon: 'bg-[var(--brand-tint)] text-[var(--brand)]',
+		title: 'text-[var(--ink)]',
+		body: 'text-[var(--muted)]',
+		tick: 'text-[var(--brand)]',
+		chip: 'bg-[color-mix(in_oklab,var(--ink)_6%,transparent)]'
+	};
+	const OLIVE = {
+		card: 'border border-[var(--brand)] bg-[var(--brand)]',
+		icon: 'bg-[var(--accent)] text-[var(--brand)]',
+		title: 'text-[var(--accent)]',
+		body: 'text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]',
+		tick: 'text-[var(--accent)]',
+		chip: 'bg-[color-mix(in_oklab,var(--surface)_12%,transparent)]'
+	};
+	const toneAt = (i: number, n: number) => (i === n - 1 ? OLIVE : PAPER);
 
 	// Honest rotating statements for the animated carousel — what the product does,
 	// not invented customer quotes. Real, attributed testimonials can drop in here.
@@ -573,8 +558,8 @@
 		</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each audiences as a, i (a.who)}
-				{@const tone = tones[i % tones.length]}
-				<div class="flex min-h-[15rem] flex-col rounded-3xl p-6 {tone.card}">
+				{@const tone = toneAt(i, audiences.length)}
+				<div class="flex min-h-[15rem] flex-col rounded-[var(--r-lg)] p-6 {tone.card}">
 					<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
 						<Icon icon={a.icon} class="size-5" />
 					</span>
@@ -641,8 +626,8 @@
 		</p>
 		<div class="mt-8 grid gap-4 md:grid-cols-2">
 			{#each tabs as t, i (t.key)}
-				{@const tone = tones[i % tones.length]}
-				<div class="rounded-3xl p-7 {tone.card}">
+				{@const tone = toneAt(i, tabs.length)}
+				<div class="rounded-[var(--r-lg)] p-7 {tone.card}">
 					<span class="grid size-12 place-items-center rounded-xl {tone.icon}">
 						<Icon icon={t.icon} class="size-6" />
 					</span>
@@ -689,8 +674,8 @@
 
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each breadth as g, i (g.key)}
-				{@const tone = tones[i % tones.length]}
-				<div class="flex flex-col rounded-3xl p-6 {tone.card}">
+				{@const tone = toneAt(i, breadth.length)}
+				<div class="flex flex-col rounded-[var(--r-lg)] p-6 {tone.card}">
 					<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
 						<Icon icon={g.icon} class="size-5" />
 					</span>
@@ -723,8 +708,8 @@
 		</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each reasons as r, i (r.title)}
-				{@const tone = tones[i % tones.length]}
-				<div class="flex min-h-[14rem] flex-col rounded-3xl p-6 {tone.card}">
+				{@const tone = toneAt(i, reasons.length)}
+				<div class="flex min-h-[14rem] flex-col rounded-[var(--r-lg)] p-6 {tone.card}">
 					<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
 						<Icon icon={r.icon} class="size-5" />
 					</span>
