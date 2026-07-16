@@ -10,7 +10,8 @@
 		FloppyDiskIcon,
 		Mail01Icon,
 		StarIcon,
-		UserAdd01Icon
+		UserAdd01Icon,
+		UserLock01Icon
 	} from '@hugeicons/core-free-icons';
 	import {
 		Alert,
@@ -25,7 +26,13 @@
 		Select,
 		Sheet
 	} from '$lib/components';
-	import { LIMITS, STUDENT_STATUSES, guardianSchema, updateStudentSchema } from '$lib/schemas';
+	import {
+		LIMITS,
+		STUDENT_STATUSES,
+		guardianAccountSchema,
+		guardianSchema,
+		updateStudentSchema
+	} from '$lib/schemas';
 	import { statusLabel, statusTone, type Guardian, type Student } from '$lib/students';
 	import { toast } from '$lib/toast.svelte';
 	import { validated, type FieldErrors } from '$lib/validation';
@@ -69,6 +76,26 @@
 	let confirming = $state<string | null>(null);
 	let confirmRemove = $state(false);
 	let removingStudent = $state(false);
+
+	// ------------------------------------------------------- guardian sign-in
+	let linkingGuardian = $state<Guardian | null>(null);
+	let linking = $state(false);
+	let linkErrors = $state<FieldErrors>({});
+	const linkProblem = (field: string) => linkErrors[field] ?? form?.errors?.[field];
+
+	// The guardian's own address is the best guess at which person they are, so the
+	// picker opens on it. It stays a guess — the school confirms it before saving.
+	let linkUser = $state('');
+	function openLink(guardian: Guardian) {
+		const match = guardian.email
+			? data.members.find((m) => m.email.toLowerCase() === guardian.email?.toLowerCase())
+			: undefined;
+		linkUser = match?.user_id ?? '';
+		linkErrors = {};
+		linkingGuardian = guardian;
+	}
+
+	const chosenMember = $derived(data.members.find((m) => m.user_id === linkUser));
 </script>
 
 <svelte:head><title>{student.full_name} — Muallim</title></svelte:head>
@@ -309,14 +336,25 @@
 									</Button>
 								</form>
 							{:else}
-								<Button
-									variant="ghost"
-									size="sm"
-									onclick={() => (confirming = guardian.id)}
-									aria-label="Remove {guardian.full_name}"
-								>
-									<Icon icon={Delete02Icon} class="size-4" />
-								</Button>
+								<div class="flex shrink-0 items-center gap-1">
+									<Button
+										variant="ghost"
+										size="sm"
+										onclick={() => openLink(guardian)}
+										aria-label="Give {guardian.full_name} a sign-in"
+									>
+										<Icon icon={UserLock01Icon} class="size-4" />
+										Sign-in
+									</Button>
+									<Button
+										variant="ghost"
+										size="sm"
+										onclick={() => (confirming = guardian.id)}
+										aria-label="Remove {guardian.full_name}"
+									>
+										<Icon icon={Delete02Icon} class="size-4" />
+									</Button>
+								</div>
 							{/if}
 						</div>
 					</li>
@@ -431,6 +469,94 @@
 		</form>
 	</section>
 </div>
+
+<!-- --------------------------------------------------- give a guardian a sign-in -->
+{#if linkingGuardian}
+	{@const guardian = linkingGuardian}
+	<form
+		method="POST"
+		action="?/linkAccount"
+		use:enhance={validated(
+			guardianAccountSchema,
+			(next) => (linkErrors = next),
+			() => {
+				linking = true;
+				return async ({ result, update }) => {
+					await update({ invalidateAll: false, reset: false });
+					linking = false;
+
+					if (result.type !== 'success') return;
+
+					linkingGuardian = null;
+					toast.success(`${guardian.full_name} can now sign in and read this student’s pages.`);
+				};
+			}
+		)}
+	>
+		<Sheet open={linkingGuardian !== null} onClose={() => (linkingGuardian = null)}>
+			{#snippet header()}
+				<h2 class="font-medium">Give {guardian.full_name} a sign-in</h2>
+				<p class="mt-0.5 text-sm text-muted">
+					Choose the person in this workspace who already has an account.
+				</p>
+			{/snippet}
+
+			<input type="hidden" name="guardian_id" value={guardian.id} />
+
+			{#if data.members.length === 0}
+				<!-- The list is empty either because nobody has joined or because this reader may
+				     not see it. Both leave the same nothing to pick from, so say the useful half. -->
+				<Alert tone="warning">
+					Nobody in this workspace can be picked yet. Invite {guardian.full_name} from the People page
+					first, then come back here.
+				</Alert>
+			{:else}
+				<div class="space-y-5">
+					<Field
+						id="guardian_user"
+						label="Who signs in"
+						hint="Only people who already have an account here can be chosen."
+						error={linkProblem('user_id')}
+					>
+						{#snippet children({ id, describedBy, invalid })}
+							<Select
+								{id}
+								{invalid}
+								name="user_id"
+								bind:value={linkUser}
+								aria-describedby={describedBy}
+							>
+								<option value="">Choose a person…</option>
+								{#each data.members as member (member.user_id)}
+									<option value={member.user_id}>{member.name} — {member.email}</option>
+								{/each}
+							</Select>
+						{/snippet}
+					</Field>
+
+					<!-- Saying it plainly, and only once something is picked: this hands a real person
+					     a real view of a real child, and the name is the part worth checking. -->
+					{#if chosenMember}
+						<Alert tone="warning">
+							{chosenMember.name} will be able to sign in and read {student.full_name}’s attendance,
+							fees and progress. Only do this if they are {guardian.full_name}.
+						</Alert>
+					{/if}
+				</div>
+			{/if}
+
+			{#snippet footer()}
+				<Button type="button" variant="ghost" onclick={() => (linkingGuardian = null)}
+					>Cancel</Button
+				>
+				<Button type="submit" loading={linking} disabled={linking || data.members.length === 0}>
+					<Icon icon={UserLock01Icon} class="size-4" />
+					Give access
+				</Button>
+			{/snippet}
+		</Sheet>
+	</form>
+{/if}
 
 <!-- ------------------------------------------------------------- danger zone -->
 <section class="mt-10 rounded-card border border-danger-border bg-danger-surface/40 p-5">

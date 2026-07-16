@@ -47,6 +47,10 @@
 
 	const settled = $derived(data.attempt.status === 'graded');
 
+	// The two kinds muallim-api leaves to a person: an essay and a drawing. Everything
+	// else it grades itself and refuses a mark on.
+	const byHand = (type: string) => type === 'open_ended' || type === 'draw_image';
+
 	function wrote(response: Record<string, unknown>): string {
 		if (typeof response.text === 'string' && response.text !== '') return response.text;
 		return '';
@@ -102,7 +106,7 @@
 							</span>
 						</p>
 
-						{#if question.type !== 'open_ended'}
+						{#if !byHand(question.type)}
 							{#if answer?.correct}
 								<Badge tone="success" icon={CheckmarkCircle02Icon}>Correct</Badge>
 							{:else}
@@ -111,12 +115,40 @@
 						{/if}
 					</div>
 
-					{#if question.type === 'open_ended'}
-						<blockquote
-							class="mt-3 rounded-control bg-surface-sunken px-4 py-3 text-sm whitespace-pre-wrap"
-						>
-							{wrote(answer?.response ?? {}) || 'They left this blank.'}
-						</blockquote>
+					{#if byHand(question.type)}
+						{#if question.type === 'draw_image'}
+							{@const drawing = data.drawingUrls[question.id]}
+							{#if drawing}
+								<!--
+									The link opens the full size: a drawing is marked by looking closely, and
+									the card is not the whole of it.
+								-->
+								<a
+									href={drawing}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="mt-3 block w-fit rounded-control border border-border bg-surface-sunken p-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+								>
+									<img
+										src={drawing}
+										alt="The drawing submitted for question {index + 1}"
+										class="max-h-96 w-auto rounded-sm"
+									/>
+								</a>
+							{:else}
+								<p class="mt-3 rounded-control bg-surface-sunken px-4 py-3 text-sm text-muted">
+									{answer?.response?.upload
+										? 'This drawing could not be opened. Reload the page to try again.'
+										: 'They left this blank.'}
+								</p>
+							{/if}
+						{:else}
+							<blockquote
+								class="mt-3 rounded-control bg-surface-sunken px-4 py-3 text-sm whitespace-pre-wrap"
+							>
+								{wrote(answer?.response ?? {}) || 'They left this blank.'}
+							</blockquote>
+						{/if}
 
 						{#if answer?.graded}
 							<p class="mt-3 text-sm">

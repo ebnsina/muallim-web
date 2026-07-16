@@ -5,6 +5,8 @@
 		Calendar03Icon,
 		Cancel01Icon,
 		Delete02Icon,
+		FloppyDiskIcon,
+		PencilEdit02Icon,
 		PlusSignIcon
 	} from '@hugeicons/core-free-icons';
 	import {
@@ -24,6 +26,7 @@
 		EVENT_KINDS,
 		EVENT_LIMITS,
 		createEventSchema,
+		editEventSchema,
 		kindLabel,
 		kindTone,
 		type CalendarEvent,
@@ -52,6 +55,23 @@
 
 	// The picked kind seeds the form's select, so a re-open keeps the last choice.
 	let kind = $state<EventKind>('holiday');
+
+	// ------------------------------------------------------------------- edit
+	let editing = $state<CalendarEvent | null>(null);
+	let saving = $state(false);
+	let editErrors = $state<FieldErrors>({});
+
+	// The action bags its refusal by event, so a bad date marks the row it is about.
+	const editProblem = (field: string) =>
+		editErrors[field] ?? (form?.editId === editing?.id ? form?.errors?.[field] : undefined);
+
+	// The sheet's own kind, seeded from the event so the select opens on what it is.
+	let editKind = $state<EventKind>('holiday');
+	function openEdit(event: CalendarEvent) {
+		editKind = event.kind as EventKind;
+		editErrors = {};
+		editing = event;
+	}
 
 	// A single day reads as one date; a span reads as a range. Both are ISO dates.
 	function whenLabel(event: CalendarEvent): string {
@@ -271,32 +291,44 @@
 							{/if}
 						</div>
 
-						<form
-							method="POST"
-							action="?/delete"
-							use:enhance={() => {
-								removing = event.id;
-								return async ({ result }) => {
-									removing = null;
-									if (result.type !== 'success') return applyAction(result);
-									events = removeRow(events, eventKey, event.id);
-									toast.success(`“${event.title}” has been removed.`);
-								};
-							}}
-						>
-							<input type="hidden" name="id" value={event.id} />
+						<div class="flex shrink-0 items-center gap-1">
 							<Button
-								type="submit"
 								size="sm"
 								variant="ghost"
-								loading={removing === event.id}
-								disabled={removing === event.id}
-								aria-label="Delete {event.title}"
+								onclick={() => openEdit(event)}
+								aria-label="Edit {event.title}"
 							>
-								<Icon icon={Delete02Icon} class="size-4" />
-								Delete
+								<Icon icon={PencilEdit02Icon} class="size-4" />
+								Edit
 							</Button>
-						</form>
+
+							<form
+								method="POST"
+								action="?/delete"
+								use:enhance={() => {
+									removing = event.id;
+									return async ({ result }) => {
+										removing = null;
+										if (result.type !== 'success') return applyAction(result);
+										events = removeRow(events, eventKey, event.id);
+										toast.success(`“${event.title}” has been removed.`);
+									};
+								}}
+							>
+								<input type="hidden" name="id" value={event.id} />
+								<Button
+									type="submit"
+									size="sm"
+									variant="ghost"
+									loading={removing === event.id}
+									disabled={removing === event.id}
+									aria-label="Delete {event.title}"
+								>
+									<Icon icon={Delete02Icon} class="size-4" />
+									Delete
+								</Button>
+							</form>
+						</div>
 					</div>
 				</li>
 			{/each}
@@ -330,3 +362,132 @@
 		{/if}
 	{/if}
 </section>
+
+<!-- -------------------------------------------------------------------- edit -->
+{#if editing}
+	{@const event = editing}
+	<form
+		method="POST"
+		action="?/edit"
+		use:enhance={validated(
+			editEventSchema,
+			(next) => (editErrors = next),
+			() => {
+				saving = true;
+				return async ({ result, update }) => {
+					await update({ invalidateAll: false, reset: false });
+					saving = false;
+
+					if (result.type !== 'success') return;
+
+					const edited = result.data?.edited as CalendarEvent | undefined;
+					if (edited) {
+						// The row updates in place: the calendar's order is the API's, and an edit
+						// that moved the date does not get to jump the queue on the strength of a guess.
+						events = {
+							...events,
+							rows: events.rows.map((row) => (row.id === edited.id ? edited : row))
+						};
+						editing = null;
+						toast.success(`“${edited.title}” has been saved.`);
+					}
+				};
+			}
+		)}
+	>
+		<Sheet open={editing !== null} onClose={() => (editing = null)}>
+			{#snippet header()}
+				<h2 class="font-medium">Edit event</h2>
+				<p class="mt-0.5 text-sm text-muted">
+					Change what this day is, when it falls, or its note.
+				</p>
+			{/snippet}
+
+			<input type="hidden" name="id" value={event.id} />
+
+			<div class="grid gap-5 sm:grid-cols-2">
+				<div class="sm:col-span-2">
+					<Field id="edit-title" label="Title" error={editProblem('title')}>
+						{#snippet children({ id, describedBy, invalid })}
+							<Input
+								{id}
+								{invalid}
+								name="title"
+								value={event.title}
+								aria-describedby={describedBy}
+								{...EVENT_LIMITS.title}
+							/>
+						{/snippet}
+					</Field>
+				</div>
+
+				<Field id="edit-kind" label="Kind" error={editProblem('kind')}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Select {id} {invalid} name="kind" bind:value={editKind} aria-describedby={describedBy}>
+							{#each EVENT_KINDS as option (option)}
+								<option value={option}>{kindLabel(option)}</option>
+							{/each}
+						</Select>
+					{/snippet}
+				</Field>
+
+				<div class="hidden sm:block"></div>
+
+				<Field id="edit-starts_on" label="Start date" error={editProblem('starts_on')}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="starts_on"
+							value={event.starts_on}
+							aria-describedby={describedBy}
+							{...EVENT_LIMITS.date}
+						/>
+					{/snippet}
+				</Field>
+
+				<Field
+					id="edit-ends_on"
+					label="End date"
+					hint="An end date can be changed, but not taken off once set."
+					error={editProblem('ends_on')}
+				>
+					{#snippet children({ id, describedBy, invalid })}
+						<Input
+							{id}
+							{invalid}
+							name="ends_on"
+							value={event.ends_on ?? ''}
+							aria-describedby={describedBy}
+							{...EVENT_LIMITS.endDate}
+						/>
+					{/snippet}
+				</Field>
+
+				<div class="sm:col-span-2">
+					<Field id="edit-description" label="Description" error={editProblem('description')}>
+						{#snippet children({ id, describedBy, invalid })}
+							<Textarea
+								{id}
+								{invalid}
+								name="description"
+								rows={3}
+								value={event.description ?? ''}
+								aria-describedby={describedBy}
+								{...EVENT_LIMITS.description}
+							/>
+						{/snippet}
+					</Field>
+				</div>
+			</div>
+
+			{#snippet footer()}
+				<Button type="button" variant="ghost" onclick={() => (editing = null)}>Cancel</Button>
+				<Button type="submit" loading={saving} disabled={saving}>
+					<Icon icon={FloppyDiskIcon} class="size-4" />
+					Save changes
+				</Button>
+			{/snippet}
+		</Sheet>
+	</form>
+{/if}

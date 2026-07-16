@@ -15,7 +15,8 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
-	const submission = await authedApi(url.origin, locals.accessToken).GET('/v1/attempts/{id}', {
+	const api = authedApi(url.origin, locals.accessToken);
+	const submission = await api.GET('/v1/attempts/{id}', {
 		params: { path: { id: params.attempt } }
 	});
 
@@ -28,19 +29,45 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 
 	const answers = new Map((submission.data.answers ?? []).map((a) => [a.question_id, a]));
 
+	const questions = (submission.data.questions ?? []).map((question) => ({
+		...question,
+		answer: answers.get(question.id) ?? null
+	}));
+
+	/*
+		A drawing lives in the object store, and the marker's browser has no credentials
+		for it — so the URL is fetched here, signed, and handed over ready to render.
+		Asked for only where a drawing was actually uploaded: `upload` carries its key.
+	*/
+	const drawn = questions.filter((q) => q.type === 'draw_image' && q.answer?.response?.upload);
+	const drawings = await Promise.all(
+		drawn.map((question) =>
+			api.GET('/v1/attempts/{id}/answers/{question_id}/drawing', {
+				params: { path: { id: params.attempt, question_id: question.id } }
+			})
+		)
+	);
+
+	// A drawing that will not load is not worth failing the whole page over — the rest
+	// of the attempt still marks, and the one picture says it is missing where it sits.
+	const drawingUrls: Record<string, string> = {};
+	drawn.forEach((question, index) => {
+		const url = drawings[index].data?.url;
+		if (url) drawingUrls[question.id] = url;
+	});
+
 	return {
 		slug: params.slug,
 		lessonId: params.id,
 		attemptId: params.attempt,
 		attempt: submission.data.attempt,
 
-		// Only the essays are markable. The rest are shown for context, and muallim-api
-		// refuses a mark on them — an instructor who could overwrite the machine's
-		// verdict on a multiple-choice question could quietly make a wrong answer right.
-		questions: (submission.data.questions ?? []).map((question) => ({
-			...question,
-			answer: answers.get(question.id) ?? null
-		}))
+		// Only the essays and the drawings are markable. The rest are shown for context,
+		// and muallim-api refuses a mark on them — an instructor who could overwrite the
+		// machine's verdict on a multiple-choice question could quietly make a wrong
+		// answer right.
+		questions,
+		drawingUrls
 	};
 };
 

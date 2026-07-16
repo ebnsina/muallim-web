@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
-import { EVENT_KINDS, createEventSchema, type EventKind } from '$lib/calendar';
+import { EVENT_KINDS, createEventSchema, editEventSchema, type EventKind } from '$lib/calendar';
 import { pageOf } from '$lib/paging';
 import { authedApi } from '$lib/server/api';
 import { parseForm } from '$lib/validation';
@@ -95,6 +95,50 @@ export const actions: Actions = {
 		}
 
 		return { created: data.event };
+	},
+
+	/*
+		Edit an event. PATCH, not its PUT alias: muallim-api leaves an absent field alone,
+		which is a patch whichever verb asks for it, and PATCH is the one that says so.
+		The whole form is sent because the form holds the whole event.
+	*/
+	edit: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login?next=%2Fmanage%2Fcalendar');
+
+		const form = await request.formData();
+		const id = String(form.get('id') ?? '');
+
+		const parsed = parseForm(editEventSchema, form);
+		if (!parsed.ok) return fail(400, { editId: id, errors: parsed.errors });
+
+		const { title, kind, starts_on, ends_on, description } = parsed.value;
+
+		const {
+			data,
+			error: problem,
+			response
+		} = await authedApi(url.origin, locals.accessToken).PATCH('/v1/calendar/events/{id}', {
+			params: { path: { id } },
+			body: {
+				title,
+				kind,
+				starts_on,
+				...(ends_on ? { ends_on } : {}),
+
+				// A cleared note is a real edit, so it goes as an empty string; a cleared end
+				// date cannot be sent that way — the API would read it as a date and refuse.
+				description
+			}
+		});
+
+		if (problem || !data) {
+			return fail(response?.status ?? 500, {
+				editId: id,
+				message: problemMessage(problem, 'We couldn’t save that event. Please try again.')
+			});
+		}
+
+		return { edited: data.event };
 	},
 
 	/** Delete an event. The API answers 204; the row is gone. */

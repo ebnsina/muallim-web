@@ -1,10 +1,13 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
 import { authedApi } from '$lib/server/api';
-import { guardianSchema, updateStudentSchema } from '$lib/schemas';
+import { guardianAccountSchema, guardianSchema, updateStudentSchema } from '$lib/schemas';
 import type { Section } from '$lib/students';
 import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
+
+/** Enough of the workspace to fill the "who signs in" picker; the rest is behind a cursor. */
+const MEMBER_LIMIT = 100;
 
 /*
 	One student: their record, their guardians, and the classes they can be placed
@@ -18,10 +21,11 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	const [studentRes, guardiansRes, classesRes] = await Promise.all([
+	const [studentRes, guardiansRes, classesRes, membersRes] = await Promise.all([
 		api.GET('/v1/students/{id}', { params: { path: { id: params.id } } }),
 		api.GET('/v1/students/{id}/guardians', { params: { path: { id: params.id } } }),
-		api.GET('/v1/classes')
+		api.GET('/v1/classes'),
+		api.GET('/v1/members', { params: { query: { limit: MEMBER_LIMIT } } })
 	]);
 
 	if (studentRes.error || !studentRes.data) {
@@ -48,7 +52,11 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 		student: studentRes.data.student,
 		guardians: guardiansRes.data?.guardians ?? [],
 		classes,
-		sectionsByClass
+		sectionsByClass,
+
+		// Empty when this reader may not see the people list; the picker then says so
+		// rather than offering an empty menu with no explanation.
+		members: membersRes.data?.members ?? []
 	};
 };
 
@@ -136,6 +144,40 @@ export const actions: Actions = {
 		}
 
 		redirect(303, '/manage/students');
+	},
+
+	/*
+		Give a guardian a sign-in. The account must already be in this workspace — the API
+		ties the guardian to it and never creates one, so an address nobody holds is not a
+		person this can reach. It answers 204: there is nothing to read back but success.
+	*/
+	linkAccount: async ({ request, locals, params, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+
+		const form = await request.formData();
+		const guardianId = String(form.get('guardian_id') ?? '');
+
+		const parsed = parseForm(guardianAccountSchema, form);
+		if (!parsed.ok) return fail(400, { errors: parsed.errors });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/students/{id}/guardians/{guardian_id}/account',
+			{
+				params: { path: { id: params.id, guardian_id: guardianId } },
+				body: { user_id: parsed.value.user_id }
+			}
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(
+					problem,
+					'We couldn’t give that guardian a sign-in. Please try again.'
+				)
+			});
+		}
+
+		return { linked: guardianId };
 	},
 
 	/** Unlink a guardian. The guardian record survives; only the link to this student goes. */

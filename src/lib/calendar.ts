@@ -88,6 +88,14 @@ export const createEventSchema = z
 		message: 'The end date must be on or after the start date.'
 	});
 
+/*
+	Editing an event. The same shape as adding one: the form is seeded with what the
+	event already says, so every field arrives filled and the same rules hold. Blanking
+	the end date leaves the span alone rather than clearing it — muallim-api reads an
+	absent date as "unchanged", and has no way to say "remove".
+*/
+export const editEventSchema = createEventSchema;
+
 /** The HTML constraints for the calendar form, as attributes. Spread them onto the control. */
 export const EVENT_LIMITS = {
 	title: { required: true, maxlength: 200 },
