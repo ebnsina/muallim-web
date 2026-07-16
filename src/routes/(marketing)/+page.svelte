@@ -13,7 +13,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Button, CardObject, SiteCta } from '$lib/features/marketing/ui';
+	import { Button, CardObject, IsoBlocks, SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -382,7 +382,7 @@
 
 		<div class="build-cards">
 			<div class="fcard fcard-teal">
-				<CardObject kind="ring" />
+				<IsoBlocks tone="lime" />
 				<h3 class="fcard-title">Run the day, effortlessly</h3>
 				<ul class="fcard-list">
 					<li><Icon icon={ArrowRight02Icon} class="size-4" /> Take the register, class by class</li>
