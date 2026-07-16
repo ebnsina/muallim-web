@@ -25,7 +25,9 @@
 		{ value: 'expert', label: 'Expert' }
 	];
 
-	const filtered = $derived(Boolean(data.q || data.difficulty || data.author));
+	const filtered = $derived(
+		Boolean(data.q || data.difficulty || data.author || data.category || data.tag)
+	);
 
 	// When the page is one person's work, it says so — and the search box below still
 	// searches within it, because the filter is in the URL the form does not name.
@@ -40,6 +42,8 @@
 		if (data.q) params.set('q', data.q);
 		if (data.difficulty) params.set('difficulty', data.difficulty);
 		if (data.author) params.set('author', data.author);
+		if (data.category) params.set('category', data.category);
+		if (data.tag) params.set('tag', data.tag);
 		params.set('cursor', data.nextCursor);
 		return `${resolve('/courses')}?${params.toString()}`;
 	});
@@ -81,6 +85,15 @@
 			<input type="hidden" name="author" value={data.author} />
 		{/if}
 
+		<!-- Same for a category or tag filter with no picker to carry it: a search
+		     from a signed-out reader would otherwise silently drop the filter. -->
+		{#if data.category && data.categories.length === 0}
+			<input type="hidden" name="category" value={data.category} />
+		{/if}
+		{#if data.tag && data.tags.length === 0}
+			<input type="hidden" name="tag" value={data.tag} />
+		{/if}
+
 		<div class="min-w-0 flex-1">
 			<Label for="q" class="sr-only">Search courses</Label>
 			<div class="relative">
@@ -111,6 +124,43 @@
 				{/each}
 			</Select>
 		</div>
+
+		<!-- The category and tag pickers only appear when the vocabulary loaded — a
+		     signed-in reader with the names to build them. The URL filter still works
+		     without them; there is just nothing to click. -->
+		{#if data.categories.length > 0}
+			<div class="w-44">
+				<Label for="category" class="sr-only">Category</Label>
+				<Select
+					id="category"
+					name="category"
+					value={data.category}
+					onchange={(event) => event.currentTarget.form?.requestSubmit()}
+				>
+					<option value="">All categories</option>
+					{#each data.categories as category (category.id)}
+						<option value={category.id}>{category.name}</option>
+					{/each}
+				</Select>
+			</div>
+		{/if}
+
+		{#if data.tags.length > 0}
+			<div class="w-44">
+				<Label for="tag" class="sr-only">Tag</Label>
+				<Select
+					id="tag"
+					name="tag"
+					value={data.tag}
+					onchange={(event) => event.currentTarget.form?.requestSubmit()}
+				>
+					<option value="">All tags</option>
+					{#each data.tags as tag (tag.id)}
+						<option value={tag.id}>{tag.name}</option>
+					{/each}
+				</Select>
+			</div>
+		{/if}
 
 		<Button type="submit" variant="secondary">
 			<Icon icon={Search01Icon} class="size-4" />
