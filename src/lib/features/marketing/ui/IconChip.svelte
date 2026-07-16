@@ -18,7 +18,7 @@
 		justify-content: center;
 		width: 2.5rem;
 		height: 2.5rem;
-		border-radius: 12px;
+		border-radius: var(--r-sm);
 	}
 	.tone-brand {
 		background: var(--brand-tint);

@@ -1,16 +1,15 @@
 <script lang="ts">
 	/**
-	 * The marketing preview, composed from the UI kit — frosted Card, Button, IconChip,
-	 * Tag — over a fixed aurora. Tokens come from the (marketing) layout; the only CSS
-	 * here is the page's own layout and the bespoke dashboard viz (meter, gauge, split).
-	 * Light only. English content, ৳ pricing. Live at /preview.
+	 * The marketing preview, composed from the UI kit — paper Card, pill Button,
+	 * IconChip, Tag — on flat cream, the same look as the landing. Tokens come from
+	 * the (marketing) layout; the only CSS here is the page's own layout and the
+	 * bespoke dashboard viz (meter, gauge, split). Light only. ৳ pricing.
 	 */
 	import { Icon } from '$lib/components';
 	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
 	import {
 		ArrowRight01Icon,
 		ArrowUpRight01Icon,
-		Mortarboard01Icon,
 		School01Icon,
 		Building01Icon,
 		Mosque01Icon,
@@ -88,8 +87,10 @@
 		{ icon: UserMultipleIcon, tone: 'rose', label: 'New admissions', value: `${num(18)}` }
 	] as const;
 
+	// Split colours come from the marketing spectrum, not the gateways' own brands —
+	// the palette has no bKash pink, and inventing one is how two looks started.
 	const gateways = [
-		['bKash', 62, '#e2136e'],
+		['bKash', 62, 'var(--rose)'],
 		['SSLCommerz', 24, 'var(--brand)'],
 		['Cash', 14, 'var(--muted)']
 	] as const;
@@ -109,12 +110,6 @@
 <svelte:head><title>Muallim — design preview</title></svelte:head>
 
 <div class="page">
-	<header class="menu">
-		<span class="brand"><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</span>
-		<Button href="#start" size="sm"
-			>Start free <Icon icon={ArrowRight01Icon} class="size-4" /></Button
-		>
-	</header>
 
 	<section class="hero">
 		<div>
@@ -255,42 +250,12 @@
 			</Card>
 		</Card>
 	</section>
-
-	<footer class="foot">
-		0% platform fee. The school is the merchant of record — you own your money, your refunds, your
-		students.
-	</footer>
 </div>
 
 <style>
-	/* A full-viewport aurora, held fixed so every frosted card scrolls over the same
-	   wash of color, top to bottom. */
 	.page {
 		min-height: 100vh;
-		background-color: var(--bg);
-		background-image:
-			radial-gradient(
-				50rem 40rem at 8% 6%,
-				color-mix(in oklab, var(--brand) 24%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				46rem 38rem at 94% 10%,
-				color-mix(in oklab, var(--gold) 20%, transparent),
-				transparent 58%
-			),
-			radial-gradient(
-				46rem 40rem at 88% 88%,
-				color-mix(in oklab, var(--indigo) 18%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				42rem 38rem at 10% 90%,
-				color-mix(in oklab, var(--teal) 15%, transparent),
-				transparent 60%
-			);
-		background-repeat: no-repeat;
-		background-attachment: fixed;
+		background: var(--cream);
 		padding-bottom: 4rem;
 	}
 
@@ -444,7 +409,7 @@
 		background: var(--brand-tint);
 		color: var(--brand);
 		font-weight: 700;
-		border-radius: 8px;
+		border-radius: var(--r-sm);
 		padding: 0.2rem 0.5rem;
 		font-size: 0.9rem;
 	}
@@ -462,7 +427,8 @@
 	.h2 {
 		font-weight: 700;
 		font-size: clamp(1.7rem, 3vw, 2.3rem);
-		letter-spacing: -0.02em;
+		letter-spacing: -0.025em;
+		color: var(--brand);
 	}
 	.lead {
 		margin-top: 0.5rem;

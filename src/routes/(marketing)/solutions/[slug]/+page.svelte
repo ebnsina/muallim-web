@@ -1,18 +1,13 @@
 <script lang="ts">
 	/**
-	 * A per-audience solution page, in the locked marketing design — composed from the
-	 * UI kit over a fixed aurora. The segment data (headline, blurb, the "today" list,
-	 * the highlight) is preserved; only the presentation is the new design.
+	 * A per-audience solution page — flat cream, paper cards, pill buttons, the same
+	 * look as the landing. The segment data (headline, blurb, the "today" list, the
+	 * highlight) is content, not presentation, and is untouched here.
 	 */
 	import { resolve } from '$app/paths';
-	import { Icon, MarketingFooter } from '$lib/components';
+	import { Icon } from '$lib/components';
 	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
-	import {
-		ArrowRight01Icon,
-		ArrowUpRight01Icon,
-		Tick02Icon,
-		Mortarboard01Icon
-	} from '@hugeicons/core-free-icons';
+	import { ArrowRight01Icon, ArrowUpRight01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -33,17 +28,6 @@
 </svelte:head>
 
 <div class="page">
-	<header class="menu">
-		<a class="brand" href={resolve('/')}><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</a
-		>
-		<div class="menu-actions">
-			<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
-			<Button href={resolve('/register')} size="sm">
-				Start free <Icon icon={ArrowRight01Icon} class="size-4" />
-			</Button>
-		</div>
-	</header>
-
 	<section class="hero">
 		<Tag>{segment.eyebrow}</Tag>
 		<h1 class="h1">
@@ -106,52 +90,10 @@
 	</section>
 </div>
 
-<MarketingFooter />
-
 <style>
 	.page {
-		background-color: var(--bg);
-		background-image:
-			radial-gradient(
-				50rem 40rem at 8% 4%,
-				color-mix(in oklab, var(--brand) 24%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				46rem 38rem at 94% 8%,
-				color-mix(in oklab, var(--gold) 20%, transparent),
-				transparent 58%
-			),
-			radial-gradient(
-				46rem 40rem at 88% 82%,
-				color-mix(in oklab, var(--indigo) 16%, transparent),
-				transparent 60%
-			);
-		background-repeat: no-repeat;
-		background-attachment: fixed;
+		background: var(--cream);
 		padding-bottom: 5rem;
-	}
-	.menu {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		max-width: 76rem;
-		margin: 0 auto;
-		padding: 1.4rem 1.5rem 0;
-	}
-	.menu-actions {
-		display: flex;
-		gap: 0.6rem;
-	}
-	.brand {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-weight: 700;
-		font-size: 1.2rem;
-		letter-spacing: -0.01em;
-		color: var(--brand);
-		text-decoration: none;
 	}
 
 	.hero {
@@ -193,7 +135,8 @@
 	.h2 {
 		font-weight: 700;
 		font-size: clamp(1.7rem, 3vw, 2.3rem);
-		letter-spacing: -0.02em;
+		letter-spacing: -0.025em;
+		color: var(--brand);
 	}
 	.lead {
 		margin-top: 0.5rem;
@@ -204,9 +147,10 @@
 	.eyebrow {
 		font-size: 0.72rem;
 		font-weight: 700;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		color: var(--brand);
+		color: var(--ink-soft);
+		margin: 0 0 0.4rem;
 	}
 	.grid {
 		margin-top: 1.5rem;

@@ -2,9 +2,9 @@
 	import type { Snippet } from 'svelte';
 
 	/**
-	 * The marketing button — large, rounded‑xl, flat. Separation is a border's job,
-	 * not a shadow's; the only motion is a small lift on hover. Solid is berry, ghost
-	 * is bordered. Renders an <a> when given href, a <button> otherwise.
+	 * The marketing button — a pill, as on the landing. Solid is olive carrying the
+	 * weight; ghost is white paper behind a hairline border. The only motion is a
+	 * small lift. Renders an <a> when given href, a <button> otherwise.
 	 */
 	type Props = {
 		children: Snippet;
@@ -36,43 +36,41 @@
 	.btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.95rem 1.9rem;
-		border: 0;
-		border-radius: 0.75rem;
+		gap: 0.45rem;
+		padding: 0.8rem 1.35rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
 		font: inherit;
 		font-weight: 600;
-		font-size: 1.02rem;
+		font-size: 0.98rem;
 		line-height: 1;
 		text-decoration: none;
 		cursor: pointer;
 		transition:
-			transform 0.12s ease,
-			background 0.12s ease,
-			border-color 0.12s ease,
-			color 0.12s ease;
+			transform 0.14s ease,
+			background 0.14s ease,
+			box-shadow 0.14s ease;
 	}
 	.sm {
-		padding: 0.55rem 1.1rem;
+		padding: 0.55rem 1.05rem;
 		font-size: 0.9rem;
 	}
 	.solid {
 		background: var(--brand);
-		color: #fff;
+		color: var(--accent-tint);
 	}
 	.solid:hover {
-		background: var(--brand-strong);
+		background: var(--brand-soft);
 		transform: translateY(-1px);
 	}
 	.ghost {
 		background: var(--surface);
 		color: var(--ink);
-		border: 1px solid var(--line);
+		border-color: var(--line);
 	}
 	.ghost:hover {
-		border-color: var(--brand);
-		color: var(--brand);
 		transform: translateY(-1px);
+		box-shadow: 0 6px 20px rgba(23, 23, 15, 0.07);
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.btn {

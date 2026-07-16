@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * A switch — the trailing control of a settings list item. `checked` is bindable;
-	 * the knob slides and the track fills berry when on.
+	 * the knob slides and the track fills olive when on.
 	 */
 	let { checked = $bindable(false), label }: { checked?: boolean; label?: string } = $props();
 </script>
@@ -48,9 +48,9 @@
 		width: 1.25rem;
 		height: 1.25rem;
 		border-radius: 999px;
-		background: #fff;
+		background: var(--surface);
 		transform: translateY(-50%);
-		box-shadow: 0 1px 2px rgba(33, 24, 32, 0.25);
+		box-shadow: 0 1px 2px rgba(23, 23, 15, 0.25);
 		transition: left 0.16s ease;
 	}
 	.toggle.on .knob {

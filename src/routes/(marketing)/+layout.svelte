@@ -1,19 +1,33 @@
 <script lang="ts">
 	/*
-		The marketing shell.
+		The marketing shell: the tokens, the header, the footer.
 
 		Marketing pages are grouped under (marketing), apart from the app under (app),
 		so the two never share chrome. Marketing does not theme — it is light, always —
 		so the design tokens live here, on one wrapper, and every marketing component
-		inherits them (CSS custom properties cascade). The look is locked in the tokens
-		below and the components under $lib/features/marketing/ui; pages compose those,
-		not raw CSS.
+		inherits them (CSS custom properties cascade).
+
+		The header and footer live here too, which is the whole point of a layout. They
+		used to live inside the landing: every other page then grew its own header, none
+		of them agreed, and /solutions and /features had no footer at all. A page's job
+		is its content. The chrome is the shell's.
+
+		The landing floats its header over a hero photograph and everything else sits on
+		cream, so the tone follows the route — one header, two backdrops, rather than
+		two headers that drift.
 	*/
+	import { page } from '$app/state';
+	import { SiteFooter, SiteHeader } from '$lib/features/marketing/ui';
+
 	let { children } = $props();
+
+	const onLanding = $derived(page.url.pathname === '/');
 </script>
 
-<div class="marketing">
+<div class="marketing" class:landing={onLanding}>
+	<SiteHeader tone={onLanding ? 'photo' : 'cream'} />
 	{@render children()}
+	<SiteFooter />
 </div>
 
 <style>
@@ -46,6 +60,9 @@
 		--accent: #c4e84b;
 		--accent-tint: #eaf5cf;
 		--accent-ink: #4a5f10;
+		/* The band the footer sits in, and the ink that reads on olive. */
+		--accent-band: #dfeaa6;
+		--on-brand: #eef0e6;
 
 		/* The second voice, for when one accent is not enough to separate two ideas. */
 		--lav: #dedbf6;
@@ -91,6 +108,12 @@
 		--glass-shadow: 0 12px 30px -28px rgba(23, 23, 15, 0.18);
 		--tint: var(--surface-2);
 		--tint-border: var(--line);
+
+		/* The shell paints the paper. Without this every page that did not paint its
+		   own showed the app's dark root through — which is what a layout is for. */
+		position: relative;
+		min-height: 100vh;
+		background: var(--bg);
 
 		color: var(--ink);
 	}

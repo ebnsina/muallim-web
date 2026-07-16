@@ -1,17 +1,13 @@
 <script lang="ts">
 	/**
 	 * The feature index — every feature, grouped, so the breadth is visible without
-	 * scrolling for it. Locked marketing design, composed from the UI kit.
+	 * scrolling for it. Flat cream and paper cards, the same look as the landing.
 	 */
 	import { resolve } from '$app/paths';
-	import { Icon, MarketingFooter } from '$lib/components';
+	import { Icon } from '$lib/components';
 	import { Card, Button, IconChip, Tag } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS, featuresIn } from '$lib/content/features';
-	import {
-		ArrowRight01Icon,
-		ArrowUpRight01Icon,
-		Mortarboard01Icon
-	} from '@hugeicons/core-free-icons';
+	import { ArrowRight01Icon, ArrowUpRight01Icon } from '@hugeicons/core-free-icons';
 
 	const TONES = ['indigo', 'teal', 'violet', 'amber', 'rose'] as const;
 </script>
@@ -25,17 +21,6 @@
 </svelte:head>
 
 <div class="page">
-	<header class="menu">
-		<a class="brand" href={resolve('/')}><Icon icon={Mortarboard01Icon} class="size-6" /> Muallim</a
-		>
-		<div class="menu-actions">
-			<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
-			<Button href={resolve('/register')} size="sm">
-				Start free <Icon icon={ArrowRight01Icon} class="size-4" />
-			</Button>
-		</div>
-	</header>
-
 	<section class="hero">
 		<Tag>{FEATURES.length} features, all of them shipping</Tag>
 		<h1 class="h1">
@@ -110,52 +95,10 @@
 	</section>
 </div>
 
-<MarketingFooter />
-
 <style>
 	.page {
-		background-color: var(--bg);
-		background-image:
-			radial-gradient(
-				50rem 40rem at 8% 4%,
-				color-mix(in oklab, var(--brand) 24%, transparent),
-				transparent 60%
-			),
-			radial-gradient(
-				46rem 38rem at 94% 8%,
-				color-mix(in oklab, var(--gold) 20%, transparent),
-				transparent 58%
-			),
-			radial-gradient(
-				46rem 40rem at 88% 82%,
-				color-mix(in oklab, var(--indigo) 16%, transparent),
-				transparent 60%
-			);
-		background-repeat: no-repeat;
-		background-attachment: fixed;
+		background: var(--cream);
 		padding-bottom: 5rem;
-	}
-	.menu {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		max-width: 76rem;
-		margin: 0 auto;
-		padding: 1.4rem 1.5rem 0;
-	}
-	.menu-actions {
-		display: flex;
-		gap: 0.6rem;
-	}
-	.brand {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-weight: 700;
-		font-size: 1.2rem;
-		letter-spacing: -0.01em;
-		color: var(--brand);
-		text-decoration: none;
 	}
 
 	.hero {
@@ -198,7 +141,8 @@
 	.h2 {
 		font-weight: 700;
 		font-size: clamp(1.7rem, 3vw, 2.3rem);
-		letter-spacing: -0.02em;
+		letter-spacing: -0.025em;
+		color: var(--brand);
 		margin: 0;
 	}
 	.lead {

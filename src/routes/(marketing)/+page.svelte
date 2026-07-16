@@ -18,7 +18,6 @@
 		ArrowRight01Icon,
 		ArrowRight02Icon,
 		Tick02Icon,
-		Mortarboard01Icon,
 		School01Icon,
 		UserMultipleIcon,
 		Money04Icon,
@@ -178,69 +177,7 @@
 		}
 	];
 
-	let menuOpen = $state(false);
 	let monthly = $state(184250);
-	let megaOpen = $state(false);
-	let activeCat = $state(0);
-	// A short close-delay so moving the cursor across the gap into the panel — or
-	// between the trigger and the panel — doesn't dismiss the menu mid-flight.
-	let megaCloseTimer: ReturnType<typeof setTimeout>;
-	const openMega = () => {
-		clearTimeout(megaCloseTimer);
-		megaOpen = true;
-	};
-	const scheduleCloseMega = () => {
-		clearTimeout(megaCloseTimer);
-		megaCloseTimer = setTimeout(() => (megaOpen = false), 140);
-	};
-
-	// Header mega menu — two panels: categories on the left, their features on the right.
-	const megaCats = [
-		{
-			icon: Book02Icon,
-			title: 'Creation',
-			sub: 'Build courses visually, faster.',
-			items: [
-				{ icon: Book02Icon, label: 'Course Builder' },
-				{ icon: ClipboardIcon, label: 'Content Bank' },
-				{ icon: AiBrain01Icon, label: 'AI Studio' },
-				{ icon: CheckmarkBadge01Icon, label: 'Certificate Builder' }
-			]
-		},
-		{
-			icon: Message02Icon,
-			title: 'Engagement',
-			sub: 'Keep learners hooked.',
-			items: [
-				{ icon: Quiz01Icon, label: 'Quizzes & assignments' },
-				{ icon: Message02Icon, label: 'Forum & Q&A' },
-				{ icon: ChartLineData01Icon, label: 'Points & badges' },
-				{ icon: School01Icon, label: 'Notifications' }
-			]
-		},
-		{
-			icon: Money04Icon,
-			title: 'Monetization',
-			sub: 'Sell courses your way.',
-			items: [
-				{ icon: Money04Icon, label: 'Pricing & checkout' },
-				{ icon: Store01Icon, label: 'bKash & SSLCommerz' },
-				{ icon: ChartLineData01Icon, label: 'Stripe · international' },
-				{ icon: CheckmarkBadge01Icon, label: '0% platform fee' }
-			]
-		},
-		{
-			icon: ClipboardIcon,
-			title: 'Management',
-			sub: 'Run everything in one place.',
-			items: [
-				{ icon: UserMultipleIcon, label: 'Students & guardians' },
-				{ icon: ClipboardIcon, label: 'Attendance' },
-				{ icon: CheckmarkBadge01Icon, label: 'Exams & report cards' },
-				{ icon: Money04Icon, label: 'Fees & timetable' }
-			]
-		}
-	];
 
 	// Rotating card tones — mint, lavender, teal, olive. `chip` is the
 	// pill background, which has to lift off the dark card rather than sink into it.
@@ -375,101 +312,6 @@
 	<!-- HEADER + HERO: full-bleed portrait, floating pill nav, bottom-left copy, a
 	     floating stat card bottom-right. -->
 	<div class="topwrap">
-		<header class="nav">
-			<nav class="nav-pill nav-links" class:open={menuOpen}>
-				<div class="relative" onmouseenter={openMega} onmouseleave={scheduleCloseMega} role="none">
-					<button
-						type="button"
-						class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium text-white/80 hover:text-white"
-						aria-haspopup="true"
-						aria-expanded={megaOpen}
-						onclick={() => (megaOpen = !megaOpen)}
-					>
-						Product
-						<svg
-							class="size-3.5 transition-transform duration-200 {megaOpen ? 'rotate-180' : ''}"
-							viewBox="0 0 12 12"
-							fill="none"
-						>
-							<path
-								d="M2.5 4.5 6 8l3.5-3.5"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</button>
-					{#if megaOpen}
-						<div
-							role="none"
-							onmouseenter={openMega}
-							onmouseleave={scheduleCloseMega}
-							class="absolute top-[calc(100%+0.25rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[#e7e4d8] bg-white p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
-						>
-							<div class="grid grid-cols-[1.15fr_1fr] gap-2">
-								<div class="flex flex-col gap-1">
-									{#each megaCats as c, i (c.title)}
-										<button
-											type="button"
-											onmouseenter={() => (activeCat = i)}
-											onfocus={() => (activeCat = i)}
-											class="flex items-start gap-3 rounded-xl p-3 text-left transition {activeCat ===
-											i
-												? 'bg-[#f1efe7]'
-												: 'hover:bg-[#f7f5ef]'}"
-										>
-											<span
-												class="grid size-9 shrink-0 place-items-center rounded-lg bg-[#eaf5cf] text-[#2e3320]"
-											>
-												<Icon icon={c.icon} class="size-5" />
-											</span>
-											<span>
-												<span class="block text-sm font-bold text-[#17170f]">{c.title}</span>
-												<span class="mt-0.5 block text-xs text-[#6b6a5e]">{c.sub}</span>
-											</span>
-										</button>
-									{/each}
-								</div>
-								<div class="rounded-xl bg-[#f7f5ef] p-2">
-									{#each megaCats[activeCat].items as item (item.label)}
-										<a
-											href={resolve('/register')}
-											class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-[#2e3320] transition hover:bg-white"
-										>
-											<Icon icon={item.icon} class="size-4 text-[#2e5148]" />
-											{item.label}
-										</a>
-									{/each}
-								</div>
-							</div>
-						</div>
-					{/if}
-				</div>
-				<a href={resolve('/(marketing)/features')} onclick={() => (menuOpen = false)}>Features</a>
-				<a href="#faq" onclick={() => (menuOpen = false)}>FAQ</a>
-				<a class="nav-links-signin" href={resolve('/login')}>Sign in</a>
-			</nav>
-			<a class="nav-logo" href={resolve('/')}>
-				<span class="nav-mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
-				Muallim
-			</a>
-			<div class="nav-right">
-				<div class="nav-pill nav-auth">
-					<a class="nav-login" href={resolve('/login')}>Sign in</a>
-					<a class="nav-signup" href={resolve('/register')}>Start free</a>
-				</div>
-				<button
-					class="nav-burger"
-					aria-label="Menu"
-					aria-expanded={menuOpen}
-					onclick={() => (menuOpen = !menuOpen)}
-				>
-					<span></span>
-				</button>
-			</div>
-		</header>
-
 		<section class="hero">
 			<div class="hero-copy">
 				<h1 class="hero-h1">Run the whole<br />institution.</h1>
@@ -984,57 +826,6 @@
 	</section>
 
 	<!-- FOOTER: dark-olive rounded card, on the same lime the CTA gradient ends on -->
-	<footer class="bg-[#dfeaa6] px-4 pb-6">
-		<div class="mx-auto max-w-[84rem] rounded-[32px] bg-[#2e3320] px-8 py-12 text-[#eef0e6]">
-			<div class="flex flex-wrap items-start justify-between gap-6">
-				<a href={resolve('/')} class="inline-flex items-center gap-2 text-xl font-bold text-white">
-					<span class="grid size-8 place-items-center rounded-lg bg-[#c4e84b] text-[#2e3320]">
-						<Icon icon={Mortarboard01Icon} class="size-5" />
-					</span>
-					Muallim
-				</a>
-				<nav class="flex flex-wrap gap-6 text-sm text-[#eef0e6]/75">
-					<a href="#audiences" class="hover:text-white">Solutions</a>
-					<a href={resolve('/(marketing)/features')} class="hover:text-white">Features</a>
-					<a href="#faq" class="hover:text-white">FAQ</a>
-					<a href="mailto:hello@muallim.app" class="hover:text-white">Contact</a>
-				</nav>
-			</div>
-
-			<div class="mt-10 grid gap-10 md:grid-cols-2">
-				<div>
-					<p class="max-w-sm text-sm leading-relaxed text-[#eef0e6]/70">
-						Run the whole institution and teach the whole world — attendance, exams, report cards,
-						and fees, in one place. You keep the money and the students.
-					</p>
-					<a
-						href={resolve('/register')}
-						class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#c4e84b] hover:underline"
-					>
-						Start free <Icon icon={ArrowRight02Icon} class="size-4" />
-					</a>
-				</div>
-				<div class="md:justify-self-end">
-					<p class="text-sm font-semibold text-white">Contact</p>
-					<a
-						href="mailto:hello@muallim.app"
-						class="mt-2 block text-sm text-[#eef0e6]/70 hover:text-white">hello@muallim.app</a
-					>
-					<p class="mt-4 text-sm font-semibold text-white">Built for</p>
-					<p class="mt-2 max-w-xs text-sm text-[#eef0e6]/70">
-						Bangladesh first, the world next · English interface, Bengali &amp; Arabic content
-					</p>
-				</div>
-			</div>
-
-			<div
-				class="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-[#eef0e6]/60"
-			>
-				<span>© 2026 Muallim · All rights reserved</span>
-				<span>Made for people who teach</span>
-			</div>
-		</div>
-	</footer>
 </div>
 
 <style>
@@ -1065,6 +856,9 @@
 	   Swap the Unsplash URL for your own hero image when ready. */
 	.topwrap {
 		position: relative;
+		/* The header floats out of the flow above this, so the hero reserves its band
+		   rather than sliding up underneath it. */
+		padding-top: 5.2rem;
 		min-height: 42rem;
 		display: flex;
 		flex-direction: column;

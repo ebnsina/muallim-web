@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	/** The small gold pill above a hero headline — an announcement or a "New" note. */
+	/** The small pill above a hero headline. Brand tint, not lime — the accent is
+	    spent on one thing per screen, and this is never it. */
 	let { children }: { children: Snippet } = $props();
 </script>
 
@@ -12,10 +13,10 @@
 		display: inline-block;
 		font-size: 0.82rem;
 		font-weight: 600;
-		color: var(--gold);
-		border: 1px solid color-mix(in oklab, var(--gold) 35%, var(--line));
+		color: var(--accent-ink);
+		border: 1px solid color-mix(in oklab, var(--accent-ink) 18%, var(--line));
 		border-radius: 999px;
 		padding: 0.35rem 0.85rem;
-		background: var(--gold-tint);
+		background: var(--brand-tint);
 	}
 </style>

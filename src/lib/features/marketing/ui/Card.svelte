@@ -2,9 +2,9 @@
 	import type { Snippet } from 'svelte';
 
 	/**
-	 * Frosted glass — the locked marketing surface. Translucent, blurred over the
-	 * fixed aurora, with a lit top edge. `subtle` is the nested variant: a translucent
-	 * tint with no blur of its own, for a panel that sits inside another card.
+	 * Paper, not glass — the marketing surface: a flat white card on cream with a
+	 * hairline border and the 24px corner. `subtle` is the nested variant, a warmer
+	 * flat tint on a tighter radius, for a panel sitting inside another card.
 	 */
 	type Props = {
 		children: Snippet;
@@ -21,10 +21,8 @@
 
 <style>
 	.card {
-		background: var(--glass);
-		backdrop-filter: var(--glass-blur);
-		-webkit-backdrop-filter: var(--glass-blur);
-		border: 1px solid var(--glass-border);
+		background: var(--surface);
+		border: 1px solid var(--line);
 		border-radius: var(--r-lg);
 		box-shadow: var(--glass-shadow);
 	}
@@ -32,10 +30,8 @@
 		padding: 1.5rem;
 	}
 	.subtle {
-		background: var(--tint);
-		backdrop-filter: none;
-		-webkit-backdrop-filter: none;
-		border-color: var(--tint-border);
+		background: var(--surface-2);
+		border-color: var(--line);
 		border-radius: var(--r-sm);
 		box-shadow: none;
 	}
