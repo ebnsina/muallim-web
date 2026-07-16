@@ -51,7 +51,7 @@
 		'Your own grading scale',
 		'Hifz tracking',
 		'15 quiz types',
-		'0% platform fee'
+		'0% on your own bKash'
 	];
 
 	// The four cards under the build heading. Each links to the feature page that
@@ -239,40 +239,42 @@
 
 	let monthly = $state(184250);
 
-	// Rotating card tones — mint, lavender, teal, olive. `chip` is the
-	// pill background, which has to lift off the dark card rather than sink into it.
+	// Rotating card tones — brand, lavender, teal, olive — every one of them mixed
+	// from the layout's tokens. This was a private palette of nine hand-picked hexes
+	// that belonged to no system and could not be themed. `chip` is the pill
+	// background, which has to lift off the dark card rather than sink into it.
 	const tones = [
 		{
-			card: 'border border-[#e2eeca] bg-[radial-gradient(120%_90%_at_30%_0%,#eaf5cf,#ffffff_75%)]',
-			icon: 'bg-white text-[#2e3320]',
-			title: 'text-[#17170f]',
-			body: 'text-[#5c6248]',
-			tick: 'text-[#2e3320]',
-			chip: 'bg-black/5'
+			card: 'border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--brand-tint)]',
+			icon: 'bg-[var(--surface)] text-[var(--brand)]',
+			title: 'text-[var(--ink)]',
+			body: 'text-[color-mix(in_oklab,var(--ink-soft)_72%,var(--surface))]',
+			tick: 'text-[var(--brand)]',
+			chip: 'bg-[color-mix(in_oklab,var(--ink)_6%,transparent)]'
 		},
 		{
-			card: 'bg-[#dedbf6]',
-			icon: 'bg-white text-[#4a3f7a]',
-			title: 'text-[#17170f]',
-			body: 'text-[#5a5675]',
-			tick: 'text-[#4a3f7a]',
-			chip: 'bg-white/60'
+			card: 'bg-[var(--lav)]',
+			icon: 'bg-[var(--surface)] text-[var(--lav-ink)]',
+			title: 'text-[var(--ink)]',
+			body: 'text-[color-mix(in_oklab,var(--lav-ink)_42%,var(--ink))]',
+			tick: 'text-[var(--lav-ink)]',
+			chip: 'bg-[color-mix(in_oklab,var(--surface)_60%,transparent)]'
 		},
 		{
-			card: 'bg-[#dbe9e6]',
-			icon: 'bg-white text-[#2e5148]',
-			title: 'text-[#17170f]',
-			body: 'text-[#4c5a55]',
-			tick: 'text-[#2e5148]',
-			chip: 'bg-white/60'
+			card: 'bg-[var(--teal-tint)]',
+			icon: 'bg-[var(--surface)] text-[var(--teal)]',
+			title: 'text-[var(--ink)]',
+			body: 'text-[color-mix(in_oklab,var(--teal)_42%,var(--ink))]',
+			tick: 'text-[var(--teal)]',
+			chip: 'bg-[color-mix(in_oklab,var(--surface)_60%,transparent)]'
 		},
 		{
-			card: 'bg-[#2e3320] text-[#eef0e6]',
-			icon: 'bg-[#c4e84b] text-[#2e3320]',
-			title: 'text-[#c4e84b]',
-			body: 'text-[#c9d0b8]',
-			tick: 'text-[#c4e84b]',
-			chip: 'bg-white/10'
+			card: 'bg-[var(--brand)] text-[var(--on-brand)]',
+			icon: 'bg-[var(--accent)] text-[var(--brand)]',
+			title: 'text-[var(--accent)]',
+			body: 'text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]',
+			tick: 'text-[var(--accent)]',
+			chip: 'bg-[color-mix(in_oklab,var(--surface)_12%,transparent)]'
 		}
 	];
 
@@ -281,7 +283,7 @@
 	const statements = [
 		{
 			label: 'What you keep',
-			text: '0% platform fee. You collect through your own bKash or SSLCommerz — every taka is yours.'
+			text: 'Sell through your own bKash or SSLCommerz and every taka is yours — you are the merchant, not us.'
 		},
 		{
 			label: 'One place',
@@ -303,8 +305,8 @@
 	const reasons = [
 		{
 			icon: Money04Icon,
-			title: '0% platform fee',
-			line: 'Muallim never holds your money. Price a course in ৳ and keep every taka you collect.'
+			title: '0% on your own bKash',
+			line: 'Sell through your own bKash or SSLCommerz and Muallim never holds your money, or takes any. Stripe, for learners abroad, is 2.5%.'
 		},
 		{
 			icon: Store01Icon,
@@ -330,7 +332,7 @@
 		},
 		{
 			q: 'Is it free to begin?',
-			a: 'Yes. Opening a workspace is free, and a course with no price stays free. When you do sell a course, the only fees are the ones your own payment service charges — Muallim takes 0%.'
+			a: 'Yes. Opening a workspace is free, and a course with no price stays free. Sell through your own bKash or SSLCommerz and Muallim takes nothing — you are the merchant, so there is no cut for us to take. Sell through Stripe, which is how learners abroad pay, and Muallim takes 2.5%.'
 		},
 		{
 			q: 'Which payment gateways can I use?',
@@ -510,28 +512,30 @@
 		</div>
 	</section>
 
-	<!-- STATEMENTS carousel: full-bleed photo, text animates in (Tailwind + svelte transition).
-	     Honest product statements, not fabricated testimonials — real quotes can replace them. -->
+	<!-- STATEMENTS carousel: an olive band, text animates in. Honest product
+	     statements, not fabricated testimonials — real quotes can replace them.
+
+	     It was a full-bleed Unsplash photo of strangers under a black scrim: a stock
+	     picture standing in for the product, hotlinked, so every reader's address went
+	     to a third party and the page broke the day the URL moved. The band is the
+	     shape this site already uses to raise its voice, and it needs no permission. -->
 	<section
-		class="relative mt-24 min-h-[42rem] overflow-hidden"
+		class="relative mt-24 overflow-hidden bg-[var(--brand)]"
 		aria-roledescription="carousel"
 		aria-label="Why Muallim"
 	>
-		<img
-			src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=75"
-			alt=""
-			loading="lazy"
-			class="absolute inset-0 h-full w-full object-cover"
-		/>
-		<div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/15"></div>
 		<div
-			class="relative mx-auto flex min-h-[42rem] max-w-[82rem] flex-col justify-center px-6 py-16"
+			class="relative mx-auto flex min-h-[26rem] max-w-[82rem] flex-col justify-center px-6 py-16"
 		>
 			{#key slide}
 				<div in:fly={{ y: 24, duration: 500 }}>
-					<p class="text-sm font-semibold tracking-wide text-white/80">{statements[slide].label}</p>
 					<p
-						class="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-[#c4e84b] sm:text-4xl md:text-5xl"
+						class="text-sm font-semibold tracking-wide text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]"
+					>
+						{statements[slide].label}
+					</p>
+					<p
+						class="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-[var(--accent)] sm:text-4xl md:text-5xl"
 					>
 						{statements[slide].text}
 					</p>
@@ -541,14 +545,14 @@
 				<button
 					onclick={prevSlide}
 					aria-label="Previous statement"
-					class="grid size-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white/10"
+					class="grid size-11 place-items-center rounded-full border border-[color-mix(in_oklab,var(--on-brand)_30%,transparent)] text-[var(--on-brand)] transition duration-200 hover:bg-[color-mix(in_oklab,var(--on-brand)_12%,transparent)] motion-reduce:transition-none"
 				>
 					<Icon icon={ArrowLeft01Icon} class="size-5" />
 				</button>
 				<button
 					onclick={nextSlide}
 					aria-label="Next statement"
-					class="grid size-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white/10"
+					class="grid size-11 place-items-center rounded-full border border-[color-mix(in_oklab,var(--on-brand)_30%,transparent)] text-[var(--on-brand)] transition duration-200 hover:bg-[color-mix(in_oklab,var(--on-brand)_12%,transparent)] motion-reduce:transition-none"
 				>
 					<Icon icon={ArrowRight01Icon} class="size-5" />
 				</button>
@@ -558,8 +562,8 @@
 
 	<!-- WHO IT'S FOR: colored persona cards -->
 	<section id="audiences" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
-		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Is this you?</p>
-		<h2 class="mt-2 max-w-[22ch] text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Is this you?</p>
+		<h2 class="mt-2 max-w-[22ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 			You have an institution to run — spread across too many books.
 		</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -580,32 +584,40 @@
 	<section id="journey" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<div class="grid gap-10 md:grid-cols-2 md:items-start">
 			<div class="md:sticky md:top-24">
-				<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Your journey</p>
-				<h2 class="mt-2 text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+				<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
+					Your journey
+				</p>
+				<h2 class="mt-2 text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 					From first day to fully online, one clear path.
 				</h2>
-				<p class="mt-3 max-w-md leading-relaxed text-[#6b6a5e]">
+				<p class="mt-3 max-w-md leading-relaxed text-[var(--muted)]">
 					Seven steps, in the order you'd actually live them — nothing to install, and you start
 					today.
 				</p>
 				<a
 					href={resolve('/register')}
-					class="mt-6 inline-flex items-center gap-2 rounded-full bg-[#2e3320] px-6 py-3 font-semibold text-[#eaf5cf] transition hover:-translate-y-0.5 hover:bg-[#3a4029]"
+					class="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
 				>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
 				</a>
 			</div>
-			<ol class="space-y-1 rounded-3xl bg-[#2e3320] p-3">
+			<ol class="space-y-1 rounded-3xl bg-[var(--brand)] p-3">
 				{#each journey as s, i (s.title)}
-					<li class="flex gap-4 rounded-2xl p-4 transition hover:bg-white/5">
+					<li
+						class="flex gap-4 rounded-2xl p-4 transition duration-200 hover:bg-[color-mix(in_oklab,var(--on-brand)_7%,transparent)] motion-reduce:transition-none"
+					>
 						<span
-							class="grid size-9 shrink-0 place-items-center rounded-lg bg-[#c4e84b] font-mono text-sm font-bold text-[#2e3320]"
+							class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent)] font-mono text-sm font-bold text-[var(--brand)]"
 						>
 							{i + 1 < 10 ? `0${i + 1}` : i + 1}
 						</span>
 						<div>
-							<h3 class="font-bold text-white">{s.title}</h3>
-							<p class="mt-0.5 text-sm leading-relaxed text-[#c9d0b8]">{s.line}</p>
+							<h3 class="font-bold text-[var(--on-brand)]">{s.title}</h3>
+							<p
+								class="mt-0.5 text-sm leading-relaxed text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]"
+							>
+								{s.line}
+							</p>
 						</div>
 					</li>
 				{/each}
@@ -615,11 +627,11 @@
 
 	<!-- CAPABILITIES: colored feature cards -->
 	<section id="capabilities" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
-		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Up close</p>
-		<h2 class="mt-2 text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Up close</p>
+		<h2 class="mt-2 text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 			The same platform, four sides to it
 		</h2>
-		<p class="mt-2 max-w-2xl leading-relaxed text-[#6b6a5e]">
+		<p class="mt-2 max-w-2xl leading-relaxed text-[var(--muted)]">
 			Everything you just walked through, in more detail — all in one system, no add-ons.
 		</p>
 		<div class="mt-8 grid gap-4 md:grid-cols-2">
@@ -651,19 +663,21 @@
 	<!-- BREADTH: every feature group, linking into /features. Counts come from the
 	     content file, so the page cannot claim more than there are pages for. -->
 	<section id="everything" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
-		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Everything in it</p>
+		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
+			Everything in it
+		</p>
 		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
-			<h2 class="max-w-[24ch] text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+			<h2 class="max-w-[24ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 				Four sides, and {FEATURES.length} features behind them.
 			</h2>
 			<a
 				href={resolve('/(marketing)/features')}
-				class="inline-flex items-center gap-2 rounded-full bg-[#2e3320] px-6 py-3 font-semibold text-[#eaf5cf] transition hover:-translate-y-0.5 hover:bg-[#3a4029]"
+				class="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
 			>
 				See all {FEATURES.length} features <Icon icon={ArrowRight02Icon} class="size-4" />
 			</a>
 		</div>
-		<p class="mt-3 max-w-2xl leading-relaxed text-[#6b6a5e]">
+		<p class="mt-3 max-w-2xl leading-relaxed text-[var(--muted)]">
 			The list below is the whole product, not a highlight reel — and every one of them has a page
 			saying plainly what it does today.
 		</p>
@@ -698,8 +712,8 @@
 
 	<!-- HONEST DIFFERENTIATORS: colored cards + olive stat panel -->
 	<section id="why" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
-		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Why Muallim</p>
-		<h2 class="mt-2 max-w-[26ch] text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Why Muallim</p>
+		<h2 class="mt-2 max-w-[26ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 			No invented reviews. Just what the product actually does.
 		</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -717,20 +731,23 @@
 	</section>
 
 	<!-- FAQ: dark-olive band, lime headline, accordion (Tailwind) -->
-	<section id="faq" class="mt-24 bg-[#2e3320] py-20 text-[#eaf5cf]">
+	<section id="faq" class="mt-24 bg-[var(--brand)] py-20 text-[var(--brand-tint)]">
 		<div class="mx-auto grid max-w-[82rem] gap-12 px-6 md:grid-cols-2">
 			<div>
-				<h2 class="text-4xl font-bold leading-[1.05] tracking-tight text-[#c4e84b] sm:text-5xl">
+				<h2
+					class="text-4xl font-bold leading-[1.05] tracking-tight text-[var(--accent)] sm:text-5xl"
+				>
 					Frequently<br />Asked Questions
 				</h2>
-				<p class="mt-5 max-w-sm leading-relaxed text-[#eaf5cf]/70">
+				<p class="mt-5 max-w-sm leading-relaxed text-[var(--brand-tint)]/70">
 					Clear answers to the questions schools, madrasas, and coaching centers ask before they
 					start.
 				</p>
-				<p class="mt-6 text-sm text-[#eaf5cf]/60">
+				<p class="mt-6 text-sm text-[var(--brand-tint)]/60">
 					Still have questions?
-					<a class="font-semibold text-[#c4e84b] hover:underline" href="mailto:hello@muallim.app"
-						>hello@muallim.app</a
+					<a
+						class="font-semibold text-[var(--accent)] hover:underline"
+						href="mailto:hello@muallim.app">hello@muallim.app</a
 					>
 				</p>
 			</div>
@@ -738,18 +755,18 @@
 				{#each faqs as f, i (f.q)}
 					<div class="border-b border-white/10">
 						<button
-							class="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-semibold text-[#eaf5cf]"
+							class="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-semibold text-[var(--brand-tint)]"
 							aria-expanded={openFaq === i}
 							onclick={() => toggleFaq(i)}
 						>
 							<span>{f.q}</span>
 							<Icon
 								icon={openFaq === i ? MinusSignIcon : PlusSignIcon}
-								class="size-5 shrink-0 text-[#c4e84b]"
+								class="size-5 shrink-0 text-[var(--accent)]"
 							/>
 						</button>
 						{#if openFaq === i}
-							<p class="max-w-xl pb-5 leading-relaxed text-[#eaf5cf]/65">{f.a}</p>
+							<p class="max-w-xl pb-5 leading-relaxed text-[var(--brand-tint)]/65">{f.a}</p>
 						{/if}
 					</div>
 				{/each}
@@ -994,10 +1011,10 @@
 
 	/* Feature-card widgets. */
 	.ava:nth-child(2) {
-		background: #8fae7a;
+		background: var(--face-2);
 	}
 	.fw-panel .fw-label {
-		color: #cfd3c2;
+		color: color-mix(in oklab, var(--on-brand) 68%, var(--brand));
 	}
 
 	@media (prefers-reduced-motion: reduce) {
