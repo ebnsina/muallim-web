@@ -23,7 +23,10 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That certificate could not be found.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't find that certificate. Check the link and try again.")
+		);
 	}
 
 	setHeaders({ 'cache-control': 'private, no-store' });

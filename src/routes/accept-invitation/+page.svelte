@@ -15,7 +15,7 @@
 
 	{#if !data.token}
 		<Alert tone="danger" class="mt-6" role="alert">
-			This invitation link is missing its token.
+			This invitation link isn't complete. Please ask for a new invitation.
 		</Alert>
 	{:else}
 		<p class="text-muted mt-2 text-sm">

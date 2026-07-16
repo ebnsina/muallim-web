@@ -34,13 +34,13 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	if (studentRes.error || !studentRes.data) {
 		error(
 			studentRes.response?.status ?? 500,
-			problemMessage(studentRes.error, 'That student could not be loaded.')
+			problemMessage(studentRes.error, 'We couldn’t open that student’s record. Please try again.')
 		);
 	}
 	if (logRes.error || !logRes.data) {
 		error(
 			logRes.response?.status ?? 500,
-			problemMessage(logRes.error, 'The hifz log could not be loaded.')
+			problemMessage(logRes.error, 'We couldn’t load this hifz log. Please try again.')
 		);
 	}
 
@@ -78,7 +78,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That recitation could not be logged.')
+				message: problemMessage(problem, 'We couldn’t save that recitation. Please try again.')
 			});
 		}
 
@@ -98,7 +98,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That entry could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that entry. Please try again.')
 			});
 		}
 
@@ -121,7 +121,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of the log could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more of the log. Please try again.')
 			});
 		}
 

@@ -15,14 +15,16 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 
 	const childrenRes = await api.GET('/v1/portal/children');
 	if (childrenRes.error) {
-		error(502, problemMessage(childrenRes.error, 'Your children could not be loaded.'));
+		error(
+			502,
+			problemMessage(childrenRes.error, "We couldn't load your children. Please try again.")
+		);
 	}
 	const children = childrenRes.data.children ?? [];
 
 	// The requested child, but only if it is one of theirs — otherwise the first.
 	const requested = url.searchParams.get('child');
-	const selected =
-		children.find((c) => c.id === requested)?.id ?? children[0]?.id ?? null;
+	const selected = children.find((c) => c.id === requested)?.id ?? children[0]?.id ?? null;
 
 	setHeaders({ 'cache-control': 'private, no-store' });
 

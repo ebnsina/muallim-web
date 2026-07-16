@@ -52,7 +52,10 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not mark your notifications read.')
+				message: problemMessage(
+					problem,
+					"We couldn't mark your notifications as read. Please try again."
+				)
 			});
 		}
 		return { allRead: true };
@@ -70,7 +73,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not save that setting.')
+				message: problemMessage(problem, "We couldn't save that setting. Please try again.")
 			});
 		}
 		return { digestSaved: true };

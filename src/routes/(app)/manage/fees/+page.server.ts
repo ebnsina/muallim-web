@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (structuresRes.error || !structuresRes.data) {
 		error(
 			structuresRes.response?.status ?? 500,
-			problemMessage(structuresRes.error, 'The fee structures could not be loaded.')
+			problemMessage(structuresRes.error, 'We couldn’t load your fees. Please try again.')
 		);
 	}
 
@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// section rather than an error page over the whole thing.
 	const invoicesError =
 		invoicesRes.error || !invoicesRes.data
-			? problemMessage(invoicesRes.error, 'The invoices could not be loaded.')
+			? problemMessage(invoicesRes.error, 'We couldn’t load the invoices. Please try again.')
 			: null;
 
 	// A student in focus brings their ledger — the outstanding-by-currency total the
@@ -124,7 +124,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That fee could not be created.')
+				message: problemMessage(problem, 'We couldn’t create that fee. Please try again.')
 			});
 		}
 
@@ -144,7 +144,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That fee could not be deleted.')
+				message: problemMessage(problem, 'We couldn’t delete that fee. Please try again.')
 			});
 		}
 
@@ -181,7 +181,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Those fees could not be issued.')
+				message: problemMessage(problem, 'We couldn’t issue those fees. Please try again.')
 			});
 		}
 
@@ -217,7 +217,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That invoice could not be raised.')
+				message: problemMessage(problem, 'We couldn’t create that invoice. Please try again.')
 			});
 		}
 
@@ -251,7 +251,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That payment could not be recorded.')
+				message: problemMessage(problem, 'We couldn’t record that payment. Please try again.')
 			});
 		}
 
@@ -274,7 +274,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That invoice could not be waived.')
+				message: problemMessage(problem, 'We couldn’t waive that invoice. Please try again.')
 			});
 		}
 
@@ -297,7 +297,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That invoice could not be cancelled.')
+				message: problemMessage(problem, 'We couldn’t cancel that invoice. Please try again.')
 			});
 		}
 
@@ -330,7 +330,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of invoices could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more invoices. Please try again.')
 			});
 		}
 

@@ -15,7 +15,7 @@
 
 	{#if !data.token}
 		<Alert tone="danger" class="mt-6" role="alert">
-			This link is missing its token. Request a new one.
+			This link isn't complete. Please request a new one.
 		</Alert>
 		<p class="text-muted mt-6 text-sm">
 			<a class="underline" href={resolve('/forgot-password')}>Request a reset link</a>

@@ -49,10 +49,10 @@
 				picked = arr.map(() => true);
 				parseError = '';
 			} else {
-				parseError = 'The model returned no usable outline. Try again.';
+				parseError = 'No outline came back. Please try again.';
 			}
 		} catch {
-			parseError = 'Could not read the generated outline. Try again.';
+			parseError = 'This outline didn’t come out right. Please try again.';
 		}
 	});
 

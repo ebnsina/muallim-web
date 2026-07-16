@@ -6,6 +6,6 @@ export const entries: EntryGenerator = () => SEGMENTS.map((s) => ({ slug: s.slug
 
 export const load: PageLoad = ({ params }) => {
 	const segment = segmentBySlug(params.slug);
-	if (!segment) error(404, 'No such solution page.');
+	if (!segment) error(404, "We couldn't find that page.");
 	return { segment };
 };

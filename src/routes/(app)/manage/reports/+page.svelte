@@ -88,7 +88,9 @@
 
 	{#if !o}
 		<Card class="mt-8 p-5">
-			<p class="text-sm text-muted">{data.overviewError ?? 'The report could not be loaded.'}</p>
+			<p class="text-sm text-muted">
+				{data.overviewError ?? "We couldn't load this report. Please try again."}
+			</p>
 		</Card>
 	{:else}
 		<!-- Enrolment snapshot -->

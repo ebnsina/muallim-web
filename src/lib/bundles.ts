@@ -57,9 +57,12 @@ const currency = z
 const slug = z
 	.string()
 	.trim()
-	.min(1, 'Give the bundle a slug.')
+	.min(1, 'Give the bundle a web address.')
 	.max(120, 'That is longer than 120 characters.')
-	.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'A slug is lowercase letters, numbers, and single hyphens.');
+	.regex(
+		/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+		'Use lowercase letters, numbers and single hyphens only — like starter-pack.'
+	);
 
 /*
 	Creating a bundle: a name and a slug it cannot do without, a price in taka the

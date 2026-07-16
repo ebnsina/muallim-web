@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	}
 
 	const sessionsError = problem
-		? problemMessage(problem, 'The live sessions could not be loaded.')
+		? problemMessage(problem, "We couldn't load the live sessions. Please try again.")
 		: null;
 
 	return {
@@ -59,7 +59,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of sessions could not be loaded.')
+				message: problemMessage(problem, "We couldn't load more sessions. Please try again.")
 			});
 		}
 

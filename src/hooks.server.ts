@@ -39,7 +39,7 @@ export const handle: Handle = async ({ event, resolve }) => {
  * We reuse the `x-request-id` muallim-api echoes when the failing request came from
  * the API, so one identifier spans both services.
  */
-export const handleError: HandleServerError = ({ error, event, status, message }) => {
+export const handleError: HandleServerError = ({ error, event, status }) => {
 	const correlationId = event.request.headers.get('x-request-id') ?? crypto.randomUUID();
 
 	// A 404 is a routing fact, not a failure. Logging its stack is noise.
@@ -58,7 +58,10 @@ export const handleError: HandleServerError = ({ error, event, status, message }
 	}
 
 	return {
-		message: status === 404 ? 'Not found' : message,
+		message:
+			status === 404
+				? 'We couldn’t find that page.'
+				: 'Something went wrong on our end. Please try again in a moment.',
 		correlationId
 	};
 };

@@ -21,7 +21,7 @@ const API = env.MUALLIM_API_URL ?? 'http://localhost:8080';
 
 function signingSecret(): string {
 	const secret = env.MUALLIM_FAKE_GATEWAY_SECRET;
-	if (!secret) error(503, 'The test gateway is not configured on this deployment.');
+	if (!secret) error(503, 'Practice payments are not available here.');
 	return secret;
 }
 
@@ -36,7 +36,9 @@ export const load: PageServerLoad = ({ url, params, locals }) => {
 	const amount = Number(url.searchParams.get('amount'));
 	const currency = url.searchParams.get('currency') ?? '';
 
-	if (!order || !tenant || !Number.isFinite(amount)) error(400, 'That checkout is not valid.');
+	if (!order || !tenant || !Number.isFinite(amount)) {
+		error(400, "We couldn't open that payment page. Please go back and try again.");
+	}
 
 	return {
 		session: params.session,
@@ -65,12 +67,12 @@ async function webhook(kind: string, fields: Record<string, string>) {
 		body: payload
 	});
 
-	if (!response.ok) error(502, 'The gateway could not settle that order.');
+	if (!response.ok) error(502, "We couldn't complete that payment. Please try again.");
 }
 
 export const actions: Actions = {
 	pay: async ({ request, locals }) => {
-		if (!locals.accessToken) error(401, 'Sign in first.');
+		if (!locals.accessToken) error(401, 'Please sign in to continue.');
 		const form = await request.formData();
 		const fields = Object.fromEntries([...form].map(([k, v]) => [k, String(v)]));
 
@@ -83,7 +85,7 @@ export const actions: Actions = {
 	},
 
 	cancel: async ({ request, locals }) => {
-		if (!locals.accessToken) error(401, 'Sign in first.');
+		if (!locals.accessToken) error(401, 'Please sign in to continue.');
 		const form = await request.formData();
 		const fields = Object.fromEntries([...form].map(([k, v]) => [k, String(v)]));
 

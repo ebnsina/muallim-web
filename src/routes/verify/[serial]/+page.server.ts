@@ -27,7 +27,13 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	if (problem || !data) {
 		// 404 is the honest answer for a number nobody issued. It is not "forbidden":
 		// there is nothing here to be forbidden from.
-		error(response?.status ?? 500, problemMessage(problem, 'That certificate could not be found.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(
+				problem,
+				"We couldn't find a certificate with that number. Please check it and try again."
+			)
+		);
 	}
 
 	setHeaders({ 'cache-control': 'public, max-age=60' });

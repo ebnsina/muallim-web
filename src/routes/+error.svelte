@@ -24,11 +24,7 @@
 
 <svelte:head>
 	<title>
-		{page.status} — {isNotFound
-			? 'Page not found'
-			: isDenied
-				? 'Not allowed'
-				: 'Something went wrong'}
+		{isNotFound ? 'Page not found' : isDenied ? 'Not allowed' : 'Something went wrong'}
 	</title>
 </svelte:head>
 
@@ -51,15 +47,11 @@
 			{/if}
 		</div>
 
-		<p class="text-muted text-sm font-medium tracking-wide tabular-nums">
-			Error {page.status}
-		</p>
-
 		<h1 class="mt-2 text-2xl font-semibold text-balance">
 			{isNotFound
-				? 'We could not find that page'
+				? 'We couldn’t find that page'
 				: isDenied
-					? 'This page is not yours to open'
+					? 'You can’t open this page'
 					: 'Something went wrong on our end'}
 		</h1>
 
@@ -68,9 +60,9 @@
 				The page may have moved, or the link that brought you here may be out of date.
 			{:else if isDenied}
 				<!-- muallim-api's own sentence: it is the one that made the decision. -->
-				{page.error?.message ?? 'Your role does not permit this.'}
+				{page.error?.message ?? 'Your account doesn’t have permission to open this page.'}
 			{:else}
-				{page.error?.message ?? 'An unexpected error occurred.'} We have been notified.
+				{page.error?.message ?? 'Please try again in a moment.'} Our team has been told about it.
 			{/if}
 		</p>
 

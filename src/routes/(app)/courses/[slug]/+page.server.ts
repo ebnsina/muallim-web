@@ -148,12 +148,12 @@ export const actions: Actions = {
 
 			last = {
 				status: response?.status ?? 500,
-				message: problemMessage(problem, 'Could not start that checkout.')
+				message: problemMessage(problem, "We couldn't start your payment. Please try again.")
 			};
 		}
 
 		return fail(last?.status ?? 500, {
-			message: last?.message ?? 'Could not start that checkout.'
+			message: last?.message ?? "We couldn't start your payment. Please try again."
 		});
 	},
 
@@ -167,7 +167,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not enroll you on that course.')
+				message: problemMessage(problem, "We couldn't enrol you on that course. Please try again.")
 			});
 		}
 		return { enrolled: true };
@@ -183,7 +183,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not cancel your enrollment.')
+				message: problemMessage(problem, "We couldn't cancel your enrolment. Please try again.")
 			});
 		}
 		return { cancelled: true };
@@ -207,7 +207,7 @@ export const actions: Actions = {
 		// A failure of the call, not of a field: `reviewMessage` is the section's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				reviewMessage: problemMessage(problem, 'Could not save your review.')
+				reviewMessage: problemMessage(problem, "We couldn't save your review. Please try again.")
 			});
 		}
 		return { reviewed: true };
@@ -223,7 +223,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				reviewMessage: problemMessage(problem, 'Could not remove your review.')
+				reviewMessage: problemMessage(problem, "We couldn't remove your review. Please try again.")
 			});
 		}
 		return { unreviewed: true };

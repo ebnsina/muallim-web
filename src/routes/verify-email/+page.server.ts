@@ -20,7 +20,8 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const token = String(form.get('token') ?? '');
 
-		if (!token) return fail(400, { message: 'This link is missing its token.' });
+		if (!token)
+			return fail(400, { message: "This link isn't complete. Please request a new one." });
 
 		const { error, response } = await serverApi(url.origin).POST('/v1/auth/email/verify', {
 			body: { token }
@@ -28,7 +29,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(response?.status ?? 400, {
-				message: problemMessage(error, 'This link is invalid or has expired. Request a new one.')
+				message: problemMessage(error, 'That link no longer works. Please request a new one.')
 			});
 		}
 

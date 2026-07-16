@@ -107,7 +107,7 @@
 						</Field>
 						<Field
 							id="board-course"
-							label="Course slug (optional)"
+							label="Course web address (optional)"
 							hint="Leave empty for a workspace board."
 							error={problem('course_slug')}
 						>

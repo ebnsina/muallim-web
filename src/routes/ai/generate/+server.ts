@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.accessToken) error(401, 'Sign in to use AI.');
 
 	const adapter = aiAdapter();
-	if (!adapter) error(501, 'AI is not configured on this server.');
+	if (!adapter) error(501, 'AI isn’t set up yet. Ask your administrator to turn it on.');
 
 	const { messages } = await request.json();
 

@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.accessToken) error(401, 'Sign in to use AI.');
 
 	const adapter = imageAdapter();
-	if (!adapter) error(501, 'Image generation is not configured on this server.');
+	if (!adapter) error(501, 'AI image creation isn’t set up yet. Ask your administrator to turn it on.');
 
 	const body = await request.json().catch(() => ({}));
 	const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
@@ -30,13 +30,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch {
 		// The provider's own error may name a model or a quota; neither is the
 		// instructor's to read, and nothing was saved, so it is one clean sentence.
-		error(502, 'The image provider could not generate that. Try again.');
+		error(502, 'That image couldn’t be created. Try describing it differently.');
 	}
 
 	// Exactly one of `url` or `b64Json` is present. Base64 becomes a data URL the
 	// browser can turn straight into a Blob; a hosted URL is passed through as is.
 	const image = result.images[0];
-	if (!image) error(502, 'The image provider returned nothing. Try again.');
+	if (!image) error(502, 'No image came back. Please try again.');
 
 	if ('b64Json' in image && image.b64Json) {
 		return json({ image: `data:image/png;base64,${image.b64Json}`, mimeType: 'image/png' });
@@ -45,5 +45,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ image: image.url, mimeType: 'image/png' });
 	}
 
-	error(502, 'The image provider returned nothing usable. Try again.');
+	error(502, 'No image came back. Please try again.');
 };

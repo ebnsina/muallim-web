@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (staffRes.error || !staffRes.data) {
 		error(
 			staffRes.response?.status ?? 500,
-			problemMessage(staffRes.error, 'The staff roster could not be loaded.')
+			problemMessage(staffRes.error, 'We couldn’t load your staff. Please try again.')
 		);
 	}
 
@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// than an error page over the whole thing.
 	const payslipsError =
 		payslipsRes.error || !payslipsRes.data
-			? problemMessage(payslipsRes.error, 'The payslips could not be loaded.')
+			? problemMessage(payslipsRes.error, 'We couldn’t load the payslips. Please try again.')
 			: null;
 
 	// A member in focus brings their salary structure. There may be none yet — a 404 is
@@ -129,7 +129,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That salary could not be saved.')
+				message: problemMessage(problem, 'We couldn’t save that salary. Please try again.')
 			});
 		}
 
@@ -162,7 +162,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Those payslips could not be generated.')
+				message: problemMessage(problem, 'We couldn’t create those payslips. Please try again.')
 			});
 		}
 
@@ -197,7 +197,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That payslip could not be marked paid.')
+				message: problemMessage(problem, 'We couldn’t mark that payslip as paid. Please try again.')
 			});
 		}
 
@@ -232,7 +232,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of payslips could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more payslips. Please try again.')
 			});
 		}
 

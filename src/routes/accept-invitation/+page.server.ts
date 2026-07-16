@@ -17,7 +17,12 @@ export const actions: Actions = {
 		const name = String(form.get('name') ?? '').trim();
 		const password = String(form.get('password') ?? '');
 
-		if (!token) return fail(400, { name, message: 'This invitation is missing its token.' });
+		if (!token) {
+			return fail(400, {
+				name,
+				message: "This invitation link isn't complete. Please ask for a new invitation."
+			});
+		}
 
 		// The password field means one of two things, and the page cannot tell which:
 		// for an address with no account it sets a new password, and for an address
@@ -40,7 +45,7 @@ export const actions: Actions = {
 		if (error || !data) {
 			return fail(response?.status ?? 400, {
 				name,
-				message: problemMessage(error, 'This invitation could not be accepted.')
+				message: problemMessage(error, "We couldn't accept that invitation. Please try again.")
 			});
 		}
 

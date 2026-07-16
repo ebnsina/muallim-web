@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (routesRes.error || !routesRes.data) {
 		error(
 			routesRes.response?.status ?? 500,
-			problemMessage(routesRes.error, 'The transport routes could not be loaded.')
+			problemMessage(routesRes.error, 'We couldn’t load your transport routes. Please try again.')
 		);
 	}
 
@@ -58,7 +58,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 		if (vehiclesRes.error || !vehiclesRes.data) {
 			vehiclesError = problemMessage(
 				vehiclesRes.error,
-				'This route’s vehicles could not be loaded.'
+				'We couldn’t load the vehicles on this route. Please try again.'
 			);
 		} else {
 			vehicles = vehiclesRes.data.vehicles ?? [];
@@ -69,7 +69,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// failed list degrades to a notice in its own section.
 	const assignmentsError =
 		assignmentsRes.error || !assignmentsRes.data
-			? problemMessage(assignmentsRes.error, 'The assignments could not be loaded.')
+			? problemMessage(
+					assignmentsRes.error,
+					'We couldn’t load the riders on this route. Please try again.'
+				)
 			: null;
 
 	setHeaders({ 'cache-control': 'private, no-store' });
@@ -120,7 +123,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That route could not be created.')
+				message: problemMessage(problem, 'We couldn’t create that route. Please try again.')
 			});
 		}
 
@@ -155,7 +158,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That vehicle could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that vehicle. Please try again.')
 			});
 		}
 
@@ -188,7 +191,10 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That student could not be assigned.')
+				message: problemMessage(
+					problem,
+					'We couldn’t put that student on the route. Please try again.'
+				)
 			});
 		}
 
@@ -208,7 +214,10 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That student could not be taken off the route.')
+				message: problemMessage(
+					problem,
+					'We couldn’t take that student off the route. Please try again.'
+				)
 			});
 		}
 
@@ -241,7 +250,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of assignments could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more riders. Please try again.')
 			});
 		}
 

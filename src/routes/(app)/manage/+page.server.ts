@@ -18,7 +18,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	} = await authedApi(url.origin, locals.accessToken).GET('/v1/overview');
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'The dashboard could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, 'We couldn’t load your dashboard. Please try again.')
+		);
 	}
 
 	// A workspace's own numbers, and no two workspaces share a page.

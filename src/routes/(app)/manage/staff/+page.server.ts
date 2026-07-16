@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (staffRes.error || !staffRes.data) {
 		error(
 			staffRes.response?.status ?? 500,
-			problemMessage(staffRes.error, 'The staff roster could not be loaded.')
+			problemMessage(staffRes.error, 'We couldn’t load your staff. Please try again.')
 		);
 	}
 
@@ -69,7 +69,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That member could not be hired.')
+				message: problemMessage(problem, 'We couldn’t add that staff member. Please try again.')
 			});
 		}
 
@@ -94,7 +94,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of staff could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more staff. Please try again.')
 			});
 		}
 

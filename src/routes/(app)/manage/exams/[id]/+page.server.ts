@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	const api = authedApi(url.origin, locals.accessToken);
 
 	const exam = await findExam(api, params.id);
-	if (!exam) error(404, 'That exam could not be found.');
+	if (!exam) error(404, 'We couldn’t find that exam. It may have been removed.');
 
 	const [subjectsRes, studentsRes, classesRes] = await Promise.all([
 		api.GET('/v1/subjects'),
@@ -119,7 +119,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Those marks could not be saved.')
+				message: problemMessage(problem, 'We couldn’t save those marks. Please try again.')
 			});
 		}
 

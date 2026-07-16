@@ -120,7 +120,7 @@
 			{#snippet header()}
 				<h2 class="font-medium">A new category</h2>
 				<p class="mt-0.5 text-sm text-muted">
-					A name is all it needs; the slug is derived for you.
+					A name is all it needs; the rest is filled in for you.
 				</p>
 			{/snippet}
 

@@ -113,7 +113,7 @@
 						{/snippet}
 					</Field>
 
-					<Field id="slug" label="Slug" error={createErrors.slug}>
+					<Field id="slug" label="Web address" error={createErrors.slug}>
 						{#snippet children({ id, describedBy, invalid })}
 							<Input
 								{id}

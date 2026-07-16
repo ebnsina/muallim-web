@@ -43,7 +43,7 @@
 	const fake = $derived(at('fake'));
 
 	$effect(() => {
-		if (form?.saved) toast.success('Keys saved. They are encrypted, and never shown again.');
+		if (form?.saved) toast.success('Saved. These are locked away, and won’t be shown again.');
 	});
 </script>
 
@@ -62,16 +62,17 @@
 {/snippet}
 
 <Page width="wide">
-	<PageHeader title="Payments" description="The gateways this workspace can be paid through.">
+	<PageHeader title="Payments" description="The ways this workspace can take money.">
 		{#snippet actions()}
 			<Button href={resolve('/teach/sales')} variant="secondary" size="sm">Sales</Button>
 		{/snippet}
 	</PageHeader>
 
-	<Alert tone="info" class="mt-6" title="You are the merchant">
-		A learner pays this workspace's own gateway account. Muallim never holds the money — it takes a
-		fee, and the tax, the refunds and the disputes stay yours. A secret you give here is encrypted
-		before it is stored and cannot be read back, by us or by anyone with your session.
+	<Alert tone="info" class="mt-6" title="The money is yours">
+		A learner pays this workspace's own account directly. Muallim never holds the money — it takes a
+		fee, and the tax, the refunds and the disputes stay yours. Anything secret you type here is
+		locked away before it is saved, and nobody can read it back afterwards — not us, and not anyone
+		who gets into your account.
 	</Alert>
 
 	{#if form?.message}
@@ -150,7 +151,7 @@
 						<Field
 							id="ssl-password"
 							label="Store password"
-							hint="Saved encrypted. It is never shown again."
+							hint="Locked away when saved. It is never shown again."
 							error={problem('sslcommerz', 'secret')}
 						>
 							{#snippet children({ id, describedBy, invalid })}
@@ -186,8 +187,8 @@
 						bKash
 					</h2>
 					<p class="text-muted mt-1 max-w-prose text-sm">
-						The wallet, in Bangladesh. Four values from your bKash merchant account: the app key,
-						and the three secrets it signs with.
+						The wallet, in Bangladesh. Four things from your bKash merchant account: the app key,
+						and the three secrets that go with it.
 					</p>
 				</div>
 				{@render status(bkash)}
@@ -246,7 +247,7 @@
 						<Field
 							id="bkash-password"
 							label="Password"
-							hint="The three secrets are sealed together. None of them is shown again."
+							hint="The three secrets are locked away together. None of them is shown again."
 							error={problem('bkash', 'password')}
 						>
 							{#snippet children({ id, describedBy, invalid })}
@@ -280,11 +281,11 @@
 					<div>
 						<h2 class="flex items-center gap-2 font-medium">
 							<Icon icon={CreditCardIcon} class="text-muted size-4" />
-							Test gateway
+							Test payments
 						</h2>
 						<p class="text-muted mt-1 max-w-prose text-sm">
-							Runs the whole purchase — checkout, webhook, enrollment, refund — and takes no money.
-							This deployment has it switched on.
+							Practise a whole purchase — paying, enrolling, refunding — without any real money
+							changing hands. Useful for trying things out before you go live.
 						</p>
 					</div>
 					{@render status(fake)}
@@ -294,7 +295,7 @@
 					<input type="hidden" name="gateway" value="fake" />
 					<Button type="submit" variant="secondary" size="sm">
 						<Icon icon={CreditCardIcon} class="size-4" />
-						{fake?.account ? 'Reconnect' : 'Connect test gateway'}
+						{fake?.account ? 'Reconnect' : 'Turn on test payments'}
 					</Button>
 				</form>
 			</Card>

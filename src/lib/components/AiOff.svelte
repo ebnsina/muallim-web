@@ -3,25 +3,19 @@
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
-	// Stands in for an AI control when no provider key is set. The control keeps its
-	// place and says why it is off — a vanished button is a feature nobody finds.
-	type Props = {
-		label?: string;
-		/** The private env key an admin sets to switch this control on. */
-		envKey?: string;
-	};
+	// Stands in for an AI control when the server has no provider key. The control
+	// keeps its place and says it is off in the reader's terms — a vanished button
+	// is a feature nobody finds, and the key's name is the admin's problem, not the
+	// teacher's.
+	type Props = { label?: string };
 
-	let { label = 'Draft with AI', envKey = 'ANTHROPIC_API_KEY' }: Props = $props();
+	let { label = 'Draft with AI' }: Props = $props();
 </script>
 
 <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-	<Button type="button" variant="ghost" size="sm" disabled title="AI is not configured">
+	<Button type="button" variant="ghost" size="sm" disabled title="AI isn’t set up yet">
 		<Icon icon={SparklesIcon} class="size-4" />
 		{label}
 	</Button>
-	<p class="text-xs text-muted">
-		AI is not configured — set
-		<code class="rounded bg-surface-hover px-1 py-0.5 font-mono text-[0.7rem]">{envKey}</code>
-		to switch this on.
-	</p>
+	<p class="text-xs text-muted">AI isn’t set up yet. Ask your administrator to turn it on.</p>
 </div>

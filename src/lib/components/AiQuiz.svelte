@@ -53,10 +53,10 @@
 				picked = arr.map(() => true);
 				parseError = '';
 			} else {
-				parseError = 'The model returned no usable questions. Try again.';
+				parseError = 'No questions came back. Please try again.';
 			}
 		} catch {
-			parseError = 'Could not read the generated questions. Try again.';
+			parseError = 'These questions didn’t come out right. Please try again.';
 		}
 	});
 

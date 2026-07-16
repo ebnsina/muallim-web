@@ -51,7 +51,7 @@
 	async function addHighlight(selection: { quote: string; start: number; end: number }) {
 		const result = await callAction('?/addHighlight', selection);
 		if (result.type !== 'success') {
-			toast.danger('That passage could not be marked.');
+			toast.danger("We couldn't mark that passage. Please try again.");
 			return;
 		}
 		if (result.data?.highlight) {
@@ -69,7 +69,7 @@
 
 		const result = await callAction('?/editHighlight', { id, note });
 		if (result.type !== 'success') {
-			toast.danger('That note could not be saved.');
+			toast.danger("We couldn't save that note. Please try again.");
 			return;
 		}
 		toast.success(note.trim() === '' ? 'Note cleared.' : 'Note saved.');
@@ -82,7 +82,7 @@
 		const result = await callAction('?/deleteHighlight', { id });
 		if (result.type !== 'success') {
 			highlights = kept;
-			toast.danger('That highlight could not be removed.');
+			toast.danger("We couldn't remove that highlight. Please try again.");
 			return;
 		}
 		await invalidateAll();

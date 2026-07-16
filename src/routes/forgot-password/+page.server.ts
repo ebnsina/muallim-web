@@ -21,11 +21,17 @@ export const actions: Actions = {
 		// ours, not as evidence about the account.
 		if (error) {
 			if (response?.status === 429) {
-				return fail(429, { email, message: problemMessage(error, 'Too many attempts.') });
+				return fail(429, {
+					email,
+					message: problemMessage(
+						error,
+						'Too many attempts. Please wait a few minutes and try again.'
+					)
+				});
 			}
 			return fail(response?.status ?? 500, {
 				email,
-				message: 'We could not send that email. Try again shortly.'
+				message: "We couldn't send that email. Please try again shortly."
 			});
 		}
 

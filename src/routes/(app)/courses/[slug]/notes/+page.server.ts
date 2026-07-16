@@ -23,7 +23,10 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	const { data, error: problem, response } = await annotations;
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'Could not load your notes.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't load your notes. Please try again.")
+		);
 	}
 
 	return {

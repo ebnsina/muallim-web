@@ -38,13 +38,13 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (classesRes.error || !classesRes.data) {
 		error(
 			classesRes.response?.status ?? 500,
-			problemMessage(classesRes.error, 'This institution’s classes could not be loaded.')
+			problemMessage(classesRes.error, 'We couldn’t load your classes. Please try again.')
 		);
 	}
 	if (studentsRes.error || !studentsRes.data) {
 		error(
 			studentsRes.response?.status ?? 500,
-			problemMessage(studentsRes.error, 'The student roster could not be loaded.')
+			problemMessage(studentsRes.error, 'We couldn’t load your students. Please try again.')
 		);
 	}
 
@@ -97,7 +97,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That student could not be admitted.')
+				message: problemMessage(problem, 'We couldn’t admit that student. Please try again.')
 			});
 		}
 
@@ -133,7 +133,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of students could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more students. Please try again.')
 			});
 		}
 

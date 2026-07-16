@@ -57,7 +57,10 @@ export const actions: Actions = {
 
 		const gateway = String((await request.formData()).get('gateway') ?? '');
 		if (gateway !== 'stripe' && gateway !== 'fake') {
-			return fail(400, { scope: gateway, message: 'That gateway is connected with keys.' });
+			return fail(400, {
+				scope: gateway,
+				message: 'This one is set up by typing in its keys below, not by connecting.'
+			});
 		}
 
 		const {
@@ -71,7 +74,7 @@ export const actions: Actions = {
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
 				scope: gateway,
-				message: problemMessage(problem, 'Could not connect that gateway.')
+				message: problemMessage(problem, 'Couldn’t set that up just now. Please try again.')
 			});
 		}
 
@@ -93,7 +96,7 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				scope: 'sslcommerz',
-				message: problemMessage(problem, 'Could not save those keys.')
+				message: problemMessage(problem, 'Couldn’t save those keys. Please check them and try again.')
 			});
 		}
 
@@ -117,7 +120,7 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				scope: 'bkash',
-				message: problemMessage(problem, 'Could not save those keys.')
+				message: problemMessage(problem, 'Couldn’t save those keys. Please check them and try again.')
 			});
 		}
 

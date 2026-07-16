@@ -31,13 +31,16 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (members.error || !members.data) {
 		error(
 			members.response?.status ?? 500,
-			problemMessage(members.error, 'This workspace’s people could not be loaded.')
+			problemMessage(members.error, "We couldn't load this workspace's people. Please try again.")
 		);
 	}
 	if (invitations.error || !invitations.data) {
 		error(
 			invitations.response?.status ?? 500,
-			problemMessage(invitations.error, 'This workspace’s invitations could not be loaded.')
+			problemMessage(
+				invitations.error,
+				"We couldn't load this workspace's invitations. Please try again."
+			)
 		);
 	}
 
@@ -73,7 +76,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of members could not be loaded.')
+				message: problemMessage(problem, "We couldn't load more people. Please try again.")
 			});
 		}
 
@@ -96,7 +99,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of invitations could not be loaded.')
+				message: problemMessage(problem, "We couldn't load more invitations. Please try again.")
 			});
 		}
 
@@ -124,7 +127,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That role could not be changed.')
+				message: problemMessage(problem, "We couldn't change that role. Please try again.")
 			});
 		}
 
@@ -146,7 +149,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That person could not be removed.')
+				message: problemMessage(problem, "We couldn't remove that person. Please try again.")
 			});
 		}
 
@@ -174,7 +177,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That invitation could not be sent.')
+				message: problemMessage(problem, "We couldn't send that invitation. Please try again.")
 			});
 		}
 
@@ -197,7 +200,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That invitation could not be withdrawn.')
+				message: problemMessage(problem, "We couldn't withdraw that invitation. Please try again.")
 			});
 		}
 

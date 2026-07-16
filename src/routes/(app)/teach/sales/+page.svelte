@@ -53,14 +53,14 @@
 			<EmptyState
 				icon={MoneyReceive01Icon}
 				title="No sales yet"
-				description="Price a course and connect a gateway, and every order appears here."
+				description="Put a price on a course and set up a way to take payment, and every order appears here."
 			/>
 		</div>
 	{:else}
 		<div class="mt-8 overflow-x-auto rounded-card bg-surface-raised shadow-card">
 			<table class="w-full border-collapse text-sm">
 				<caption class="sr-only">
-					Every order: the course, its price, how it ended, the gateway that took it, and when.
+					Every order: the course, its price, how it ended, how it was paid, and when.
 				</caption>
 
 				<thead>
@@ -68,7 +68,7 @@
 						<th scope="col" class="px-4 py-3 font-medium whitespace-nowrap">Course</th>
 						<th scope="col" class="px-4 py-3 font-medium">Price</th>
 						<th scope="col" class="px-4 py-3 font-medium">Status</th>
-						<th scope="col" class="px-4 py-3 font-medium">Gateway</th>
+						<th scope="col" class="px-4 py-3 font-medium">Paid with</th>
 						<th scope="col" class="px-4 py-3 font-medium">Placed</th>
 						<th scope="col" class="px-4 py-3 font-medium">Paid</th>
 						<!-- Wide enough for the question the button turns into: asking must not

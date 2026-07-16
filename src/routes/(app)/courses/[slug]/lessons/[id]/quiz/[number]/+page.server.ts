@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
 
 	const number = Number(params.number);
-	if (!Number.isInteger(number) || number < 1) error(404, 'No such attempt.');
+	if (!Number.isInteger(number) || number < 1) error(404, "We couldn't find that attempt.");
 
 	const review = await authedApi(url.origin, locals.accessToken).GET(
 		'/v1/lessons/{id}/quiz/attempts/{number}',
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (review.error || !review.data) {
 		error(
 			review.response?.status ?? 500,
-			problemMessage(review.error, 'That attempt could not be loaded.')
+			problemMessage(review.error, "We couldn't open that attempt. Please try again.")
 		);
 	}
 

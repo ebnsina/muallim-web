@@ -47,19 +47,19 @@
 				error =
 					problem?.message ||
 					(response.status === 501
-						? 'Image generation is switched off on this server.'
+						? 'AI isn’t set up yet. Ask your administrator to turn it on.'
 						: 'That image could not be generated. Try again.');
 				return;
 			}
 
 			const data = await response.json();
 			if (typeof data.image !== 'string') {
-				error = 'The server returned no image. Try again.';
+				error = 'No image came back. Please try again.';
 				return;
 			}
 			preview = data.image;
 		} catch {
-			error = 'Could not reach the image service. Try again.';
+			error = 'Couldn’t connect. Check your connection and try again.';
 		} finally {
 			generating = false;
 		}
@@ -76,7 +76,7 @@
 			await onaccept(file);
 			reset();
 		} catch {
-			error = 'That generated image could not be saved. Try again.';
+			error = 'That image couldn’t be saved. Please try again.';
 		} finally {
 			accepting = false;
 		}
@@ -165,5 +165,5 @@
 		</div>
 	{/if}
 {:else}
-	<AiOff label="Generate with AI" envKey="AI_IMAGE_API_KEY" />
+	<AiOff label="Generate with AI" />
 {/if}

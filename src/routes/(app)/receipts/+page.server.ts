@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (orders.error || !orders.data) {
 		error(
 			orders.response?.status ?? 500,
-			problemMessage(orders.error, 'Could not load your purchases.')
+			problemMessage(orders.error, "We couldn't load your purchases. Please try again.")
 		);
 	}
 

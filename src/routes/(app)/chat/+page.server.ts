@@ -105,7 +105,7 @@ export const actions: Actions = {
 			if (memberIds.length === 0) return fail(400, { message: 'Add at least one member.' });
 			body = { kind: 'group', title, member_ids: memberIds };
 		} else {
-			return fail(400, { message: 'Unknown conversation kind.' });
+			return fail(400, { message: "We couldn't start that conversation. Please try again." });
 		}
 
 		const {
@@ -115,7 +115,7 @@ export const actions: Actions = {
 		} = await authedApi(url.origin, locals.accessToken).POST('/v1/chat/conversations', { body });
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not start that conversation.')
+				message: problemMessage(problem, "We couldn't start that conversation. Please try again.")
 			});
 		}
 		redirect(303, `/chat?c=${data.conversation.id}`);
@@ -132,9 +132,10 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const id = String(form.get('conversation_id') ?? '');
 		const body = String(form.get('body') ?? '').trim();
-		if (!id) return fail(400, { message: 'No conversation.' });
+		if (!id) return fail(400, { message: 'Open a conversation first.' });
 		if (!body) return fail(400, { sendError: 'Type a message first.' });
-		if (body.length > MAX_BODY) return fail(400, { sendError: 'That message is too long.' });
+		if (body.length > MAX_BODY)
+			return fail(400, { sendError: 'That message is too long. Please shorten it and try again.' });
 
 		const {
 			data,
@@ -146,7 +147,7 @@ export const actions: Actions = {
 		);
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				sendError: problemMessage(problem, 'Message not sent.')
+				sendError: problemMessage(problem, "We couldn't send that message. Please try again.")
 			});
 		}
 		return { sent: data.message };
@@ -172,7 +173,7 @@ export const actions: Actions = {
 		});
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not open that channel.')
+				message: problemMessage(problem, "We couldn't open that course channel. Please try again.")
 			});
 		}
 		redirect(303, `/chat?c=${data.conversation.id}`);
@@ -183,7 +184,7 @@ export const actions: Actions = {
 		if (!locals.accessToken) redirect(303, '/login');
 		const form = await request.formData();
 		const id = String(form.get('conversation_id') ?? '');
-		if (!id) return fail(400, { message: 'No conversation.' });
+		if (!id) return fail(400, { message: 'Open a conversation first.' });
 
 		await authedApi(url.origin, locals.accessToken).POST('/v1/chat/conversations/{id}/read', {
 			params: { path: { id } }
@@ -209,7 +210,7 @@ export const actions: Actions = {
 		);
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not load older messages.')
+				message: problemMessage(problem, "We couldn't load older messages. Please try again.")
 			});
 		}
 		// DESC again; reverse so the older page reads oldest-at-top when prepended.

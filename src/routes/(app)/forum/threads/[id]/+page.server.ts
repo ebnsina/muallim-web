@@ -18,7 +18,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That thread could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't open that thread. Please try again.")
+		);
 	}
 
 	return { thread: data.thread, posts: data.posts ?? [], nextCursor: data.next_cursor ?? '' };
@@ -40,7 +43,7 @@ export const actions: Actions = {
 		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not post that reply.')
+				message: problemMessage(problem, "We couldn't post your reply. Please try again.")
 			});
 		}
 		return { replied: true };
@@ -61,7 +64,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not update that thread.')
+				message: problemMessage(problem, "We couldn't update that thread. Please try again.")
 			});
 		}
 	},
@@ -78,7 +81,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not delete that thread.')
+				message: problemMessage(problem, "We couldn't delete that thread. Please try again.")
 			});
 		}
 		redirect(303, spaceId ? `/forum/spaces/${spaceId}` : '/forum');
@@ -96,7 +99,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not delete that reply.')
+				message: problemMessage(problem, "We couldn't delete that reply. Please try again.")
 			});
 		}
 	}

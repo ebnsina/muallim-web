@@ -38,13 +38,13 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (classesRes.error || !classesRes.data) {
 		error(
 			classesRes.response?.status ?? 500,
-			problemMessage(classesRes.error, 'This institution’s classes could not be loaded.')
+			problemMessage(classesRes.error, 'We couldn’t load your classes. Please try again.')
 		);
 	}
 	if (applicationsRes.error || !applicationsRes.data) {
 		error(
 			applicationsRes.response?.status ?? 500,
-			problemMessage(applicationsRes.error, 'The applications could not be loaded.')
+			problemMessage(applicationsRes.error, 'We couldn’t load the applications. Please try again.')
 		);
 	}
 
@@ -96,7 +96,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That application could not be submitted.')
+				message: problemMessage(problem, 'We couldn’t submit that application. Please try again.')
 			});
 		}
 
@@ -122,7 +122,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That application could not be accepted.')
+				message: problemMessage(problem, 'We couldn’t accept that application. Please try again.')
 			});
 		}
 
@@ -147,7 +147,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That application could not be rejected.')
+				message: problemMessage(problem, 'We couldn’t reject that application. Please try again.')
 			});
 		}
 
@@ -180,7 +180,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That application could not be admitted.')
+				message: problemMessage(problem, 'We couldn’t admit that applicant. Please try again.')
 			});
 		}
 
@@ -208,7 +208,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of applications could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more applications. Please try again.')
 			});
 		}
 

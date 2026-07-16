@@ -41,7 +41,7 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				scope: 'name',
-				message: problemMessage(problem, 'Could not save your name.')
+				message: problemMessage(problem, "We couldn't save your name. Please try again.")
 			});
 		}
 
@@ -70,8 +70,8 @@ export const actions: Actions = {
 			// will think they have been signed out and reload into the same wall.
 			const fallback =
 				response?.status === 401
-					? 'That is not your current password.'
-					: 'Could not change your password.';
+					? "That current password doesn't match. Please try again."
+					: "We couldn't change your password. Please try again.";
 
 			return fail(response?.status ?? 500, {
 				scope: 'password',
@@ -96,7 +96,7 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				scope: 'digest',
-				message: problemMessage(problem, 'Could not save that. Try again shortly.')
+				message: problemMessage(problem, "We couldn't save that. Please try again in a moment.")
 			});
 		}
 
@@ -113,7 +113,10 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				scope: 'email',
-				message: problemMessage(problem, 'Could not send that email. Try again shortly.')
+				message: problemMessage(
+					problem,
+					"We couldn't send that email. Please try again in a moment."
+				)
 			});
 		}
 

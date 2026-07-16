@@ -293,7 +293,8 @@
 					scrollToBottom();
 				}
 			} else if (result.type === 'failure') {
-				sendError = (result.data?.sendError as string) ?? 'Message not sent.';
+				sendError =
+					(result.data?.sendError as string) ?? "We couldn't send that message. Please try again.";
 				draft = body; // give the text back so nothing is lost
 				tick().then(grow);
 			}
@@ -343,7 +344,9 @@
 				sheet = null;
 				await goto(result.location, { invalidateAll: true, noScroll: true });
 			} else if (result.type === 'failure') {
-				createError = (result.data?.message as string) ?? 'Could not start that conversation.';
+				createError =
+					(result.data?.message as string) ??
+					"We couldn't start that conversation. Please try again.";
 			}
 		};
 	};

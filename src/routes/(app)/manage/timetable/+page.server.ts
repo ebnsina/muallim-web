@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (classesRes.error || !classesRes.data) {
 		error(
 			classesRes.response?.status ?? 500,
-			problemMessage(classesRes.error, 'This institution’s classes could not be loaded.')
+			problemMessage(classesRes.error, 'We couldn’t load your classes. Please try again.')
 		);
 	}
 
@@ -52,7 +52,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (timetableRes?.error) {
 		error(
 			timetableRes.response?.status ?? 500,
-			problemMessage(timetableRes.error, 'This section’s timetable could not be loaded.')
+			problemMessage(
+				timetableRes.error,
+				'We couldn’t load this section’s timetable. Please try again.'
+			)
 		);
 	}
 
@@ -104,7 +107,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That period could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that period. Please try again.')
 			});
 		}
 
@@ -124,7 +127,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That period could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that period. Please try again.')
 			});
 		}
 

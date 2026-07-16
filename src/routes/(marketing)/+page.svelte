@@ -325,7 +325,7 @@
 		},
 		{
 			q: 'Is it free to begin?',
-			a: 'Yes. Opening a workspace is free, and a course with no price stays free. When you do sell a course, the only fees are the ones your own payment gateway charges — Muallim takes 0%.'
+			a: 'Yes. Opening a workspace is free, and a course with no price stays free. When you do sell a course, the only fees are the ones your own payment service charges — Muallim takes 0%.'
 		},
 		{
 			q: 'Which payment gateways can I use?',
@@ -647,7 +647,7 @@
 				</h2>
 				<p class="mt-5 max-w-md leading-relaxed text-[#6b6a5e]">
 					You collect fees through your own bKash or SSLCommerz account, so Muallim never holds your
-					money. The only fee is the one your gateway charges — Muallim takes 0%.
+					money. The only fee is the one bKash or SSLCommerz charges — Muallim takes 0%.
 				</p>
 				<a
 					href={resolve('/register')}

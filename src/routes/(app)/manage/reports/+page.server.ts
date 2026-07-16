@@ -22,13 +22,13 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	const overview = overviewRes.data?.overview ?? null;
 	const overviewError =
 		overviewRes.error || !overviewRes.data
-			? problemMessage(overviewRes.error, 'The report could not be loaded.')
+			? problemMessage(overviewRes.error, 'We couldn’t load this report. Please try again.')
 			: null;
 
 	const totals = ledgerRes.data?.totals ?? null;
 	const ledgerError =
 		ledgerRes.error || !ledgerRes.data
-			? problemMessage(ledgerRes.error, 'The finance summary could not be loaded.')
+			? problemMessage(ledgerRes.error, 'We couldn’t load the money summary. Please try again.')
 			: null;
 
 	// A workspace's own numbers, and the report is deterministic: the date is stamped on

@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (classesRes.error || !classesRes.data) {
 		error(
 			classesRes.response?.status ?? 500,
-			problemMessage(classesRes.error, 'This institution’s classes could not be loaded.')
+			problemMessage(classesRes.error, 'We couldn’t load your classes. Please try again.')
 		);
 	}
 
@@ -58,7 +58,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (registerRes?.error) {
 		error(
 			registerRes.response?.status ?? 500,
-			problemMessage(registerRes.error, 'The register for this section could not be loaded.')
+			problemMessage(
+				registerRes.error,
+				'We couldn’t load the register for this section. Please try again.'
+			)
 		);
 	}
 
@@ -72,7 +75,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (historyRes?.error) {
 		error(
 			historyRes.response?.status ?? 500,
-			problemMessage(historyRes.error, 'That student’s attendance could not be loaded.')
+			problemMessage(
+				historyRes.error,
+				'We couldn’t load that student’s attendance. Please try again.'
+			)
 		);
 	}
 
@@ -122,7 +128,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The register could not be saved.')
+				message: problemMessage(problem, 'We couldn’t save the register. Please try again.')
 			});
 		}
 

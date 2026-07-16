@@ -18,7 +18,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That board could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't open that board. Please try again.")
+		);
 	}
 
 	return {
@@ -52,7 +55,7 @@ export const actions: Actions = {
 		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not start that thread.')
+				message: problemMessage(problem, "We couldn't start that thread. Please try again.")
 			});
 		}
 

@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (noticesRes.error || !noticesRes.data) {
 		error(
 			noticesRes.response?.status ?? 500,
-			problemMessage(noticesRes.error, 'The notice board could not be loaded.')
+			problemMessage(noticesRes.error, 'We couldn’t load your notice board. Please try again.')
 		);
 	}
 
@@ -78,7 +78,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That notice could not be posted.')
+				message: problemMessage(problem, 'We couldn’t post that notice. Please try again.')
 			});
 		}
 
@@ -101,7 +101,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of notices could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more notices. Please try again.')
 			});
 		}
 

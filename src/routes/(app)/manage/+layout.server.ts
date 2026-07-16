@@ -15,7 +15,10 @@ export const load: LayoutServerLoad = async ({ locals, parent, url }) => {
 
 	const { user } = await parent();
 	if (!canManageInstitution(user)) {
-		error(403, 'You do not manage this institution.');
+		error(
+			403,
+			'Only owners and admins can open this area. Ask someone who runs your workspace for access.'
+		);
 	}
 
 	return { user };

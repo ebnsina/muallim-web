@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (problem || !data) {
 		error(
 			response?.status ?? 500,
-			problemMessage(problem, 'Your certificates could not be loaded.')
+			problemMessage(problem, "We couldn't load your certificates. Please try again.")
 		);
 	}
 

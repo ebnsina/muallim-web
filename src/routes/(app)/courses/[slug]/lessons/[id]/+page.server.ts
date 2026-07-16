@@ -34,7 +34,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		// A lesson behind a paywall, on a course the reader cannot see, and a lesson
 		// that does not exist all answer 404. Passing the status straight through
 		// keeps it that way.
-		error(response?.status ?? 500, problemMessage(problem, 'That lesson could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't open that lesson. Please try again.")
+		);
 	}
 
 	// The margin — note and marks — that fails to load is not worth failing the
@@ -83,8 +86,8 @@ export const actions: Actions = {
 		if (problem) {
 			return fail(response?.status ?? 500, {
 				message: complete
-					? problemMessage(problem, 'Could not mark that lesson complete.')
-					: problemMessage(problem, 'Could not reopen that lesson.')
+					? problemMessage(problem, "We couldn't mark that lesson complete. Please try again.")
+					: problemMessage(problem, "We couldn't reopen that lesson. Please try again.")
 			});
 		}
 
@@ -111,7 +114,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				noteMessage: problemMessage(problem, 'Could not save your note.')
+				noteMessage: problemMessage(problem, "We couldn't save your note. Please try again.")
 			});
 		}
 
@@ -138,7 +141,10 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				highlightMessage: problemMessage(problem, 'Could not save that highlight.')
+				highlightMessage: problemMessage(
+					problem,
+					"We couldn't save that highlight. Please try again."
+				)
 			});
 		}
 
@@ -160,7 +166,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				highlightMessage: problemMessage(problem, 'Could not save that note.')
+				highlightMessage: problemMessage(problem, "We couldn't save that note. Please try again.")
 			});
 		}
 
@@ -180,7 +186,10 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				highlightMessage: problemMessage(problem, 'Could not remove that highlight.')
+				highlightMessage: problemMessage(
+					problem,
+					"We couldn't remove that highlight. Please try again."
+				)
 			});
 		}
 
@@ -203,7 +212,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				qaMessage: problemMessage(problem, 'Could not post your question.')
+				qaMessage: problemMessage(problem, "We couldn't post your question. Please try again.")
 			});
 		}
 		return { asked: true };
@@ -228,7 +237,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				qaMessage: problemMessage(problem, 'Could not post your answer.')
+				qaMessage: problemMessage(problem, "We couldn't post your answer. Please try again.")
 			});
 		}
 		return { answered: true };
@@ -246,7 +255,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				qaMessage: problemMessage(problem, 'Could not remove that question.')
+				qaMessage: problemMessage(problem, "We couldn't remove that question. Please try again.")
 			});
 		}
 	},
@@ -263,7 +272,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				qaMessage: problemMessage(problem, 'Could not remove that answer.')
+				qaMessage: problemMessage(problem, "We couldn't remove that answer. Please try again.")
 			});
 		}
 	}

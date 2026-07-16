@@ -73,7 +73,10 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not send that email. Try again shortly.')
+				message: problemMessage(
+					problem,
+					"We couldn't send that email. Please try again in a moment."
+				)
 			});
 		}
 

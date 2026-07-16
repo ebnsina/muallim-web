@@ -7,7 +7,7 @@ import type { HandleClientError } from '@sveltejs/kit';
  * Once an error-reporting service exists, this is where a browser exception is
  * forwarded to it, tagged with the same correlation ID the user sees on screen.
  */
-export const handleError: HandleClientError = ({ error, event, status, message }) => {
+export const handleError: HandleClientError = ({ error, event, status }) => {
 	const correlationId = crypto.randomUUID();
 
 	if (status !== 404) {
@@ -20,7 +20,10 @@ export const handleError: HandleClientError = ({ error, event, status, message }
 	}
 
 	return {
-		message: status === 404 ? 'Not found' : message,
+		message:
+			status === 404
+				? 'We couldn’t find that page.'
+				: 'Something went wrong on our end. Please try again in a moment.',
 		correlationId
 	};
 };

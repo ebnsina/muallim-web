@@ -24,13 +24,14 @@ export const actions: Actions = {
 		const password = String(form.get('password') ?? '');
 		const confirm = String(form.get('confirm') ?? '');
 
-		if (!token) return fail(400, { message: 'This link is missing its token. Request a new one.' });
+		if (!token)
+			return fail(400, { message: "This link isn't complete. Please request a new one." });
 		if (password.length < MIN_PASSWORD_LENGTH) {
 			return fail(400, {
 				message: `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`
 			});
 		}
-		if (password !== confirm) return fail(400, { message: 'The two passwords do not match.' });
+		if (password !== confirm) return fail(400, { message: "The two passwords don't match." });
 
 		const { error, response } = await serverApi(url.origin).POST('/v1/auth/password/reset', {
 			body: { token, password }
@@ -38,7 +39,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(response?.status ?? 400, {
-				message: problemMessage(error, 'This link is invalid or has expired. Request a new one.')
+				message: problemMessage(error, 'That link no longer works. Please request a new one.')
 			});
 		}
 

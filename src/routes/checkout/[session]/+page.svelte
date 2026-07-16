@@ -19,7 +19,7 @@
 	<Alert tone="warning" role="status">
 		<span class="flex items-center gap-2">
 			<Icon icon={Alert02Icon} class="size-4 shrink-0" />
-			No money moves here. This stands in for the payment gateway until its keys are set.
+			No money moves here. This is a practice payment page, used for testing.
 		</span>
 	</Alert>
 

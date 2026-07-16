@@ -19,7 +19,10 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	if (staffRes.error || !staffRes.data) {
 		error(
 			staffRes.response?.status ?? 500,
-			problemMessage(staffRes.error, 'That member could not be loaded.')
+			problemMessage(
+				staffRes.error,
+				'We couldn’t open that staff member’s record. Please try again.'
+			)
 		);
 	}
 
@@ -56,7 +59,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Those changes could not be saved.')
+				message: problemMessage(problem, 'We couldn’t save your changes. Please try again.')
 			});
 		}
 
@@ -77,7 +80,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That member could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that staff member. Please try again.')
 			});
 		}
 

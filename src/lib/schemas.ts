@@ -287,7 +287,7 @@ export const priceSchema = z.object({
 	amount: z.coerce
 		.number({ error: 'A price is a number.' })
 		.positive('A price is more than nothing.')
-		.max(1_000_000, 'That is more than this system will sell a course for.'),
+		.max(1_000_000, 'That price is too high. Enter a smaller amount.'),
 	currency: z.string().trim().length(3, 'A currency is three letters, like BDT or USD.')
 });
 
@@ -295,8 +295,8 @@ export const priceSchema = z.object({
 
 /** SSLCommerz: a store id and a store password. Both go straight to the API. */
 export const sslcommerzSchema = z.object({
-	public_id: text(200, 'The store id is missing.'),
-	secret: text(500, 'The store password is missing.')
+	public_id: text(200, 'Enter your store id.'),
+	secret: text(500, 'Enter your store password.')
 });
 
 /*
@@ -306,10 +306,10 @@ export const sslcommerzSchema = z.object({
 	it. Three inputs here, one field on the wire — see `packBkashSecret`.
 */
 export const bkashSchema = z.object({
-	public_id: text(200, 'The app key is missing.'),
-	app_secret: text(500, 'The app secret is missing.'),
-	username: text(500, 'The username is missing.'),
-	password: text(500, 'The password is missing.')
+	public_id: text(200, 'Enter your app key.'),
+	app_secret: text(500, 'Enter your app secret.'),
+	username: text(500, 'Enter your username.'),
+	password: text(500, 'Enter your password.')
 });
 
 // --------------------------------------------------------------------- Q&A

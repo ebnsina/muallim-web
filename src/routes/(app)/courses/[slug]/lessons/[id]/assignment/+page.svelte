@@ -95,7 +95,7 @@
 
 				const signed = await callAction('?/presign', { filename: file.name, bytes: file.size });
 				if (signed.type !== 'success') {
-					toast.danger(actionMessage(signed, `${file.name} could not be uploaded.`));
+					toast.danger(actionMessage(signed, `We couldn't upload ${file.name}. Please try again.`));
 					continue;
 				}
 
@@ -106,7 +106,9 @@
 					filename: file.name
 				});
 				if (confirmed.type !== 'success') {
-					toast.danger(actionMessage(confirmed, `${file.name} could not be attached.`));
+					toast.danger(
+						actionMessage(confirmed, `We couldn't attach ${file.name}. Please try again.`)
+					);
 					continue;
 				}
 
@@ -116,7 +118,11 @@
 				toast.success(`${file.name} attached.`);
 			}
 		} catch (problem) {
-			toast.danger(problem instanceof Error ? problem.message : 'That upload failed.');
+			toast.danger(
+				problem instanceof Error
+					? problem.message
+					: "We couldn't upload that file. Please try again."
+			);
 		} finally {
 			uploading = false;
 			// Clearing it lets the same file be chosen again after a failure; a file

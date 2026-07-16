@@ -35,7 +35,7 @@ export const actions: Actions = {
 			// specific here would undo that.
 			return fail(response?.status ?? 401, {
 				email,
-				message: problemMessage(error, 'Those credentials are not valid.')
+				message: problemMessage(error, "Those details don't match. Please check and try again.")
 			});
 		}
 

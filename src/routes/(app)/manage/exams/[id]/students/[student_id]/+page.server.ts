@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	if (cardRes.error || !cardRes.data) {
 		error(
 			cardRes.response?.status ?? 500,
-			problemMessage(cardRes.error, 'That report card could not be loaded.')
+			problemMessage(cardRes.error, 'We couldn’t open that report card. Please try again.')
 		);
 	}
 

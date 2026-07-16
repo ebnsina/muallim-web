@@ -32,7 +32,7 @@ export const actions: Actions = {
 		// A failure of the call, not of a field: it stays the page's voice.
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not create that board.')
+				message: problemMessage(problem, "We couldn't create that board. Please try again.")
 			});
 		}
 		return { created: true };

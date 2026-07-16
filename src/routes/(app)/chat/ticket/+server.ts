@@ -25,7 +25,10 @@ export const POST: RequestHandler = async ({ locals, url }) => {
 	);
 
 	if (apiError || !data) {
-		error(503, problemMessage(apiError, 'Chat is unavailable right now.'));
+		error(
+			503,
+			problemMessage(apiError, "Chat isn't available right now. Please try again in a moment.")
+		);
 	}
 
 	return json({ ticket: data.ticket });

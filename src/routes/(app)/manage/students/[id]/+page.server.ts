@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, params, url, setHeaders }) 
 	if (studentRes.error || !studentRes.data) {
 		error(
 			studentRes.response?.status ?? 500,
-			problemMessage(studentRes.error, 'That student could not be loaded.')
+			problemMessage(studentRes.error, 'We couldn’t open that student’s record. Please try again.')
 		);
 	}
 
@@ -74,7 +74,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Those changes could not be saved.')
+				message: problemMessage(problem, 'We couldn’t save your changes. Please try again.')
 			});
 		}
 
@@ -110,7 +110,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That guardian could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that guardian. Please try again.')
 			});
 		}
 
@@ -131,7 +131,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That student could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that student. Please try again.')
 			});
 		}
 
@@ -153,7 +153,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That guardian could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that guardian. Please try again.')
 			});
 		}
 

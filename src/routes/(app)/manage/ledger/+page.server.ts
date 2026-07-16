@@ -59,7 +59,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (categoriesRes.error || !categoriesRes.data) {
 		error(
 			categoriesRes.response?.status ?? 500,
-			problemMessage(categoriesRes.error, 'The categories could not be loaded.')
+			problemMessage(
+				categoriesRes.error,
+				'We couldn’t load your ledger categories. Please try again.'
+			)
 		);
 	}
 
@@ -68,7 +71,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// rather than an error page over the whole thing.
 	const entriesError =
 		entriesRes.error || !entriesRes.data
-			? problemMessage(entriesRes.error, 'The entries could not be loaded.')
+			? problemMessage(entriesRes.error, 'We couldn’t load your ledger entries. Please try again.')
 			: null;
 
 	setHeaders({ 'cache-control': 'private, no-store' });
@@ -112,7 +115,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That category could not be created.')
+				message: problemMessage(problem, 'We couldn’t create that category. Please try again.')
 			});
 		}
 
@@ -147,7 +150,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That entry could not be recorded.')
+				message: problemMessage(problem, 'We couldn’t record that entry. Please try again.')
 			});
 		}
 
@@ -184,7 +187,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of entries could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more entries. Please try again.')
 			});
 		}
 

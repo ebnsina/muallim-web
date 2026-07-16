@@ -59,7 +59,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const { data, error: problem, response } = coursesRes;
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'Could not load the catalog.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't load the courses. Please try again.")
+		);
 	}
 
 	// A vocabulary that fails to load costs the filter, not the page — the listing

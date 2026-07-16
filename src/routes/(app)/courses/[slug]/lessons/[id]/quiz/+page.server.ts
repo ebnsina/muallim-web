@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	if (quiz.error || !quiz.data) {
 		error(
 			quiz.response?.status ?? 500,
-			problemMessage(quiz.error, 'That quiz could not be loaded.')
+			problemMessage(quiz.error, "We couldn't open that quiz. Please try again.")
 		);
 	}
 
@@ -49,7 +49,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That attempt could not be started.')
+				message: problemMessage(problem, "We couldn't start your attempt. Please try again.")
 			});
 		}
 	},
@@ -70,7 +70,7 @@ export const actions: Actions = {
 		const bytes = Number(form.get('bytes'));
 
 		if (!questionId || !Number.isSafeInteger(bytes) || bytes < 1) {
-			return fail(422, { message: 'That drawing could not be read.' });
+			return fail(422, { message: "We couldn't read that drawing. Please draw it again." });
 		}
 
 		const {
@@ -84,7 +84,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That drawing could not be uploaded.')
+				message: problemMessage(problem, "We couldn't upload that drawing. Please try again.")
 			});
 		}
 
@@ -116,7 +116,10 @@ export const actions: Actions = {
 		for (const saved of await Promise.all(saves)) {
 			if (saved.error) {
 				return fail(saved.response?.status ?? 500, {
-					message: problemMessage(saved.error, 'An answer could not be saved.')
+					message: problemMessage(
+						saved.error,
+						"We couldn't save one of your answers. Please try again."
+					)
 				});
 			}
 		}
@@ -131,7 +134,10 @@ export const actions: Actions = {
 
 		if (submitted.error || !submitted.data) {
 			return fail(submitted.response?.status ?? 500, {
-				message: problemMessage(submitted.error, 'That attempt could not be submitted.')
+				message: problemMessage(
+					submitted.error,
+					"We couldn't submit your attempt. Please try again."
+				)
 			});
 		}
 

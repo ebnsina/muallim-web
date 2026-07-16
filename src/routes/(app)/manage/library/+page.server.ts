@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (booksRes.error || !booksRes.data) {
 		error(
 			booksRes.response?.status ?? 500,
-			problemMessage(booksRes.error, 'The library catalogue could not be loaded.')
+			problemMessage(booksRes.error, 'We couldn’t load your library. Please try again.')
 		);
 	}
 
@@ -61,7 +61,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// list degrades to a notice in its own section rather than an error page over the whole thing.
 	const loansError =
 		loansRes.error || !loansRes.data
-			? problemMessage(loansRes.error, 'The loans could not be loaded.')
+			? problemMessage(loansRes.error, 'We couldn’t load the books on loan. Please try again.')
 			: null;
 
 	setHeaders({ 'cache-control': 'private, no-store' });
@@ -110,7 +110,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That book could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that book. Please try again.')
 			});
 		}
 
@@ -139,7 +139,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That loan could not be issued.')
+				message: problemMessage(problem, 'We couldn’t issue that book. Please try again.')
 			});
 		}
 
@@ -162,7 +162,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That loan could not be returned.')
+				message: problemMessage(problem, 'We couldn’t return that book. Please try again.')
 			});
 		}
 
@@ -187,7 +187,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of books could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more books. Please try again.')
 			});
 		}
 
@@ -220,7 +220,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of loans could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more loans. Please try again.')
 			});
 		}
 

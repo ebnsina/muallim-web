@@ -48,7 +48,7 @@
 			bytes: blob.size
 		});
 		if (signed.type !== 'success') {
-			toast.danger(actionMessage(signed, 'That drawing could not be uploaded.'));
+			toast.danger(actionMessage(signed, "We couldn't upload that drawing. Please try again."));
 			return null;
 		}
 
@@ -56,7 +56,7 @@
 		try {
 			await putToStore(upload, new File([blob], 'drawing.png', { type: 'image/png' }));
 		} catch {
-			toast.danger('That drawing could not be uploaded.');
+			toast.danger("We couldn't upload that drawing. Please try again.");
 			return null;
 		}
 		return upload.key;

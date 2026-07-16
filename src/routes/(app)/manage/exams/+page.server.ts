@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (defaultRes.error) {
 		error(
 			defaultRes.response?.status ?? 500,
-			problemMessage(defaultRes.error, 'A grading scale could not be prepared.')
+			problemMessage(defaultRes.error, 'We couldn’t set up your grading scale. Please try again.')
 		);
 	}
 
@@ -38,13 +38,13 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (scalesRes.error || !scalesRes.data) {
 		error(
 			scalesRes.response?.status ?? 500,
-			problemMessage(scalesRes.error, 'The grading scales could not be loaded.')
+			problemMessage(scalesRes.error, 'We couldn’t load your grading scales. Please try again.')
 		);
 	}
 	if (examsRes.error || !examsRes.data) {
 		error(
 			examsRes.response?.status ?? 500,
-			problemMessage(examsRes.error, 'The exams could not be loaded.')
+			problemMessage(examsRes.error, 'We couldn’t load your exams. Please try again.')
 		);
 	}
 
@@ -87,7 +87,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That exam could not be created.')
+				message: problemMessage(problem, 'We couldn’t create that exam. Please try again.')
 			});
 		}
 
@@ -119,7 +119,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The madrasa scale could not be added.')
+				message: problemMessage(problem, 'We couldn’t add the madrasa scale. Please try again.')
 			});
 		}
 
@@ -145,7 +145,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That exam could not be published.')
+				message: problemMessage(problem, 'We couldn’t publish that exam. Please try again.')
 			});
 		}
 
@@ -165,7 +165,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That exam could not be removed.')
+				message: problemMessage(problem, 'We couldn’t remove that exam. Please try again.')
 			});
 		}
 
@@ -188,7 +188,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of exams could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more exams. Please try again.')
 			});
 		}
 

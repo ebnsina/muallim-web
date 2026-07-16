@@ -35,7 +35,7 @@ export const actions: Actions = {
 			return fail(response?.status ?? 400, {
 				email,
 				name,
-				message: problemMessage(error, 'That account could not be created.')
+				message: problemMessage(error, "We couldn't create that account. Please try again.")
 			});
 		}
 

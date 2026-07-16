@@ -19,7 +19,9 @@
 			<a class="underline" href={resolve('/dashboard')}>Go to your dashboard</a>
 		</p>
 	{:else if !data.token}
-		<Alert tone="danger" class="mt-6" role="alert">This link is missing its token.</Alert>
+		<Alert tone="danger" class="mt-6" role="alert">
+			This link isn't complete. Please request a new one.
+		</Alert>
 	{:else}
 		<p class="text-muted mt-2 text-sm">
 			Press the button to confirm the address this link was sent to.

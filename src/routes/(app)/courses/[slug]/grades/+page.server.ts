@@ -25,7 +25,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'Your grades could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't load your grades. Please try again.")
+		);
 	}
 
 	return {

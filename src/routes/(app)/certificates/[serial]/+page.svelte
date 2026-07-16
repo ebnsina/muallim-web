@@ -35,7 +35,7 @@
 			setTimeout(() => (copied = false), 2000);
 		} catch {
 			// Clipboard access can be denied. The link is on the page to select by hand.
-			toast.danger('Could not copy. The link is shown below.');
+			toast.danger("We couldn't copy the link. You can copy it from below instead.");
 		}
 	}
 </script>

@@ -55,7 +55,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (buildingsRes.error || !buildingsRes.data) {
 		error(
 			buildingsRes.response?.status ?? 500,
-			problemMessage(buildingsRes.error, 'The boarding buildings could not be loaded.')
+			problemMessage(
+				buildingsRes.error,
+				'We couldn’t load your hostel buildings. Please try again.'
+			)
 		);
 	}
 
@@ -63,7 +66,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	// without it, so a failed list degrades to a notice in its own section.
 	const allocationsError =
 		allocationsRes.error || !allocationsRes.data
-			? problemMessage(allocationsRes.error, 'The allocations could not be loaded.')
+			? problemMessage(
+					allocationsRes.error,
+					'We couldn’t load who’s in which bed. Please try again.'
+				)
 			: null;
 
 	// A building in focus brings its rooms — the beds an allocation is made against, with
@@ -75,7 +81,10 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 			params: { path: { id: buildingId } }
 		});
 		if (roomsRes.error || !roomsRes.data) {
-			roomsError = problemMessage(roomsRes.error, 'This building’s rooms could not be loaded.');
+			roomsError = problemMessage(
+				roomsRes.error,
+				'We couldn’t load this building’s rooms. Please try again.'
+			);
 		} else {
 			rooms = roomsRes.data.rooms ?? [];
 		}
@@ -129,7 +138,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That building could not be registered.')
+				message: problemMessage(problem, 'We couldn’t add that building. Please try again.')
 			});
 		}
 
@@ -163,7 +172,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That room could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that room. Please try again.')
 			});
 		}
 
@@ -192,7 +201,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That bed could not be allocated.')
+				message: problemMessage(problem, 'We couldn’t give that student a bed. Please try again.')
 			});
 		}
 
@@ -215,7 +224,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That allocation could not be vacated.')
+				message: problemMessage(problem, 'We couldn’t free that bed. Please try again.')
 			});
 		}
 
@@ -238,7 +247,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of buildings could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more buildings. Please try again.')
 			});
 		}
 
@@ -273,7 +282,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of allocations could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more beds. Please try again.')
 			});
 		}
 

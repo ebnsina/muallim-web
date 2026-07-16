@@ -1308,7 +1308,7 @@
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<h2 class="font-medium">Payments</h2>
 							<!-- The gateways themselves are the workspace's, not this course's. -->
-							<ActionLink href={resolve('/teach/payments')} tone="muted">All gateways</ActionLink>
+							<ActionLink href={resolve('/teach/payments')} tone="muted">All payment methods</ActionLink>
 						</div>
 
 						{#if !data.account}
@@ -1324,7 +1324,8 @@
 							</form>
 						{:else if !data.account.ready}
 							<p class="text-muted mt-1 text-sm">
-								Your account is connected but the gateway will not take charges on it yet.
+								Your account is connected, but it can’t take payments yet. Finish setting it up on the
+							Payments page.
 							</p>
 							<Badge tone="warning" class="mt-3">{data.account.status}</Badge>
 						{:else}

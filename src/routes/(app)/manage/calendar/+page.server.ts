@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	if (eventsRes.error || !eventsRes.data) {
 		error(
 			eventsRes.response?.status ?? 500,
-			problemMessage(eventsRes.error, 'The calendar could not be loaded.')
+			problemMessage(eventsRes.error, 'We couldn’t load your calendar. Please try again.')
 		);
 	}
 
@@ -90,7 +90,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That event could not be added.')
+				message: problemMessage(problem, 'We couldn’t add that event. Please try again.')
 			});
 		}
 
@@ -110,7 +110,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That event could not be deleted.')
+				message: problemMessage(problem, 'We couldn’t delete that event. Please try again.')
 			});
 		}
 
@@ -145,7 +145,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'The next page of the calendar could not be loaded.')
+				message: problemMessage(problem, 'We couldn’t load more events. Please try again.')
 			});
 		}
 

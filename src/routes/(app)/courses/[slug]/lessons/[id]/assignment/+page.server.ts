@@ -19,7 +19,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'That assignment could not be loaded.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, "We couldn't open that assignment. Please try again.")
+		);
 	}
 
 	return {
@@ -51,7 +54,7 @@ export const actions: Actions = {
 		const bytes = Number(form.get('bytes'));
 
 		if (!filename || !Number.isSafeInteger(bytes) || bytes < 1) {
-			return fail(422, { message: 'That file could not be read.' });
+			return fail(422, { message: "We couldn't read that file. Please pick another one." });
 		}
 
 		const {
@@ -68,7 +71,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, `${filename} could not be uploaded.`)
+				message: problemMessage(problem, `We couldn't upload ${filename}. Please try again.`)
 			});
 		}
 
@@ -99,7 +102,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, `${filename} could not be attached.`)
+				message: problemMessage(problem, `We couldn't attach ${filename}. Please try again.`)
 			});
 		}
 
@@ -122,7 +125,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That file could not be removed.')
+				message: problemMessage(problem, "We couldn't remove that file. Please try again.")
 			});
 		}
 
@@ -146,7 +149,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That work could not be handed in.')
+				message: problemMessage(problem, "We couldn't hand in your work. Please try again.")
 			});
 		}
 
@@ -176,7 +179,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'That file could not be downloaded.')
+				message: problemMessage(problem, "We couldn't download that file. Please try again.")
 			});
 		}
 
