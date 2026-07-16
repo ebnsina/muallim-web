@@ -367,7 +367,6 @@
 				<a class="pill pill-primary" href={resolve('/register')}>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
 				</a>
-				<a class="pill pill-ghost" href="#capabilities">See features</a>
 			</div>
 			<p class="build-p">
 				<strong>One platform, end to end.</strong> The morning register, the board result, and the fee
@@ -390,9 +389,6 @@
 						<Icon icon={ArrowRight02Icon} class="size-4" /> Timetable, staff, and sections in one place
 					</li>
 				</ul>
-				<a class="pill pill-primary pill-sm" href={resolve('/register')}>
-					Take the register <Icon icon={ArrowRight02Icon} class="size-4" />
-				</a>
 			</div>
 
 			<div class="fcard fcard-dark">

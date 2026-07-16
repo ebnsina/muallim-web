@@ -4,9 +4,8 @@
 		itself in.
 
 		Bold and open rather than shaded — a heavy stroke reads at a glance where a
-		rendered ball just sits there, and it costs nothing to load. The drawing is the
-		motion: the path lays itself down, waits, and starts again. Nothing rotates,
-		nothing bounces.
+		rendered ball just sits there, and it costs nothing to load. It does not move:
+		a picture in the corner of somebody's eye should not perform while they read.
 
 		Abstract on purpose. The mock register it replaced drew a screenshot of a
 		feature; a drawn ring promises nothing it cannot keep.
@@ -20,29 +19,9 @@
 		corner?: 'bottom' | 'top';
 	};
 	let { kind, tone = 'brand', corner = 'bottom' }: Props = $props();
-
-	let el: HTMLElement | undefined = $state();
-	let seen = $state(false);
-
-	// It draws once, so it draws when somebody is there to watch: a card two screens
-	// down would otherwise finish long before anybody scrolled to it.
-	$effect(() => {
-		if (!el || seen) return;
-		const io = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting) {
-					seen = true;
-					io.disconnect();
-				}
-			},
-			{ threshold: 0.4 }
-		);
-		io.observe(el);
-		return () => io.disconnect();
-	});
 </script>
 
-<span class="object {tone} {corner}" class:seen bind:this={el} aria-hidden="true">
+<span class="object {tone} {corner}" aria-hidden="true">
 	{#if kind === 'ring'}
 		<svg viewBox="0 0 200 200" fill="none">
 			<circle class="p a" cx="100" cy="100" r="76" pathLength="100" />
@@ -65,7 +44,7 @@
 	*/
 	.object {
 		position: absolute;
-		right: -3.4rem;
+		right: -2.6rem;
 		z-index: 0;
 		display: block;
 		width: 17.5rem;
@@ -82,7 +61,7 @@
 		bottom: -3.8rem;
 	}
 	.top {
-		top: -3.8rem;
+		top: -2.2rem;
 	}
 
 	.brand {
@@ -101,33 +80,5 @@
 	.p {
 		stroke: currentColor;
 		stroke-width: 11;
-		stroke-dasharray: 100;
-		stroke-dashoffset: 100;
-	}
-	/* Once, on the way past, and then it stays drawn. A loop turns a flourish into a
-	   thing flickering in the corner of the eye while somebody is trying to read. */
-	.seen .p {
-		animation: draw 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-	}
-	.seen .b {
-		animation-delay: 0.22s;
-	}
-	.seen .c {
-		animation-delay: 0.44s;
-	}
-
-	@keyframes draw {
-		to {
-			stroke-dashoffset: 0;
-		}
-	}
-
-	/* Asked for less motion: the drawing, finished, holding still. */
-	@media (prefers-reduced-motion: reduce) {
-		.p,
-		.seen .p {
-			animation: none;
-			stroke-dashoffset: 0;
-		}
 	}
 </style>

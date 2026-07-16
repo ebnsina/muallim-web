@@ -13,8 +13,13 @@
 	type Props = {
 		/** The hue family, so a card's blocks belong to the card. */
 		tone?: 'lime' | 'lav';
+		/**
+		 * `week` — a timetable: a flat grid of periods with the day's classes standing
+		 * up out of it. `stack` — pieces assembled into one.
+		 */
+		kind?: 'week' | 'stack';
 	};
-	let { tone = 'lime' }: Props = $props();
+	let { tone = 'lime', kind = 'week' }: Props = $props();
 
 	const ramp = $derived(
 		tone === 'lime'
@@ -22,8 +27,29 @@
 			: { top: '#efedfb', left: '#c9c3f0', right: '#9990d8', stud: '#f7f6fd', line: '#6f63c9' }
 	);
 
-	// Where each block sits on the isometric grid, in column/row/height.
-	const blocks = [
+	/*
+		A week, as a school sees it: a flat grid of periods, and the ones that are
+		taught standing up out of it. It is the card's own sentence — take the
+		register, keep the timetable — rather than a shape that means nothing.
+	*/
+	const WEEK = [
+		{ x: 0, y: 0, z: 0 },
+		{ x: 1, y: 0, z: 0 },
+		{ x: 2, y: 0, z: 0 },
+		{ x: 0, y: 1, z: 0 },
+		{ x: 1, y: 1, z: 0 },
+		{ x: 2, y: 1, z: 0 },
+		{ x: 0, y: 2, z: 0 },
+		{ x: 1, y: 2, z: 0 },
+		{ x: 2, y: 2, z: 0 },
+		// Today's classes.
+		{ x: 0, y: 0, z: 1 },
+		{ x: 1, y: 1, z: 1 },
+		{ x: 2, y: 1, z: 1 },
+		{ x: 1, y: 2, z: 1 }
+	];
+
+	const STACK = [
 		{ x: 0, y: 1, z: 0 },
 		{ x: 1, y: 0, z: 0 },
 		{ x: 1, y: 1, z: 0 },
@@ -31,10 +57,12 @@
 		{ x: 1, y: 1, z: 1 }
 	];
 
+	const blocks = $derived(kind === 'week' ? WEEK : STACK);
+
 	// Half-width, quarter-height, wall depth: the isometric cell.
-	const W = 30;
-	const H = 15;
-	const D = 22;
+	const W = 26;
+	const H = 13;
+	const D = 18;
 
 	// Grid to screen. Painter's order: back to front, bottom to top.
 	const placed = $derived(
@@ -42,7 +70,9 @@
 			.map((b) => ({
 				...b,
 				sx: 100 + (b.x - b.y) * W,
-				sy: 96 + (b.x + b.y) * (H / 2) - b.z * D
+				sy: 120 + (b.x + b.y) * (H / 2) - b.z * D,
+				// A period nobody teaches is a thin tile; a class stands proud of it.
+				d: b.z === 0 ? D * 0.42 : D
 			}))
 			.sort((a, b) => a.x + a.y - (b.x + b.y) || a.z - b.z)
 	);
@@ -63,26 +93,30 @@
 			</linearGradient>
 		</defs>
 
-		<!-- The thread through the stack, drawn on the way past. -->
-		<path
-			class="thread"
-			d="M8 150c26-6 40 14 62 6M130 120c24 10 44-6 62 2"
-			stroke={ramp.line}
-			stroke-width="2"
-			stroke-dasharray="5 6"
-			stroke-linecap="round"
-			pathLength="100"
-		/>
+		<!-- The thread through the stack. -->
+		{#if kind === 'stack'}
+			<path
+				class="thread"
+				d="M8 150c26-6 40 14 62 6M130 120c24 10 44-6 62 2"
+				stroke={ramp.line}
+				stroke-width="2"
+				stroke-dasharray="5 6"
+				stroke-linecap="round"
+				pathLength="100"
+			/>
+		{/if}
 
 		{#each placed as b (`${b.x}-${b.y}-${b.z}`)}
 			<g class="block">
 				<!-- Left wall, right wall, then the lid: the order a brick is seen in. -->
 				<path
-					d="M{b.sx - W} {b.sy} L{b.sx} {b.sy + H} L{b.sx} {b.sy + H + D} L{b.sx - W} {b.sy + D} Z"
+					d="M{b.sx - W} {b.sy} L{b.sx} {b.sy + H} L{b.sx} {b.sy + H + b.d} L{b.sx - W} {b.sy +
+						b.d} Z"
 					fill="url(#left-{id})"
 				/>
 				<path
-					d="M{b.sx + W} {b.sy} L{b.sx} {b.sy + H} L{b.sx} {b.sy + H + D} L{b.sx + W} {b.sy + D} Z"
+					d="M{b.sx + W} {b.sy} L{b.sx} {b.sy + H} L{b.sx} {b.sy + H + b.d} L{b.sx + W} {b.sy +
+						b.d} Z"
 					fill={ramp.right}
 				/>
 				<path
@@ -108,12 +142,12 @@
 <style>
 	.blocks {
 		position: absolute;
-		right: -3rem;
-		bottom: -3.5rem;
+		right: -2rem;
+		bottom: -2.5rem;
 		z-index: 0;
 		display: block;
-		width: 24rem;
-		height: 24rem;
+		width: 20rem;
+		height: 20rem;
 		pointer-events: none;
 		opacity: 0.9;
 	}
