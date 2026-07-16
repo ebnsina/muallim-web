@@ -13,7 +13,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Button, SiteCta } from '$lib/features/marketing/ui';
+	import { Button, CardObject, SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -382,13 +382,7 @@
 
 		<div class="build-cards">
 			<div class="fcard fcard-teal">
-				<div class="fcard-widget">
-					<span class="fw-label">Today's register · Class 6A</span>
-					<div class="fw-row">
-						<span class="ava"></span><span class="ava"></span><span class="ava"></span>
-						<span class="fw-chip">92% present</span>
-					</div>
-				</div>
+				<CardObject kind="ring" />
 				<h3 class="fcard-title">Run the day, effortlessly</h3>
 				<ul class="fcard-list">
 					<li><Icon icon={ArrowRight02Icon} class="size-4" /> Take the register, class by class</li>
@@ -402,14 +396,7 @@
 			</div>
 
 			<div class="fcard fcard-dark">
-				<div class="fw-panel">
-					<span class="fw-label">You're the merchant</span>
-					<div class="fw-chips">
-						<span class="gw">bKash</span><span class="gw">SSLCommerz</span><span class="gw"
-							>Stripe</span
-						>
-					</div>
-				</div>
+				<CardObject kind="orb" tone="lime" />
 				<div class="fcard-dark-foot">
 					<h3 class="fcard-title lime">Teach beyond the gate</h3>
 					<p class="fcard-dark-p">
@@ -1054,6 +1041,10 @@
 		}
 	}
 	.fcard {
+		/* Anchors the corner glyph and clips it, which is what makes it read as a mark
+		   on the card rather than a picture in it. */
+		position: relative;
+		overflow: hidden;
 		border-radius: 22px;
 		padding: 1.5rem;
 		display: flex;
@@ -1061,11 +1052,18 @@
 		min-height: 20rem;
 	}
 	.fcard-teal {
-		background: #dbe9e6;
+		background: var(--teal-tint);
 	}
 	.fcard-dark {
 		background: var(--olive);
 		color: #eef0e6;
+	}
+	.fcard-title,
+	.fcard-list,
+	.fcard-dark-foot,
+	.fcard .pill {
+		position: relative;
+		z-index: 1;
 	}
 	.fcard-title {
 		margin: 0 0 0.4rem;
@@ -1116,74 +1114,11 @@
 	}
 
 	/* Feature-card widgets. */
-	.fcard-widget {
-		background: #fff;
-		border-radius: 14px;
-		padding: 0.9rem 1rem;
-		margin-bottom: 1.2rem;
-	}
-	.fw-label {
-		font-size: 0.76rem;
-		font-weight: 600;
-		color: var(--muted);
-	}
-	.fw-row {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		margin-top: 0.6rem;
-	}
-	.ava {
-		width: 1.7rem;
-		height: 1.7rem;
-		border-radius: 50%;
-		border: 2px solid #fff;
-		margin-left: -0.5rem;
-	}
-	.ava:first-child {
-		margin-left: 0;
-	}
-	.ava:nth-child(1) {
-		background: #c9b7a4;
-	}
 	.ava:nth-child(2) {
 		background: #8fae7a;
 	}
-	.ava:nth-child(3) {
-		background: #b9a0c6;
-	}
-	.fw-chip {
-		margin-left: auto;
-		background: var(--lime);
-		color: var(--olive);
-		font-weight: 700;
-		font-size: 0.74rem;
-		border-radius: 999px;
-		padding: 0.2rem 0.6rem;
-	}
-	.fw-panel {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 14px;
-		padding: 0.9rem 1rem;
-		margin-bottom: 1.2rem;
-	}
 	.fw-panel .fw-label {
 		color: #cfd3c2;
-	}
-	.fw-chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		margin-top: 0.6rem;
-	}
-	.gw {
-		background: rgba(255, 255, 255, 0.14);
-		color: #eef0e6;
-		border-radius: 999px;
-		padding: 0.25rem 0.7rem;
-		font-size: 0.78rem;
-		font-weight: 600;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
