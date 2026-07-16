@@ -10,12 +10,12 @@
 		 */
 		label: string;
 		/**
-		 * `active`, `completed` and `lapsed` are the three states of an enrollment, and
+		 * `active`, `completed` and `lapsed` are the three states of an enrolment, and
 		 * they wear the chart palette — the same hues the donut gives those slices. A
 		 * bar and a slice describing the same course must agree, or the reader has two
 		 * color systems to learn instead of one.
 		 *
-		 * `accent` and `success` remain for bars that are not an enrollment: a score, a
+		 * `accent` and `success` remain for bars that are not an enrolment: a score, a
 		 * quota, anything whose full is not a finished course.
 		 */
 		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed' | 'inverse';

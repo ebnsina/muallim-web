@@ -58,7 +58,7 @@
 -->
 <div class="relative shrink-0" style="width: {size}px; height: {size}px;" aria-hidden="true">
 	<svg viewBox="0 0 176 176" class="size-full -rotate-90">
-		<!-- The track. Without it, a course with two enrollments is two lonely dashes. -->
+		<!-- The track. Without it, a course with two enrolments is two lonely dashes. -->
 		<circle
 			cx="88"
 			cy="88"

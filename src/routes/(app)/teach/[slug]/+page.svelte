@@ -428,7 +428,7 @@
 	const hints: Record<string, string> = {
 		none: 'Every lesson is available as soon as a learner enrolls.',
 		scheduled: 'Each lesson opens at its own date and time, the same for everybody.',
-		after_enrolment: "Each lesson opens a number of days after each learner's own enrollment.",
+		after_enrolment: "Each lesson opens a number of days after each learner's own enrolment.",
 		sequential: 'A lesson opens when the learner has finished every lesson before it.'
 	};
 
@@ -1176,7 +1176,7 @@
 						<div class="grid gap-8 lg:grid-cols-3 lg:gap-0">
 							<!--
 							The mix is a part-to-whole, so it is drawn as one: three states of an
-							enrollment, summing to everybody who ever started. Hovering a slice lights
+							enrolment, summing to everybody who ever started. Hovering a slice lights
 							its row and hovering a row lights its slice — one bound value, so the two
 							cannot disagree about what is highlighted.
 						-->
@@ -1191,7 +1191,7 @@
 									</p>
 								{:else}
 									<div class="min-w-40">
-										<DonutLegend {segments} bind:hovered caption="Enrollments by status" />
+										<DonutLegend {segments} bind:hovered caption="Enrolments by status" />
 									</div>
 								{/if}
 							</div>
@@ -1561,7 +1561,7 @@
 						<h2 class="font-medium">Prerequisites</h2>
 						<p class="text-muted mt-1 text-sm">
 							Courses a learner must finish before they may enroll on this one. An administrator
-							granting an enrollment overrides them.
+							granting an enrolment overrides them.
 						</p>
 
 						{#if data.prerequisites.length === 0}

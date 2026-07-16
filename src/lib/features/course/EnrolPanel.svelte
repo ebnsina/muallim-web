@@ -226,7 +226,7 @@
 					</p>
 					<p class="text-muted mt-1 text-sm">
 						It is yours to keep. A refund is issued by the workspace that sold it — ask them, and
-						the enrollment comes off with the money.
+						the enrolment comes off with the money.
 					</p>
 
 					<Button href={resolve('/receipts')} variant="secondary" size="sm" class="mt-3 w-full">
@@ -248,7 +248,7 @@
 							if (result.type === 'failure' || result.type === 'error') return;
 							// Progress survives a cancellation, and a learner about to lose access is
 							// the person who most needs telling that it does.
-							toast.info('Enrollment cancelled. Your progress is kept if you come back.');
+							toast.info('Enrolment cancelled. Your progress is kept if you come back.');
 						};
 					}}
 				>
@@ -261,7 +261,7 @@
 						disabled={cancelling}
 					>
 						<Icon icon={Cancel01Icon} class="size-4" />
-						{cancelling ? 'Cancelling…' : 'Cancel enrollment'}
+						{cancelling ? 'Cancelling…' : 'Cancel enrolment'}
 					</Button>
 				</form>
 			{/if}

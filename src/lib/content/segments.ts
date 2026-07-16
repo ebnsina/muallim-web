@@ -63,7 +63,7 @@ export const SEGMENTS: Segment[] = [
 		eyebrow: 'For nonprofits & community builders',
 		headline: 'Teach it for free. Grow the community around it.',
 		blurb:
-			'Open enrollment, a forum where questions get answered in the open, and announcements that reach every member — in the app and in their inbox.',
+			'Open enrolment, a forum where questions get answered in the open, and announcements that reach every member — in the app and in their inbox.',
 		shot: {
 			src: '/marketing/forum.webp',
 			alt: 'A community board: threads with their author, their age, and how many replies they drew.',
@@ -72,7 +72,7 @@ export const SEGMENTS: Segment[] = [
 		today: [
 			{
 				icon: Award01Icon,
-				title: 'Free courses, open enrollment',
+				title: 'Free courses, open enrolment',
 				body: 'Publish a course and let anyone you invite join it. No checkout stands between a learner and the material.'
 			},
 			{
@@ -115,7 +115,7 @@ export const SEGMENTS: Segment[] = [
 			{
 				icon: TeachingIcon,
 				title: 'Author and publish',
-				body: 'Write lessons, structure a curriculum, and put it in a catalog learners can browse.'
+				body: 'Write lessons, structure a curriculum, and put it in a catalogue learners can browse.'
 			},
 			{
 				icon: Quiz01Icon,
@@ -143,7 +143,7 @@ export const SEGMENTS: Segment[] = [
 			title: 'One person, and still the whole teaching loop.',
 			body: 'From the first lesson to the certificate at the end — and the payment that came before it. Nothing here needs a second tool bolted on, and nothing needs a team to operate.',
 			points: [
-				'Curriculum authoring and a public catalog',
+				'Curriculum authoring and a public catalogue',
 				'Self-marking quizzes, hand-marked essays, a gradebook',
 				'Certificates, points and a leaderboard',
 				'A price in your currency, paid into your own account'
@@ -184,7 +184,7 @@ export const SEGMENTS: Segment[] = [
 		highlight: {
 			label: 'Operations',
 			title: 'The day-to-day, handled.',
-			body: 'Roles, invitations, enrollment, marking and isolation are the operational core of a school, and they are the parts a term actually runs on. Staff change, cohorts change, and the workspace keeps up.',
+			body: 'Roles, invitations, enrolment, marking and isolation are the operational core of a school, and they are the parts a term actually runs on. Staff change, cohorts change, and the workspace keeps up.',
 			points: [
 				'Multi-role RBAC with least privilege',
 				'Invitations and member management',
@@ -242,7 +242,7 @@ export const SEGMENTS: Segment[] = [
 		eyebrow: 'For agencies',
 		headline: 'One deployment. A separate school for every client.',
 		blurb:
-			'Each client is an isolated tenant on its own domain, with its own roles, its own members, and its own catalog — enforced in the database, not by a filter somebody has to remember to write.',
+			'Each client is an isolated tenant on its own domain, with its own roles, its own members, and its own catalogue — enforced in the database, not by a filter somebody has to remember to write.',
 		shot: {
 			src: '/marketing/course.webp',
 			alt: 'A course page: the preview video, the level, the rating, the instructor, and the enrol panel.',

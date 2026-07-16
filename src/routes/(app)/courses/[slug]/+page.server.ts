@@ -68,7 +68,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			).filter((gateway) => gateway !== null)
 		: [];
 
-	// Which prerequisites this reader has finished. muallim-api refuses the enrollment
+	// Which prerequisites this reader has finished. muallim-api refuses the enrolment
 	// and names them, but a learner should see the gate before they walk into it.
 	const finished = new Set(
 		(enrolments?.data?.enrolments ?? [])
@@ -85,7 +85,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 			done: finished.has(c.slug)
 		})),
 
-		// After-enrollment drip counts from this learner's own enrollment, so the page
+		// After-enrolment drip counts from this learner's own enrolment, so the page
 		// cannot compute an unlock date without it. Sequential drip has no date at
 		// all, and muallim-api is the only thing that knows which lesson comes next.
 		enrolledAt: mine?.enrolled_at ?? null,

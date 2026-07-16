@@ -18,7 +18,7 @@
 
 <!--
 	The passages marked in the text, each with its own remark. Select any words in the
-	lesson to add one; the quote is the anchor, kept so the passage is recognizable
+	lesson to add one; the quote is the anchor, kept so the passage is recognisable
 	even after the lesson is edited under it.
 -->
 <div id="panel-highlights" role="tabpanel" aria-labelledby="tab-highlights" class="mt-5 max-w-2xl">

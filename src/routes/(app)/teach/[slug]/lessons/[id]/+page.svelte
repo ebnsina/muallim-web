@@ -262,7 +262,7 @@
 						id="available_after_days"
 						label="Opens this many days after enrolling"
 						error={problem('available_after_days')}
-						hint="Counted from each learner's own enrollment, so they see different dates."
+						hint="Counted from each learner's own enrolment, so they see different dates."
 					>
 						{#snippet children({ id, describedBy, invalid })}
 							<Input

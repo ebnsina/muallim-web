@@ -21,7 +21,7 @@
 
 	/*
 		The board's three columns are not invented states: they are what the API already
-		says about an enrollment. Active with nothing done is a course on the shelf,
+		says about an enrolment. Active with nothing done is a course on the shelf,
 		active with something done is a course underway, completed is done. A column for
 		a state the server does not have would be a column that never fills.
 	*/
@@ -52,7 +52,7 @@
 		}
 	];
 
-	// A filter over what is already on screen — no request, because every enrollment
+	// A filter over what is already on screen — no request, because every enrolment
 	// this learner has is here.
 	let query = $state('');
 

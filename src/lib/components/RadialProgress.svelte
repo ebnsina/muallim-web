@@ -9,7 +9,7 @@
 		label: string;
 		/** The pixel size of the ring. The number inside scales with it. */
 		size?: number;
-		/** The enrollment states wear the chart palette, so a ring agrees with the
+		/** The enrolment states wear the chart palette, so a ring agrees with the
 		 *  donut slice describing the same course. See `Progress`. */
 		tone?: 'accent' | 'success' | 'active' | 'completed' | 'lapsed' | 'inverse';
 		class?: string;

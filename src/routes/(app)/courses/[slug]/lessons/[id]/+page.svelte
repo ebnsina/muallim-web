@@ -105,7 +105,7 @@
 		form && 'completed' in form ? Boolean(form.completed) : Boolean(data.lesson.completed_at)
 	);
 
-	// Completing a lesson requires an enrollment, so a previewer is shown the content
+	// Completing a lesson requires an enrolment, so a previewer is shown the content
 	// and nothing to press. `access` is the API's word on that, not a guess made from
 	// the presence of a session.
 	const canComplete = $derived(data.access === 'enrolled');

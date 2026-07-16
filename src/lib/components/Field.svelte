@@ -23,7 +23,7 @@
 	/*
 		The error is described *first*. A screen reader reads describedby in order,
 		and hearing "must be a whole number" before "counted from each learner's own
-		enrollment" is the right way round — the correction matters more than the
+		enrolment" is the right way round — the correction matters more than the
 		explanation.
 	*/
 	const describedBy = $derived(
