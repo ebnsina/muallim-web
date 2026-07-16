@@ -7,7 +7,8 @@
 		built rather than photographed, which is honest about what it is.
 
 		The dashed line threads the stack the way the product threads the parts: a
-		register, a timetable, a report card, one thing.
+		register, a timetable, a report card, one thing. Nothing moves — it is a
+		picture, and a picture that performs is a picture somebody has to wait for.
 	*/
 	type Props = {
 		/** The hue family, so a card's blocks belong to the card. */
@@ -107,12 +108,12 @@
 <style>
 	.blocks {
 		position: absolute;
-		right: -1.5rem;
-		bottom: -1.5rem;
+		right: -3rem;
+		bottom: -3.5rem;
 		z-index: 0;
 		display: block;
-		width: 17rem;
-		height: 17rem;
+		width: 24rem;
+		height: 24rem;
 		pointer-events: none;
 		opacity: 0.9;
 	}
@@ -123,19 +124,6 @@
 	}
 
 	.thread {
-		stroke-dashoffset: 100;
-		animation: thread 1.8s ease-out 0.3s forwards;
-	}
-	@keyframes thread {
-		to {
-			stroke-dashoffset: 0;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.thread {
-			animation: none;
-			stroke-dashoffset: 0;
-		}
+		stroke-dashoffset: 0;
 	}
 </style>
