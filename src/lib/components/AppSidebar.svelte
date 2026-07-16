@@ -7,6 +7,7 @@
 		Analytics01Icon,
 		Award01Icon,
 		BankIcon,
+		BubbleChatIcon,
 		BookOpen01Icon,
 		Building03Icon,
 		Bus01Icon,
@@ -93,6 +94,12 @@
 							href: resolve('/forum'),
 							label: 'Community',
 							icon: UserGroupIcon,
+							show: Boolean(user)
+						},
+						{
+							href: resolve('/chat'),
+							label: 'Chat',
+							icon: BubbleChatIcon,
 							show: Boolean(user)
 						},
 						{
