@@ -194,9 +194,13 @@
 	/*
 		The pill floats out of the flow so the hero's gradient runs to the top of the
 		window behind it; in the flow it would push the hero down and leave a band.
+
+		Fixed, not absolute: it used to scroll away with the hero, which left a very
+		long page with no way back to the nav without a trip to the top. Out of flow
+		either way, so `.topwrap`'s reserved band still holds.
 	*/
 	.site-header {
-		position: absolute;
+		position: fixed;
 		top: 0;
 		right: 0;
 		left: 0;
@@ -205,15 +209,39 @@
 		justify-content: center;
 		padding: 1.1rem 1rem 0;
 	}
+	/*
+		The one piece of glass on the site, and the only one with a job: the pill now
+		stays while cards, screenshots and olive bands pass under it, so it has to read
+		against all of them without going opaque and blunt. This is not the old frosted
+		look coming back — that was every panel translucent over an aurora, so nothing
+		had an edge and the palette had nowhere to sit. A card is still paper.
+
+		How transparent it can go is set by the worst thing that passes under it — a
+		white screenshot — not by how it looks over the hero. Olive at 74% measures
+		about 5:1 against the nav's words there, which is the room the links bought by
+		dropping their 78% dim: two transparencies stacked took the same links to 4:1,
+		under AA, and the pill could not go past 82% while they did. Full-strength links
+		on a glassier pill is both the more see-through option and the more legible one;
+		the hierarchy comes from weight instead. Re-measure before opening it further.
+		The blur is what stops a screenshot's text ghosting through the words on top.
+	*/
 	.pill {
 		display: flex;
 		align-items: center;
 		gap: 0.6rem;
 		max-width: 100%;
-		background: var(--brand);
+		background: color-mix(in oklab, var(--brand) 74%, transparent);
+		-webkit-backdrop-filter: blur(18px) saturate(1.5);
+		backdrop-filter: blur(18px) saturate(1.5);
 		border-radius: 999px;
 		padding: 0.4rem 0.4rem 0.4rem 1.1rem;
 		box-shadow: 0 18px 40px -24px rgba(23, 23, 15, 0.6);
+	}
+	/* No blur, no translucency — a see-through pill over a screenshot is unreadable. */
+	@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+		.pill {
+			background: var(--brand);
+		}
 	}
 	.logo {
 		display: inline-flex;
@@ -246,7 +274,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.25rem;
-		color: color-mix(in srgb, var(--on-brand) 78%, transparent);
+		color: var(--on-brand);
 		text-decoration: none;
 		font-size: 0.9rem;
 		font-weight: 500;

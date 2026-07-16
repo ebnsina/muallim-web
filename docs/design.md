@@ -43,11 +43,27 @@ anything that carries weight, and **lime rationed to the one thing on the screen
 that should catch the eye**. Lavender is the second voice, for when one accent
 cannot separate two ideas. The 24px corner is the shape people will recognise.
 
-It is not frosted glass over an aurora. It was, once: the site ran a berry palette
-with blurred translucent panels, the landing was redesigned in warm olive and kept
-its own private copy of the tokens, and for a while the product had two looks and
-no way to tell which was current. The palette now lives in the layout and nowhere
-else. **A token defined twice is a token that disagrees with itself.**
+Panels are not frosted glass. They were, once: the site ran a berry palette with
+every surface blurred and translucent, the landing was redesigned in warm olive and
+kept its own private copy of the tokens, and for a while the product had two looks
+and no way to tell which was current. The palette now lives in the layout and
+nowhere else. **A token defined twice is a token that disagrees with itself.**
+
+**The header is the one piece of glass, and the only element with a job for it.**
+It is fixed, so cards, screenshots and olive bands pass beneath it all the way down
+the page; it has to read against every one of them without going opaque and blunt.
+That is what the old frosted look never had — a reason. What it did was translucent
+_everything_, so nothing had an edge and the palette had nowhere to sit. A card is
+still paper: solid, edged, casting nothing.
+
+**How transparent it can go is set by the worst thing that passes under it**, which
+is a white screenshot — not by how it looks over the hero, where a blur over a
+smooth gradient does nothing visible at all. Olive at 74% measures ~5:1 against the
+nav's words over white. That room was bought by dropping the links' 78% dim: two
+transparencies stacked took the same links to ~4:1, under AA, and the pill could not
+open past 82% while they did. Full-strength links on a glassier pill is both the
+more see-through option and the more legible one — hierarchy comes from weight.
+Measure before opening it further; do not eyeball it against the hero.
 
 The aurora was tried on the landing's cards and taken back out. It is worth knowing
 why, because the ban above reads as dogma otherwise: a wash lowers the contrast
