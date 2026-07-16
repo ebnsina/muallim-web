@@ -1,14 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { afterNavigate } from '$app/navigation';
-	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import { slide } from 'svelte/transition';
 	import {
-		Award01Icon,
-		BookOpen01Icon,
-		Cancel01Icon,
-		ChampionIcon,
 		Invoice01Icon,
 		Menu01Icon,
 		Mortarboard02Icon,
@@ -16,15 +10,9 @@
 		Notification02Icon,
 		PaintBoardIcon,
 		Settings02Icon,
-		TeachingIcon,
-		UserIcon,
-		UserGroupIcon,
-		UserMultiple02Icon,
-		DashboardSquare01Icon
+		UserIcon
 	} from '@hugeicons/core-free-icons';
-	import type { IconSvgElement } from '@hugeicons/svelte';
-	import { DURATION, easeOut, popover } from '$lib/motion';
-	import { Pill } from '$lib/pill.svelte';
+	import { popover } from '$lib/motion';
 	import { cn } from '$lib/utils';
 	import Badge from './Badge.svelte';
 	import Button from './Button.svelte';
@@ -42,85 +30,17 @@
 
 	type Props = {
 		user?: { name: string; email: string; role: string };
-		/** Shown only to somebody who may author. Hiding it is a courtesy, not a control. */
-		canAuthor?: boolean;
-		/** Shown only to somebody who holds `user:manage`. The same courtesy. */
-		canManagePeople?: boolean;
 		/** Unread notification count for the bell badge. */
 		unread?: number;
 		/** The few notices behind the bell. Loaded with the page; see the layout. */
 		notifications?: Notice[];
+		/** The sidebar drawer's open state, shared with `AppSidebar` below `lg`. */
+		menuOpen?: boolean;
 	};
 
-	let {
-		user,
-		canAuthor = false,
-		canManagePeople = false,
-		unread = 0,
-		notifications = []
-	}: Props = $props();
+	let { user, unread = 0, notifications = [], menuOpen = $bindable(false) }: Props = $props();
 
 	const noticeDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
-
-	type Tab = { href: string; label: string; icon: IconSvgElement; show: boolean };
-
-	const links = $derived(
-		(
-			[
-				{
-					href: resolve('/dashboard'),
-					label: 'Dashboard',
-					icon: DashboardSquare01Icon,
-					show: Boolean(user)
-				},
-				{ href: resolve('/courses'), label: 'Courses', icon: BookOpen01Icon, show: true },
-				{
-					href: resolve('/forum'),
-					label: 'Community',
-					icon: UserGroupIcon,
-					show: Boolean(user)
-				},
-				{ href: resolve('/teach'), label: 'Teach', icon: TeachingIcon, show: canAuthor },
-				{
-					href: resolve('/certificates'),
-					label: 'Certificates',
-					icon: Award01Icon,
-					show: Boolean(user)
-				},
-				{
-					href: resolve('/leaderboard'),
-					label: 'Leaderboard',
-					icon: ChampionIcon,
-					show: Boolean(user)
-				}
-			] satisfies Tab[]
-		).filter((link) => link.show)
-	);
-
-	// `startsWith` on a trailing slash, not equality: /teach/algebra lights up
-	// "Teach", and /teaching does not.
-	const current = (href: string) =>
-		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
-
-	/*
-		The band's sliding pill. The measuring lives in `Pill` — the lesson's tabs are
-		the same widget with different paint, and two copies of a measurement are two
-		things to keep in step.
-	*/
-	const pill = new Pill();
-	const activeHref = $derived(links.find((link) => current(link.href))?.href);
-
-	// Re-measured when the route changes (a different tab) and when the window does
-	// (the nav is laid out by flexbox, so a resize moves every tab under it).
-	$effect(() => {
-		pill.measure(activeHref);
-	});
-
-	// And once the webfont has landed. Until it does the labels are metric-fallback
-	// wide, and a pill measured against those is a pill that fits the wrong text.
-	$effect(() => {
-		document.fonts?.ready.then(() => pill.measure(activeHref));
-	});
 
 	// A monogram, from the first letters of the name. A face nobody uploaded is a
 	// gray silhouette; two initials in the accent are a person.
@@ -133,21 +53,16 @@
 			.join('')
 	);
 
-	let open = $state(false);
-
-	// The account menu, behind the avatar. Its own flag: the phone menu and this one
-	// are two panels, and closing one should not close the other.
+	// The account menu, behind the avatar.
 	let accountOpen = $state(false);
 	let accountRef = $state<HTMLElement>();
 
-	// The bell's panel. Its own flag and its own element, so opening one menu does not
+	// The bell's panel. Its own flag and element, so opening one menu does not
 	// silently close the other and leave a reader wondering what they pressed.
 	let bellOpen = $state(false);
 	let bellRef = $state<HTMLElement>();
 
-	// A menu that opens on a click closes on a click anywhere else, and on Escape —
-	// the two ways anyone expects to dismiss one. The toggle button lives inside
-	// `accountRef`, so its own click is not counted as "outside".
+	// A menu that opens on a click closes on a click anywhere else, and on Escape.
 	function onWindowClick(event: MouseEvent) {
 		if (accountOpen && accountRef && !accountRef.contains(event.target as Node)) {
 			accountOpen = false;
@@ -163,42 +78,34 @@
 		}
 	}
 
-	/*
-		Navigating closes both panels.
-
-		Left open they cover the page they just took you to, along with the button
-		that would have closed them. `afterNavigate` rather than an `$effect` that
-		reads the pathname for its dependency: both work, and only one of them says
-		when it means to run.
-	*/
+	// Navigating closes the panels; left open they cover the page they just reached.
 	afterNavigate(() => {
-		open = false;
 		accountOpen = false;
 		bellOpen = false;
 	});
 </script>
 
-<svelte:window
-	onclick={onWindowClick}
-	onkeydown={onWindowKeydown}
-	onresize={() => pill.measure(activeHref)}
-/>
+<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} />
 
 <!--
 	A band, not a bar. It runs the width of the window and the page lies on it as a
-	sheet with its top corners rounded off, so the brand color is the surface the
-	product rests on rather than a stripe drawn across it. The sections sit in the
-	band itself — one row, not a bar with a tab strip under it.
--->
-<!--
-	Sticky, and above the sheet. The sheet is painted after the band, so without a
-	stacking order it covers the account menu that hangs out of the band — and a menu
-	you cannot press is worse than no menu at all.
+	sheet with its top corners rounded off. It carries the quick actions only — the
+	brand, the bell, and the account. The sections live in the sidebar on the sheet.
 -->
 <header class="aurora aurora-frame sticky top-0 z-30 text-on-solid">
-	<!-- Taller than a bar needs to be, deliberately: the band is a surface, and a surface
-	     has to be big enough for its light to read as light. -->
 	<div class="flex h-20 items-center gap-3 px-4 sm:h-24 sm:gap-6 sm:px-6 lg:px-8">
+		<!-- The menu button, below `lg`. It toggles the sidebar drawer; above `lg` the
+		     sidebar is a rail on the sheet and this is gone. -->
+		<button
+			type="button"
+			class="rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none lg:hidden"
+			aria-expanded={menuOpen}
+			aria-label="Menu"
+			onclick={() => (menuOpen = !menuOpen)}
+		>
+			<Icon icon={Menu01Icon} class="size-5" />
+		</button>
+
 		<a href={resolve('/')} class="flex shrink-0 items-center gap-2.5 font-semibold">
 			<span class="flex size-8 items-center justify-center rounded-control bg-on-solid/15">
 				<Icon icon={Mortarboard02Icon} class="size-5" />
@@ -206,72 +113,11 @@
 			<span class="hidden text-[0.95rem] tracking-tight sm:inline">Muallim</span>
 		</a>
 
-		<!-- ------------------------------------------------------------ sections -->
-		<!--
-			In the band, where they read as the product's own sections. The current one is
-			a filled pill rather than an underline: on a solid color an underline is a
-			scratch, and the fill is the only mark that survives.
-		-->
-		<nav
-			bind:this={pill.track}
-			aria-label="Main"
-			class="relative hidden items-center gap-1 sm:flex"
-		>
-			<!--
-				One pill, moved — not six pills, one of which is lit.
-
-				The fill is a single element that slides to whichever tab is current, so the
-				eye follows the mark from where it was to where it went. Six independently
-				fading backgrounds say "that one stopped, this one started", which is the
-				same information and none of the continuity.
-
-				It is `aria-hidden`: `aria-current="page"` on the link is what says which
-				section this is. The pill is a picture of that, for people who can see it.
-			-->
-			<span
-				aria-hidden="true"
-				class={cn(
-					// `inset-y-0`, exactly the tab's own box: the pill was inset by a few pixels
-					// and read as a smaller mark than the hover fill it replaced, so the two
-					// disagreed about how big a tab is.
-					'squircle pointer-events-none absolute inset-y-0 left-0 bg-on-solid/15',
-					'transition-[transform,width,opacity] duration-260 ease-out',
-					pill.pos.measured ? 'opacity-100' : 'opacity-0'
-				)}
-				style={pill.style}
-			></span>
-
-			{#each links as link (link.href)}
-				{@const active = current(link.href)}
-				<a
-					bind:this={pill.items[link.href]}
-					href={link.href}
-					aria-current={active ? 'page' : undefined}
-					class={cn(
-						'squircle relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none',
-						active ? 'text-on-solid' : 'text-on-solid/75 hover:bg-on-solid/10 hover:text-on-solid',
-
-						// Until the pill has been measured — the first server-rendered paint —
-						// the active tab wears its own fill. Otherwise the band arrives with
-						// nothing lit, and the mark appears out of nowhere a frame later.
-						active && !pill.pos.measured && 'bg-on-solid/15'
-					)}
-				>
-					<Icon icon={link.icon} class="size-4" />
-					{link.label}
-				</a>
-			{/each}
-		</nav>
-
 		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			{#if user}
 				<!--
-					The bell, and the few notices behind it.
-
-					It was a link to the notifications page. A person glancing at a badge wants
-					to know what it is *for*, and making them leave the page they are on to find
-					out is the reason nobody read them. The page is still there, at the bottom of
-					the panel, for everything the panel does not hold.
+					The bell, and the few notices behind it. The notifications page is still
+					there, at the bottom of the panel, for everything the panel does not hold.
 				-->
 				<div class="relative" bind:this={bellRef}>
 					<button
@@ -355,10 +201,10 @@
 
 				<!--
 					The account, behind its avatar. Who you are and how you stop being them —
-					name, theme, sign out — are one person's business, so they gather under one
-					control rather than spreading across the bar.
+					name, theme, sign out — gather under one control rather than spreading
+					across the band.
 				-->
-				<div class="relative hidden sm:block" bind:this={accountRef}>
+				<div class="relative" bind:this={accountRef}>
 					<button
 						type="button"
 						class="flex items-center rounded-full transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
@@ -423,19 +269,6 @@
 								Purchases
 							</a>
 
-							<!-- The workspace's people, for whoever may manage them. Beside Settings:
-							     both are the workspace's own business, not a section of the product. -->
-							{#if canManagePeople}
-								<a
-									role="menuitem"
-									href={resolve('/people')}
-									class="hover:bg-surface-hover flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-								>
-									<Icon icon={UserMultiple02Icon} class="text-muted size-4" />
-									People
-								</a>
-							{/if}
-
 							<a
 								role="menuitem"
 								href={resolve('/settings')}
@@ -471,71 +304,10 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="hidden items-center gap-3 sm:flex">
-					<ThemeToggle />
-					<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
-					<Button href={resolve('/register')} size="sm">Get started</Button>
-				</div>
+				<ThemeToggle />
+				<Button href={resolve('/login')} variant="ghost" size="sm">Sign in</Button>
+				<Button href={resolve('/register')} size="sm">Get started</Button>
 			{/if}
-
-			<!-- On a phone the theme toggle stays on the bar; the rest is in the menu. -->
-			<div class="sm:hidden"><ThemeToggle /></div>
-
-			<!--
-				A button that says what it controls and whether it is open. An icon that
-				swaps between two glyphs tells that to whoever is looking at it and to
-				nobody else.
-			-->
-			<button
-				type="button"
-				class="rounded-control p-2 text-on-solid/80 transition-colors hover:bg-on-solid/10 hover:text-on-solid focus-visible:ring-2 focus-visible:ring-on-solid focus-visible:outline-none sm:hidden"
-				aria-expanded={open}
-				aria-controls="mobile-nav"
-				aria-label={open ? 'Close menu' : 'Open menu'}
-				onclick={() => (open = !open)}
-			>
-				<Icon icon={open ? Cancel01Icon : Menu01Icon} class="size-5" />
-			</button>
 		</div>
 	</div>
-
-	{#if open}
-		<div
-			id="mobile-nav"
-			class="border-t border-border bg-surface sm:hidden"
-			transition:slide={{ duration: DURATION.instant, easing: easeOut }}
-		>
-			<nav aria-label="Main" class="flex flex-col p-3">
-				{#each links as link (link.href)}
-					<a
-						href={link.href}
-						aria-current={current(link.href) ? 'page' : undefined}
-						class={cn(
-							'flex items-center gap-2.5 rounded-control px-3 py-2.5 text-sm font-medium transition-colors',
-							current(link.href) ? 'bg-surface-active text-text' : 'text-muted hover:text-text'
-						)}
-					>
-						<Icon icon={link.icon} class="size-4" />
-						{link.label}
-					</a>
-				{/each}
-			</nav>
-
-			<div class="border-t border-border p-3">
-				{#if user}
-					<p class="px-3 text-sm font-medium">{user.name}</p>
-					<p class="text-muted px-3 text-xs">{user.email}</p>
-
-					<form method="POST" action="/logout" use:enhance class="mt-3">
-						<Button type="submit" variant="secondary" size="sm" class="w-full">Sign out</Button>
-					</form>
-				{:else}
-					<div class="flex flex-col gap-2">
-						<Button href={resolve('/login')} variant="secondary" size="sm">Sign in</Button>
-						<Button href={resolve('/register')} size="sm">Get started</Button>
-					</div>
-				{/if}
-			</div>
-		</div>
-	{/if}
 </header>

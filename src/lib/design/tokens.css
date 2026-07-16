@@ -91,21 +91,27 @@
 		also mean "primary action" — a green Submit beside a green Correct is a
 		sentence with two verbs. Teal drifts toward the same collision. Orange and
 		red are the warning and danger colors. Violet past ~285° starts to read as
-		consumer-social rather than institutional. Blue is what is left, and it is
-		left for a reason.
+		consumer-social rather than institutional.
+
+		The brand hue is olive — one number, `--brand-hue`, is the single source of
+		truth every step of the ramp (and therefore every accent, ring, and primary
+		button, in both light and dark) reads its hue from. Move this one value and
+		the whole product moves with it. Olive sits far enough from the success green
+		(~145°) that a primary action never reads as a "correct" mark.
 	*/
-	--b-1: oklch(0.9938 0.0028 243);
-	--b-2: oklch(0.9793 0.0088 243);
-	--b-3: oklch(0.9528 0.0242 243);
-	--b-4: oklch(0.9247 0.0417 243);
-	--b-5: oklch(0.8909 0.0596 243);
-	--b-6: oklch(0.8437 0.0789 243);
-	--b-7: oklch(0.7739 0.102 243);
-	--b-8: oklch(0.6822 0.1439 243);
-	--b-9: oklch(0.4934 0.204 243);
-	--b-10: oklch(0.4508 0.1957 243);
-	--b-11: oklch(0.4595 0.1861 243);
-	--b-12: oklch(0.2822 0.0868 243);
+	--brand-hue: 128;
+	--b-1: oklch(0.9938 0.0028 var(--brand-hue));
+	--b-2: oklch(0.9793 0.0088 var(--brand-hue));
+	--b-3: oklch(0.9528 0.0242 var(--brand-hue));
+	--b-4: oklch(0.9247 0.0417 var(--brand-hue));
+	--b-5: oklch(0.8909 0.0596 var(--brand-hue));
+	--b-6: oklch(0.8437 0.0789 var(--brand-hue));
+	--b-7: oklch(0.7739 0.102 var(--brand-hue));
+	--b-8: oklch(0.6822 0.1439 var(--brand-hue));
+	--b-9: oklch(0.4934 0.204 var(--brand-hue));
+	--b-10: oklch(0.4508 0.1957 var(--brand-hue));
+	--b-11: oklch(0.4595 0.1861 var(--brand-hue));
+	--b-12: oklch(0.2822 0.0868 var(--brand-hue));
 
 	/*
 		Success. A green at the same lightness as the danger red is the same gray to
@@ -300,14 +306,14 @@
 	--n-11: oklch(0.7683 0.0161 259);
 	--n-12: oklch(0.9491 0.0064 259);
 
-	--b-1: oklch(0.1789 0.0125 243);
-	--b-2: oklch(0.2188 0.0324 243);
-	--b-3: oklch(0.2716 0.0716 243);
-	--b-4: oklch(0.3106 0.099 243);
-	--b-5: oklch(0.3506 0.1092 243);
-	--b-6: oklch(0.4022 0.1146 243);
-	--b-7: oklch(0.4693 0.1284 243);
-	--b-8: oklch(0.5556 0.1594 243);
+	--b-1: oklch(0.1789 0.0125 var(--brand-hue));
+	--b-2: oklch(0.2188 0.0324 var(--brand-hue));
+	--b-3: oklch(0.2716 0.0716 var(--brand-hue));
+	--b-4: oklch(0.3106 0.099 var(--brand-hue));
+	--b-5: oklch(0.3506 0.1092 var(--brand-hue));
+	--b-6: oklch(0.4022 0.1146 var(--brand-hue));
+	--b-7: oklch(0.4693 0.1284 var(--brand-hue));
+	--b-8: oklch(0.5556 0.1594 var(--brand-hue));
 
 	/*
 		Dark mode brightens on hover, and white-on-blue must still clear 4.5:1 —
@@ -315,10 +321,10 @@
 		the hover is where the light one lives. The contrast test is what found
 		this; hovering a button is not a moment to lose the label.
 	*/
-	--b-9: oklch(0.5164 0.1913 243);
-	--b-10: oklch(0.5484 0.1913 243);
-	--b-11: oklch(0.7461 0.1287 243);
-	--b-12: oklch(0.9098 0.0561 243);
+	--b-9: oklch(0.5164 0.1913 var(--brand-hue));
+	--b-10: oklch(0.5484 0.1913 var(--brand-hue));
+	--b-11: oklch(0.7461 0.1287 var(--brand-hue));
+	--b-12: oklch(0.9098 0.0561 var(--brand-hue));
 
 	--ok-1: oklch(0.1793 0.0086 155);
 	--ok-2: oklch(0.2141 0.0212 155);

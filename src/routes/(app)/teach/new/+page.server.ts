@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
-import { aiEnabled } from '$lib/server/ai';
+import { aiEnabled, imageEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import { newCourseSchema } from '$lib/schemas';
 import { parseForm, type FieldErrors } from '$lib/validation';
@@ -10,7 +10,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	// muallim-api enforces course:write and answers 403 otherwise; this redirect is for
 	// the unauthenticated case, where the useful instruction is "sign in".
 	if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
-	return { aiEnabled: aiEnabled() };
+	// A thumbnail is set on the edit page, once the course has a slug to sign an
+	// upload against; the flag is plumbed here for parity with the AI writing assist.
+	return { aiEnabled: aiEnabled(), imageEnabled: imageEnabled() };
 };
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced', 'expert'] as const;

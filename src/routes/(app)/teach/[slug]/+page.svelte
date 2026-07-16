@@ -55,6 +55,7 @@
 		type IconSvgElement
 	} from '$lib/components';
 	import AiOutline from '$lib/components/AiOutline.svelte';
+	import AiThumbnail from '$lib/components/AiThumbnail.svelte';
 	import {
 		OUTCOMES,
 		outcomeHint,
@@ -1061,7 +1062,7 @@
 							};
 						})}
 					>
-						<Sheet>
+						<Sheet open={composing} onClose={() => (composing = false)}>
 							<div class="space-y-4">
 								<Field
 									id="announcement-title"
@@ -1437,6 +1438,11 @@
 										? 'Replace image'
 										: 'Add image'}
 							</label>
+
+							<!-- Same upload flow, a different source: the generated image is handed
+							     back as a File and goes through `uploadImage` untouched. Hidden with
+							     no image-provider key, so the manual picker stands alone. -->
+							<AiThumbnail enabled={data.imageEnabled} onaccept={uploadImage} />
 						</div>
 					</div>
 

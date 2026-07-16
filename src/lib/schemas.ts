@@ -60,6 +60,16 @@ export const LIMITS = {
 
 	inviteEmail: { required: true, type: 'email', maxlength: 320 },
 	memberRole: { required: true },
+
+	// The institution roster. muallim-api's own bounds; a limit invented here that the
+	// server does not share is a form that accepts what the API will refuse.
+	admissionNo: { required: true, maxlength: 60 },
+	studentName: { required: true, maxlength: 120 },
+	roll: { type: 'number', min: 0, max: 100000, step: 1 },
+	guardianName: { required: true, maxlength: 120 },
+	guardianRelation: { maxlength: 60 },
+	guardianPhone: { maxlength: 40 },
+	guardianEmail: { type: 'email', maxlength: 320 },
 	certificateSerial: { required: true, minlength: 4, maxlength: 64 },
 	revokeReason: { required: true, maxlength: 500 }
 } as const;
@@ -90,6 +100,15 @@ const blankIsAbsent = (value: unknown) => (value === '' ? undefined : value);
 
 const optionalWholeNumber = (min: number, max: number, message: string) =>
 	z.preprocess(blankIsAbsent, wholeNumber(min, max, message).optional());
+
+// A blank picker means "unplaced", not an id — an empty `<option>` is absent, not ''.
+const optionalUuid = (message: string) => z.preprocess(blankIsAbsent, z.uuid(message).optional());
+
+// A checkbox is `on` when ticked and absent when not; either way it is a boolean.
+const checkbox = z.preprocess(
+	(value) => value === 'on' || value === true || value === 'true',
+	z.boolean()
+);
 
 /** What a `datetime-local` produces: blank, or something `Date` can read. */
 const optionalDateTime = (message: string) =>
@@ -387,4 +406,47 @@ export const certificateLookupSchema = z.object({
 
 export const revokeCertificateSchema = certificateLookupSchema.extend({
 	reason: text(500, 'Say why the certificate is being withdrawn.')
+});
+
+// -------------------------------------------------------------- institution
+
+/** The states a student may be in. muallim-api's enum; an unknown one is refused here too. */
+export const STUDENT_STATUSES = ['active', 'inactive', 'graduated', 'transferred'] as const;
+export type StudentStatus = (typeof STUDENT_STATUSES)[number];
+
+const studentStatus = z.enum(STUDENT_STATUSES, { error: 'Choose a status.' });
+
+/*
+	Admitting a student. The admission number and name are the two things a roster
+	cannot do without; class, section, and roll are the placement, and an unplaced
+	student is a legal one — the picker's blank option is "not placed yet", not an id.
+*/
+export const admitStudentSchema = z.object({
+	admission_no: text(60, 'Give the student an admission number.'),
+	full_name: text(120, 'Enter the student’s full name.'),
+	grade_level_id: optionalUuid('Choose a class.'),
+	section_id: optionalUuid('Choose a section.'),
+	roll: optionalWholeNumber(0, 100000, 'A roll number is a whole number, zero or more.')
+});
+
+/** Editing a student. The name and status are always set; placement may be cleared. */
+export const updateStudentSchema = z.object({
+	full_name: text(120, 'A student needs a name.'),
+	status: studentStatus,
+	grade_level_id: optionalUuid('Choose a class.'),
+	section_id: optionalUuid('Choose a section.'),
+	roll: optionalWholeNumber(0, 100000, 'A roll number is a whole number, zero or more.')
+});
+
+/*
+	A guardian. Only the name is required — a phone or an email is how the school
+	reaches them, and a guardian with neither is still a guardian on the record.
+	`is_primary` is the one the school calls first; the API keeps at most one.
+*/
+export const guardianSchema = z.object({
+	full_name: text(120, 'Enter the guardian’s name.'),
+	relation: optionalText(60),
+	phone: optionalText(40),
+	email: z.preprocess(blankIsAbsent, z.email('Enter a valid email address.').optional()),
+	is_primary: checkbox
 });

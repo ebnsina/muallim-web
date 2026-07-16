@@ -19,11 +19,21 @@ function minorPerMajor(currency: string): number {
 /** A price, in the reader's own locale: `৳1,200.00`, `$19.99`, `¥1,200`. */
 export function formatMoney(money: Money, locale?: string): string {
 	const currency = money.currency.toUpperCase();
+	const major = money.amount_minor / minorPerMajor(currency);
+
+	// BDT is the default, and `Intl`'s currency style prints the letters "BDT" in
+	// every English locale — never the sign. So the taka glyph is composed onto an
+	// en-IN number (which also gives the lakh/crore grouping a BD reader expects).
+	if (currency === 'BDT') {
+		const digits = Math.log10(minorPerMajor(currency));
+		return `৳${new Intl.NumberFormat('en-IN', {
+			minimumFractionDigits: digits,
+			maximumFractionDigits: digits
+		}).format(major)}`;
+	}
 
 	try {
-		return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(
-			money.amount_minor / minorPerMajor(currency)
-		);
+		return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(major);
 	} catch {
 		// A currency `Intl` does not know is still a number. Saying "1200 XYZ" beats
 		// throwing on a page whose only job is to show a price.

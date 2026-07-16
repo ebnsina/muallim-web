@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
-import { aiEnabled } from '$lib/server/ai';
+import { aiEnabled, imageEnabled } from '$lib/server/ai';
 import { authedApi } from '$lib/server/api';
 import {
 	announcementSchema,
@@ -46,6 +46,7 @@ export const load: PageServerLoad = async ({ locals, params, parent, url }) => {
 	// `course`, `topics` and `lessonCount` come from the layout.
 	return {
 		aiEnabled: aiEnabled(),
+		imageEnabled: imageEnabled(),
 		prerequisites: prerequisites.data?.prerequisites ?? [],
 		candidates,
 

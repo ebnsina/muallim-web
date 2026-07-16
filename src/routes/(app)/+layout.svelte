@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { AppHeader } from '$lib/components';
-	import { canAuthor, canManagePeople } from '$lib/roles';
+	import { AppHeader, AppSidebar } from '$lib/components';
+	import { canAuthor, canManageInstitution, canManagePeople } from '$lib/roles';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
+
+	// The sidebar drawer, below `lg`. The header's menu button opens it and the
+	// sidebar closes it — one flag, so the two can never disagree about its state.
+	let menuOpen = $state(false);
 </script>
 
 <!--
@@ -28,10 +32,9 @@
 <div class="aurora aurora-frame flex min-h-dvh flex-col">
 	<AppHeader
 		user={data.user ?? undefined}
-		canAuthor={canAuthor(data.user)}
-		canManagePeople={canManagePeople(data.user)}
 		unread={data.unread ?? 0}
 		notifications={data.notifications ?? []}
+		bind:menuOpen
 	/>
 
 	<!--
@@ -66,6 +69,28 @@
 			<div class="h-4 rounded-t-2xl bg-surface"></div>
 		</div>
 
-		{@render children()}
+		<!--
+			The sheet's two columns: the global sidebar and the page beside it. The row is
+			wider than a page alone was (`96rem`), so the rail is added *next to* the
+			content rather than *out of* it — a page keeps the room it had.
+
+			The rail is `hidden lg:block` (in `AppSidebar`); below `lg` it is a drawer and
+			only the page renders here, centred by its own `Page` gutters as before. The
+			`/manage` section keeps its own sub-nav inside `children` — this rail is the
+			global one, that rail is the section's, and they sit side by side.
+		-->
+		<div class="mx-auto flex w-full max-w-[96rem] lg:pl-4 xl:pl-8">
+			<AppSidebar
+				user={data.user ?? undefined}
+				canAuthor={canAuthor(data.user)}
+				canManagePeople={canManagePeople(data.user)}
+				canManageInstitution={canManageInstitution(data.user)}
+				bind:open={menuOpen}
+			/>
+
+			<div class="min-w-0 flex-1">
+				{@render children()}
+			</div>
+		</div>
 	</div>
 </div>

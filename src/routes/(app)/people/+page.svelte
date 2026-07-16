@@ -71,6 +71,7 @@
 	let removing = $state<string | null>(null);
 	let withdrawing = $state<string | null>(null);
 	let inviting = $state(false);
+	let inviteOpen = $state(false);
 	let loadingMembers = $state(false);
 	let loadingInvitations = $state(false);
 
@@ -312,9 +313,15 @@
 
 	<!-- ------------------------------------------------------------ invitations -->
 	<section class="mt-12">
-		<h2 class="text-lg font-semibold">Invitations</h2>
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="text-lg font-semibold">Invitations</h2>
+			<Button size="sm" onclick={() => (inviteOpen = true)}>
+				<Icon icon={UserAdd01Icon} class="size-4" />
+				Invite someone
+			</Button>
+		</div>
 
-		<div class="mt-4 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+		<div class="mt-4">
 			{#if invitations.rows.length === 0}
 				<EmptyState
 					icon={Mail01Icon}
@@ -444,7 +451,9 @@
 					{/if}
 				</div>
 			{/if}
+		</div>
 
+		{#if inviteOpen}
 			<form
 				method="POST"
 				action="?/invite"
@@ -460,6 +469,7 @@
 							inviting = false;
 
 							if (result.type !== 'success') return;
+							inviteOpen = false;
 
 							// The API sent the row back, so a newest-first list takes it at the head.
 							const invited = result.data?.invited as Invitation | undefined;
@@ -471,7 +481,7 @@
 					}
 				)}
 			>
-				<Sheet>
+				<Sheet open={inviteOpen} onClose={() => (inviteOpen = false)}>
 					{#snippet header()}
 						<h3 class="font-medium">Invite someone</h3>
 						<p class="text-muted mt-0.5 text-sm">
@@ -521,6 +531,6 @@
 					{/snippet}
 				</Sheet>
 			</form>
-		</div>
+		{/if}
 	</section>
 </Page>

@@ -70,7 +70,7 @@
 					}
 				)}
 			>
-				<Sheet>
+				<Sheet open={composing} onClose={() => (composing = false)}>
 					{#snippet header()}
 						<h2 class="font-medium">New board</h2>
 						<p class="text-muted text-sm">

@@ -70,7 +70,7 @@
 				action="?/startThread"
 				use:enhance={validated(threadSchema, (next) => (errors = next))}
 			>
-				<Sheet>
+				<Sheet open={composing} onClose={() => (composing = false)}>
 					{#snippet header()}
 						<h2 class="font-medium">Start a thread</h2>
 					{/snippet}

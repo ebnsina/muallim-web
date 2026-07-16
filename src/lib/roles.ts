@@ -36,3 +36,13 @@ const MANAGERS = new Set(['owner', 'admin']);
 export function canManagePeople(user: { role?: string } | null | undefined): boolean {
 	return user?.role !== undefined && MANAGERS.has(user.role);
 }
+
+// `academics:manage` — the institution roster, attendance, exams, fees, the rest —
+// belongs to the same two. muallim-api enforces the permission; a link to /manage for
+// anyone else is a link that 403s, so the "Manage" nav entry is drawn only for these.
+const ACADEMIC_MANAGERS = new Set(['owner', 'admin']);
+
+/** Whether to draw the "Manage" link. Instructor, student, and unknown all deny. */
+export function canManageInstitution(user: { role?: string } | null | undefined): boolean {
+	return user?.role !== undefined && ACADEMIC_MANAGERS.has(user.role);
+}

@@ -103,12 +103,16 @@ function resolve(tokens: Map<string, string>, name: string): Oklch {
 	let value = tokens.get(name);
 	expect(value, `${name} is not defined`).toBeDefined();
 
-	for (let hops = 0; hops < 10; hops++) {
-		const alias = /^var\((--[\w-]+)\)$/.exec(value!.trim());
-		if (!alias) break;
+	// Substitute every var(--x) — whole-value aliases like `var(--b-9)` and vars
+	// embedded in a function like `oklch(L C var(--brand-hue))` alike — until the
+	// value is a bare colour.
+	for (let hops = 0; hops < 20; hops++) {
+		const ref = /var\((--[\w-]+)\)/.exec(value!);
+		if (!ref) break;
 
-		value = tokens.get(alias[1]);
-		expect(value, `${name} resolves to ${alias[1]}, which is not defined`).toBeDefined();
+		const sub = tokens.get(ref[1]);
+		expect(sub, `${name} resolves through ${ref[1]}, which is not defined`).toBeDefined();
+		value = value!.replace(ref[0], sub!);
 	}
 
 	const colour = parseOklch(value!);
@@ -249,7 +253,9 @@ describe('design tokens', () => {
 			for (let step = 1; step <= 12; step++) {
 				const name = `${prefix}${step}`;
 				expect(tokens.has(name), `${name} is missing from the ramp`).toBe(true);
-				expect(parseOklch(tokens.get(name)!), `${name} is not an oklch color`).not.toBeNull();
+				// resolve() substitutes embedded vars (the ramp reads its hue from
+				// var(--brand-hue)) before parsing.
+				expect(resolve(tokens, name), `${name} is not an oklch color`).not.toBeNull();
 			}
 		});
 
@@ -258,7 +264,7 @@ describe('design tokens', () => {
 		it.each([['--n-'], ['--b-'], ['--ok-'], ['--no-'], ['--wa-']])('%s gets darker', (prefix) => {
 			const lightnesses = Array.from(
 				{ length: 8 },
-				(_, i) => parseOklch(tokens.get(`${prefix}${i + 1}`)!)!.l
+				(_, i) => resolve(tokens, `${prefix}${i + 1}`).l
 			);
 
 			for (let i = 1; i < lightnesses.length; i++) {
