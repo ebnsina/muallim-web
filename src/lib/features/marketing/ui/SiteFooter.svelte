@@ -42,7 +42,7 @@
 				</p>
 				<a
 					href={resolve('/register')}
-					class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#c4e84b] hover:underline"
+					class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] hover:underline"
 				>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
 				</a>

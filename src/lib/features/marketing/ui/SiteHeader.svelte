@@ -122,7 +122,7 @@
 						role="none"
 						onmouseenter={openMega}
 						onmouseleave={scheduleCloseMega}
-						class="absolute top-[calc(100%+0.25rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[#e7e4d8] bg-white p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
+						class="absolute top-[calc(100%+0.25rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
 					>
 						<div class="grid grid-cols-[1.15fr_1fr] gap-2">
 							<div class="flex flex-col gap-1">
@@ -133,28 +133,28 @@
 										onfocus={() => (activeCat = i)}
 										class="flex items-start gap-3 rounded-xl p-3 text-left transition {activeCat ===
 										i
-											? 'bg-[#f1efe7]'
-											: 'hover:bg-[#f7f5ef]'}"
+											? 'bg-[var(--accent-tint)]'
+											: 'hover:bg-[var(--surface-2)]'}"
 									>
 										<span
-											class="grid size-9 shrink-0 place-items-center rounded-lg bg-[#eaf5cf] text-[#2e3320]"
+											class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent-tint)] text-[var(--brand)]"
 										>
 											<Icon icon={c.icon} class="size-5" />
 										</span>
 										<span>
-											<span class="block text-sm font-bold text-[#17170f]">{c.title}</span>
-											<span class="mt-0.5 block text-xs text-[#6b6a5e]">{c.sub}</span>
+											<span class="block text-sm font-bold text-[var(--ink)]">{c.title}</span>
+											<span class="mt-0.5 block text-xs text-[var(--muted)]">{c.sub}</span>
 										</span>
 									</button>
 								{/each}
 							</div>
-							<div class="rounded-xl bg-[#f7f5ef] p-2">
+							<div class="rounded-xl bg-[var(--surface-2)] p-2">
 								{#each megaCats[activeCat].items as item (item.label)}
 									<a
 										href={resolve('/register')}
-										class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-[#2e3320] transition hover:bg-white"
+										class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
 									>
-										<Icon icon={item.icon} class="size-4 text-[#2e5148]" />
+										<Icon icon={item.icon} class="size-4 text-[var(--teal)]" />
 										{item.label}
 									</a>
 								{/each}
