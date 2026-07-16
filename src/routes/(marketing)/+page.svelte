@@ -125,7 +125,7 @@
 		},
 		{
 			icon: UserMultipleIcon,
-			who: 'Coaching centres',
+			who: 'Coaching centers',
 			line: 'Batches that overlap, a different fee for every course, and admissions living in a WhatsApp thread you scroll to find.'
 		},
 		{
@@ -793,7 +793,7 @@
 					Frequently<br />Asked Questions
 				</h2>
 				<p class="mt-5 max-w-sm leading-relaxed text-[var(--brand-tint)]/70">
-					Clear answers to the questions schools, madrasas, and coaching centres ask before they
+					Clear answers to the questions schools, madrasas, and coaching centers ask before they
 					start.
 				</p>
 				<p class="mt-6 text-sm text-[var(--brand-tint)]/60">

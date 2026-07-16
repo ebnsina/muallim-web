@@ -94,7 +94,9 @@ pnpm build
 
 **Nothing on a page may jump** — see the rule near the top of this section: reserve the space, or animate the height with `transition:slide`. Never snap.
 
-**The copy is American; the API is British.** `enrolments` is a Postgres table, a Go package and a JSON field, so every property, path, form action and enum keeps the server's spelling (`data.enrolments`, `?/enrol`, `after_enrolment`, `EnrolmentView`). Everything a person _reads_ — labels, headings, toasts, comments — is American: enroll, enrollment, catalog, color, center. The two disagree on purpose, and only at the boundary where one side is read by people and the other by machines.
+**The copy is American; the wire keeps its spelling.** `enrolments` is a Postgres table, a Go package and a JSON field, so every property, path, form action and enum keeps the server's spelling (`data.enrolments`, `?/enrol`, `after_enrolment`, `EnrolmentView`) — those are identifiers, and renaming one breaks a client nobody can see. Everything a person _reads_ — labels, headings, toasts, comments — is American: enroll, enrollment, catalog, color, center. The two disagree on purpose, and only at the boundary where one side is read by people and the other by machines.
+
+This used to read "the API is British", which invited exactly the mistake it was meant to prevent: `muallim-api/CLAUDE.md` said "British throughout", so a landing card reading "Coaching centers" was "corrected" to "centres" — against this rule, citing that one. Both files now say American prose, and both say the wire does not move. If you find yourself changing a spelling because the other repo told you to, you are reading the wrong half of the sentence.
 
 **A form's submit sits at its bottom-right, and every action button carries an icon.** Exceptions, all deliberate: a lone CTA with no fields ("Mark as complete"), a `w-full` submit, a row action positioned by its container, and a filter bar's inline button.
 
