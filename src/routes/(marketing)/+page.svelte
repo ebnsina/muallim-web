@@ -380,12 +380,19 @@
 
 <div class="landing">
 	<!-- HERO: the light gradient the header pill sits on, centred copy, one call to
-	     action, and the product itself bleeding off the bottom. -->
+	     action, and the product itself bleeding off the bottom.
+
+	     It said "Run the whole institution." and stopped — half the positioning. The
+	     title tag, the footer and every doc say both halves, and the second is the
+	     half nobody else offers: a school that also sells its teaching past its own
+	     gate. The fold was selling an admin tool and keeping the differentiator for
+	     the fourth section down. The stroke moves with it, onto the surprising word. -->
 	<div class="topwrap">
 		<section class="hero">
 			<h1 class="hero-h1">
-				Run the whole<br /><span class="underlined"
-					>institution<svg
+				Run the whole institution.<br />Teach the whole
+				<span class="underlined"
+					>world<svg
 						class="swoosh"
 						viewBox="0 0 200 10"
 						preserveAspectRatio="none"
@@ -396,10 +403,10 @@
 				>.
 			</h1>
 			<p class="hero-sub">
-				One platform to run a <span class="kind">school</span>, <span class="kind">college</span>,
-				<span class="kind">madrasa</span>, or <span class="kind">coaching centre</span> — and teach the
-				world online. Attendance, exams, report cards, and fees, together. You keep the money and the
-				students.
+				One platform for a <span class="kind">school</span>, <span class="kind">college</span>,
+				<span class="kind">madrasa</span>, or <span class="kind">coaching centre</span> — the register,
+				the exams, the report cards and the fees, together. Then publish a course and sell it to anyone,
+				anywhere. You keep the money and the students.
 			</p>
 			<Button href={resolve('/register')} variant="lime">
 				Get started <Icon icon={ArrowRight02Icon} class="size-5" />
@@ -963,10 +970,14 @@
 
 	/* The four kinds of institution, each its own thing rather than a list of words
 	   the eye slides over. */
+	/*
+		Olive and semibold, not a tinted chip. The chip's padding stood every comma off
+		its own word — "school , college , madrasa" — and four lime pills argued with
+		the lime stroke and the lime button for the one bit of attention the accent is
+		rationed to spend. The words still lift off the muted sentence; the punctuation
+		now sits where it was typed.
+	*/
 	.kind {
-		padding: 0.06em 0.3em;
-		border-radius: 0.4em;
-		background: var(--accent-tint);
 		color: var(--brand);
 		font-weight: 600;
 		white-space: nowrap;
