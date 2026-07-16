@@ -44,7 +44,7 @@
 			icon: Mosque01Icon,
 			tone: 'violet',
 			name: 'Madrasa',
-			line: 'Ebtedayee to Kamil, Hifz tracking, Arabic (RTL) curriculum.'
+			line: 'Classes you name yourself, Hifz tracking, your own grading scale.'
 		},
 		{
 			icon: UserGroupIcon,
@@ -59,7 +59,7 @@
 			icon: MagicWand01Icon,
 			tone: 'indigo',
 			name: 'Create',
-			line: 'Courses, 16 quiz types, certificates, AI Studio.'
+			line: 'Courses, 15 quiz types, certificates, AI Studio.'
 		},
 		{
 			icon: Message02Icon,

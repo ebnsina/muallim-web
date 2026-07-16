@@ -10,6 +10,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
+	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
 		ArrowRight01Icon,
@@ -44,9 +45,9 @@
 		'Stripe · international',
 		'Guardian SMS',
 		'GPA-5 report cards',
-		'Madrasa ladder',
-		'Arabic RTL',
-		'16 quiz types',
+		'Your own grading scale',
+		'Hifz tracking',
+		'15 quiz types',
 		'0% platform fee'
 	];
 
@@ -59,7 +60,7 @@
 		{
 			icon: Book02Icon,
 			who: 'Madrasas',
-			line: 'Hifz to track, the Ebtedayee-to-Kamil ladder to run, and an Arabic right-to-left curriculum no ordinary school tool was built to hold.'
+			line: 'Hifz to track — Sabaq, Sabqi and Manzil — and classes you name yourself, from Ebtedayee to Kamil, on a grading scale you set.'
 		},
 		{
 			icon: UserMultipleIcon,
@@ -87,7 +88,7 @@
 		{
 			icon: Book02Icon,
 			title: 'Teach your way',
-			line: 'Text and video lessons, 16 question types, quizzes graded the moment a learner submits. Lessons and marking stop living in your evenings.'
+			line: 'Text and video lessons, 15 question types, quizzes graded the moment a learner submits. Lessons and marking stop living in your evenings.'
 		},
 		{
 			icon: ClipboardIcon,
@@ -129,7 +130,7 @@
 			lead: 'Build a course in the order you teach it, mark the work, and hand out a certificate that verifies.',
 			points: [
 				'Text and video lessons, with a free preview clip',
-				'16 quiz types — auto-graded the moment they submit',
+				'15 quiz types — most auto-graded the moment they submit',
 				'Assignments with file upload and a real gradebook',
 				'Certificates on completion, drip and prerequisites'
 			]
@@ -156,7 +157,7 @@
 			points: [
 				'Course forum and threaded Q&A',
 				'Ratings and reviews from learners who finished',
-				'Gamification and streaks to keep them coming back',
+				'Points, badges and a leaderboard to keep them coming back',
 				'Notifications, private notes, and highlights'
 			]
 		},
@@ -211,7 +212,7 @@
 			items: [
 				{ icon: Quiz01Icon, label: 'Quizzes & assignments' },
 				{ icon: Message02Icon, label: 'Forum & Q&A' },
-				{ icon: ChartLineData01Icon, label: 'Gamification & streaks' },
+				{ icon: ChartLineData01Icon, label: 'Points & badges' },
 				{ icon: School01Icon, label: 'Notifications' }
 			]
 		},
@@ -239,35 +240,40 @@
 		}
 	];
 
-	// Rotating Solv-style card tones — mint, lavender, teal, olive.
+	// Rotating Solv-style card tones — mint, lavender, teal, olive. `chip` is the
+	// pill background, which has to lift off the dark card rather than sink into it.
 	const tones = [
 		{
 			card: 'border border-[#e2eeca] bg-[radial-gradient(120%_90%_at_30%_0%,#eaf5cf,#ffffff_75%)]',
 			icon: 'bg-white text-[#2e3320]',
 			title: 'text-[#17170f]',
 			body: 'text-[#5c6248]',
-			tick: 'text-[#2e3320]'
+			tick: 'text-[#2e3320]',
+			chip: 'bg-black/5'
 		},
 		{
 			card: 'bg-[#dedbf6]',
 			icon: 'bg-white text-[#4a3f7a]',
 			title: 'text-[#17170f]',
 			body: 'text-[#5a5675]',
-			tick: 'text-[#4a3f7a]'
+			tick: 'text-[#4a3f7a]',
+			chip: 'bg-white/60'
 		},
 		{
 			card: 'bg-[#dbe9e6]',
 			icon: 'bg-white text-[#2e5148]',
 			title: 'text-[#17170f]',
 			body: 'text-[#4c5a55]',
-			tick: 'text-[#2e5148]'
+			tick: 'text-[#2e5148]',
+			chip: 'bg-white/60'
 		},
 		{
 			card: 'bg-[#2e3320] text-[#eef0e6]',
 			icon: 'bg-[#c4e84b] text-[#2e3320]',
 			title: 'text-[#c4e84b]',
 			body: 'text-[#c9d0b8]',
-			tick: 'text-[#c4e84b]'
+			tick: 'text-[#c4e84b]',
+			chip: 'bg-white/10'
 		}
 	];
 
@@ -309,11 +315,11 @@
 		{
 			icon: LanguageSkillIcon,
 			title: 'Bangladesh-first',
-			line: 'Taka with lakh grouping, GPA-5 report cards, and Arabic right-to-left madrasa curricula.'
+			line: 'Taka with lakh grouping, GPA-5 report cards, bKash and SSLCommerz, and Hifz tracking.'
 		},
 		{
 			icon: Quiz01Icon,
-			title: '16 quiz types + certificates',
+			title: '15 quiz types + certificates',
 			line: 'From MCQ to essays a person still marks, then a verifiable certificate at the end.'
 		}
 	] as const;
@@ -333,23 +339,33 @@
 		},
 		{
 			q: 'Can a madrasa use it?',
-			a: 'Yes. The madrasa setup runs the Ebtedayee-to-Kamil ladder, tracks Hifz, and supports an Arabic right-to-left curriculum alongside the general classes.'
+			a: 'Yes. Set the workspace to madrasa, name your classes from Ebtedayee to Kamil, set your own grading scale, and track Hifz alongside the general classes.'
 		},
 		{
 			q: 'Does it work in Bengali and Arabic?',
-			a: 'Pricing is shown in taka with lakh grouping (for example ৳18,42,500), and madrasa curricula support Arabic right-to-left content. The interface itself is in English.'
+			a: 'Pricing is shown in taka with lakh grouping (for example ৳18,42,500), and you write your courses in whatever language you teach in. The interface itself is in English.'
 		}
 	] as const;
 
 	let openFaq = $state(0);
 	const toggleFaq = (i: number) => (openFaq = openFaq === i ? -1 : i);
+
+	// The breadth strip: every feature group, counted from the content file so the
+	// number on the page can never drift from the pages behind it.
+	const breadth = FEATURE_GROUPS.map((g) => ({
+		key: g.key,
+		name: g.name,
+		blurb: g.blurb,
+		icon: g.icon,
+		names: featuresIn(g.key).map((f) => f.name)
+	}));
 </script>
 
 <svelte:head>
 	<title>Muallim — run the whole institution, teach the whole world</title>
 	<meta
 		name="description"
-		content="One platform for a school, a college, a madrasa, or a coaching center: courses, 16 quiz types, certificates, attendance, exams and report cards, fees through your own bKash or SSLCommerz account — 0% platform fee."
+		content="One platform for a school, a college, a madrasa, or a coaching centre: courses, 15 quiz types, certificates, attendance, exams and report cards, fees through your own bKash or SSLCommerz account — 0% platform fee."
 	/>
 </svelte:head>
 
@@ -428,7 +444,7 @@
 						</div>
 					{/if}
 				</div>
-				<a href="#capabilities" onclick={() => (menuOpen = false)}>Features</a>
+				<a href={resolve('/(marketing)/features')} onclick={() => (menuOpen = false)}>Features</a>
 				<a href="#faq" onclick={() => (menuOpen = false)}>FAQ</a>
 				<a class="nav-links-signin" href={resolve('/login')}>Sign in</a>
 			</nav>
@@ -456,7 +472,7 @@
 			<div class="hero-copy">
 				<h1 class="hero-h1">Run the whole<br />institution.</h1>
 				<p class="hero-sub">
-					One platform to run a school, college, madrasa, or coaching center — and teach the world
+					One platform to run a school, college, madrasa, or coaching centre — and teach the world
 					online. Attendance, exams, report cards, and fees, together. You keep the money and the
 					students.
 				</p>
@@ -513,8 +529,8 @@
 			</p>
 			<p class="build-p">
 				<strong>Set up for your kind of school.</strong> School, college, madrasa, or coaching — pick
-				your type and Muallim fits how you already work, from classes and sections to the Ebtedayee-to-Kamil
-				ladder.
+				your type and Muallim fits how you already work, from classes and sections to the grading scale
+				you mark on.
 			</p>
 		</div>
 
@@ -820,6 +836,54 @@
 		</div>
 	</section>
 
+	<!-- BREADTH: every feature group, linking into /features. Counts come from the
+	     content file, so the page cannot claim more than there are pages for. -->
+	<section id="everything" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Everything in it</p>
+		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+			<h2 class="max-w-[24ch] text-3xl font-bold tracking-tight text-[#2e3320] sm:text-4xl">
+				Four sides, and {FEATURES.length} features behind them.
+			</h2>
+			<a
+				href={resolve('/(marketing)/features')}
+				class="inline-flex items-center gap-2 rounded-full bg-[#2e3320] px-6 py-3 font-semibold text-[#eaf5cf] transition hover:-translate-y-0.5 hover:bg-[#3a4029]"
+			>
+				See all {FEATURES.length} features <Icon icon={ArrowRight02Icon} class="size-4" />
+			</a>
+		</div>
+		<p class="mt-3 max-w-2xl leading-relaxed text-[#6b6a5e]">
+			The list below is the whole product, not a highlight reel — and every one of them has a page
+			saying plainly what it does today.
+		</p>
+
+		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			{#each breadth as g, i (g.key)}
+				{@const tone = tones[i % tones.length]}
+				<div class="flex flex-col rounded-3xl p-6 {tone.card}">
+					<span class="grid size-11 place-items-center rounded-xl {tone.icon}">
+						<Icon icon={g.icon} class="size-5" />
+					</span>
+					<h3 class="mt-4 text-lg font-bold {tone.title}">{g.name}</h3>
+					<p class="mt-1 text-sm leading-relaxed {tone.body}">{g.blurb}</p>
+					<ul class="mt-4 flex flex-wrap gap-1.5">
+						{#each g.names as name (name)}
+							<li class="rounded-full {tone.chip} px-2.5 py-1 text-xs font-semibold {tone.body}">
+								{name}
+							</li>
+						{/each}
+					</ul>
+					<a
+						href="{resolve('/(marketing)/features')}#{g.key}"
+						class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold {tone.tick} hover:underline"
+					>
+						Explore {g.name.toLowerCase()}
+						<Icon icon={ArrowRight02Icon} class="size-4" />
+					</a>
+				</div>
+			{/each}
+		</div>
+	</section>
+
 	<!-- HONEST DIFFERENTIATORS: colored cards + olive stat panel -->
 	<section id="why" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[#3f4a2b] uppercase">Why Muallim</p>
@@ -929,7 +993,7 @@
 				</a>
 				<nav class="flex flex-wrap gap-6 text-sm text-[#eef0e6]/75">
 					<a href="#audiences" class="hover:text-white">Solutions</a>
-					<a href="#capabilities" class="hover:text-white">Features</a>
+					<a href={resolve('/(marketing)/features')} class="hover:text-white">Features</a>
 					<a href="#faq" class="hover:text-white">FAQ</a>
 					<a href="mailto:hello@muallim.app" class="hover:text-white">Contact</a>
 				</nav>
