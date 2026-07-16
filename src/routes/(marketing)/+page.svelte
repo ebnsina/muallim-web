@@ -13,7 +13,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { Button, CardObject, IsoBlocks, SiteCta } from '$lib/features/marketing/ui';
+	import { Button, FeatureCard, SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -53,6 +53,40 @@
 		'15 quiz types',
 		'0% platform fee'
 	];
+
+	// The four cards under the build heading. Each links to the feature page that
+	// proves it — a "learn more" with nowhere to go is the affordance lying.
+	const BUILD_CARDS = [
+		{
+			title: 'Take the register,',
+			tail: 'class by class',
+			kind: 'clipboard',
+			href: resolve('/(marketing)/features/[slug]', { slug: 'attendance' }),
+			label: 'Learn more about attendance'
+		},
+		{
+			title: 'Exams, marked',
+			tail: 'and reported',
+			kind: 'medal',
+			href: resolve('/(marketing)/features/[slug]', { slug: 'exams-and-report-cards' }),
+			label: 'Learn more about exams and report cards'
+		},
+		{
+			title: 'Fees, collected',
+			tail: 'and reconciled',
+			kind: 'note',
+			href: resolve('/(marketing)/features/[slug]', { slug: 'fees' }),
+			label: 'Learn more about fees'
+		},
+		{
+			title: 'Teach beyond',
+			tail: 'the gate',
+			kind: 'plane',
+			tone: 'dark',
+			href: resolve('/(marketing)/features/[slug]', { slug: 'payments' }),
+			label: 'Learn more about selling courses'
+		}
+	] as const;
 
 	const audiences = [
 		{
@@ -360,14 +394,10 @@
 	</section>
 
 	<!-- BUILD BLOCK -->
-	<section class="section build">
-		<div class="build-copy">
-			<h2 class="h2">Built for how your institution actually runs</h2>
-			<div class="build-cta">
-				<a class="pill pill-primary" href={resolve('/register')}>
-					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
-				</a>
-			</div>
+	<section class="section grid gap-10">
+		<!-- The copy reads once across the top; the cards carry the rest. -->
+		<div class="grid items-start gap-x-12 lg:grid-cols-[0.9fr_1.1fr]">
+			<h2 class="h2 lg:row-span-2">Built for how your institution actually runs</h2>
 			<p class="build-p">
 				<strong>One platform, end to end.</strong> The morning register, the board result, and the fee
 				receipt used to live in separate books that never quite agreed. Muallim keeps them together.
@@ -379,28 +409,17 @@
 			</p>
 		</div>
 
-		<div class="build-cards">
-			<div class="fcard fcard-teal">
-				<IsoBlocks tone="lime" />
-				<h3 class="fcard-title">Run the day, effortlessly</h3>
-				<ul class="fcard-list">
-					<li><Icon icon={ArrowRight02Icon} class="size-4" /> Take the register, class by class</li>
-					<li>
-						<Icon icon={ArrowRight02Icon} class="size-4" /> Timetable, staff, and sections in one place
-					</li>
-				</ul>
-			</div>
-
-			<div class="fcard fcard-dark">
-				<CardObject kind="orb" tone="lime" corner="top" />
-				<div class="fcard-dark-foot">
-					<h3 class="fcard-title lime">Teach beyond the gate</h3>
-					<p class="fcard-dark-p">
-						Publish a course and sell it to the world — Stripe for learners paying from abroad. You
-						keep the money, at 0% platform fee.
-					</p>
-				</div>
-			</div>
+		<div class="grid gap-4 md:grid-cols-2">
+			{#each BUILD_CARDS as c (c.href)}
+				<FeatureCard
+					title={c.title}
+					tail={c.tail}
+					kind={c.kind}
+					tone={'tone' in c ? c.tone : 'paper'}
+					href={c.href}
+					label={c.label}
+				/>
+			{/each}
 		</div>
 	</section>
 
@@ -996,28 +1015,10 @@
 		background: var(--olive);
 	}
 
-	/* Build block. */
-	.build {
-		display: grid;
-		gap: 2.5rem;
-		grid-template-columns: 1fr;
-		align-items: center;
-	}
-	@media (min-width: 960px) {
-		.build {
-			grid-template-columns: 0.85fr 1.15fr;
-			gap: 3rem;
-		}
-	}
-	.build-cta {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.7rem;
-		margin: 1.5rem 0;
-	}
+	/* Build block: only the paragraph survives as scoped CSS — the rest is Tailwind. */
 	.build-p {
 		margin: 0 0 1rem;
-		max-width: 30rem;
+		max-width: 34rem;
 		font-size: 0.95rem;
 		line-height: 1.6;
 		color: var(--muted);
@@ -1025,88 +1026,6 @@
 	.build-p strong {
 		color: var(--ink);
 		font-weight: 700;
-	}
-	.build-cards {
-		display: grid;
-		gap: 1rem;
-		grid-template-columns: 1fr;
-	}
-	@media (min-width: 620px) {
-		.build-cards {
-			grid-template-columns: 1.15fr 0.85fr;
-		}
-	}
-	.fcard {
-		/* Anchors the corner glyph and clips it, which is what makes it read as a mark
-		   on the card rather than a picture in it. */
-		position: relative;
-		overflow: hidden;
-		border-radius: 22px;
-		padding: 1.5rem;
-		display: flex;
-		flex-direction: column;
-		min-height: 20rem;
-	}
-	.fcard-teal {
-		background: var(--teal-tint);
-	}
-	.fcard-dark {
-		background: var(--olive);
-		color: #eef0e6;
-	}
-	.fcard-title,
-	.fcard-list,
-	.fcard-dark-foot,
-	.fcard .pill {
-		position: relative;
-		z-index: 1;
-	}
-	.fcard-title {
-		margin: 0 0 0.4rem;
-		font-weight: 700;
-		font-size: 1.4rem;
-		letter-spacing: -0.02em;
-		color: var(--ink);
-	}
-	.fcard-title.lime {
-		color: var(--lime);
-	}
-	.fcard-list {
-		list-style: none;
-		margin: 1rem 0 1.2rem;
-		padding: 0;
-		display: grid;
-		gap: 0.5rem;
-	}
-	.fcard-list li {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.5rem;
-		font-size: 0.86rem;
-		line-height: 1.4;
-		color: var(--ink-soft);
-	}
-	.fcard-list :global(svg) {
-		margin-top: 0.12rem;
-		flex-shrink: 0;
-		color: var(--olive);
-	}
-	.fcard .pill {
-		margin-top: auto;
-		align-self: flex-start;
-	}
-	.pill-sm {
-		padding: 0.55rem 1.05rem;
-		font-size: 0.9rem;
-	}
-	.fcard-dark-foot {
-		margin-top: auto;
-	}
-	.fcard-dark-p {
-		margin: 0.4rem 0 0;
-		font-size: 0.9rem;
-		line-height: 1.55;
-		color: #cfd3c2;
 	}
 
 	/* Feature-card widgets. */

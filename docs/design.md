@@ -15,7 +15,7 @@ and the marketing layout argues its own. Read those before changing a value.
 ramp reads its hue from that one number, and therefore so does every accent, ring
 and primary button, in light and dark. Move the number and the product moves.
 
-Olive was chosen for what it is *not*: green at ~145° is the success colour, and a
+Olive was chosen for what it is _not_: green at ~145° is the success colour, and a
 green Submit beside a green Correct is a sentence with two verbs. Olive sits far
 enough away that a primary action never reads as a mark.
 
@@ -24,13 +24,13 @@ computed, because that page is light-only and never needed the ramp.
 
 ## The two surfaces
 
-| | Product | Marketing |
-| --- | --- | --- |
-| Tokens | `src/lib/design/tokens.css`, via `@theme` in `src/routes/layout.css` | `src/routes/(marketing)/+layout.svelte`, class `.marketing` |
-| Themes | Light **and** dark. Both are first-class; the viewer's toggle stamps `data-theme` on the root and must win in both directions. | Light only. |
-| Surface | Solid. Cards, borders, tables — density is the point. | Paper on cream. Flat cards, 24px corners, a photo behind the hero. |
-| Colour | The `--b-*` ramp plus semantic tokens (`text`, `muted`, `surface`, `danger-text`…). | Cream, ink, olive, lime, lavender, and a warm spectrum for chips. |
-| Type | Mona Sans; Geist Mono for numerals and code. | The same. |
+|         | Product                                                                                                                        | Marketing                                                          |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Tokens  | `src/lib/design/tokens.css`, via `@theme` in `src/routes/layout.css`                                                           | `src/routes/(marketing)/+layout.svelte`, class `.marketing`        |
+| Themes  | Light **and** dark. Both are first-class; the viewer's toggle stamps `data-theme` on the root and must win in both directions. | Light only.                                                        |
+| Surface | Solid. Cards, borders, tables — density is the point.                                                                          | Paper on cream. Flat cards, 24px corners, a photo behind the hero. |
+| Colour  | The `--b-*` ramp plus semantic tokens (`text`, `muted`, `surface`, `danger-text`…).                                            | Cream, ink, olive, lime, lavender, and a warm spectrum for chips.  |
+| Type    | Mona Sans; Geist Mono for numerals and code.                                                                                   | The same.                                                          |
 
 **Never hardcode a colour in either.** A colour in a component is a colour that
 cannot be themed, and every tenant will want to theme. The one exception is the
@@ -49,8 +49,34 @@ its own private copy of the tokens, and for a while the product had two looks an
 no way to tell which was current. The palette now lives in the layout and nowhere
 else. **A token defined twice is a token that disagrees with itself.**
 
-Compose from `src/lib/features/marketing/ui/` — Button, Card, IconChip, Tag,
-Toggle. A page inventing its own card is how the drift started.
+The aurora was tried on the landing's cards and taken back out. It is worth knowing
+why, because the ban above reads as dogma otherwise: a wash lowers the contrast
+between a card and its neighbour, and contrast was the only thing holding the set
+together. The page keeps its one aurora — `--hero-backdrop`, behind the hero — so
+the rule in practice is _aurora belongs to the page, not the panels_.
+
+Compose from `src/lib/features/marketing/ui/` — Button, Card, FeatureCard, IconChip,
+Tag, Toggle. A page inventing its own card is how the drift started.
+
+`FeatureCard` is the landing's build-block card: a two-tone headline, one object
+from `CardArt` clipped by the right edge, an arrow disc at the foot. Two things make
+a set of them work, and neither is the background. **A set gets its rhythm from one
+bold step** — three paper cards and one olive — because four near-identical surfaces
+read as sorted by nothing, and the olive card is where lime is finally spent. **The
+object has to have presence**: a heavy open stroke, full opacity, large enough to own
+the right half of the card. The objects stay outlines — filling them in was tried and
+is not what was wrong. What reads as tentative is a _small, faded_ drawing, and for
+four rounds that got mistaken for a background problem.
+
+A section whose cards are each a call to action does not also get a button. The
+build block had a "Start free" above the grid, which made five doors on one screen
+and drew the eye away from the four that say what the product does.
+
+The object names a real thing — a clipboard is the register, a medal a result, a
+banknote with ৳ a fee, a paper plane a course sold abroad. The abstract ring and
+globe that came before made a reader decode them, which is a picture doing no work.
+The references this answers are lit 3D renders; these are drawings, and closing that
+gap needs a modelling tool or a licensed asset pack rather than a cleverer SVG.
 
 ## Accessibility is a build-time constraint
 
