@@ -1,7 +1,8 @@
 <script lang="ts">
 	/**
-	 * The landing: a warm nature backdrop under a floating white panel, olive and
-	 * lime, big rounded cards, pill buttons. The tokens are the marketing layout's —
+	 * The landing: one dark header pill on a light hero gradient, centred copy, a
+	 * single call to action, and the product itself bleeding off the fold below it.
+	 * Olive and lime, big rounded cards. The tokens are the marketing layout's —
 	 * this page carried its own copy of them for a while, which is how the rest of
 	 * the site ended up a different colour entirely.
 	 *
@@ -12,7 +13,7 @@
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
-	import { SiteCta } from '$lib/features/marketing/ui';
+	import { Button, SiteCta } from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS as FEATURE_GROUPS, featuresIn } from '$lib/content/features';
 	import {
 		ArrowLeft01Icon,
@@ -310,40 +311,26 @@
 </svelte:head>
 
 <div class="landing">
-	<!-- HEADER + HERO: full-bleed portrait, floating pill nav, bottom-left copy, a
-	     floating stat card bottom-right. -->
+	<!-- HERO: the light gradient the header pill sits on, centred copy, one call to
+	     action, and the product itself bleeding off the bottom. -->
 	<div class="topwrap">
 		<section class="hero">
-			<div class="hero-copy">
-				<h1 class="hero-h1">Run the whole<br />institution.</h1>
-				<p class="hero-sub">
-					One platform to run a school, college, madrasa, or coaching centre — and teach the world
-					online. Attendance, exams, report cards, and fees, together. You keep the money and the
-					students.
-				</p>
-				<a class="pill-lime" href={resolve('/register')}>
-					Get started <Icon icon={ArrowRight02Icon} class="size-5" />
-				</a>
-			</div>
-
-			<aside class="statcard" aria-label="Fees collected this term">
-				<div class="statcard-top">
-					<span class="statcard-title">Fees collected</span>
-					<span class="statcard-badge">+18%</span>
-				</div>
-				<div class="statcard-tabs">
-					<span class="on">This term</span><span>Monthly</span><span>Yearly</span>
-				</div>
-				<div class="statcard-bars">
-					<span style="height:46%"></span>
-					<span class="dark" style="height:64%"></span>
-					<span style="height:52%"></span>
-					<span class="dark" style="height:80%"></span>
-					<span style="height:60%"></span>
-					<span class="dark" style="height:94%"></span>
-				</div>
-				<p class="statcard-foot">{taka(1842500)} to your own bKash · updates as fees come in</p>
-			</aside>
+			<h1 class="hero-h1">Run the whole<br />institution.</h1>
+			<p class="hero-sub">
+				One platform to run a school, college, madrasa, or coaching centre — and teach the world
+				online. Attendance, exams, report cards, and fees, together. You keep the money and the
+				students.
+			</p>
+			<Button href={resolve('/register')} variant="lime">
+				Get started <Icon icon={ArrowRight02Icon} class="size-5" />
+			</Button>
+			<img
+				class="hero-shot"
+				src="/marketing/dashboard.webp"
+				alt="A learner's Muallim dashboard: a “Welcome back” greeting, courses in progress, lessons completed, average progress, and a calendar."
+				width="2360"
+				height="1342"
+			/>
 		</section>
 	</div>
 
@@ -816,189 +803,19 @@
 		overflow: hidden;
 	}
 
-	/* Warm nature backdrop behind header + hero; fades to cream at the bottom so the
-	   sections sit on the page cleanly. A soft green gradient stands in if the photo
-	   is slow or blocked. */
-	/* Full-bleed hero: warm portrait, scrims for legibility, warm gradient fallback.
-	   Swap the Unsplash URL for your own hero image when ready. */
+	/* The hero band: the shared light gradient, near-white where the header pill sits
+	   and warm low down. `overflow: hidden` is what crops the screenshot. */
 	.topwrap {
 		position: relative;
 		/* The header floats out of the flow above this, so the hero reserves its band
 		   rather than sliding up underneath it. */
 		padding-top: 5.2rem;
-		min-height: 42rem;
+		/* Tall enough that the screenshot is always cut by the fold, short viewport or
+		   not — that crop is what says the product goes on past the page. */
+		min-height: 100svh;
 		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
 		overflow: hidden;
-		color: #fff;
-		background:
-			linear-gradient(180deg, rgba(24, 20, 14, 0) 42%, rgba(18, 15, 10, 0.66) 100%),
-			linear-gradient(100deg, rgba(18, 15, 10, 0.44), rgba(18, 15, 10, 0) 55%),
-			radial-gradient(120% 100% at 62% 22%, #dccbb7, #bfae9c 62%, #8f8073);
-		background-image:
-			linear-gradient(180deg, rgba(24, 20, 14, 0) 42%, rgba(18, 15, 10, 0.66) 100%),
-			linear-gradient(100deg, rgba(18, 15, 10, 0.44), rgba(18, 15, 10, 0) 55%),
-			url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1600&q=75'),
-			radial-gradient(120% 100% at 62% 22%, #dccbb7, #bfae9c 62%, #8f8073);
-		background-size: cover;
-		background-position: center 22%;
-		background-repeat: no-repeat;
-	}
-	@media (min-width: 720px) {
-		.topwrap {
-			min-height: 46rem;
-		}
-	}
-
-	/* Floating pill nav over the photo. */
-	.nav {
-		position: relative;
-		z-index: 2;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		width: 100%;
-		max-width: 82rem;
-		margin: 0 auto;
-		padding: 1.1rem 1.4rem 0;
-	}
-	.nav-pill {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		background: rgba(32, 27, 22, 0.42);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		border-radius: 999px;
-		padding: 0.4rem 0.5rem;
-	}
-	.nav-links {
-		display: none;
-		padding: 0.5rem 0.8rem;
-	}
-	.nav-links > a {
-		color: rgba(255, 255, 255, 0.82);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 500;
-		padding: 0.25rem 0.7rem;
-		border-radius: 999px;
-	}
-	.nav-links > a:hover {
-		color: #fff;
-	}
-	.nav-links-signin {
-		display: none;
-	}
-	.nav-logo {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: #fff;
-		font-weight: 700;
-		font-size: 1.2rem;
-		letter-spacing: -0.02em;
-		text-decoration: none;
-	}
-	.nav-mark {
-		display: grid;
-		place-items: center;
-		width: 1.9rem;
-		height: 1.9rem;
-		border-radius: 0.6rem;
-		background: var(--lime);
-		color: var(--olive);
-	}
-	.nav-right {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-	}
-	.nav-auth {
-		display: none;
-	}
-	.nav-login {
-		color: rgba(255, 255, 255, 0.85);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 600;
-		padding: 0.35rem 0.85rem;
-	}
-	.nav-login:hover {
-		color: #fff;
-	}
-	.nav-signup {
-		background: #fff;
-		color: var(--ink);
-		border-radius: 999px;
-		padding: 0.5rem 1.1rem;
-		font-size: 0.9rem;
-		font-weight: 700;
-		text-decoration: none;
-	}
-	.nav-burger {
-		display: grid;
-		place-items: center;
-		width: 2.7rem;
-		height: 2.7rem;
-		border-radius: 0.9rem;
-		background: rgba(32, 27, 22, 0.42);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		cursor: pointer;
-	}
-	.nav-burger span {
-		position: relative;
-		display: block;
-		width: 1.05rem;
-		height: 2px;
-		border-radius: 2px;
-		background: #fff;
-	}
-	.nav-burger span::before,
-	.nav-burger span::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		width: 1.05rem;
-		height: 2px;
-		border-radius: 2px;
-		background: #fff;
-	}
-	.nav-burger span::before {
-		top: -0.34rem;
-	}
-	.nav-burger span::after {
-		top: 0.34rem;
-	}
-	.nav-links.open {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.15rem;
-		position: absolute;
-		top: 4.2rem;
-		left: 1.4rem;
-		padding: 0.7rem;
-		z-index: 3;
-	}
-	.nav-links.open .nav-links-signin {
-		display: block;
-		color: #fff;
-		font-weight: 700;
-	}
-	@media (min-width: 860px) {
-		.nav-links {
-			display: flex;
-		}
-		.nav-auth {
-			display: flex;
-		}
-		.nav-burger {
-			display: none;
-		}
+		background: var(--hero-backdrop);
 	}
 
 	/* Pills (shared with the closing CTA below). */
@@ -1035,126 +852,50 @@
 		transform: translateY(-1px);
 		box-shadow: 0 6px 20px rgba(23, 23, 15, 0.07);
 	}
-	.pill-lime {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		background: var(--lime);
-		color: var(--olive);
-		border-radius: 999px;
-		padding: 0.9rem 1.6rem;
-		font-weight: 700;
-		font-size: 1rem;
-		text-decoration: none;
-		transition:
-			transform 0.14s ease,
-			box-shadow 0.14s ease;
-	}
-	.pill-lime:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 12px 30px rgba(163, 200, 40, 0.4);
-	}
-
-	/* Hero content — bottom-left copy, bottom-right stat card. */
+	/* Hero content — centred copy, one button, the product below it. */
 	.hero {
 		position: relative;
 		z-index: 2;
 		width: 100%;
-		max-width: 82rem;
+		max-width: 72rem;
 		margin: 0 auto;
-		padding: 3rem 1.4rem 2.6rem;
+		padding: 3rem 1.4rem 0;
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 2rem;
-		flex-wrap: wrap;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 	}
-	.hero-copy {
-		max-width: 34rem;
+	/* The button holds the gap open; the shot's auto margin above it takes whatever
+	   height is left, so the shot always lands on the band's bottom edge. */
+	.hero :global(.btn) {
+		margin-bottom: 3.4rem;
 	}
 	.hero-h1 {
 		margin: 0;
 		font-weight: 700;
-		font-size: clamp(2.8rem, 7vw, 5.2rem);
+		font-size: clamp(2.6rem, 7vw, 5rem);
 		line-height: 0.98;
 		letter-spacing: -0.035em;
-		color: #fff;
+		color: var(--ink);
 	}
 	.hero-sub {
-		margin: 1.1rem 0 0;
-		max-width: 30rem;
+		margin: 1.1rem 0 1.8rem;
+		max-width: 38rem;
 		font-size: 1rem;
 		line-height: 1.55;
-		color: rgba(255, 255, 255, 0.85);
-	}
-	.hero-copy .pill-lime {
-		margin-top: 1.6rem;
-	}
-
-	/* Floating stat card. */
-	.statcard {
-		width: 20rem;
-		max-width: 100%;
-		background: #fff;
-		border-radius: 20px;
-		box-shadow: 0 30px 70px -30px rgba(18, 15, 10, 0.65);
-		padding: 1.2rem 1.3rem;
-		color: var(--ink);
-	}
-	.statcard-top {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-	}
-	.statcard-title {
-		font-weight: 700;
-		font-size: 1rem;
-	}
-	.statcard-badge {
-		background: var(--lime);
-		color: var(--olive);
-		font-weight: 700;
-		font-size: 0.74rem;
-		border-radius: 999px;
-		padding: 0.15rem 0.55rem;
-	}
-	.statcard-tabs {
-		display: flex;
-		gap: 1rem;
-		margin: 0.9rem 0 0;
-		padding-bottom: 0.6rem;
-		font-size: 0.82rem;
-		color: var(--muted);
-		border-bottom: 1px solid var(--line);
-	}
-	.statcard-tabs .on {
-		color: var(--ink);
-		font-weight: 700;
-	}
-	.statcard-bars {
-		display: flex;
-		align-items: flex-end;
-		gap: 0.5rem;
-		height: 5rem;
-		margin: 1rem 0 0.7rem;
-	}
-	.statcard-bars span {
-		flex: 1;
-		background: var(--lime);
-		border-radius: 5px;
-	}
-	.statcard-bars span.dark {
-		background: var(--olive);
-	}
-	.statcard-foot {
-		margin: 0;
-		font-size: 0.76rem;
 		color: var(--muted);
 	}
-	@media (max-width: 760px) {
-		.statcard {
-			display: none;
-		}
+	/* Cropped by .topwrap: the screenshot runs off the bottom of the band rather than
+	   ending on it, so the page keeps going. */
+	.hero-shot {
+		width: 100%;
+		max-width: 62rem;
+		height: auto;
+		margin-top: auto;
+		margin-bottom: -5rem;
+		border: 1px solid rgb(255 255 255 / 0.6);
+		border-radius: var(--r-lg);
+		box-shadow: 0 40px 90px -40px rgba(23, 23, 15, 0.45);
 	}
 
 	/* Works-with marquee. */

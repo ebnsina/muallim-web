@@ -2,9 +2,8 @@
 	import type { Snippet } from 'svelte';
 
 	/*
-		The hero band every non-landing page opens on: the landing's dark, full-bleed
-		treatment without the photograph, so the floating header has something to sit
-		over here too rather than a bare cream strip.
+		The hero band every non-landing page opens on: the same light gradient the
+		landing wears, so the one dark header pill reads the same everywhere.
 
 		The copy stays the page's — this owns the band and nothing that is said on it.
 		With `aside` it lays out copy-left/panel-right like the landing's hero; without,
@@ -47,10 +46,7 @@
 		   rather than letting the nav land on the copy. */
 		padding-top: 5.2rem;
 		background: var(--hero-backdrop);
-		background-size: cover;
-		background-position: center 22%;
-		background-repeat: no-repeat;
-		color: var(--on-hero);
+		color: var(--ink);
 	}
 
 	.inner {
@@ -65,11 +61,6 @@
 		gap: 3rem;
 		align-items: center;
 		text-align: start;
-	}
-	/* The band is white-on-dark, but an aside is paper — it takes ink back, as the
-	   landing's stat card does. */
-	.aside {
-		color: var(--ink);
 	}
 	@media (min-width: 900px) {
 		.split {
@@ -86,19 +77,19 @@
 		line-height: 1.05;
 		letter-spacing: -0.03em;
 		margin: 1.4rem 0 0;
-		color: var(--on-hero);
+		color: var(--ink);
 	}
-	/* The pages mark the second half of a headline `.accent`; on paper that was olive,
-	   on the band it is the lime that reads. */
+	/* The pages mark the second half of a headline `.accent`; on paper lime vanishes,
+	   so it is olive that carries it. */
 	.h1 :global(.accent) {
-		color: var(--accent);
+		color: var(--brand);
 	}
 	.sub {
 		margin: 1.3rem auto 0;
 		max-width: 40rem;
 		font-size: 1.12rem;
 		line-height: 1.6;
-		color: color-mix(in srgb, var(--on-hero) 85%, transparent);
+		color: var(--muted);
 	}
 	.split .sub {
 		margin-inline: 0;

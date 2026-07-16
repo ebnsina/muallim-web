@@ -18,16 +18,12 @@
 
 	/*
 		The marketing site's header, owned by the (marketing) layout so every page wears
-		the same one. It used to live inside the landing, which is why every other page
-		grew its own and none of them agreed.
+		the same one. One dark pill holding the logo, the links, and the single call to
+		action — floating over the light hero gradient every page now opens on.
 
-		Two backdrops, one component: on the landing it floats over a dark hero
-		photograph, everywhere else it sits on cream. `tone` is the only difference —
-		a second header would drift from this one within a week.
+		It had a `tone` prop for a second, cream variant; there is one backdrop now, and
+		a second variant is how the two drifted apart last time.
 	*/
-	type Props = { tone?: 'photo' | 'cream' };
-	let { tone = 'cream' }: Props = $props();
-
 	let menuOpen = $state(false);
 	let megaOpen = $state(false);
 	let activeCat = $state(0);
@@ -91,13 +87,18 @@
 	];
 </script>
 
-<div class="site-header" class:on-cream={tone === 'cream'}>
-	<header class="nav">
-		<nav class="nav-pill nav-links" class:open={menuOpen}>
+<header class="site-header">
+	<div class="pill">
+		<a class="logo" href={resolve('/')}>
+			<span class="mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
+			Muallim
+		</a>
+
+		<nav class="links" class:open={menuOpen} aria-label="Main">
 			<div class="relative" onmouseenter={openMega} onmouseleave={scheduleCloseMega} role="none">
 				<button
 					type="button"
-					class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium text-white/80 hover:text-white"
+					class="mega-trigger"
 					aria-haspopup="true"
 					aria-expanded={megaOpen}
 					onclick={() => (megaOpen = !megaOpen)}
@@ -122,7 +123,7 @@
 						role="none"
 						onmouseenter={openMega}
 						onmouseleave={scheduleCloseMega}
-						class="absolute top-[calc(100%+0.25rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
+						class="absolute top-[calc(100%+0.5rem)] left-0 z-20 w-[40rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
 					>
 						<div class="grid grid-cols-[1.15fr_1fr] gap-2">
 							<div class="flex flex-col gap-1">
@@ -148,7 +149,7 @@
 									</button>
 								{/each}
 							</div>
-							<div class="rounded-xl bg-[var(--surface-2)] p-2">
+							<div class="flex flex-col rounded-xl bg-[var(--surface-2)] p-2">
 								{#each megaCats[activeCat].items as item (item.label)}
 									<a
 										href={resolve('/register')}
@@ -158,6 +159,13 @@
 										{item.label}
 									</a>
 								{/each}
+								<!-- The one call to action is "Get started", so signing in lives here. -->
+								<a
+									href={resolve('/login')}
+									class="mt-auto rounded-lg border-t border-[var(--line)] px-3 pt-3 pb-1 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
+								>
+									Already have an account? Sign in
+								</a>
 							</div>
 						</div>
 					</div>
@@ -165,229 +173,167 @@
 			</div>
 			<a href={resolve('/(marketing)/features')} onclick={() => (menuOpen = false)}>Features</a>
 			<a href="#faq" onclick={() => (menuOpen = false)}>FAQ</a>
-			<a class="nav-links-signin" href={resolve('/login')}>Sign in</a>
-		</nav>
-		<a class="nav-logo" href={resolve('/')}>
-			<span class="nav-mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
-			Muallim
-		</a>
-		<div class="nav-right">
-			<div class="nav-pill nav-auth">
-				<a class="nav-login" href={resolve('/login')}>Sign in</a>
-				<a class="nav-signup" href={resolve('/register')}>Start free</a>
-			</div>
-			<button
-				class="nav-burger"
-				aria-label="Menu"
-				aria-expanded={menuOpen}
-				onclick={() => (menuOpen = !menuOpen)}
+			<a class="links-signin" href={resolve('/login')} onclick={() => (menuOpen = false)}>Sign in</a
 			>
-				<span></span>
-			</button>
-		</div>
-	</header>
-</div>
+		</nav>
+
+		<a class="cta" href={resolve('/register')}>Get started</a>
+
+		<button
+			class="burger"
+			aria-label="Menu"
+			aria-expanded={menuOpen}
+			onclick={() => (menuOpen = !menuOpen)}
+		>
+			<span></span>
+		</button>
+	</div>
+</header>
 
 <style>
-	.nav {
-		position: relative;
-		z-index: 2;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		width: 100%;
-		max-width: 82rem;
-		margin: 0 auto;
-		padding: 1.1rem 1.4rem 0;
-	}
-	.nav-pill {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-		background: rgba(32, 27, 22, 0.42);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		border-radius: 999px;
-		padding: 0.4rem 0.5rem;
-	}
-	.nav-links {
-		display: none;
-		padding: 0.5rem 0.8rem;
-	}
-	.nav-links > a {
-		color: rgba(255, 255, 255, 0.82);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 500;
-		padding: 0.25rem 0.7rem;
-		border-radius: 999px;
-	}
-	.nav-links > a:hover {
-		color: #fff;
-	}
-	.nav-links-signin {
-		display: none;
-	}
-	.nav-logo {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: #fff;
-		font-weight: 700;
-		font-size: 1.2rem;
-		letter-spacing: -0.02em;
-		text-decoration: none;
-	}
-	.nav-mark {
-		display: grid;
-		place-items: center;
-		width: 1.9rem;
-		height: 1.9rem;
-		border-radius: 0.6rem;
-		background: var(--accent);
-		color: var(--brand);
-	}
-	.nav-right {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-	}
-	.nav-auth {
-		display: none;
-	}
-	.nav-login {
-		color: rgba(255, 255, 255, 0.85);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 600;
-		padding: 0.35rem 0.85rem;
-	}
-	.nav-login:hover {
-		color: #fff;
-	}
-	.nav-signup {
-		background: #fff;
-		color: var(--ink);
-		border-radius: 999px;
-		padding: 0.5rem 1.1rem;
-		font-size: 0.9rem;
-		font-weight: 700;
-		text-decoration: none;
-	}
-	.nav-burger {
-		display: grid;
-		place-items: center;
-		width: 2.7rem;
-		height: 2.7rem;
-		border-radius: 0.9rem;
-		background: rgba(32, 27, 22, 0.42);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.14);
-		cursor: pointer;
-	}
-	.nav-burger span {
-		position: relative;
-		display: block;
-		width: 1.05rem;
-		height: 2px;
-		border-radius: 2px;
-		background: #fff;
-	}
-	.nav-burger span::before,
-	.nav-burger span::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		width: 1.05rem;
-		height: 2px;
-		border-radius: 2px;
-		background: #fff;
-	}
-	.nav-burger span::before {
-		top: -0.34rem;
-	}
-	.nav-burger span::after {
-		top: 0.34rem;
-	}
-	.nav-links.open {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.15rem;
-		position: absolute;
-		top: 4.2rem;
-		left: 1.4rem;
-		padding: 0.7rem;
-		z-index: 3;
-	}
-	.nav-links.open .nav-links-signin {
-		display: block;
-		color: #fff;
-		font-weight: 700;
-	}
-	@media (min-width: 860px) {
-		.nav-links {
-			display: flex;
-		}
-		.nav-auth {
-			display: flex;
-		}
-		.nav-burger {
-			display: none;
-		}
-	}
-
-	/* Pills (shared with the closing CTA below). */
-
 	/*
-		On cream there is no photograph to read against, so the pill that was glass over
-		a picture becomes paper on paper: a white pill with ink on it, and a border to
-		separate the two. Same header, same geometry — only what is behind it changed.
+		The pill floats out of the flow so the hero's gradient runs to the top of the
+		window behind it; in the flow it would push the hero down and leave a band.
 	*/
-	/*
-		Over a photograph the header floats: it is lifted out of the flow so the picture
-		runs to the top of the window behind it. In the flow it would push the hero
-		down and leave a band of paper above the image.
-	*/
-	.site-header:not(.on-cream) {
+	.site-header {
 		position: absolute;
 		top: 0;
 		right: 0;
 		left: 0;
 		z-index: 30;
+		display: flex;
+		justify-content: center;
+		padding: 1.1rem 1rem 0;
 	}
-
-	/*
-		On the landing the photograph is the header's background. On cream there is no
-		photograph, so without this the page's own backdrop shows through as a band.
-	*/
-	.on-cream {
-		background: var(--cream);
+	.pill {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		max-width: 100%;
+		background: var(--brand);
+		border-radius: 999px;
+		padding: 0.4rem 0.4rem 0.4rem 1.1rem;
+		box-shadow: 0 18px 40px -24px rgba(23, 23, 15, 0.6);
 	}
-	.on-cream :global(.nav-pill) {
-		background: var(--surface);
-		border-color: var(--line);
+	.logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--on-brand);
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
+		text-decoration: none;
+		white-space: nowrap;
 	}
-	/* The mega-menu trigger is white-on-photo in the markup; on paper it is ink. */
-	.on-cream :global(.nav-links button) {
-		color: var(--ink);
-	}
-	.on-cream :global(.nav-links button:hover) {
+	.mark {
+		display: grid;
+		place-items: center;
+		width: 1.7rem;
+		height: 1.7rem;
+		border-radius: 0.55rem;
+		background: var(--accent);
 		color: var(--brand);
 	}
-	.on-cream :global(.nav-links > a),
-	.on-cream :global(.nav-logo),
-	.on-cream :global(.nav-login) {
-		color: var(--ink);
+	.links {
+		display: none;
+		align-items: center;
+		gap: 0.15rem;
+		margin: 0 0.35rem;
 	}
-	.on-cream :global(.nav-links > a:hover),
-	.on-cream :global(.nav-login:hover) {
+	.links > a,
+	.mega-trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		color: color-mix(in srgb, var(--on-brand) 78%, transparent);
+		text-decoration: none;
+		font-size: 0.9rem;
+		font-weight: 500;
+		padding: 0.35rem 0.7rem;
+		border-radius: 999px;
+		cursor: pointer;
+	}
+	.links > a:hover,
+	.mega-trigger:hover {
+		color: var(--on-brand);
+	}
+	/* Sign-in also rides the mobile menu — the mega panel that carries it is hover-only. */
+	.links > a.links-signin {
+		display: none;
+	}
+	.cta {
+		background: var(--accent);
 		color: var(--brand);
+		border-radius: 999px;
+		padding: 0.55rem 1.1rem;
+		font-size: 0.9rem;
+		font-weight: 700;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: transform 0.14s ease;
 	}
-	.on-cream :global(.nav-burger span),
-	.on-cream :global(.nav-burger span::before),
-	.on-cream :global(.nav-burger span::after) {
-		background: var(--ink);
+	.cta:hover {
+		transform: translateY(-1px);
+	}
+	.burger {
+		display: grid;
+		place-items: center;
+		width: 2.3rem;
+		height: 2.3rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--on-brand) 12%, transparent);
+		cursor: pointer;
+	}
+	.burger span {
+		position: relative;
+		display: block;
+		width: 1rem;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--on-brand);
+	}
+	.burger span::before,
+	.burger span::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		width: 1rem;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--on-brand);
+	}
+	.burger span::before {
+		top: -0.34rem;
+	}
+	.burger span::after {
+		top: 0.34rem;
+	}
+	.links.open {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+		position: absolute;
+		top: 4rem;
+		left: 1rem;
+		right: 1rem;
+		padding: 0.7rem;
+		background: var(--brand);
+		border-radius: var(--r);
+		z-index: 3;
+	}
+	.links.open .links-signin {
+		display: block;
+		color: var(--on-brand);
+		font-weight: 700;
+	}
+	@media (min-width: 900px) {
+		.links {
+			display: flex;
+		}
+		.burger {
+			display: none;
+		}
 	}
 </style>

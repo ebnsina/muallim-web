@@ -12,20 +12,16 @@
 		of them agreed, and /solutions and /features had no footer at all. A page's job
 		is its content. The chrome is the shell's.
 
-		Every page now opens on a dark hero band — the landing's photograph, a PageHero
-		gradient everywhere else — so the header floats over all of them. The `cream`
-		tone stays on SiteHeader for a page that ever opens on paper again.
+		Every page opens on the same light hero gradient — the landing's and PageHero's
+		are the same recipe — so the one dark header pill floats over all of them.
 	*/
-	import { page } from '$app/state';
 	import { SiteFooter, SiteHeader } from '$lib/features/marketing/ui';
 
 	let { children } = $props();
-
-	const onLanding = $derived(page.url.pathname === '/');
 </script>
 
-<div class="marketing" class:landing={onLanding}>
-	<SiteHeader tone="photo" />
+<div class="marketing">
+	<SiteHeader />
 	{@render children()}
 	<SiteFooter />
 </div>
@@ -68,14 +64,14 @@
 		--lav: #dedbf6;
 		--lav-ink: #5b4fc4;
 
-		/* The dark hero band. The landing lays a photograph over this; every other page
-		   wears it plain, which is why it is a gradient and not an asset. White is the
-		   only ink that reads on it. */
+		/* The hero gradient, shared by the landing and every PageHero: near-white where
+		   the dark pill sits, warming toward the bottom. One recipe, one token, so the
+		   two can never drift apart again. */
 		--hero-backdrop:
-			linear-gradient(180deg, rgba(24, 20, 14, 0) 42%, rgba(18, 15, 10, 0.66) 100%),
-			linear-gradient(100deg, rgba(18, 15, 10, 0.44), rgba(18, 15, 10, 0) 55%),
-			radial-gradient(120% 100% at 62% 22%, #dccbb7, #bfae9c 62%, #8f8073);
-		--on-hero: #ffffff;
+			radial-gradient(100% 60% at 50% 108%, var(--accent-tint), transparent 72%),
+			radial-gradient(58% 46% at 0% 104%, var(--lav), transparent 72%),
+			radial-gradient(58% 46% at 100% 104%, var(--lav), transparent 72%),
+			linear-gradient(0deg, var(--cream), var(--surface) 62%);
 
 		/* The closing CTA's gradient runs cream → this → --accent-band, landing on the
 		   band the footer sits in. Only the middle stop needed a name. */
