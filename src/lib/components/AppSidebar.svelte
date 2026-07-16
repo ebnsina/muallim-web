@@ -23,6 +23,9 @@
 		LibraryIcon,
 		Megaphone01Icon,
 		Note04Icon,
+		PackageIcon,
+		Route02Icon,
+		Tag01Icon,
 		TaskDaily01Icon,
 		TeachingIcon,
 		UserAdd01Icon,
@@ -131,6 +134,24 @@
 							label: 'ID cards',
 							icon: IdentityCardIcon,
 							show: canManageInstitution
+						},
+						{
+							href: resolve('/teach/learning-paths'),
+							label: 'Learning paths',
+							icon: Route02Icon,
+							show: canAuthor
+						},
+						{
+							href: resolve('/teach/bundles'),
+							label: 'Bundles',
+							icon: PackageIcon,
+							show: canAuthor
+						},
+						{
+							href: resolve('/teach/taxonomy'),
+							label: 'Categories & tags',
+							icon: Tag01Icon,
+							show: canAuthor
 						}
 					]
 				},
