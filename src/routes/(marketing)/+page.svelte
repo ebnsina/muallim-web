@@ -1,11 +1,13 @@
 <script lang="ts">
 	/**
-	 * The landing, in the Solv direction — a warm nature backdrop with a floating
-	 * white panel, dark-olive + lime accents, big rounded cards, and pill buttons.
-	 * Reference: lafys.com's Solv Finance landing. Header + hero replicate that panel
-	 * composition with Muallim's own content; the sections below carry the story.
-	 * Self-contained (own tokens), so the rest of marketing keeps its own look. Every
-	 * claim is something the product does — no invented logos, testimonials, or stats.
+	 * The landing: a warm nature backdrop under a floating white panel, olive and
+	 * lime, big rounded cards, pill buttons. The tokens are the marketing layout's —
+	 * this page carried its own copy of them for a while, which is how the rest of
+	 * the site ended up a different colour entirely.
+	 *
+	 * Every claim here is something the product does. It once promised 16 quiz types
+	 * (there are 15), a grading ladder it does not ship, and right-to-left Arabic
+	 * that was never built — so: no invented feature, logo, testimonial, or number.
 	 */
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
@@ -240,7 +242,7 @@
 		}
 	];
 
-	// Rotating Solv-style card tones — mint, lavender, teal, olive. `chip` is the
+	// Rotating card tones — mint, lavender, teal, olive. `chip` is the
 	// pill background, which has to lift off the dark card rather than sink into it.
 	const tones = [
 		{
@@ -369,7 +371,7 @@
 	/>
 </svelte:head>
 
-<div class="solv">
+<div class="landing">
 	<!-- HEADER + HERO: full-bleed portrait, floating pill nav, bottom-left copy, a
 	     floating stat card bottom-right. -->
 	<div class="topwrap">
@@ -1036,19 +1038,17 @@
 </div>
 
 <style>
-	.solv {
-		--cream: #f3f1ea;
-		--card: #ffffff;
-		--ink: #17170f;
-		--ink-soft: #3f4a2b;
-		--muted: #6b6a5e;
-		--olive: #2e3320;
-		--olive-2: #3a4029;
-		--lime: #c4e84b;
-		--lime-soft: #eaf5cf;
-		--lav: #dedbf6;
-		--line: #e7e4d8;
-		--radius: 24px;
+	/*
+		The page's own frame. Every colour comes from the marketing layout — the names
+		below are the aliases this page's CSS was written against, pointed at the
+		system rather than restating it.
+	*/
+	.landing {
+		--card: var(--surface);
+		--olive: var(--brand);
+		--olive-2: var(--brand-soft);
+		--lime: var(--accent);
+		--lime-soft: var(--accent-tint);
 
 		position: relative;
 		z-index: 0;

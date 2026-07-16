@@ -12,58 +12,84 @@
 	let { children } = $props();
 </script>
 
-<div class="rd">
+<div class="marketing">
 	{@render children()}
 </div>
 
 <style>
 	/*
-		The marketing design system, in tokens. Light only.
+		The Muallim marketing design system, in tokens. Light only.
 
-		Brand is berry — premium, and clear of the success/correct green a quiz app
-		already spends. Gold is the warm second accent. The icon spectrum gives chips
-		variety. Neutrals are faintly warm to sit with the berry. Surfaces are frosted
-		glass over a fixed aurora; radii are named once.
+		Warm and grown rather than corporate: cream paper, ink that is almost black
+		but not quite, dark olive for anything that carries weight, and lime for the
+		one thing on a screen that should catch the eye. Lavender is the second voice.
+		It is the same olive the product itself wears — `--brand-hue: 128` in
+		src/lib/design/tokens.css — so the site and the thing it sells agree.
+
+		This block is the whole system, and the only place these values live. The
+		landing kept its own copy for a while and the rest of marketing drifted into a
+		different look entirely: two palettes, one product, and no way to tell which
+		was current. A token defined twice is a token that disagrees with itself.
+
+		The spectrum exists to give icon chips variety without leaving the family —
+		sage, clay, gold, lavender — all of them warm, none of them shouting over the
+		lime.
 	*/
-	.rd {
-		--brand: #9d174d;
-		--brand-strong: #831843;
-		--brand-tint: #fbe3ee;
+	.marketing {
+		/* Olive carries weight: buttons, dark panels, anything decisive. */
+		--brand: #2e3320;
+		--brand-strong: #1f2416;
+		--brand-tint: #eaf5cf;
+		--brand-soft: #3a4029;
 
+		/* Lime is the accent, and rationed. Everything cannot be the loudest thing. */
+		--accent: #c4e84b;
+		--accent-tint: #eaf5cf;
+		--accent-ink: #4a5f10;
+
+		/* The second voice, for when one accent is not enough to separate two ideas. */
+		--lav: #dedbf6;
+		--lav-ink: #5b4fc4;
+
+		/* The spectrum, warm. Names kept from the old berry system so a page that
+		   asks for one still gets a colour, but every value now sits on cream. */
+		--indigo: #5b4fc4;
+		--indigo-tint: #dedbf6;
+		--teal: #4b7a5e;
+		--teal-tint: #dfeee4;
+		--violet: #7a5fd3;
+		--violet-tint: #e5e0f8;
+		--amber: #b4762a;
+		--amber-tint: #f7efda;
+		--rose: #b4653a;
+		--rose-tint: #f5e4d9;
 		--gold: #b7791f;
 		--gold-tint: #f7efda;
 
-		--indigo: #4f46e5;
-		--indigo-tint: #e8e7fb;
-		--teal: #0d9488;
-		--teal-tint: #d8f2ee;
-		--violet: #7c3aed;
-		--violet-tint: #efe8fd;
-		--amber: #c2620c;
-		--amber-tint: #fbebd9;
-		--rose: #be185d;
-		--rose-tint: #fbe4ee;
-
-		--ink: #211820;
-		--muted: #6b5f66;
-		--line: #ece7ea;
-		--bg: #faf7f9;
+		--ink: #17170f;
+		--ink-soft: #3f4a2b;
+		--muted: #6b6a5e;
+		--line: #e7e4d8;
+		--bg: #f3f1ea;
+		--cream: #f3f1ea;
 		--surface: #ffffff;
-		--surface-2: #f4eff2;
+		--surface-2: #f7f5ef;
 
+		/* Generous. A 24px corner is the one that reads as this product. */
 		--r-sm: 12px;
-		--r: 16px;
-		--r-lg: 22px;
+		--r: 18px;
+		--r-lg: 24px;
+		--radius: 24px;
 
-		/* A whisper of glass, named once so a card and a panel agree. Mostly a solid
-		   surface with just a hint of the aurora bleeding through and a gentle blur —
-		   halfway between a standard card and a frosted one, not the full frost. */
-		--glass: color-mix(in oklab, var(--surface) 86%, transparent);
-		--glass-border: color-mix(in oklab, #ffffff 45%, var(--line));
-		--glass-blur: blur(10px) saturate(1.15);
-		--glass-shadow:
-			0 12px 30px -28px rgba(33, 24, 32, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-		--tint: color-mix(in oklab, var(--surface-2) 82%, transparent);
+		/* Paper, not glass. The old system frosted everything over an aurora; this one
+		   puts flat cards on cream and lets the type do the work. The names survive so
+		   nothing that asks for them breaks, and they now resolve to paper.
+		*/
+		--glass: var(--surface);
+		--glass-border: var(--line);
+		--glass-blur: none;
+		--glass-shadow: 0 12px 30px -28px rgba(23, 23, 15, 0.18);
+		--tint: var(--surface-2);
 		--tint-border: var(--line);
 
 		color: var(--ink);
