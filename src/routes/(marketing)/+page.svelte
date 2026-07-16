@@ -316,7 +316,16 @@
 	<div class="topwrap">
 		<section class="hero">
 			<h1 class="hero-h1">
-				Run the whole<br /><span class="underlined">institution</span>.
+				Run the whole<br /><span class="underlined"
+					>institution<svg
+						class="swoosh"
+						viewBox="0 0 200 10"
+						preserveAspectRatio="none"
+						aria-hidden="true"
+					>
+						<path d="M3 7.2C42 2.6 86 8.4 120 4.6 150 1.4 178 5 197 3.2" />
+					</svg></span
+				>.
 			</h1>
 			<p class="hero-sub">
 				One platform to run a <span class="kind">school</span>, <span class="kind">college</span>,
@@ -891,19 +900,26 @@
 		position: relative;
 		white-space: nowrap;
 	}
-	.underlined::after {
-		content: '';
+	/*
+		Drawn, not ruled: a line that lifts a little to the right, the way a hand does.
+		`preserveAspectRatio: none` stretches it to whatever the word measures, and
+		non-scaling-stroke keeps the nib's weight while it does.
+	*/
+	.swoosh {
 		position: absolute;
-		right: -0.04em;
-		/* The inline box runs below the baseline to hold descenders, so anchoring at 0
-		   drops the stroke into the paragraph beneath. This sits it under the letters. */
-		bottom: 0.13em;
-		left: -0.04em;
-		height: 0.11em;
-		border-radius: 999px;
-		background: var(--accent);
-		/* Behind the letters, so a descender is never cut in half. */
-		z-index: -1;
+		right: -0.06em;
+		bottom: -0.1em;
+		left: -0.06em;
+		width: auto;
+		height: 0.3em;
+		overflow: visible;
+	}
+	.swoosh path {
+		fill: none;
+		stroke: var(--accent);
+		stroke-width: 7;
+		stroke-linecap: round;
+		vector-effect: non-scaling-stroke;
 	}
 
 	/* The four kinds of institution, each its own thing rather than a list of words
@@ -917,7 +933,7 @@
 		white-space: nowrap;
 	}
 	.hero-sub {
-		margin: 1.5rem 0 1.8rem;
+		margin: 2.4rem 0 2rem;
 		max-width: 38rem;
 		font-size: 1rem;
 		line-height: 1.55;
