@@ -336,13 +336,15 @@
 			<Button href={resolve('/register')} variant="lime">
 				Get started <Icon icon={ArrowRight02Icon} class="size-5" />
 			</Button>
-			<img
-				class="hero-shot"
-				src="/marketing/dashboard.webp"
-				alt="A learner's Muallim dashboard: a “Welcome back” greeting, courses in progress, lessons completed, average progress, and a calendar."
-				width="2360"
-				height="1342"
-			/>
+			<div class="hero-frame">
+				<img
+					class="hero-shot"
+					src="/marketing/dashboard.webp"
+					alt="A learner's Muallim dashboard: a “Welcome back” greeting, courses in progress, lessons completed, average progress, and a calendar."
+					width="2360"
+					height="1342"
+				/>
+			</div>
 		</section>
 	</div>
 
@@ -942,15 +944,28 @@
 	}
 	/* Cropped by .topwrap: the screenshot runs off the bottom of the band rather than
 	   ending on it, so the page keeps going. */
-	.hero-shot {
+	/*
+		The pane the screenshot sits in: a hair of padding and a see-through paper fill,
+		so the picture has a border that is part of the page rather than a line drawn
+		around it — the gradient carries on through the glass.
+	*/
+	.hero-frame {
 		width: 100%;
-		max-width: 62rem;
-		height: auto;
+		max-width: 64rem;
 		margin-top: auto;
 		margin-bottom: -5rem;
-		border: 1px solid rgb(255 255 255 / 0.6);
-		border-radius: var(--r-lg);
+		padding: 0.6rem;
+		border: 1px solid var(--frame-line);
+		border-radius: calc(var(--r-lg) + 0.6rem);
+		background: var(--frame);
+		backdrop-filter: blur(14px) saturate(1.1);
 		box-shadow: 0 40px 90px -40px rgba(23, 23, 15, 0.45);
+	}
+	.hero-shot {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: var(--r-lg);
 	}
 
 	/* Works-with marquee. */

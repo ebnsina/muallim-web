@@ -91,6 +91,10 @@
 		/* The closing CTA's gradient runs cream → this → --accent-band, landing on the
 		   band the footer sits in. Only the middle stop needed a name. */
 		--cta-mid: #eef2d4;
+		/* The pane the hero's screenshot sits in: paper, mostly see-through, so the
+		   gradient carries on behind it. */
+		--frame: color-mix(in oklab, var(--surface) 22%, transparent);
+		--frame-line: color-mix(in oklab, var(--surface) 60%, transparent);
 		/* Body copy on that gradient: olive, but lighter than --ink-soft under lime. */
 		--cta-ink: #4a4d38;
 
