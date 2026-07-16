@@ -86,6 +86,15 @@ export const bundleEditSchema = z.object({
 	price: amount
 });
 
+/*
+	Granting a bundle enrols one learner in every course it holds. A grant is not a
+	purchase: the learner was given the courses and cannot cancel their way out of
+	them, so the person doing this is choosing somebody by name, never by address.
+*/
+export const bundleGrantSchema = z.object({
+	learner_id: z.string().uuid('Choose who to give this bundle to.')
+});
+
 /** The HTML constraints for the bundle forms, as attributes. Spread onto the control. */
 export const BUNDLE_LIMITS = {
 	name: { required: true, maxlength: 200 },

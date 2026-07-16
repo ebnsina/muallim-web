@@ -7,6 +7,7 @@
 		ArrowUp01Icon,
 		BookOpen01Icon,
 		FloppyDiskIcon,
+		GiftIcon,
 		PlusSignIcon,
 		RemoveCircleIcon
 	} from '@hugeicons/core-free-icons';
@@ -21,9 +22,16 @@
 		Page,
 		PageHeader,
 		Select,
+		Sheet,
 		Textarea
 	} from '$lib/components';
-	import { BUNDLE_LIMITS, bundleEditSchema, toMajor, type Bundle } from '$lib/bundles';
+	import {
+		BUNDLE_LIMITS,
+		bundleEditSchema,
+		bundleGrantSchema,
+		toMajor,
+		type Bundle
+	} from '$lib/bundles';
 	import type { components } from '$lib/api/schema';
 	import { formatMoney } from '$lib/money';
 	import { toast } from '$lib/toast.svelte';
@@ -44,9 +52,22 @@
 		{ label: bundle.name }
 	]);
 
+	type Member = components['schemas']['MemberView'];
+
+	const members = $derived(data.members as Member[]);
+
 	let editErrors = $state<FieldErrors>({});
 	let saving = $state(false);
 	let savingCourses = $state(false);
+
+	// Giving the bundle away, in a panel: it is one field, and it does not belong in
+	// the middle of the page an admin came here to edit.
+	let granting = $state(false);
+	let grantOpen = $state(false);
+	let grantErrors = $state<FieldErrors>({});
+	let learner = $state('');
+
+	const memberLabel = (m: Member) => (m.name?.trim() ? `${m.name} — ${m.email}` : m.email);
 
 	// The ordered course ids the admin is arranging. Seeded once from the bundle
 	// (`untrack`, because the initial snapshot is the point) and mutated in place by
@@ -99,9 +120,19 @@
 				{formatMoney({ amount_minor: bundle.price_amount, currency: bundle.currency })}
 			</span>
 		{/snippet}
+		{#snippet actions()}
+			<Button
+				variant="secondary"
+				onclick={() => (grantOpen = true)}
+				disabled={orderedIds.length === 0}
+			>
+				<Icon icon={GiftIcon} class="size-4" />
+				Give to a learner
+			</Button>
+		{/snippet}
 	</PageHeader>
 
-	{#if form?.message}
+	{#if form?.message && form?.scope !== 'grant'}
 		<Alert tone="danger" class="mt-6" role="alert">{form.message}</Alert>
 	{/if}
 
@@ -304,3 +335,80 @@
 		</div>
 	</section>
 </Page>
+
+<!--
+	Giving the bundle away. Not a sale: the learner is enrolled in every course at
+	once and keeps them, so the panel says so before the button is pressed.
+-->
+{#if grantOpen}
+	<Sheet open={grantOpen} onClose={() => (grantOpen = false)}>
+		{#snippet header()}
+			<h2 class="text-lg font-semibold">Give this bundle to a learner</h2>
+			<p class="mt-1 text-sm text-muted">
+				They are enrolled in all {orderedIds.length}
+				{orderedIds.length === 1 ? 'course' : 'courses'} straight away, at no charge.
+			</p>
+		{/snippet}
+
+		<form
+			id="grant-bundle"
+			method="POST"
+			action="?/grant"
+			use:enhance={validated(
+				bundleGrantSchema,
+				(next) => (grantErrors = next),
+				() => {
+					granting = true;
+					return async ({ result, update }) => {
+						await update({ invalidateAll: false });
+						granting = false;
+						if (result.type !== 'success') return;
+						grantOpen = false;
+						learner = '';
+						toast.success('The bundle has been given out.');
+					};
+				}
+			)}
+		>
+			{#if form?.message && form?.scope === 'grant'}
+				<Alert tone="danger" class="mb-4" role="alert">{form.message}</Alert>
+			{/if}
+
+			{#if !data.canPickLearner}
+				<Alert tone="warning" role="alert">
+					You can’t see this workspace’s people, so there is nobody to choose from here. Ask an
+					owner or an admin to give the bundle out.
+				</Alert>
+			{:else if members.length === 0}
+				<Alert tone="warning" role="alert">
+					There is nobody in this workspace yet. Invite people first, then give them the bundle.
+				</Alert>
+			{:else}
+				<Field id="learner_id" label="Who gets it" error={grantErrors.learner_id}>
+					{#snippet children({ id, describedBy, invalid })}
+						<Select
+							{id}
+							{invalid}
+							name="learner_id"
+							bind:value={learner}
+							aria-describedby={describedBy}
+						>
+							<option value="">Choose someone…</option>
+							{#each members as member (member.user_id)}
+								<option value={member.user_id}>{memberLabel(member)}</option>
+							{/each}
+						</Select>
+					{/snippet}
+				</Field>
+			{/if}
+		</form>
+
+		{#snippet footer()}
+			<Button variant="ghost" onclick={() => (grantOpen = false)}>Cancel</Button>
+			<Button type="submit" form="grant-bundle" loading={granting} disabled={granting || !learner}>
+				<Icon icon={GiftIcon} class="size-4" />
+				Give the bundle
+			</Button>
+		{/snippet}
+	</Sheet>
+{/if}

@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { problemMessage } from '$lib/api';
-import { bundleEditSchema, toMinor } from '$lib/bundles';
+import { bundleEditSchema, bundleGrantSchema, toMinor } from '$lib/bundles';
 import { authedApi } from '$lib/server/api';
 import { parseForm } from '$lib/validation';
 import type { Actions, PageServerLoad } from './$types';
@@ -14,6 +14,13 @@ import type { Actions, PageServerLoad } from './$types';
 const COURSE_LIMIT = 100;
 
 /*
+	How many members to offer in the "give this bundle to" picker. The members list
+	is capped rather than paged, so a workspace larger than this cannot pick its
+	whole roll from here — the picker says as much rather than pretending.
+*/
+const MEMBER_LIMIT = 200;
+
+/*
 	One bundle and everything needed to manage it: its own record (name, price, and
 	its ordered course_ids), plus the workspace's courses to name those ids and to
 	fill the "add a course" picker. The bundle omits nothing here — a detail fetch
@@ -25,9 +32,13 @@ export const load: PageServerLoad = async ({ params, locals, url, setHeaders }) 
 
 	const api = authedApi(url.origin, locals.accessToken);
 
-	const [bundleRes, coursesRes] = await Promise.all([
+	// The members fill the "give this bundle to" picker. An instructor may not list
+	// them; that is not an error here — the picker simply says so and the rest of
+	// the page still works.
+	const [bundleRes, coursesRes, membersRes] = await Promise.all([
 		api.GET('/v1/bundles/{slug}', { params: { path: { slug: params.slug } } }),
-		api.GET('/v1/me/courses', { params: { query: { limit: COURSE_LIMIT } } })
+		api.GET('/v1/me/courses', { params: { query: { limit: COURSE_LIMIT } } }),
+		api.GET('/v1/members', { params: { query: { limit: MEMBER_LIMIT } } })
 	]);
 
 	if (bundleRes.error || !bundleRes.data) {
@@ -41,7 +52,10 @@ export const load: PageServerLoad = async ({ params, locals, url, setHeaders }) 
 
 	return {
 		bundle: bundleRes.data.bundle,
-		courses: coursesRes.data?.courses ?? []
+		courses: coursesRes.data?.courses ?? [],
+		members: membersRes.data?.members ?? [],
+		// Distinguishes "nobody to show" from "you may not see the roll".
+		canPickLearner: !membersRes.error
 	};
 };
 
@@ -104,5 +118,35 @@ export const actions: Actions = {
 		}
 
 		return { savedCourses: data.bundle };
+	},
+
+	/*
+		Give the bundle to one learner: every course it holds, enrolled at once. The
+		API records it as a grant, so the learner cannot cancel and be left with
+		neither the courses nor a refund — which is why this names a member rather
+		than taking an address.
+	*/
+	grant: async ({ request, params, locals, url }) => {
+		if (!locals.accessToken) redirect(303, `/login?next=${encodeURIComponent(url.pathname)}`);
+
+		const parsed = parseForm(bundleGrantSchema, await request.formData());
+		if (!parsed.ok) return fail(400, { scope: 'grant', errors: parsed.errors });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/bundles/{slug}/grant',
+			{
+				params: { path: { slug: params.slug } },
+				body: { learner_id: parsed.value.learner_id }
+			}
+		);
+
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				scope: 'grant',
+				message: problemMessage(problem, 'We couldn’t give that bundle out. Please try again.')
+			});
+		}
+
+		return { granted: true };
 	}
 };
