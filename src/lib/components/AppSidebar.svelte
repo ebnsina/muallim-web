@@ -12,6 +12,7 @@
 		Building03Icon,
 		Bus01Icon,
 		Calendar01Icon,
+		Calendar02Icon,
 		Calendar03Icon,
 		Cancel01Icon,
 		ChampionIcon,
@@ -26,6 +27,7 @@
 		Note04Icon,
 		PackageIcon,
 		Route02Icon,
+		School01Icon,
 		Tag01Icon,
 		Tag02Icon,
 		TaskDaily01Icon,
@@ -198,6 +200,18 @@
 				{
 					label: 'Academics',
 					items: [
+						{
+							href: resolve('/manage/classes'),
+							label: 'Classes',
+							icon: School01Icon,
+							show: canManageInstitution
+						},
+						{
+							href: resolve('/manage/academic-years'),
+							label: 'Academic years',
+							icon: Calendar02Icon,
+							show: canManageInstitution
+						},
 						{
 							href: resolve('/manage/admissions'),
 							label: 'Admissions',

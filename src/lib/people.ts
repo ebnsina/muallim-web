@@ -18,6 +18,8 @@ export function roleLabel(role: Role): string {
 			return 'Instructor';
 		case 'student':
 			return 'Student';
+		case 'guardian':
+			return 'Guardian';
 	}
 }
 
@@ -32,6 +34,8 @@ export function roleHint(role: Role): string {
 			return 'Authors courses and marks work. May see the member list.';
 		case 'student':
 			return 'Takes courses.';
+		case 'guardian':
+			return 'A parent. Reads their own child’s attendance, fees and progress, and nothing else.';
 	}
 }
 

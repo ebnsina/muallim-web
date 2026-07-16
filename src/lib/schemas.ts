@@ -332,7 +332,7 @@ export const reviewSchema = z.object({
 // ------------------------------------------------------------------ people
 
 /** The roles muallim-api knows. An unknown one is refused here as it is there. */
-export const ROLES = ['owner', 'admin', 'instructor', 'student'] as const;
+export const ROLES = ['owner', 'admin', 'instructor', 'student', 'guardian'] as const;
 export type Role = (typeof ROLES)[number];
 
 const role = z.enum(ROLES, { error: 'Choose a role.' });
@@ -449,4 +449,13 @@ export const guardianSchema = z.object({
 	phone: optionalText(40),
 	email: z.preprocess(blankIsAbsent, z.email('Enter a valid email address.').optional()),
 	is_primary: checkbox
+});
+
+/*
+	Giving a guardian a sign-in. muallim-api ties the guardian to an account that
+	already belongs to this workspace — it never makes one — so the only choice here
+	is which of those people it is.
+*/
+export const guardianAccountSchema = z.object({
+	user_id: z.uuid('Choose which person signs in for this guardian.')
 });

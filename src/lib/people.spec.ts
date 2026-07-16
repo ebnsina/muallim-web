@@ -20,7 +20,7 @@ const invitation = (status: Invitation['status']): Invitation => ({
 
 describe('roleLabel', () => {
 	it('names every role the API can send', () => {
-		expect(ROLES.map(roleLabel)).toEqual(['Owner', 'Admin', 'Instructor', 'Student']);
+		expect(ROLES.map(roleLabel)).toEqual(['Owner', 'Admin', 'Instructor', 'Student', 'Guardian']);
 	});
 });
 
