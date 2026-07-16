@@ -601,13 +601,13 @@ export const FEATURES: Feature[] = [
 		slug: 'fees',
 		group: 'operations',
 		name: 'Fees & invoices',
-		tagline: 'Invoice, collect, and know who has paid',
+		tagline: 'Invoice, record, and know who has paid',
 		icon: Invoice01Icon,
 		headline: 'Who has paid, without opening three books.',
 		blurb:
-			'Invoice students, take the money through your own bKash or SSLCommerz account, and see what is outstanding.',
+			'Invoice students, record how each one paid, and see what is still outstanding. The money goes straight to you — Muallim keeps the count, not the cash.',
 		today: [
-			'Invoices raised against the students who owe them',
+			'Invoices raised against the students who owe them, one at a time or a whole class at once',
 			'Every amount in taka, to the poisha — never a rounded-off float',
 			'What is paid and what is outstanding, in one list',
 			'Guardians can see their own child’s fees in the portal'

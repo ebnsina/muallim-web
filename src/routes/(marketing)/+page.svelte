@@ -72,7 +72,7 @@
 			label: 'Learn more about exams and report cards'
 		},
 		{
-			title: 'Fees, collected',
+			title: 'Fees, billed',
 			tail: 'and reconciled',
 			kind: 'note',
 			href: resolve('/(marketing)/features/[slug]', { slug: 'fees' }),
@@ -163,8 +163,8 @@
 		},
 		{
 			icon: Money04Icon,
-			title: 'Get paid',
-			line: 'Collect fees through your own bKash or SSLCommerz account — you are the merchant, at 0% platform fee. Every taka is yours, with a receipt trail.'
+			title: 'Bill and keep the count',
+			line: 'Set a fee once, issue it to a whole class, and see what each student still owes. Families pay you as they always have; you record how. Muallim never touches the money.'
 		},
 		{
 			icon: ChartLineData01Icon,
@@ -311,7 +311,7 @@
 		{
 			icon: Store01Icon,
 			title: "You're the merchant",
-			line: 'Fees land in your own bKash or SSLCommerz account. Stripe is there for international learners.'
+			line: 'Sell a course through your own bKash or SSLCommerz and the money never passes through us. Stripe is there for learners abroad.'
 		},
 		{
 			icon: LanguageSkillIcon,
@@ -366,7 +366,7 @@
 	<title>Muallim — run the whole institution, teach the whole world</title>
 	<meta
 		name="description"
-		content="One platform for a school, a college, a madrasa, or a coaching centre: courses, 15 quiz types, certificates, attendance, exams and report cards, fees through your own bKash or SSLCommerz account — 0% platform fee."
+		content="One platform for a school, a college, a madrasa, or a coaching centre: courses, 15 quiz types, certificates, attendance, exams and report cards, and fees you bill and reconcile. Sell courses through your own bKash or SSLCommerz and Muallim takes nothing."
 	/>
 </svelte:head>
 
@@ -470,17 +470,22 @@
 		</div>
 	</section>
 
-	<!-- FEE TRANSPARENCY: copy + the "what you keep" slider. The claim here is scoped
-	     to fees collected through the school's own bKash or SSLCommerz, where no
-	     platform account exists and our cut is structurally zero. Selling a course
-	     through Stripe is a different number — see MUALLIM_PLATFORM_FEE_BPS. -->
+	<!-- FEES: what internal/fees actually is — structures, batch-issued invoices, a
+	     recorded payment with a Method string. It has no gateway code and imports no
+	     commerce: the money never routes through us, which is the honest reason the
+	     cut is nought. This said "collect fees through your own bKash or SSLCommerz",
+	     which described a rail that is not built for fees. -->
 	<section class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<div class="grid items-center gap-10 md:grid-cols-2">
 			<div>
-				<h2 class="h2">One clear price.<br />No hidden cut.</h2>
+				<h2 class="h2">Your money never<br />comes near us.</h2>
 				<p class="mt-5 max-w-md leading-relaxed text-[var(--muted)]">
-					You collect fees through your own bKash or SSLCommerz account, so Muallim never holds your
-					money. The only fee is the one bKash or SSLCommerz charges — Muallim takes 0%.
+					Muallim bills and keeps the count; it never touches a taka. Set a fee once — monthly,
+					termly, or annual — issue it to a whole class in one go, and see what each student still
+					owes. Families pay you however they already pay you, and you record how.
+				</p>
+				<p class="mt-3 max-w-md leading-relaxed text-[var(--muted)]">
+					Nothing routes through us, so there is nothing for us to take.
 				</p>
 				<a class="pill pill-primary mt-6" href={resolve('/register')}>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
@@ -492,7 +497,7 @@
 			<div class="rounded-[var(--r-lg)] bg-[var(--accent)] p-8 text-[var(--brand)]">
 				<p class="text-lg font-semibold">Fee calculator</p>
 				<div class="mt-4 h-px w-full bg-[var(--brand)]/20"></div>
-				<p class="mt-6 text-sm font-medium text-[var(--brand)]/70">Fees you collect this month</p>
+				<p class="mt-6 text-sm font-medium text-[var(--brand)]/70">Fees you bill this month</p>
 				<p class="mt-1 text-5xl font-bold tracking-tight tabular-nums">{taka(monthly)}</p>
 				<input
 					type="range"
@@ -500,13 +505,13 @@
 					max="1000000"
 					step="5000"
 					bind:value={monthly}
-					aria-label="Fees collected this month"
+					aria-label="Fees billed this month"
 					class="mt-5 h-5 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-9 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[var(--brand)] [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-[var(--brand)]/20 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[var(--brand)]/20 [&::-webkit-slider-thumb]:mt-[-6px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-9 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--brand)]"
 				/>
 				<div class="mt-5 h-px w-full bg-[var(--brand)]/20"></div>
 				<div class="mt-4 flex items-center justify-between text-sm font-semibold">
 					<span>Muallim's cut</span>
-					<span class="tabular-nums">৳0 · you keep 100%</span>
+					<span class="tabular-nums">৳0 · we never touch it</span>
 				</div>
 			</div>
 		</div>
