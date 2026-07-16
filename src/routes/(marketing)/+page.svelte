@@ -396,7 +396,7 @@
 			</div>
 
 			<div class="fcard fcard-dark">
-				<CardObject kind="orb" tone="lime" />
+				<CardObject kind="orb" tone="lime" corner="top" />
 				<div class="fcard-dark-foot">
 					<h3 class="fcard-title lime">Teach beyond the gate</h3>
 					<p class="fcard-dark-p">

@@ -16,11 +16,33 @@
 		kind: 'ring' | 'orb';
 		/** `lime` on the dark card, `brand` on paper. */
 		tone?: 'lime' | 'brand';
+		/** Which corner it hangs off. Put it where the card's words are not. */
+		corner?: 'bottom' | 'top';
 	};
-	let { kind, tone = 'brand' }: Props = $props();
+	let { kind, tone = 'brand', corner = 'bottom' }: Props = $props();
+
+	let el: HTMLElement | undefined = $state();
+	let seen = $state(false);
+
+	// It draws once, so it draws when somebody is there to watch: a card two screens
+	// down would otherwise finish long before anybody scrolled to it.
+	$effect(() => {
+		if (!el || seen) return;
+		const io = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					seen = true;
+					io.disconnect();
+				}
+			},
+			{ threshold: 0.4 }
+		);
+		io.observe(el);
+		return () => io.disconnect();
+	});
 </script>
 
-<span class="object {tone}" aria-hidden="true">
+<span class="object {tone} {corner}" class:seen bind:this={el} aria-hidden="true">
 	{#if kind === 'ring'}
 		<svg viewBox="0 0 200 200" fill="none">
 			<circle class="p a" cx="100" cy="100" r="76" pathLength="100" />
@@ -43,12 +65,11 @@
 	*/
 	.object {
 		position: absolute;
-		right: -2.4rem;
-		bottom: -2.8rem;
+		right: -3.4rem;
 		z-index: 0;
 		display: block;
-		width: 13rem;
-		height: 13rem;
+		width: 17.5rem;
+		height: 17.5rem;
 		transform: rotate(-10deg);
 		pointer-events: none;
 	}
@@ -56,6 +77,12 @@
 		width: 100%;
 		height: 100%;
 		overflow: visible;
+	}
+	.bottom {
+		bottom: -3.8rem;
+	}
+	.top {
+		top: -3.8rem;
 	}
 
 	.brand {
@@ -73,35 +100,32 @@
 	*/
 	.p {
 		stroke: currentColor;
-		stroke-width: 7;
+		stroke-width: 11;
 		stroke-dasharray: 100;
 		stroke-dashoffset: 100;
-		animation: draw 9s ease-in-out infinite;
 	}
-	.b {
-		animation-delay: 0.5s;
+	/* Once, on the way past, and then it stays drawn. A loop turns a flourish into a
+	   thing flickering in the corner of the eye while somebody is trying to read. */
+	.seen .p {
+		animation: draw 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 	}
-	.c {
-		animation-delay: 1s;
+	.seen .b {
+		animation-delay: 0.22s;
+	}
+	.seen .c {
+		animation-delay: 0.44s;
 	}
 
 	@keyframes draw {
-		0% {
-			stroke-dashoffset: 100;
-		}
-		18%,
-		78% {
+		to {
 			stroke-dashoffset: 0;
-		}
-		96%,
-		100% {
-			stroke-dashoffset: -100;
 		}
 	}
 
 	/* Asked for less motion: the drawing, finished, holding still. */
 	@media (prefers-reduced-motion: reduce) {
-		.p {
+		.p,
+		.seen .p {
 			animation: none;
 			stroke-dashoffset: 0;
 		}
