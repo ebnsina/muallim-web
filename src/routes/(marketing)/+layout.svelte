@@ -68,10 +68,25 @@
 		   the dark pill sits, warming toward the bottom. One recipe, one token, so the
 		   two can never drift apart again. */
 		--hero-backdrop:
-			radial-gradient(100% 60% at 50% 108%, var(--accent-tint), transparent 72%),
-			radial-gradient(58% 46% at 0% 104%, var(--lav), transparent 72%),
-			radial-gradient(58% 46% at 100% 104%, var(--lav), transparent 72%),
-			linear-gradient(0deg, var(--cream), var(--surface) 62%);
+			/* Lime rises behind the call to action and spills around the screenshot;
+			   lavender sits out at the shoulders, beside the headline. Anchored to the
+			   bottom edge it was all hidden behind the shot — colour nobody could see. */
+			radial-gradient(
+				120% 66% at 50% 88%,
+				color-mix(in oklab, var(--accent) 50%, transparent),
+				transparent 64%
+			),
+			radial-gradient(
+				62% 68% at -8% 52%,
+				color-mix(in oklab, var(--lav-ink) 34%, transparent),
+				transparent 66%
+			),
+			radial-gradient(
+				62% 68% at 108% 52%,
+				color-mix(in oklab, var(--lav-ink) 34%, transparent),
+				transparent 66%
+			),
+			linear-gradient(0deg, var(--cream), var(--surface) 34%);
 
 		/* The closing CTA's gradient runs cream → this → --accent-band, landing on the
 		   band the footer sits in. Only the middle stop needed a name. */
