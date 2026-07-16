@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 		return {
 			blueprints: [],
 			nextCursor: null,
-			loadError: problemMessage(problem, 'Could not load your blueprints.'),
+			loadError: problemMessage(problem, 'We couldn’t load your course plans. Please try again.'),
 			status: response?.status ?? 500
 		};
 	}
@@ -63,7 +63,7 @@ export const actions: Actions = {
 
 		if (problem || !data) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not create that blueprint.')
+				message: problemMessage(problem, 'We couldn’t create that course plan. Please try again.')
 			});
 		}
 
@@ -83,7 +83,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not delete that blueprint.')
+				message: problemMessage(problem, 'We couldn’t delete that course plan. Please try again.')
 			});
 		}
 		return { deleted: id };

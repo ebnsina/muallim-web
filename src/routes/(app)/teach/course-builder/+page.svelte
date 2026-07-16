@@ -61,7 +61,7 @@
 	<PageHeader
 		class="mt-4"
 		title="Course Builder"
-		description="Design a course as modules and lessons — drag to arrange it, then save the blueprint."
+		description="Design a course as modules and lessons — drag to arrange it, then save the plan."
 	>
 		{#snippet actions()}
 			<Button size="sm" onclick={() => (blueprintOpen = true)}>
@@ -78,13 +78,13 @@
 	<div class="mt-8">
 		<!-- The list -->
 		<section class="min-w-0">
-			<h2 class="text-sm font-semibold text-muted">Your blueprints</h2>
+			<h2 class="text-sm font-semibold text-muted">Your course plans</h2>
 
 			{#if data.blueprints.length === 0}
 				<div class="mt-4">
 					<EmptyState
 						icon={Layers01Icon}
-						title="No blueprints yet"
+						title="No course plans yet"
 						description="Create one with the button above, then open it to build out its modules and lessons."
 					/>
 				</div>
@@ -129,7 +129,7 @@
 											use:enhance={() => {
 												return async ({ update, result }) => {
 													await update();
-													if (result.type === 'success') toast.success('Blueprint deleted.');
+													if (result.type === 'success') toast.success('Course plan deleted.');
 												};
 											}}
 										>
@@ -138,7 +138,7 @@
 												type="submit"
 												variant="ghost"
 												size="sm"
-												aria-label="Delete blueprint"
+												aria-label="Delete course plan"
 												onclick={(e) => {
 													if (!confirm(`Delete “${bp.name}”? This cannot be undone.`))
 														e.preventDefault();
@@ -188,7 +188,7 @@
 			>
 				<Sheet open={blueprintOpen} onClose={() => (blueprintOpen = false)}>
 					{#snippet header()}
-						<h2 class="font-semibold">New blueprint</h2>
+						<h2 class="font-semibold">New course plan</h2>
 					{/snippet}
 
 					<div class="space-y-5">

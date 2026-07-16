@@ -19,7 +19,10 @@ export const load: PageServerLoad = async ({ locals, url, params, setHeaders }) 
 	});
 
 	if (problem || !data) {
-		error(response?.status ?? 500, problemMessage(problem, 'Could not load that blueprint.'));
+		error(
+			response?.status ?? 500,
+			problemMessage(problem, 'We couldn’t open that course plan. Please try again.')
+		);
 	}
 
 	return { blueprint: toBlueprint(data.blueprint) };
@@ -40,7 +43,7 @@ export const actions: Actions = {
 			description: form.get('description')
 		});
 		if (!meta.success) {
-			return fail(400, { message: 'Give the blueprint a name before saving.' });
+			return fail(400, { message: 'Give the course plan a name before saving.' });
 		}
 
 		// The structure arrives as a JSON string built on the client. Re-parse it
@@ -63,7 +66,7 @@ export const actions: Actions = {
 
 		if (problem) {
 			return fail(response?.status ?? 500, {
-				message: problemMessage(problem, 'Could not save that blueprint.')
+				message: problemMessage(problem, 'We couldn’t save that course plan. Please try again.')
 			});
 		}
 

@@ -273,7 +273,7 @@ export const blueprintSchema = z.object({
 	name: z
 		.string()
 		.trim()
-		.min(1, 'Give the blueprint a name.')
+		.min(1, 'Give the course plan a name.')
 		.max(BLUEPRINT_LIMITS.name.maxlength, 'That name is too long.'),
 	description: z
 		.string()

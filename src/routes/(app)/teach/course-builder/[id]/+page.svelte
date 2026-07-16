@@ -161,7 +161,7 @@
 				saving = false;
 				if (result.type === 'success') {
 					savedSnapshot = submitted;
-					toast.success('Blueprint saved.');
+					toast.success('Course plan saved.');
 				}
 			};
 		}}
@@ -192,7 +192,7 @@
 		<!-- Blueprint details -->
 		<Card class="mt-6 p-5 sm:p-6">
 			<div class="grid gap-5 sm:grid-cols-2">
-				<Field id="bp-name" label="Blueprint name">
+				<Field id="bp-name" label="Plan name">
 					{#snippet children({ id })}
 						<Input {id} bind:value={name} maxlength={BLUEPRINT_LIMITS.name.maxlength} required />
 					{/snippet}
