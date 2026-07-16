@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Alert02Icon } from '@hugeicons/core-free-icons';
-	import { Alert, Icon, Page } from '$lib/components';
+	import { Alert02Icon, LiveStreaming02Icon } from '@hugeicons/core-free-icons';
+	import { ActionLink, Alert, Icon, Page } from '$lib/components';
 	import { auroraFor, cn } from '$lib/utils';
 	import {
 		CourseAnnouncements,
@@ -96,6 +96,14 @@
 			{#if form?.message}
 				<Alert tone="danger" class="mb-6" role="alert">{form.message}</Alert>
 			{/if}
+
+			<!-- Live class meetings for this course; enrolled learners join from here. -->
+			<div class="mb-6 flex items-center gap-2">
+				<Icon icon={LiveStreaming02Icon} class="text-muted size-4" />
+				<ActionLink href={resolve(`/courses/${data.course.slug}/live`)} tone="muted">
+					Live sessions
+				</ActionLink>
+			</div>
 
 			{#if data.course.drip_mode !== 'none' && dripNotice[data.course.drip_mode]}
 				<p class="text-muted mb-6 flex items-start gap-2 text-sm">

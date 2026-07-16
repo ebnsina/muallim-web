@@ -18,6 +18,7 @@
 		Delete02Icon,
 		DragDropVerticalIcon,
 		FloppyDiskIcon,
+		LiveStreaming02Icon,
 		Megaphone01Icon,
 		PencilEdit02Icon,
 		PlusSignIcon,
@@ -448,6 +449,10 @@
 			<Button href={resolve(`/teach/${data.course.slug}/gradebook`)} variant="secondary" size="sm">
 				<Icon icon={TaskDone01Icon} class="size-4" />
 				Gradebook
+			</Button>
+			<Button href={resolve(`/teach/${data.course.slug}/live`)} variant="secondary" size="sm">
+				<Icon icon={LiveStreaming02Icon} class="size-4" />
+				Live sessions
 			</Button>
 		{/snippet}
 
