@@ -23,6 +23,7 @@
 		FolderLibraryIcon,
 		IdentityCardIcon,
 		LibraryIcon,
+		Mail01Icon,
 		Megaphone01Icon,
 		Note04Icon,
 		PackageIcon,
@@ -309,6 +310,12 @@
 							href: resolve('/manage/notices'),
 							label: 'Notices',
 							icon: Megaphone01Icon,
+							show: canManageInstitution
+						},
+						{
+							href: resolve('/manage/automations'),
+							label: 'Automations',
+							icon: Mail01Icon,
 							show: canManageInstitution
 						},
 						{
