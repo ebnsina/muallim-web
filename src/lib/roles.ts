@@ -46,3 +46,14 @@ const ACADEMIC_MANAGERS = new Set(['owner', 'admin']);
 export function canManageInstitution(user: { role?: string } | null | undefined): boolean {
 	return user?.role !== undefined && ACADEMIC_MANAGERS.has(user.role);
 }
+
+// `portal:read` — a guardian reading their own child's day, a student reading their
+// own. muallim-api grants it to these two roles and gates it a second time on the
+// family tie, so a link here reveals nothing; without one, a guardian signed in and
+// found nothing at all, which is what this is fixing.
+const PORTAL_READERS = new Set(['guardian', 'student']);
+
+/** Whether to draw the portal link. Staff have their own screens and deny here. */
+export function canReadPortal(user: { role?: string } | null | undefined): boolean {
+	return user?.role !== undefined && PORTAL_READERS.has(user.role);
+}

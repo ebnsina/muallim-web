@@ -51,6 +51,8 @@
 		canManagePeople?: boolean;
 		/** Shown only to somebody who holds `academics:manage`. The same courtesy. */
 		canManageInstitution?: boolean;
+		/** Shown to a guardian or a student: their own family's record. */
+		canReadPortal?: boolean;
 		/** The mobile drawer's open state, driven by the header's menu button. */
 		open?: boolean;
 	};
@@ -60,6 +62,7 @@
 		canAuthor = false,
 		canManagePeople = false,
 		canManageInstitution = false,
+		canReadPortal = false,
 		open = $bindable(false)
 	}: Props = $props();
 
@@ -74,6 +77,14 @@
 				{
 					label: 'Learn',
 					items: [
+						{
+							href: resolve('/portal'),
+							// The same page reads differently depending on who opened it: a parent
+							// came for their child's day, a pupil for their own.
+							label: user?.role === 'guardian' ? 'My children' : 'My record',
+							icon: UserMultiple02Icon,
+							show: canReadPortal
+						},
 						{
 							href: resolve('/dashboard'),
 							label: 'Dashboard',

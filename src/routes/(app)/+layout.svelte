@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppHeader, AppSidebar } from '$lib/components';
-	import { canAuthor, canManageInstitution, canManagePeople } from '$lib/roles';
+	import { canAuthor, canManageInstitution, canManagePeople, canReadPortal } from '$lib/roles';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -85,6 +85,7 @@
 				canAuthor={canAuthor(data.user)}
 				canManagePeople={canManagePeople(data.user)}
 				canManageInstitution={canManageInstitution(data.user)}
+				canReadPortal={canReadPortal(data.user)}
 				bind:open={menuOpen}
 			/>
 

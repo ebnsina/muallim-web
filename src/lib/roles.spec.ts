@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canAuthor, canManagePeople } from './roles';
+import { canAuthor, canManagePeople, canReadPortal } from './roles';
 
 describe('canAuthor', () => {
 	it.each(['owner', 'admin', 'instructor'])('%s may author', (role) => {
@@ -54,5 +54,23 @@ describe('canManagePeople', () => {
 		expect(canManagePeople({})).toBe(false);
 		expect(canManagePeople({ role: 'auditor' })).toBe(false);
 		expect(canManagePeople({ role: 'Owner' })).toBe(false);
+	});
+});
+
+describe('canReadPortal', () => {
+	it.each(['guardian', 'student'])('%s reads their own family', (role) => {
+		expect(canReadPortal({ role })).toBe(true);
+	});
+
+	// Staff have the institution's own screens; the portal is not for them, and an
+	// owner meeting a "My record" link would wonder whose record it meant.
+	it.each(['owner', 'admin', 'instructor'])('%s does not', (role) => {
+		expect(canReadPortal({ role })).toBe(false);
+	});
+
+	it('a stranger does not', () => {
+		expect(canReadPortal(null)).toBe(false);
+		expect(canReadPortal(undefined)).toBe(false);
+		expect(canReadPortal({})).toBe(false);
 	});
 });
