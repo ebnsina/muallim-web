@@ -35,14 +35,14 @@
 	}
 </script>
 
-<svelte:head><title>Course taxonomy — Muallim</title></svelte:head>
+<svelte:head><title>Organise courses — Muallim</title></svelte:head>
 
 <div class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
 	<div class="min-w-0">
-		<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Course taxonomy</h1>
+		<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Organise courses</h1>
 		<p class="mt-2 max-w-2xl text-muted">
-			Pick a course, choose its category and tags, and save. Manage the vocabularies themselves from
-			Categories and Tags.
+			Pick a course, choose the category and tags it is filed under, and save. To add or edit the
+			categories and tags themselves, use their own pages.
 		</p>
 	</div>
 
@@ -114,7 +114,7 @@
 							{ slug: string; category: Category | null; tags: Tag[] } | undefined;
 						if (saved) {
 							adopt(saved.category, saved.tags);
-							toast.success(`Saved the taxonomy for “${courseTitle(saved.slug)}”.`);
+							toast.success(`Filed “${courseTitle(saved.slug)}”.`);
 						}
 					};
 				}}
@@ -161,9 +161,7 @@
 				</fieldset>
 
 				<div class="mt-6 flex justify-end">
-					<Button type="submit" loading={savingTaxonomy} disabled={savingTaxonomy}>
-						Save taxonomy
-					</Button>
+					<Button type="submit" loading={savingTaxonomy} disabled={savingTaxonomy}>Save</Button>
 				</div>
 			</form>
 		{/if}

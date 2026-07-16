@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 export const actions: Actions = {
 	/** Load one course's current category and tags, to fill the form. */
 	loadTaxonomy: async ({ request, locals, url }) => {
-		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach%2Fcourse-taxonomy');
+		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach%2Forganise-courses');
 
 		const slug = String((await request.formData()).get('slug') ?? '');
 
@@ -81,7 +81,7 @@ export const actions: Actions = {
 		one clears it, and the tag list replaces the whole set.
 	*/
 	saveTaxonomy: async ({ request, locals, url }) => {
-		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach%2Fcourse-taxonomy');
+		if (!locals.accessToken) redirect(303, '/login?next=%2Fteach%2Forganise-courses');
 
 		const form = await request.formData();
 		const slug = String(form.get('slug') ?? '');

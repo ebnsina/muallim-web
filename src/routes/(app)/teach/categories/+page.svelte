@@ -30,7 +30,8 @@
 		<div class="min-w-0">
 			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Categories</h1>
 			<p class="mt-2 max-w-2xl text-muted">
-				The folders this workspace files courses under. Assign one to a course from Course taxonomy.
+				The folders this workspace files courses under. Assign one to a course from Organise
+				courses.
 			</p>
 		</div>
 		<Button variant="secondary" onclick={() => (newOpen = !newOpen)}>

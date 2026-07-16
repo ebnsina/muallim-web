@@ -168,8 +168,8 @@
 							show: canAuthor
 						},
 						{
-							href: resolve('/teach/course-taxonomy'),
-							label: 'Course taxonomy',
+							href: resolve('/teach/organise-courses'),
+							label: 'Organise courses',
 							icon: Tag02Icon,
 							show: canAuthor
 						}

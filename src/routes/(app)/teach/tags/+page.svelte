@@ -25,7 +25,8 @@
 		<div class="min-w-0">
 			<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Tags</h1>
 			<p class="mt-2 max-w-2xl text-muted">
-				The labels this workspace attaches to courses. Attach them to a course from Course taxonomy.
+				The labels this workspace attaches to courses. Attach them to a course from Organise
+				courses.
 			</p>
 		</div>
 		<Button variant="secondary" onclick={() => (newOpen = !newOpen)}>
