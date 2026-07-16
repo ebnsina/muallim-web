@@ -304,6 +304,42 @@
 	// ── New conversation ────────────────────────────────────────────────────────
 	type NewKind = 'direct' | 'group' | 'channel' | null;
 	let sheet = $state<NewKind>(null);
+
+	// Managing a group's people. muallim-api admits only a group's admins, so the
+	// control is offered only to one — the screen agreeing with the server rather
+	// than presenting a button that answers 403.
+	let membersOpen = $state(false);
+	let memberQuery = $state('');
+	let memberError = $state<string | undefined>();
+
+	const iAmGroupAdmin = $derived(
+		selected?.conversation.kind === 'group' &&
+			(selected?.conversation.members ?? []).some(
+				(m) => m.user_id === data.meId && m.role === 'admin'
+			)
+	);
+
+	// The workspace's people who are not already in this group. A student cannot
+	// list members at all; then there is simply nobody to offer.
+	const addable = $derived(
+		(data.people ?? [])
+			.filter((p) => !(selected?.conversation.members ?? []).some((m) => m.user_id === p.user_id))
+			.filter((p) => p.name.toLowerCase().includes(memberQuery.trim().toLowerCase()))
+	);
+
+	const memberEnhance: SubmitFunction = () => {
+		memberError = undefined;
+		return async ({ result, update }) => {
+			if (result.type === 'failure') {
+				memberError = (result.data?.message as string) ?? 'That did not work. Please try again.';
+				return;
+			}
+			// Who is in a group is the server's to state, so the list is re-read rather
+			// than patched here — the page and the group cannot then disagree.
+			await update();
+			memberError = undefined;
+		};
+	};
 	let newMenu = $state(false);
 	let pickerQuery = $state('');
 	let createError = $state<string | undefined>();
@@ -555,6 +591,19 @@
 							{/if}
 						</p>
 					</div>
+					{#if iAmGroupAdmin}
+						<button
+							type="button"
+							onclick={() => {
+								membersOpen = true;
+								memberQuery = '';
+							}}
+							aria-label="Manage the people in this group"
+							class="shrink-0 rounded-control p-2 text-muted transition-colors hover:bg-surface-hover hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+						>
+							<Icon icon={UserGroupIcon} class="size-5" />
+						</button>
+					{/if}
 					{#if status !== 'open'}
 						<span class="text-xs text-muted"
 							>{status === 'connecting' ? 'Connecting…' : 'Reconnecting…'}</span
@@ -700,6 +749,91 @@
 		</section>
 	</div>
 </div>
+
+<!-- ── Who is in this group ───────────────────────────────────────────────── -->
+{#if membersOpen && selected}
+	<Sheet open onClose={() => (membersOpen = false)}>
+		{#snippet header()}
+			<h2 class="text-base font-semibold">People in {selectedTitle}</h2>
+			<p class="mt-0.5 text-sm text-muted">
+				Anyone here can read this group, including everything said before they arrived.
+			</p>
+		{/snippet}
+
+		{#if memberError}
+			<p class="mb-3 text-xs font-medium text-danger-text" role="alert">{memberError}</p>
+		{/if}
+
+		<ul class="divide-y divide-border">
+			{#each selected.conversation.members ?? [] as m (m.user_id)}
+				<li class="flex items-center gap-3 py-2.5">
+					<span
+						class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-xs font-semibold text-muted"
+						>{initials(m.name)}</span
+					>
+					<span class="min-w-0 flex-1">
+						<span class="block truncate text-sm font-medium">{m.name}</span>
+						<span class="block truncate text-xs text-muted">
+							{m.role === 'admin' ? 'Admin' : 'Member'}{m.user_id === data.meId ? ' · you' : ''}
+						</span>
+					</span>
+					{#if m.user_id !== data.meId}
+						<form method="POST" action="?/removeMember" use:enhance={memberEnhance}>
+							<input type="hidden" name="conversation_id" value={selected.conversation.id} />
+							<input type="hidden" name="user_id" value={m.user_id} />
+							<Button type="submit" size="sm" variant="ghost">Remove</Button>
+						</form>
+					{/if}
+				</li>
+			{/each}
+		</ul>
+
+		<div class="mt-5 border-t border-border pt-4">
+			<p class="text-sm font-medium">Add someone</p>
+			<input
+				bind:value={memberQuery}
+				placeholder="Search people…"
+				class="mt-2 h-10 w-full rounded-control border border-border bg-surface-sunken px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+			/>
+
+			{#if addable.length === 0}
+				<p class="py-4 text-center text-sm text-muted">
+					{(data.people ?? []).length === 0
+						? 'There is nobody here to add.'
+						: 'Everybody is already in this group.'}
+				</p>
+			{:else}
+				<ul class="mt-2 divide-y divide-border">
+					{#each addable as p (p.user_id)}
+						<li>
+							<form method="POST" action="?/addMember" use:enhance={memberEnhance}>
+								<input type="hidden" name="conversation_id" value={selected.conversation.id} />
+								<input type="hidden" name="user_id" value={p.user_id} />
+								<button
+									type="submit"
+									class="flex w-full items-center gap-3 py-2.5 text-left transition-colors hover:bg-surface-hover"
+								>
+									<span
+										class="flex size-9 items-center justify-center rounded-full bg-surface-sunken text-xs font-semibold text-muted"
+										>{initials(p.name)}</span
+									>
+									<span class="min-w-0">
+										<span class="block truncate text-sm font-medium">{p.name}</span>
+										<span class="block truncate text-xs text-muted capitalize">{p.role}</span>
+									</span>
+								</button>
+							</form>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
+
+		{#snippet footer()}
+			<Button type="button" variant="secondary" onclick={() => (membersOpen = false)}>Done</Button>
+		{/snippet}
+	</Sheet>
+{/if}
 
 <!-- ── New DM ─────────────────────────────────────────────────────────────── -->
 {#if sheet === 'direct'}

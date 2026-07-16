@@ -192,6 +192,53 @@ export const actions: Actions = {
 		return { read: id };
 	},
 
+	/*
+		Add somebody to a group. Group admins only — muallim-api is the judge; the
+		screen only offers the control to somebody it believes holds it.
+	*/
+	addMember: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+		const form = await request.formData();
+		const id = String(form.get('conversation_id') ?? '');
+		const userId = String(form.get('user_id') ?? '');
+		if (!id || !userId) return fail(400, { message: 'Choose who to add.' });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).POST(
+			'/v1/chat/conversations/{id}/members',
+			{ params: { path: { id } }, body: { user_id: userId } }
+		);
+		// 204: there is no body to check, so the absence of a problem is the success.
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(problem, "We couldn't add them to this group. Please try again.")
+			});
+		}
+		return { memberAdded: userId };
+	},
+
+	/* Remove somebody from a group. Also admins only, and also a 204. */
+	removeMember: async ({ request, locals, url }) => {
+		if (!locals.accessToken) redirect(303, '/login');
+		const form = await request.formData();
+		const id = String(form.get('conversation_id') ?? '');
+		const userId = String(form.get('user_id') ?? '');
+		if (!id || !userId) return fail(400, { message: 'Choose who to remove.' });
+
+		const { error: problem, response } = await authedApi(url.origin, locals.accessToken).DELETE(
+			'/v1/chat/conversations/{id}/members/{user_id}',
+			{ params: { path: { id, user_id: userId } } }
+		);
+		if (problem) {
+			return fail(response?.status ?? 500, {
+				message: problemMessage(
+					problem,
+					"We couldn't remove them from this group. Please try again."
+				)
+			});
+		}
+		return { memberRemoved: userId };
+	},
+
 	/* An older page of messages, for scrolling back. The screen prepends them. */
 	more: async ({ request, locals, url }) => {
 		if (!locals.accessToken) redirect(303, '/login');
