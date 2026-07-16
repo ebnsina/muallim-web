@@ -1,20 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import {
-		AiBrain01Icon,
-		Book02Icon,
-		ChartLineData01Icon,
-		CheckmarkBadge01Icon,
-		ClipboardIcon,
-		Message02Icon,
-		Money04Icon,
-		Mortarboard01Icon,
-		Quiz01Icon,
-		School01Icon,
-		Store01Icon,
-		UserMultipleIcon
-	} from '@hugeicons/core-free-icons';
+	import { Mortarboard01Icon } from '@hugeicons/core-free-icons';
 	import { Icon } from '$lib/components';
+	import { GROUPS, featuresIn } from '$lib/content/features';
+	import { SEGMENTS } from '$lib/content/segments';
 
 	/*
 		The marketing site's header, owned by the (marketing) layout so every page wears
@@ -23,6 +12,18 @@
 
 		It had a `tone` prop for a second, cream variant; there is one backdrop now, and
 		a second variant is how the two drifted apart last time.
+
+		The Product menu is built from `content/features.ts`, the same file the landing
+		and every feature page read. It used to be sixteen labels typed in here under
+		four headings — Creation, Engagement, Monetization, Management — that named
+		nothing else on the site, drifted from the real seven groups nobody was
+		comparing them against, and still advertised "0% platform fee" long after the
+		page learnt to say which gateway that is true of. A taxonomy written twice is a
+		taxonomy that disagrees with itself.
+
+		And every one of those sixteen linked to /register. A menu whose every door is
+		the signup form is not navigation, it is a wall with labels painted on it. Each
+		item now goes to the page that describes it.
 	*/
 	let menuOpen = $state(false);
 	let megaOpen = $state(false);
@@ -39,52 +40,30 @@
 		megaCloseTimer = setTimeout(() => (megaOpen = false), 140);
 	};
 
-	const megaCats = [
-		{
-			icon: Book02Icon,
-			title: 'Creation',
-			sub: 'Build courses visually, faster.',
-			items: [
-				{ icon: Book02Icon, label: 'Course Builder' },
-				{ icon: ClipboardIcon, label: 'Content Bank' },
-				{ icon: AiBrain01Icon, label: 'AI Studio' },
-				{ icon: CheckmarkBadge01Icon, label: 'Certificate Builder' }
-			]
-		},
-		{
-			icon: Message02Icon,
-			title: 'Engagement',
-			sub: 'Keep learners hooked.',
-			items: [
-				{ icon: Quiz01Icon, label: 'Quizzes & assignments' },
-				{ icon: Message02Icon, label: 'Forum & Q&A' },
-				{ icon: ChartLineData01Icon, label: 'Points & badges' },
-				{ icon: School01Icon, label: 'Notifications' }
-			]
-		},
-		{
-			icon: Money04Icon,
-			title: 'Monetization',
-			sub: 'Sell courses your way.',
-			items: [
-				{ icon: Money04Icon, label: 'Pricing & checkout' },
-				{ icon: Store01Icon, label: 'bKash & SSLCommerz' },
-				{ icon: ChartLineData01Icon, label: 'Stripe · international' },
-				{ icon: CheckmarkBadge01Icon, label: '0% platform fee' }
-			]
-		},
-		{
-			icon: ClipboardIcon,
-			title: 'Management',
-			sub: 'Run everything in one place.',
-			items: [
-				{ icon: UserMultipleIcon, label: 'Students & guardians' },
-				{ icon: ClipboardIcon, label: 'Attendance' },
-				{ icon: CheckmarkBadge01Icon, label: 'Exams & report cards' },
-				{ icon: Money04Icon, label: 'Fees & timetable' }
-			]
-		}
-	];
+	const megaCats = GROUPS.map((g) => ({
+		key: g.key,
+		icon: g.icon,
+		title: g.name,
+		sub: g.blurb,
+		items: featuresIn(g.key)
+	}));
+
+	// Solutions has five real pages and no index, so the nav opens them itself rather
+	// than pointing at a /solutions that would 404. `nav` and `tagline` are the
+	// Segment's own fields — their doc comments say "for the nav and dropdown", which
+	// has been waiting on a dropdown to exist.
+	const segmentLinks = SEGMENTS.map((sg) => ({ slug: sg.slug, name: sg.nav, kicker: sg.tagline }));
+
+	let solOpen = $state(false);
+	let solCloseTimer: ReturnType<typeof setTimeout>;
+	const openSol = () => {
+		clearTimeout(solCloseTimer);
+		solOpen = true;
+	};
+	const scheduleCloseSol = () => {
+		clearTimeout(solCloseTimer);
+		solCloseTimer = setTimeout(() => (solOpen = false), 140);
+	};
 </script>
 
 <header class="site-header">
@@ -103,7 +82,7 @@
 					aria-expanded={megaOpen}
 					onclick={() => (megaOpen = !megaOpen)}
 				>
-					Product
+					Products
 					<svg
 						class="size-3.5 transition-transform duration-200 {megaOpen ? 'rotate-180' : ''}"
 						viewBox="0 0 12 12"
@@ -150,29 +129,77 @@
 								{/each}
 							</div>
 							<div class="flex flex-col rounded-xl bg-[var(--surface-2)] p-2">
-								{#each megaCats[activeCat].items as item (item.label)}
+								{#each megaCats[activeCat].items as item (item.slug)}
 									<a
-										href={resolve('/register')}
-										class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
+										href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
+										onclick={() => (megaOpen = false)}
+										class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
 									>
-										<Icon icon={item.icon} class="size-4 text-[var(--teal)]" />
-										{item.label}
+										<Icon icon={item.icon} class="size-4 shrink-0 text-[var(--teal)]" />
+										{item.name}
 									</a>
 								{/each}
-								<!-- The one call to action is "Get started", so signing in lives here. -->
 								<a
-									href={resolve('/login')}
+									href={resolve('/(marketing)/features')}
+									onclick={() => (megaOpen = false)}
 									class="mt-auto rounded-lg border-t border-[var(--line)] px-3 pt-3 pb-1 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
 								>
-									Already have an account? Sign in
+									Look through all of it
 								</a>
 							</div>
 						</div>
 					</div>
 				{/if}
 			</div>
-			<a href={resolve('/(marketing)/features')} onclick={() => (menuOpen = false)}>Features</a>
-			<a href="#faq" onclick={() => (menuOpen = false)}>FAQ</a>
+			<div class="relative" onmouseenter={openSol} onmouseleave={scheduleCloseSol} role="none">
+				<button
+					type="button"
+					class="mega-trigger"
+					aria-haspopup="true"
+					aria-expanded={solOpen}
+					onclick={() => (solOpen = !solOpen)}
+				>
+					Solutions
+					<svg
+						class="size-3.5 transition-transform duration-200 {solOpen ? 'rotate-180' : ''}"
+						viewBox="0 0 12 12"
+						fill="none"
+					>
+						<path
+							d="M2.5 4.5 6 8l3.5-3.5"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
+				{#if solOpen}
+					<div
+						role="none"
+						onmouseenter={openSol}
+						onmouseleave={scheduleCloseSol}
+						class="absolute top-[calc(100%+0.5rem)] left-0 z-20 w-[19rem] max-w-[90vw] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-left shadow-[0_30px_70px_-30px_rgba(23,23,15,0.45)] before:absolute before:-top-3 before:right-0 before:left-0 before:h-3 before:content-['']"
+					>
+						{#each segmentLinks as sg (sg.slug)}
+							<a
+								href={resolve('/(marketing)/solutions/[slug]', { slug: sg.slug })}
+								onclick={() => {
+									solOpen = false;
+									menuOpen = false;
+								}}
+								class="block rounded-xl p-3 transition hover:bg-[var(--surface-2)]"
+							>
+								<span class="block text-sm font-bold text-[var(--ink)]">{sg.name}</span>
+								<span class="mt-0.5 block text-xs text-[var(--muted)]">{sg.kicker}</span>
+							</a>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			<a href="/#pricing" onclick={() => (menuOpen = false)}>Pricing</a>
+			<a href="/#faq" onclick={() => (menuOpen = false)}>FAQ</a>
+			<a href="mailto:hello@muallim.app" onclick={() => (menuOpen = false)}>Support</a>
 			<a class="links-signin" href={resolve('/login')} onclick={() => (menuOpen = false)}>Sign in</a
 			>
 		</nav>

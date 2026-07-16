@@ -490,7 +490,10 @@
 	     commerce: the money never routes through us, which is the honest reason the
 	     cut is nought. This said "collect fees through your own bKash or SSLCommerz",
 	     which described a rail that is not built for fees. -->
-	<section class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<!-- id="pricing": the nav's Pricing points here. There is no pricing page — the
+	     price is this section, and a nav link to a page that does not exist is the
+	     thing this header was just cleaned of. -->
+	<section id="pricing" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<div class="grid items-center gap-10 md:grid-cols-2">
 			<div>
 				<h2 class="h2">Your money never<br />comes near us.</h2>
