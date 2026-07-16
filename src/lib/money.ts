@@ -9,11 +9,18 @@ export type Money = { amount_minor: number; currency: string };
 	`Intl` knows the answer, so it is asked rather than assumed.
 */
 function minorPerMajor(currency: string): number {
-	const digits =
-		new Intl.NumberFormat(undefined, { style: 'currency', currency }).resolvedOptions()
-			.maximumFractionDigits ?? 2;
+	try {
+		const digits =
+			new Intl.NumberFormat(undefined, { style: 'currency', currency }).resolvedOptions()
+				.maximumFractionDigits ?? 2;
 
-	return 10 ** digits;
+		return 10 ** digits;
+	} catch {
+		// A malformed code has no minor unit to ask about. Two is the common case, and
+		// formatMoney answers with the bare number anyway — it must not throw here, or
+		// the price it exists to show never renders.
+		return 100;
+	}
 }
 
 /** A price, in the reader's own locale: `৳1,200.00`, `$19.99`, `¥1,200`. */
