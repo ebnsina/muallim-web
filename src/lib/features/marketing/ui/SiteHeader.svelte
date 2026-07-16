@@ -58,6 +58,20 @@
 		clearTimeout(closeTimer);
 		closeTimer = setTimeout(() => (open = null), 140);
 	}
+	/*
+		Hovering anything that is not a menu closes the open one, at once.
+
+		The shell listens for the pointer leaving, which is what stopped the card
+		vanishing on the way to it — but Pricing, FAQ, Support and the rest live inside
+		that same shell, so reaching them never leaves it and nothing said to close.
+		Standing on Support with the Solutions menu hanging open underneath is the
+		shape of that hole. Every sibling closes it explicitly; there is no delay here,
+		because arriving at another item is a decision, not a slip.
+	*/
+	function dismiss() {
+		clearTimeout(closeTimer);
+		open = null;
+	}
 
 	// The card takes the size of whatever panel is in it, and animates between the
 	// two — measured rather than declared, so the card cannot disagree with its own
@@ -98,7 +112,7 @@
 <header class="site-header">
 	<div class="shell" onmouseleave={scheduleClose} onmouseenter={hold} role="none">
 		<div class="pill">
-			<a class="logo" href={resolve('/')}>
+			<a class="logo" href={resolve('/')} onmouseenter={dismiss}>
 				<span class="mark"><Icon icon={Mortarboard01Icon} class="size-5" /></span>
 				Muallim
 			</a>
@@ -130,16 +144,39 @@
 						</svg>
 					</button>
 				{/each}
-				<a href="/#pricing" onclick={() => (menuOpen = false)}>Pricing</a>
-				<a href="/#faq" onclick={() => (menuOpen = false)}>FAQ</a>
-				<a href="mailto:hello@muallim.app" onclick={() => (menuOpen = false)}>Support</a>
-				<a href={resolve('/(marketing)/demo')} onclick={() => (menuOpen = false)}>Try demo</a>
-				<a class="links-signin" href={resolve('/login')} onclick={() => (menuOpen = false)}
-					>Sign in</a
+				<a
+					href="/#pricing"
+					onmouseenter={dismiss}
+					onfocus={dismiss}
+					onclick={() => (menuOpen = false)}>Pricing</a
+				>
+				<a href="/#faq" onmouseenter={dismiss} onfocus={dismiss} onclick={() => (menuOpen = false)}
+					>FAQ</a
+				>
+				<a
+					href="mailto:hello@muallim.app"
+					onmouseenter={dismiss}
+					onfocus={dismiss}
+					onclick={() => (menuOpen = false)}>Support</a
+				>
+				<a
+					href={resolve('/(marketing)/demo')}
+					onmouseenter={dismiss}
+					onfocus={dismiss}
+					onclick={() => (menuOpen = false)}>Try demo</a
+				>
+				<a
+					class="links-signin"
+					href={resolve('/login')}
+					onmouseenter={dismiss}
+					onfocus={dismiss}
+					onclick={() => (menuOpen = false)}>Sign in</a
 				>
 			</nav>
 
-			<a class="cta" href={resolve('/register')}>Get started</a>
+			<a class="cta" href={resolve('/register')} onmouseenter={dismiss} onfocus={dismiss}
+				>Get started</a
+			>
 
 			<button
 				class="burger"
