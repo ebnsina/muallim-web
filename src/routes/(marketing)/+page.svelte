@@ -593,49 +593,55 @@
 		</div>
 	</section>
 
-	<!-- THE PRODUCT JOURNEY: two-column, olive step-list -->
+	<!-- THE PRODUCT JOURNEY: copy across the top, the steps full width beneath.
+
+	     It was a two-column split: a short copy block beside a seven-step olive panel
+	     nearly a thousand pixels tall. `items-center` only centred the imbalance and
+	     `sticky` only hid it while you scrolled — at rest it was a paragraph adrift in
+	     a column of nothing. The header rhythm the build block uses fixes it properly,
+	     and the steps read in two columns instead of one long ladder. -->
 	<section id="journey" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
-		<div class="grid gap-10 md:grid-cols-2 md:items-start">
-			<div class="md:sticky md:top-24">
+		<div class="grid items-start gap-x-12 gap-y-4 lg:grid-cols-[0.9fr_1.1fr]">
+			<div>
 				<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
 					Your journey
 				</p>
 				<h2 class="mt-2 text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
 					From first day to fully online, one clear path.
 				</h2>
-				<p class="mt-3 max-w-md leading-relaxed text-[var(--muted)]">
+			</div>
+			<div>
+				<p class="max-w-md leading-relaxed text-[var(--muted)]">
 					Seven steps, in the order you'd actually live them — nothing to install, and you start
 					today.
 				</p>
-				<a
-					href={resolve('/register')}
-					class="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
-				>
+				<a class="pill pill-primary mt-6" href={resolve('/register')}>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
 				</a>
 			</div>
-			<ol class="space-y-1 rounded-3xl bg-[var(--brand)] p-3">
-				{#each journey as s, i (s.title)}
-					<li
-						class="flex gap-4 rounded-2xl p-4 transition duration-200 hover:bg-[color-mix(in_oklab,var(--on-brand)_7%,transparent)] motion-reduce:transition-none"
-					>
-						<span
-							class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent)] font-mono text-sm font-bold text-[var(--brand)]"
-						>
-							{i + 1 < 10 ? `0${i + 1}` : i + 1}
-						</span>
-						<div>
-							<h3 class="font-bold text-[var(--on-brand)]">{s.title}</h3>
-							<p
-								class="mt-0.5 text-sm leading-relaxed text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]"
-							>
-								{s.line}
-							</p>
-						</div>
-					</li>
-				{/each}
-			</ol>
 		</div>
+
+		<ol class="mt-8 grid gap-1 rounded-[var(--r-lg)] bg-[var(--brand)] p-3 md:grid-cols-2">
+			{#each journey as s, i (s.title)}
+				<li
+					class="flex gap-4 rounded-2xl p-4 transition duration-200 hover:bg-[color-mix(in_oklab,var(--on-brand)_7%,transparent)] motion-reduce:transition-none"
+				>
+					<span
+						class="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--accent)] font-mono text-sm font-bold text-[var(--brand)]"
+					>
+						{i + 1 < 10 ? `0${i + 1}` : i + 1}
+					</span>
+					<div>
+						<h3 class="font-bold text-[var(--on-brand)]">{s.title}</h3>
+						<p
+							class="mt-0.5 text-sm leading-relaxed text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]"
+						>
+							{s.line}
+						</p>
+					</div>
+				</li>
+			{/each}
+		</ol>
 	</section>
 
 	<!-- CAPABILITIES: colored feature cards -->
