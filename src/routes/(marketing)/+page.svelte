@@ -468,31 +468,29 @@
 		</div>
 	</section>
 
-	<!-- FEE TRANSPARENCY: copy + interactive "what you keep" calculator (Tailwind) -->
+	<!-- FEE TRANSPARENCY: copy + the "what you keep" slider. The claim here is scoped
+	     to fees collected through the school's own bKash or SSLCommerz, where no
+	     platform account exists and our cut is structurally zero. Selling a course
+	     through Stripe is a different number — see MUALLIM_PLATFORM_FEE_BPS. -->
 	<section class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<div class="grid items-center gap-10 md:grid-cols-2">
 			<div>
-				<h2 class="text-4xl font-bold leading-[1.05] tracking-tight text-[#17170f] sm:text-5xl">
-					One clear price.<br />No hidden cut.
-				</h2>
-				<p class="mt-5 max-w-md leading-relaxed text-[#6b6a5e]">
+				<h2 class="h2">One clear price.<br />No hidden cut.</h2>
+				<p class="mt-5 max-w-md leading-relaxed text-[var(--muted)]">
 					You collect fees through your own bKash or SSLCommerz account, so Muallim never holds your
 					money. The only fee is the one bKash or SSLCommerz charges — Muallim takes 0%.
 				</p>
-				<a
-					href={resolve('/register')}
-					class="mt-6 inline-flex items-center gap-2 rounded-full bg-[#2e3320] px-6 py-3 font-semibold text-[#eaf5cf] transition hover:-translate-y-0.5 hover:bg-[#3a4029]"
-				>
+				<a class="pill pill-primary mt-6" href={resolve('/register')}>
 					Start free <Icon icon={ArrowRight02Icon} class="size-4" />
 				</a>
 			</div>
 
-			<div
-				class="rounded-[28px] bg-[#c4e84b] p-8 text-[#2e3320] shadow-[0_30px_70px_-40px_rgba(46,51,32,0.6)]"
-			>
+			<!-- The one lime field on the page: a number a reader can move is the thing
+			     that should catch their eye here. -->
+			<div class="rounded-[var(--r-lg)] bg-[var(--accent)] p-8 text-[var(--brand)]">
 				<p class="text-lg font-semibold">Fee calculator</p>
-				<div class="mt-4 h-px w-full bg-[#2e3320]/20"></div>
-				<p class="mt-6 text-sm font-medium text-[#2e3320]/70">Fees you collect this month</p>
+				<div class="mt-4 h-px w-full bg-[var(--brand)]/20"></div>
+				<p class="mt-6 text-sm font-medium text-[var(--brand)]/70">Fees you collect this month</p>
 				<p class="mt-1 text-5xl font-bold tracking-tight tabular-nums">{taka(monthly)}</p>
 				<input
 					type="range"
@@ -501,9 +499,9 @@
 					step="5000"
 					bind:value={monthly}
 					aria-label="Fees collected this month"
-					class="mt-5 h-5 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-9 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[#2e3320] [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-[#2e3320]/20 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[#2e3320]/20 [&::-webkit-slider-thumb]:mt-[-6px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-9 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2e3320]"
+					class="mt-5 h-5 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-9 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[var(--brand)] [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-[var(--brand)]/20 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[var(--brand)]/20 [&::-webkit-slider-thumb]:mt-[-6px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-9 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--brand)]"
 				/>
-				<div class="mt-5 h-px w-full bg-[#2e3320]/20"></div>
+				<div class="mt-5 h-px w-full bg-[var(--brand)]/20"></div>
 				<div class="mt-4 flex items-center justify-between text-sm font-semibold">
 					<span>Muallim's cut</span>
 					<span class="tabular-nums">৳0 · you keep 100%</span>
