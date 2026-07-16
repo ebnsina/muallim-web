@@ -907,10 +907,11 @@
 	*/
 	.swoosh {
 		position: absolute;
-		right: -0.06em;
 		bottom: -0.1em;
 		left: -0.06em;
-		width: auto;
+		/* Sized to the word, not to itself. An SVG left on `auto` takes its width from
+		   its viewBox ratio times its height and overshoots the letters it underlines. */
+		width: calc(100% + 0.12em);
 		height: 0.3em;
 		overflow: visible;
 	}
