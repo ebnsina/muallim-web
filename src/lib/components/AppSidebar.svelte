@@ -79,6 +79,12 @@
 						},
 						{ href: resolve('/courses'), label: 'Courses', icon: BookOpen01Icon, show: true },
 						{
+							href: resolve('/learning-paths'),
+							label: 'Learning paths',
+							icon: Route02Icon,
+							show: Boolean(user)
+						},
+						{
 							href: resolve('/leaderboard'),
 							label: 'Leaderboard',
 							icon: ChampionIcon,
