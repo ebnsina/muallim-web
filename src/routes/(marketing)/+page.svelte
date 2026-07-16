@@ -125,7 +125,7 @@
 		},
 		{
 			icon: UserMultipleIcon,
-			who: 'Coaching centers',
+			who: 'Coaching centres',
 			line: 'Batches that overlap, a different fee for every course, and admissions living in a WhatsApp thread you scroll to find.'
 		},
 		{
@@ -586,9 +586,7 @@
 	<!-- WHO IT'S FOR: colored persona cards -->
 	<section id="audiences" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Is this you?</p>
-		<h2 class="mt-2 max-w-[22ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-			You have an institution to run — spread across too many books.
-		</h2>
+		<h2 class="h2 mt-2">You have an institution to run — spread across too many books.</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each audiences as a, i (a.who)}
 				{@const tone = toneAt(i, audiences.length)}
@@ -616,9 +614,7 @@
 				<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
 					Your journey
 				</p>
-				<h2 class="mt-2 text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-					From first day to fully online, one clear path.
-				</h2>
+				<h2 class="h2 mt-2">From first day to fully online, one clear path.</h2>
 			</div>
 			<div>
 				<p class="max-w-md leading-relaxed text-[var(--muted)]">
@@ -657,9 +653,7 @@
 	<!-- CAPABILITIES: colored feature cards -->
 	<section id="capabilities" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Up close</p>
-		<h2 class="mt-2 text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-			The same platform, four sides to it
-		</h2>
+		<h2 class="h2 mt-2">The same platform, four sides to it</h2>
 		<p class="mt-2 max-w-2xl leading-relaxed text-[var(--muted)]">
 			Everything you just walked through, in more detail — all in one system, no add-ons.
 		</p>
@@ -696,9 +690,7 @@
 			Everything in it
 		</p>
 		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
-			<h2 class="max-w-[24ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-				From the first lesson to the last receipt.
-			</h2>
+			<h2 class="h2">From the first lesson to the last receipt.</h2>
 			<a
 				href={resolve('/(marketing)/features')}
 				class="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
@@ -776,9 +768,7 @@
 	<!-- HONEST DIFFERENTIATORS: colored cards + olive stat panel -->
 	<section id="why" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Why Muallim</p>
-		<h2 class="mt-2 max-w-[26ch] text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">
-			No invented reviews. Just what the product actually does.
-		</h2>
+		<h2 class="h2 mt-2">No invented reviews. Just what the product actually does.</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each reasons as r, i (r.title)}
 				{@const tone = toneAt(i, reasons.length)}
@@ -803,7 +793,7 @@
 					Frequently<br />Asked Questions
 				</h2>
 				<p class="mt-5 max-w-sm leading-relaxed text-[var(--brand-tint)]/70">
-					Clear answers to the questions schools, madrasas, and coaching centers ask before they
+					Clear answers to the questions schools, madrasas, and coaching centres ask before they
 					start.
 				</p>
 				<p class="mt-6 text-sm text-[var(--brand-tint)]/60">
@@ -1103,6 +1093,11 @@
 		margin: 6rem auto 0;
 		padding: 0 1.5rem;
 	}
+	/*
+		One section heading, in the hero's ink. Five sections restated the same size,
+		weight and tracking inline and picked olive while three used this — two heading
+		looks on one page, and no way to change either without finding both.
+	*/
 	.h2 {
 		font-weight: 700;
 		font-size: clamp(1.8rem, 3.2vw, 2.5rem);
