@@ -315,10 +315,13 @@
 	     action, and the product itself bleeding off the bottom. -->
 	<div class="topwrap">
 		<section class="hero">
-			<h1 class="hero-h1">Run the whole<br />institution.</h1>
+			<h1 class="hero-h1">
+				Run the whole<br /><span class="underlined">institution</span>.
+			</h1>
 			<p class="hero-sub">
-				One platform to run a school, college, madrasa, or coaching centre — and teach the world
-				online. Attendance, exams, report cards, and fees, together. You keep the money and the
+				One platform to run a <span class="kind">school</span>, <span class="kind">college</span>,
+				<span class="kind">madrasa</span>, or <span class="kind">coaching centre</span> — and teach the
+				world online. Attendance, exams, report cards, and fees, together. You keep the money and the
 				students.
 			</p>
 			<Button href={resolve('/register')} variant="lime">
@@ -878,8 +881,43 @@
 		letter-spacing: -0.035em;
 		color: var(--ink);
 	}
+
+	/*
+		The lime stroke under the word the whole page turns on. Drawn as a pseudo
+		element rather than an underline so it can sit low, run wide of the letters,
+		and keep its weight as the headline scales.
+	*/
+	.underlined {
+		position: relative;
+		white-space: nowrap;
+	}
+	.underlined::after {
+		content: '';
+		position: absolute;
+		right: -0.04em;
+		/* The inline box runs below the baseline to hold descenders, so anchoring at 0
+		   drops the stroke into the paragraph beneath. This sits it under the letters. */
+		bottom: 0.13em;
+		left: -0.04em;
+		height: 0.11em;
+		border-radius: 999px;
+		background: var(--accent);
+		/* Behind the letters, so a descender is never cut in half. */
+		z-index: -1;
+	}
+
+	/* The four kinds of institution, each its own thing rather than a list of words
+	   the eye slides over. */
+	.kind {
+		padding: 0.06em 0.3em;
+		border-radius: 0.4em;
+		background: var(--accent-tint);
+		color: var(--brand);
+		font-weight: 600;
+		white-space: nowrap;
+	}
 	.hero-sub {
-		margin: 1.1rem 0 1.8rem;
+		margin: 1.5rem 0 1.8rem;
 		max-width: 38rem;
 		font-size: 1rem;
 		line-height: 1.55;

@@ -72,21 +72,21 @@
 			   lavender sits out at the shoulders, beside the headline. Anchored to the
 			   bottom edge it was all hidden behind the shot — colour nobody could see. */
 			radial-gradient(
-				120% 66% at 50% 88%,
+				135% 86% at 50% 78%,
 				color-mix(in oklab, var(--accent) 50%, transparent),
 				transparent 64%
 			),
 			radial-gradient(
-				62% 68% at -8% 52%,
+				70% 86% at -10% 38%,
 				color-mix(in oklab, var(--lav-ink) 34%, transparent),
 				transparent 66%
 			),
 			radial-gradient(
-				62% 68% at 108% 52%,
+				70% 86% at 110% 38%,
 				color-mix(in oklab, var(--lav-ink) 34%, transparent),
 				transparent 66%
 			),
-			linear-gradient(0deg, var(--cream), var(--surface) 34%);
+			linear-gradient(0deg, var(--cream), var(--surface) 26%);
 
 		/* The closing CTA's gradient runs cream → this → --accent-band, landing on the
 		   band the footer sits in. Only the middle stop needed a name. */
