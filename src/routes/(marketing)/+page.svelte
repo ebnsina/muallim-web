@@ -1019,11 +1019,17 @@
 	}
 
 	/* Works-with marquee. */
+	/*
+		A strip of paper between the hero and the page, which is what makes it a band:
+		it was cream on cream with a single bottom rule, so the only thing separating
+		the fold from the section under it was a hairline nobody sees.
+	*/
 	.marquee-sec {
 		margin-top: 0;
-		padding: 1.25rem 0;
+		padding: 1.1rem 0;
+		border-top: 1px solid var(--line);
 		border-bottom: 1px solid var(--line);
-		background: var(--cream);
+		background: var(--surface);
 		overflow: hidden;
 	}
 	.marquee {
@@ -1040,11 +1046,21 @@
 		white-space: nowrap;
 		animation: marquee 34s linear infinite;
 	}
+	/* It stops for anybody who stops on it. Nine claims sliding past at a fixed rate
+	   are nine claims you cannot go back and read. */
+	.marquee:hover .marquee-track {
+		animation-play-state: paused;
+	}
 	@keyframes marquee {
 		to {
 			transform: translateX(-50%);
 		}
 	}
+	/*
+		Full strength, not 78% of it. These are 17px bold — under the size that counts
+		as large text — so the faded version measured about 4.5:1 on cream and sat on
+		the line AA draws. The words are the claim; there is no reason to whisper them.
+	*/
 	.mq {
 		display: inline-flex;
 		align-items: center;
@@ -1053,14 +1069,13 @@
 		font-size: 1.05rem;
 		letter-spacing: -0.01em;
 		color: var(--ink-soft);
-		opacity: 0.78;
 	}
 	.mq::before {
 		content: '';
 		width: 0.42rem;
 		height: 0.42rem;
 		border-radius: 50%;
-		background: var(--olive);
+		background: var(--accent-ink);
 	}
 
 	/* Build block: only the paragraph survives as scoped CSS — the rest is Tailwind. */
