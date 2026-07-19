@@ -867,6 +867,10 @@ export function featureBySlug(slug: string): Feature | undefined {
 	return FEATURES.find((f) => f.slug === slug);
 }
 
+export function groupByKey(key: string): Group | undefined {
+	return GROUPS.find((g) => g.key === key);
+}
+
 export function featuresIn(group: GroupKey): Feature[] {
 	return FEATURES.filter((f) => f.group === group);
 }

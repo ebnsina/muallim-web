@@ -37,9 +37,6 @@
 		MinusSignIcon
 	} from '@hugeicons/core-free-icons';
 
-	// The taka glyph with lakh/crore grouping — en-IN numerals, glyph composed on.
-	const taka = (n: number) => '৳' + new Intl.NumberFormat('en-IN').format(n);
-
 	// An honest "works with" strip — the real rails and capabilities Muallim ships,
 	// not invented partner logos.
 	const marquee = [
@@ -54,81 +51,6 @@
 		'0% on your own bKash'
 	];
 
-	/*
-		Pricing. The model is the decision, the ৳ figures are a starting point.
-
-		Muallim takes 0% of what a school collects — that is structural: on bKash and
-		SSLCommerz the school is the merchant and no Muallim account is in the flow, so
-		there is nothing to take. Sustaining revenue is therefore a subscription to
-		*run the institution*, not a tax on its money. Free to teach and sell; paid to
-		operate; unlimited/operations on request.
-
-		Price scales by size band, not a per-head meter — a threshold a school can
-		budget, where a raw per-student bill that moves every month cannot be. The band
-		is the loud line on each card.
-
-		SUGGESTED STARTER NUMBERS, YOURS TO SET: ৳2,500/mo and the 800-student cap are
-		defensible BD-market figures, not decisions. Change them here; to move to true
-		per-student, this is also the one place.
-	*/
-	const PLANS = [
-		{
-			name: 'Teach',
-			price: 'Free',
-			per: 'forever',
-			tag: 'For creators & small classes',
-			lead: 'Everything you need to teach online and sell to the world.',
-			points: [
-				'Courses, 15 quiz types, certificates',
-				'Forum, chat, points and a leaderboard',
-				'Sell through your own bKash or SSLCommerz',
-				'0% on everything you collect'
-			],
-			cta: 'Start free',
-			href: resolve('/register'),
-			featured: false
-		},
-		{
-			name: 'Institute',
-			price: '৳2,500',
-			per: 'per month',
-			tag: 'Up to 800 students',
-			lead: 'Run the whole institution, not only the courses.',
-			points: [
-				'Everything in Teach',
-				'Attendance, exams and GPA-5 report cards',
-				'Fee billing, timetable and staff',
-				'Guardian notices by email or SMS'
-			],
-			cta: 'Start free',
-			href: resolve('/register'),
-			featured: true
-		},
-		{
-			name: 'Scale',
-			price: "Let's talk",
-			per: 'for large & multi-campus',
-			tag: 'Unlimited students',
-			lead: 'For colleges, chains, and everything an office runs on.',
-			points: [
-				'Everything in Institute',
-				'Library, transport and hostel',
-				'Payroll and an income/expense ledger',
-				'Priority support and onboarding'
-			],
-			cta: 'Talk to us',
-			href: resolve('/(marketing)/demo'),
-			featured: false
-		}
-	] as const;
-
-	// On top of any paid plan, and billed for what they cost us — honest, because
-	// each is a real bill we pay: a message sent, a token spent.
-	const ADDONS = [
-		{ name: 'Guardian SMS', line: 'Top up credits and pay only for the messages you send.' },
-		{ name: 'AI Studio', line: 'Draft courses and quizzes from a prompt, metered by use.' }
-	];
-
 	// The four cards under the build heading. Each links to the feature page that
 	// proves it — a "learn more" with nowhere to go is the affordance lying.
 	const BUILD_CARDS = [
@@ -136,21 +58,22 @@
 			title: 'Take the register,',
 			tail: 'class by class',
 			kind: 'clipboard',
-			href: resolve('/(marketing)/features/[slug]', { slug: 'attendance' }),
+			href: resolve('/(marketing)/products/[group]', { group: 'academic' }) + '#attendance',
 			label: 'Learn more about attendance'
 		},
 		{
 			title: 'Exams, marked',
 			tail: 'and reported',
 			kind: 'medal',
-			href: resolve('/(marketing)/features/[slug]', { slug: 'exams-and-report-cards' }),
+			href:
+				resolve('/(marketing)/products/[group]', { group: 'academic' }) + '#exams-and-report-cards',
 			label: 'Learn more about exams and report cards'
 		},
 		{
 			title: 'Fees, billed',
 			tail: 'and reconciled',
 			kind: 'note',
-			href: resolve('/(marketing)/features/[slug]', { slug: 'fees' }),
+			href: resolve('/(marketing)/products/[group]', { group: 'operations' }) + '#fees',
 			label: 'Learn more about fees'
 		},
 		{
@@ -158,7 +81,7 @@
 			tail: 'the gate',
 			kind: 'plane',
 			tone: 'dark',
-			href: resolve('/(marketing)/features/[slug]', { slug: 'payments' }),
+			href: resolve('/(marketing)/products/[group]', { group: 'operations' }) + '#payments',
 			label: 'Learn more about selling courses'
 		}
 	] as const;
@@ -306,8 +229,6 @@
 			]
 		}
 	];
-
-	let monthly = $state(184250);
 
 	// A set gets its rhythm from one bold step, not a colour each: paper cards, and
 	// the last one olive. This rotated through four tints — brand, lavender, teal,
@@ -538,149 +459,6 @@
 	     commerce: the money never routes through us, which is the honest reason the
 	     cut is nought. This said "collect fees through your own bKash or SSLCommerz",
 	     which described a rail that is not built for fees. -->
-	<!-- PRICING: three flat tiers by size, Institute the olive step and the one to
-	     sell. Free to teach, paid to run the institution, and 0% of what you collect
-	     on every tier — the promise the calculator at the foot then proves. -->
-	<section id="pricing" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
-		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Pricing</p>
-		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
-			<h2 class="h2">Priced to run on, not to tax you.</h2>
-			<p class="max-w-sm leading-relaxed text-[var(--muted)]">
-				You pay to run the institution. You keep every taka you collect — 0%, on every plan.
-			</p>
-		</div>
-
-		<div class="mt-8 grid items-stretch gap-4 md:grid-cols-3">
-			{#each PLANS as plan (plan.name)}
-				<div
-					class="relative flex flex-col rounded-[var(--r-lg)] border p-7 {plan.featured
-						? 'border-[var(--brand)] bg-[var(--brand)] text-[var(--on-brand)]'
-						: 'border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--surface)] text-[var(--ink)]'}"
-				>
-					{#if plan.featured}
-						<span
-							class="absolute -top-3 left-7 rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold text-[var(--brand)]"
-						>
-							Most popular
-						</span>
-					{/if}
-					<h3
-						class="text-lg font-extrabold tracking-tight {plan.featured
-							? 'text-[var(--accent)]'
-							: 'text-[var(--ink)]'}"
-					>
-						{plan.name}
-					</h3>
-					<p class="mt-3 flex items-baseline gap-1.5">
-						<span class="text-3xl font-extrabold tracking-tight">{plan.price}</span>
-						<span
-							class="text-sm {plan.featured
-								? 'text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]'
-								: 'text-[var(--muted)]'}">{plan.per}</span
-						>
-					</p>
-					<!-- The size band, made loud: this is the axis the price scales on, so a
-					     reader sees at a glance which plan their headcount lands them in. -->
-					<span
-						class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold {plan.featured
-							? 'bg-[color-mix(in_oklab,var(--accent)_22%,var(--brand))] text-[var(--accent)]'
-							: 'bg-[var(--brand-tint)] text-[var(--brand)]'}"
-					>
-						<Icon icon={UserMultipleIcon} class="size-3.5" />
-						{plan.tag}
-					</span>
-					<p
-						class="mt-4 text-sm leading-relaxed {plan.featured
-							? 'text-[color-mix(in_oklab,var(--on-brand)_74%,var(--brand))]'
-							: 'text-[var(--muted)]'}"
-					>
-						{plan.lead}
-					</p>
-					<ul class="mt-5 grid gap-2.5">
-						{#each plan.points as pt (pt)}
-							<li class="flex items-start gap-2 text-sm leading-snug">
-								<Icon
-									icon={Tick02Icon}
-									strokeWidth={2.5}
-									class="mt-0.5 size-4 shrink-0 {plan.featured
-										? 'text-[var(--accent)]'
-										: 'text-[var(--brand)]'}"
-								/>
-								<span
-									class={plan.featured
-										? 'text-[color-mix(in_oklab,var(--on-brand)_88%,var(--brand))]'
-										: 'text-[var(--ink-soft)]'}>{pt}</span
-								>
-							</li>
-						{/each}
-					</ul>
-					<a
-						href={plan.href}
-						class="mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold transition duration-200 motion-reduce:transition-none {plan.featured
-							? 'bg-[var(--accent)] text-[var(--brand)] hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--brand))]'
-							: 'bg-[var(--brand)] text-[var(--accent-tint)] hover:bg-[var(--brand-soft)]'}"
-					>
-						{plan.cta}
-						<Icon icon={ArrowRight02Icon} class="size-4" />
-					</a>
-				</div>
-			{/each}
-		</div>
-
-		<!-- Add-ons: real costs, so honest to charge for. On top of any paid plan. -->
-		<div
-			class="mt-4 grid gap-4 rounded-[var(--r-lg)] border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--surface-2)] p-6 sm:grid-cols-[auto_1fr_1fr] sm:items-center"
-		>
-			<p class="text-sm font-bold text-[var(--ink)]">
-				Add on when<br class="hidden sm:block" /> you need it
-			</p>
-			{#each ADDONS as addon (addon.name)}
-				<div>
-					<p class="text-sm font-bold text-[var(--ink)]">{addon.name}</p>
-					<p class="mt-0.5 text-sm leading-snug text-[var(--muted)]">{addon.line}</p>
-				</div>
-			{/each}
-		</div>
-
-		<!-- The 0% promise, proved. Whatever the plan above costs, this is what Muallim
-		     takes from the money a school collects: nothing. The calculator is the one
-		     movable number on the page, because a figure a reader can drag lands. -->
-		<div
-			class="mt-4 grid items-center gap-8 rounded-[var(--r-lg)] bg-[var(--brand)] p-8 text-[var(--on-brand)] md:grid-cols-2"
-		>
-			<div>
-				<h3 class="text-2xl font-extrabold tracking-tight text-[var(--accent)]">
-					And 0% of what you collect.
-				</h3>
-				<p
-					class="mt-3 max-w-md leading-relaxed text-[color-mix(in_oklab,var(--on-brand)_74%,var(--brand))]"
-				>
-					Fees and local sales run through your own bKash or SSLCommerz — you are the merchant, so
-					there is no cut for us to take. Whatever you pay to run Muallim, every taka a family pays
-					stays yours.
-				</p>
-			</div>
-			<div class="rounded-[var(--r-lg)] bg-[var(--accent)] p-8 text-[var(--brand)]">
-				<p class="text-sm font-medium text-[var(--brand)]/70">Fees you collect this month</p>
-				<p class="mt-1 text-5xl font-bold tracking-tight tabular-nums">{taka(monthly)}</p>
-				<input
-					type="range"
-					min="20000"
-					max="1000000"
-					step="5000"
-					bind:value={monthly}
-					aria-label="Fees collected this month"
-					class="mt-5 h-5 w-full cursor-pointer appearance-none bg-transparent [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-9 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[var(--brand)] [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-[var(--brand)]/20 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[var(--brand)]/20 [&::-webkit-slider-thumb]:mt-[-6px] [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-9 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--brand)]"
-				/>
-				<div class="mt-5 h-px w-full bg-[var(--brand)]/20"></div>
-				<div class="mt-4 flex items-center justify-between text-sm font-semibold">
-					<span>Muallim's cut</span>
-					<span class="tabular-nums">৳0 · we never touch it</span>
-				</div>
-			</div>
-		</div>
-	</section>
-
 	<!-- WHO IT'S FOR: colored persona cards -->
 	<section id="audiences" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Is this you?</p>
@@ -790,7 +568,7 @@
 		<div class="mt-2 flex flex-wrap items-end justify-between gap-4">
 			<h2 class="h2">From the first lesson to the last receipt.</h2>
 			<a
-				href={resolve('/(marketing)/features')}
+				href={resolve('/(marketing)/products')}
 				class="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-6 py-3 font-semibold text-[var(--brand-tint)] transition duration-200 hover:bg-[var(--brand-soft)] motion-reduce:transition-none"
 			>
 				Look through all of it <Icon icon={ArrowRight02Icon} class="size-4" />
@@ -851,7 +629,7 @@
 							{/each}
 						</ul>
 						<a
-							href="{resolve('/(marketing)/features')}#{g.key}"
+							href={resolve('/(marketing)/products/[group]', { group: g.key })}
 							class="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-bold {tone.tick} hover:underline"
 						>
 							Explore {g.name.toLowerCase()}

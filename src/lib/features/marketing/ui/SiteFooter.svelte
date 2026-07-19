@@ -34,7 +34,7 @@
 			</a>
 			<nav class="flex flex-wrap gap-6 text-sm text-[var(--on-brand)]/75">
 				<a href="/#audiences" class="hover:text-white">Solutions</a>
-				<a href={resolve('/(marketing)/features')} class="hover:text-white">Features</a>
+				<a href={resolve('/(marketing)/products')} class="hover:text-white">Products</a>
 				<a href="/#faq" class="hover:text-white">FAQ</a>
 				<a href="mailto:hello@muallim.app" class="hover:text-white">Contact</a>
 			</nav>

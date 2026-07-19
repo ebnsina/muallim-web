@@ -145,7 +145,7 @@
 					</button>
 				{/each}
 				<a
-					href="/#pricing"
+					href={resolve('/(marketing)/pricing')}
 					onmouseenter={dismiss}
 					onfocus={dismiss}
 					onclick={() => (menuOpen = false)}>Pricing</a
@@ -239,7 +239,11 @@
 										</p>
 										{#each megaCats[activeCat].items as item (item.slug)}
 											<a
-												href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
+												href={resolve('/(marketing)/products/[group]', {
+													group: megaCats[activeCat].key
+												}) +
+													'#' +
+													item.slug}
 												onclick={() => (open = null)}
 												class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
 											>
@@ -269,7 +273,7 @@
 											</a>
 										</div>
 										<a
-											href={resolve('/(marketing)/features')}
+											href={resolve('/(marketing)/products')}
 											onclick={() => (open = null)}
 											class="mt-1 px-3 py-1.5 text-center text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
 										>
