@@ -400,6 +400,13 @@
 		backdrop-filter: blur(18px) saturate(1.5);
 		border-radius: 999px;
 		padding: 0.4rem 0.4rem 0.4rem 1.1rem;
+		/*
+			A light hairline plus a soft dark shadow: the pill floats over both the light
+			hero and the dark olive bands (pricing, FAQ, footer). The shadow reads on
+			light, the border reads on dark — over a same-olive band the pill was losing
+			its edge and vanishing into the section behind it.
+		*/
+		border: 1px solid color-mix(in oklab, var(--on-brand) 20%, transparent);
 		box-shadow: 0 18px 40px -24px rgba(23, 23, 15, 0.6);
 	}
 	/* No blur, no translucency — a see-through pill over a screenshot is unreadable. */
