@@ -11,6 +11,8 @@
 	 * that was never built — so: no invented feature, logo, testimonial, or number.
 	 */
 	import { reveal } from '$lib/reveal';
+	import { slide } from 'svelte/transition';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
 	import { Button, FeatureCard, ShotCard, SiteCta } from '$lib/features/marketing/ui';
@@ -363,7 +365,7 @@
 		},
 		{
 			q: 'Is it free to begin?',
-			a: 'Yes. Opening a workspace is free, and a course with no price stays free. Sell through your own bKash or SSLCommerz and Muallim takes nothing — you are the merchant, so there is no cut for us to take. Sell through Stripe, which is how learners abroad pay, and Muallim takes 2.5%.'
+			a: 'Yes. Opening a workspace is free, teaching and selling courses is free, and Muallim takes 0% of what you collect through your own bKash or SSLCommerz — you are the merchant. Running the whole institution (attendance, exams, fees) is a paid plan, and selling through Stripe to learners abroad is 2.5%.'
 		},
 		{
 			q: 'Which payment gateways can I use?',
@@ -882,7 +884,7 @@
 	<!-- FAQ: dark-olive band, lime headline, accordion (Tailwind) -->
 	<section id="faq" use:reveal class="mt-32 bg-[var(--brand)] py-20 text-[var(--brand-tint)]">
 		<div class="mx-auto grid max-w-[82rem] gap-12 px-6 md:grid-cols-2">
-			<div>
+			<div class="flex flex-col">
 				<h2
 					class="text-4xl font-bold leading-[1.05] tracking-tight text-[var(--accent)] sm:text-5xl"
 				>
@@ -892,13 +894,26 @@
 					Clear answers to the questions schools, madrasas, and coaching centers ask before they
 					start.
 				</p>
-				<p class="mt-6 text-sm text-[var(--brand-tint)]/60">
-					Still have questions?
-					<a
-						class="font-semibold text-[var(--accent)] hover:underline"
-						href="mailto:hello@muallim.app">hello@muallim.app</a
-					>
-				</p>
+				<!-- Fills the space the short intro left under it, and turns "still have a
+				     question" into somewhere to go rather than a line to read. -->
+				<div class="mt-10 rounded-[var(--r-lg)] border border-white/10 p-6 md:mt-auto">
+					<p class="font-bold text-[var(--brand-tint)]">Still have a question?</p>
+					<p class="mt-1 max-w-xs text-sm leading-relaxed text-[var(--brand-tint)]/60">
+						A person answers — no bots, no queue. Book a walkthrough or just write to us.
+					</p>
+					<div class="mt-4 flex flex-wrap items-center gap-4">
+						<a
+							href={resolve('/(marketing)/demo')}
+							class="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--brand)] transition hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--brand))]"
+						>
+							Book a demo
+						</a>
+						<a
+							class="text-sm font-semibold text-[var(--accent)] hover:underline"
+							href="mailto:hello@muallim.app">hello@muallim.app</a
+						>
+					</div>
+				</div>
 			</div>
 			<div>
 				{#each faqs as f, i (f.q)}
@@ -911,11 +926,16 @@
 							<span>{f.q}</span>
 							<Icon
 								icon={openFaq === i ? MinusSignIcon : PlusSignIcon}
-								class="size-5 shrink-0 text-[var(--accent)]"
+								class="size-5 shrink-0 text-[var(--accent)] transition-transform duration-200 {openFaq ===
+								i
+									? 'rotate-180'
+									: ''}"
 							/>
 						</button>
 						{#if openFaq === i}
-							<p class="max-w-xl pb-5 leading-relaxed text-[var(--brand-tint)]/65">{f.a}</p>
+							<div transition:slide={{ duration: prefersReducedMotion.current ? 0 : 240 }}>
+								<p class="max-w-xl pb-5 leading-relaxed text-[var(--brand-tint)]/65">{f.a}</p>
+							</div>
 						{/if}
 					</div>
 				{/each}
