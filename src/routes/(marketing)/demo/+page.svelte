@@ -1,23 +1,11 @@
 <script lang="ts">
-	/**
-	 * Ask to be shown the product. The one page on the marketing site that collects
-	 * anything, so the one page that has to be careful.
-	 *
-	 * Three steps, because three short questions read as easier than one long form —
-	 * and because the terms deserve their own moment rather than a box under a wall
-	 * of fields somebody has stopped reading. Each step is checked by its own slice
-	 * of the schema in `$lib/demo` before it will advance, the action re-checks the
-	 * whole of it, and muallim-api checks it again behind that. Only the last one
-	 * decides anything.
-	 *
-	 * The steps slide the way you are going: forward from the right, back from the
-	 * left. Under `prefers-reduced-motion` they do not slide at all — the direction
-	 * is a nicety, and somebody who asked for stillness asked for the whole page.
-	 */
+	// Ask to be shown the product. Three steps, each checked by its slice of the
+	// $lib/demo schema; the action re-checks all of it and muallim-api checks again.
+	// Steps slide by direction; reduced motion stills them.
 	import { enhance } from '$app/forms';
 	import { fly } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { PageHero } from '$lib/features/marketing/ui';
+	import { PageHero, SiteCta } from '$lib/features/marketing/ui';
 	import { Icon } from '$lib/components';
 	import {
 		ArrowLeft01Icon,
@@ -101,229 +89,237 @@
 	/>
 </svelte:head>
 
-<PageHero>
-	{#snippet eyebrow()}See it for yourself{/snippet}
-	{#snippet title()}Let us show you Muallim.{/snippet}
-	{#snippet subtitle()}
-		Three short questions, and a person walks you through it on your own terms — no bots, no
-		runaround, and nothing installed to find out.
-	{/snippet}
-</PageHero>
+<div class="page">
+	<PageHero>
+		{#snippet eyebrow()}See it for yourself{/snippet}
+		{#snippet title()}Let us show you Muallim.{/snippet}
+		{#snippet subtitle()}
+			Three short questions, and a person walks you through it on your own terms — no bots, no
+			runaround, and nothing installed to find out.
+		{/snippet}
+	</PageHero>
 
-<section class="mx-auto mt-16 mb-24 w-full max-w-[44rem] px-6">
-	{#if form?.sent}
-		<div
-			class="rounded-[var(--r-lg)] border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--surface)] p-8 text-center"
-			in:fly={prefersReducedMotion.current ? { duration: 0 } : { y: 12, duration: 300 }}
-		>
-			<span
-				class="mx-auto grid size-12 place-items-center rounded-full bg-[var(--accent)] text-[var(--brand)]"
+	<section class="mx-auto mt-16 mb-24 w-full max-w-[44rem] px-6">
+		{#if form?.sent}
+			<div
+				class="rounded-[var(--r-lg)] border border-[color-mix(in_oklab,var(--ink)_9%,transparent)] bg-[var(--surface)] p-8 text-center"
+				in:fly={prefersReducedMotion.current ? { duration: 0 } : { y: 12, duration: 300 }}
 			>
-				<Icon icon={CheckmarkBadge01Icon} class="size-6" />
-			</span>
-			<h2 class="mt-4 text-2xl font-extrabold tracking-tight text-[var(--ink)]">
-				Check your inbox shortly.
-			</h2>
-			<p class="mx-auto mt-2 max-w-md leading-relaxed text-[var(--muted)]">
-				We will email you the demo link at
-				<strong class="font-semibold text-[var(--ink)]">{form.email}</strong>, and a person will
-				call if you would rather be walked through it. If it is urgent, write to
-				<a class="font-semibold text-[var(--brand)] underline" href="mailto:hello@muallim.app"
-					>hello@muallim.app</a
-				>.
-			</p>
-		</div>
-	{:else}
-		<!-- The bar is the whole of the progress: three questions is short enough that
+				<span
+					class="mx-auto grid size-12 place-items-center rounded-full bg-[var(--accent)] text-[var(--brand)]"
+				>
+					<Icon icon={CheckmarkBadge01Icon} class="size-6" />
+				</span>
+				<h2 class="mt-4 text-2xl font-extrabold tracking-tight text-[var(--ink)]">
+					Check your inbox shortly.
+				</h2>
+				<p class="mx-auto mt-2 max-w-md leading-relaxed text-[var(--muted)]">
+					We will email you the demo link at
+					<strong class="font-semibold text-[var(--ink)]">{form.email}</strong>, and a person will
+					call if you would rather be walked through it. If it is urgent, write to
+					<a class="font-semibold text-[var(--brand)] underline" href="mailto:hello@muallim.app"
+						>hello@muallim.app</a
+					>.
+				</p>
+			</div>
+		{:else}
+			<!-- The bar is the whole of the progress: three questions is short enough that
 		     counting them out loud only makes it sound longer. It still announces
 		     itself, because a bar a screen reader cannot read is decoration. -->
-		<div
-			class="h-1 overflow-hidden rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)]"
-			role="progressbar"
-			aria-valuenow={step + 1}
-			aria-valuemin={1}
-			aria-valuemax={STEPS.length}
-			aria-label="Step {step + 1} of {STEPS.length}"
-		>
 			<div
-				class="h-full rounded-full bg-[var(--brand)] transition-[width] duration-300 motion-reduce:transition-none"
-				style="width: {((step + 1) / STEPS.length) * 100}%"
-			></div>
-		</div>
+				class="h-1 overflow-hidden rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)]"
+				role="progressbar"
+				aria-valuenow={step + 1}
+				aria-valuemin={1}
+				aria-valuemax={STEPS.length}
+				aria-label="Step {step + 1} of {STEPS.length}"
+			>
+				<div
+					class="h-full rounded-full bg-[var(--brand)] transition-[width] duration-300 motion-reduce:transition-none"
+					style="width: {((step + 1) / STEPS.length) * 100}%"
+				></div>
+			</div>
 
-		<h2 class="mt-5 text-2xl font-extrabold tracking-tight text-[var(--ink)]">
-			{STEPS[step].legend}
-		</h2>
-		<p class="mt-1 text-sm text-[var(--muted)]">{STEPS[step].hint}</p>
+			<h2 class="mt-5 text-2xl font-extrabold tracking-tight text-[var(--ink)]">
+				{STEPS[step].legend}
+			</h2>
+			<p class="mt-1 text-sm text-[var(--muted)]">{STEPS[step].hint}</p>
 
-		<form method="POST" use:enhance class="mt-6">
-			<!-- Every answer posts, whichever step is on screen. -->
-			<input type="hidden" name="intent" value={intent} />
-			{#if step !== 1}
-				<input type="hidden" name="name" value={name} />
-				<input type="hidden" name="email" value={email} />
-				<input type="hidden" name="phone" value={phone} />
-			{/if}
-			{#if step !== 2 && agreed}
-				<input type="hidden" name="agreed" value="on" />
-			{/if}
+			<form method="POST" use:enhance class="mt-6">
+				<!-- Every answer posts, whichever step is on screen. -->
+				<input type="hidden" name="intent" value={intent} />
+				{#if step !== 1}
+					<input type="hidden" name="name" value={name} />
+					<input type="hidden" name="email" value={email} />
+					<input type="hidden" name="phone" value={phone} />
+				{/if}
+				{#if step !== 2 && agreed}
+					<input type="hidden" name="agreed" value="on" />
+				{/if}
 
-			<!-- `key` restarts the transition; the grid stacks the outgoing step on the
+				<!-- `key` restarts the transition; the grid stacks the outgoing step on the
 			     incoming one so the card does not collapse mid-slide. -->
-			{#key step}
-				<div class="grid [&>*]:col-start-1 [&>*]:row-start-1">
-					<div in:fly={slide}>
-						{#if step === 0}
-							<fieldset class="grid gap-2 sm:grid-cols-2">
-								<legend class="sr-only">{STEPS[0].legend}</legend>
-								{#each INTENTS as opt (opt.value)}
-									<label
-										class="flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition {intent ===
-										opt.value
-											? 'border-[var(--brand)] bg-[var(--brand-tint)]'
-											: 'border-[var(--line)] bg-[var(--surface)] hover:bg-[var(--surface-2)]'}"
+				{#key step}
+					<div class="grid [&>*]:col-start-1 [&>*]:row-start-1">
+						<div in:fly={slide}>
+							{#if step === 0}
+								<fieldset class="grid gap-2 sm:grid-cols-2">
+									<legend class="sr-only">{STEPS[0].legend}</legend>
+									{#each INTENTS as opt (opt.value)}
+										<label
+											class="flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition {intent ===
+											opt.value
+												? 'border-[var(--brand)] bg-[var(--brand-tint)]'
+												: 'border-[var(--line)] bg-[var(--surface)] hover:bg-[var(--surface-2)]'}"
+										>
+											<input
+												class="mt-1 size-4 shrink-0 accent-[var(--brand)]"
+												type="radio"
+												value={opt.value}
+												bind:group={intent}
+											/>
+											<span>
+												<span class="block text-sm font-bold text-[var(--ink)]">{opt.label}</span>
+												<span class="mt-0.5 block text-xs text-[var(--muted)]">{opt.line}</span>
+											</span>
+										</label>
+									{/each}
+								</fieldset>
+							{:else if step === 1}
+								<div class="grid gap-5">
+									<div>
+										<label class={label} for="name">Your name</label>
+										<input
+											class="{field} {errors.name ? bad : ok}"
+											id="name"
+											name="name"
+											type="text"
+											maxlength="200"
+											autocomplete="name"
+											aria-invalid={!!errors.name}
+											bind:value={name}
+										/>
+										{#if errors.name}
+											<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">{errors.name}</p>
+										{/if}
+									</div>
+									<div class="grid gap-5 sm:grid-cols-2">
+										<div>
+											<label class={label} for="phone">Phone</label>
+											<input
+												class="{field} {errors.phone ? bad : ok}"
+												id="phone"
+												name="phone"
+												type="tel"
+												maxlength="40"
+												autocomplete="tel"
+												inputmode="tel"
+												placeholder="01712 345678"
+												aria-invalid={!!errors.phone}
+												bind:value={phone}
+											/>
+											{#if errors.phone}
+												<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">
+													{errors.phone}
+												</p>
+											{/if}
+										</div>
+										<div>
+											<label class={label} for="email">Email</label>
+											<input
+												class="{field} {errors.email ? bad : ok}"
+												id="email"
+												name="email"
+												type="email"
+												maxlength="320"
+												autocomplete="email"
+												aria-invalid={!!errors.email}
+												bind:value={email}
+											/>
+											{#if errors.email}
+												<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">
+													{errors.email}
+												</p>
+											{/if}
+										</div>
+									</div>
+								</div>
+							{:else}
+								<div class="grid gap-4">
+									<!-- What they are about to send, before they agree to us holding it. -->
+									<dl
+										class="grid gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 text-sm"
 									>
+										{#each [['Running', INTENTS.find((i) => i.value === intent)?.label ?? ''], ['Name', name], ['Phone', phone], ['Email', email]] as [k, v] (k)}
+											<div class="flex justify-between gap-4">
+												<dt class="text-[var(--muted)]">{k}</dt>
+												<dd class="truncate font-semibold text-[var(--ink)]">{v}</dd>
+											</div>
+										{/each}
+									</dl>
+
+									<!-- Never pre-ticked, never re-ticked after a failure. Agreement is the
+								     one thing on this page we must not do on somebody's behalf. -->
+									<label class="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
 										<input
 											class="mt-1 size-4 shrink-0 accent-[var(--brand)]"
-											type="radio"
-											value={opt.value}
-											bind:group={intent}
+											type="checkbox"
+											name="agreed"
+											bind:checked={agreed}
+											aria-invalid={!!errors.agreed}
 										/>
-										<span>
-											<span class="block text-sm font-bold text-[var(--ink)]">{opt.label}</span>
-											<span class="mt-0.5 block text-xs text-[var(--muted)]">{opt.line}</span>
+										<span class="text-[var(--muted)]">
+											I agree to the <a
+												class="font-semibold text-[var(--brand)] underline"
+												href="/#faq">terms and conditions</a
+											>, and to Muallim holding these details to reply to me.
 										</span>
 									</label>
-								{/each}
-							</fieldset>
-						{:else if step === 1}
-							<div class="grid gap-5">
-								<div>
-									<label class={label} for="name">Your name</label>
-									<input
-										class="{field} {errors.name ? bad : ok}"
-										id="name"
-										name="name"
-										type="text"
-										maxlength="200"
-										autocomplete="name"
-										aria-invalid={!!errors.name}
-										bind:value={name}
-									/>
-									{#if errors.name}
-										<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">{errors.name}</p>
+									{#if errors.agreed}
+										<p class="text-sm font-semibold text-[var(--rose)]" role="alert">
+											{errors.agreed}
+										</p>
 									{/if}
 								</div>
-								<div class="grid gap-5 sm:grid-cols-2">
-									<div>
-										<label class={label} for="phone">Phone</label>
-										<input
-											class="{field} {errors.phone ? bad : ok}"
-											id="phone"
-											name="phone"
-											type="tel"
-											maxlength="40"
-											autocomplete="tel"
-											inputmode="tel"
-											placeholder="01712 345678"
-											aria-invalid={!!errors.phone}
-											bind:value={phone}
-										/>
-										{#if errors.phone}
-											<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">{errors.phone}</p>
-										{/if}
-									</div>
-									<div>
-										<label class={label} for="email">Email</label>
-										<input
-											class="{field} {errors.email ? bad : ok}"
-											id="email"
-											name="email"
-											type="email"
-											maxlength="320"
-											autocomplete="email"
-											aria-invalid={!!errors.email}
-											bind:value={email}
-										/>
-										{#if errors.email}
-											<p class="mt-1.5 text-sm font-semibold text-[var(--rose)]">{errors.email}</p>
-										{/if}
-									</div>
-								</div>
-							</div>
-						{:else}
-							<div class="grid gap-4">
-								<!-- What they are about to send, before they agree to us holding it. -->
-								<dl
-									class="grid gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 text-sm"
-								>
-									{#each [['Running', INTENTS.find((i) => i.value === intent)?.label ?? ''], ['Name', name], ['Phone', phone], ['Email', email]] as [k, v] (k)}
-										<div class="flex justify-between gap-4">
-											<dt class="text-[var(--muted)]">{k}</dt>
-											<dd class="truncate font-semibold text-[var(--ink)]">{v}</dd>
-										</div>
-									{/each}
-								</dl>
-
-								<!-- Never pre-ticked, never re-ticked after a failure. Agreement is the
-								     one thing on this page we must not do on somebody's behalf. -->
-								<label class="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
-									<input
-										class="mt-1 size-4 shrink-0 accent-[var(--brand)]"
-										type="checkbox"
-										name="agreed"
-										bind:checked={agreed}
-										aria-invalid={!!errors.agreed}
-									/>
-									<span class="text-[var(--muted)]">
-										I agree to the <a
-											class="font-semibold text-[var(--brand)] underline"
-											href="/#faq">terms and conditions</a
-										>, and to Muallim holding these details to reply to me.
-									</span>
-								</label>
-								{#if errors.agreed}
-									<p class="text-sm font-semibold text-[var(--rose)]" role="alert">
-										{errors.agreed}
-									</p>
-								{/if}
-							</div>
-						{/if}
+							{/if}
+						</div>
 					</div>
+				{/key}
+
+				{#if errors.intent}
+					<p class="mt-3 text-sm font-semibold text-[var(--rose)]" role="alert">{errors.intent}</p>
+				{/if}
+				{#if form?.message}
+					<p
+						class="mt-4 rounded-xl border border-[color-mix(in_oklab,var(--rose)_40%,transparent)] bg-[var(--rose-tint)] px-4 py-3 text-sm font-semibold text-[var(--rose)]"
+						role="alert"
+					>
+						{form.message}
+					</p>
+				{/if}
+
+				<div class="mt-7 flex items-center justify-end gap-3">
+					{#if step > 0}
+						<button class="pill pill-quiet" type="button" onclick={back}>
+							<Icon icon={ArrowLeft01Icon} class="size-4" /> Back
+						</button>
+					{/if}
+					{#if step < STEPS.length - 1}
+						<button class="pill pill-primary" type="button" onclick={advance}>
+							Continue <Icon icon={ArrowRight02Icon} class="size-4" />
+						</button>
+					{:else}
+						<button class="pill pill-primary" type="submit">
+							Request a demo <Icon icon={ArrowRight02Icon} class="size-4" />
+						</button>
+					{/if}
 				</div>
-			{/key}
+			</form>
+		{/if}
+	</section>
 
-			{#if errors.intent}
-				<p class="mt-3 text-sm font-semibold text-[var(--rose)]" role="alert">{errors.intent}</p>
-			{/if}
-			{#if form?.message}
-				<p
-					class="mt-4 rounded-xl border border-[color-mix(in_oklab,var(--rose)_40%,transparent)] bg-[var(--rose-tint)] px-4 py-3 text-sm font-semibold text-[var(--rose)]"
-					role="alert"
-				>
-					{form.message}
-				</p>
-			{/if}
-
-			<div class="mt-7 flex items-center justify-end gap-3">
-				{#if step > 0}
-					<button class="pill pill-quiet" type="button" onclick={back}>
-						<Icon icon={ArrowLeft01Icon} class="size-4" /> Back
-					</button>
-				{/if}
-				{#if step < STEPS.length - 1}
-					<button class="pill pill-primary" type="button" onclick={advance}>
-						Continue <Icon icon={ArrowRight02Icon} class="size-4" />
-					</button>
-				{:else}
-					<button class="pill pill-primary" type="submit">
-						Request a demo <Icon icon={ArrowRight02Icon} class="size-4" />
-					</button>
-				{/if}
-			</div>
-		</form>
-	{/if}
-</section>
+	<SiteCta />
+</div>
 
 <style>
 	.pill {
