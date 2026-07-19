@@ -3,7 +3,7 @@
 	import { Mortarboard01Icon } from '@hugeicons/core-free-icons';
 	import { Icon } from '$lib/components';
 	import { fade, fly } from 'svelte/transition';
-	import { GROUPS, featuresIn } from '$lib/content/features';
+	import { FEATURES, GROUPS, featuresIn } from '$lib/content/features';
 	import { SEGMENTS } from '$lib/content/segments';
 
 	/*
@@ -202,8 +202,8 @@
 							out:fly={{ x: direction * -24, duration: 160, opacity: 0 }}
 						>
 							{#if open === 'products'}
-								<div class="grid w-[42rem] max-w-[90vw] grid-cols-[1.15fr_1fr] gap-2 p-2">
-									<div class="flex flex-col gap-1">
+								<div class="grid w-[46rem] max-w-[92vw] grid-cols-[1.05fr_1fr] gap-3 p-3">
+									<div class="flex flex-col gap-0.5">
 										{#each megaCats as c, i (c.key)}
 											<button
 												type="button"
@@ -221,12 +221,22 @@
 												</span>
 												<span>
 													<span class="block text-sm font-bold text-[var(--ink)]">{c.title}</span>
-													<span class="mt-0.5 block text-xs text-[var(--muted)]">{c.sub}</span>
+													<span class="mt-0.5 block text-xs leading-snug text-[var(--muted)]"
+														>{c.sub}</span
+													>
 												</span>
 											</button>
 										{/each}
 									</div>
-									<div class="flex flex-col rounded-xl bg-[var(--surface-2)] p-2">
+									<!-- The features, and below them a demo card that fills the space a short
+									     group used to leave empty. The panel's own surface sets it apart
+									     from the categories beside it. -->
+									<div class="flex flex-col rounded-2xl bg-[var(--surface-2)] p-3">
+										<p
+											class="px-3 pt-1 pb-2 text-xs font-bold tracking-[0.1em] text-[var(--ink-soft)] uppercase"
+										>
+											{megaCats[activeCat].title}
+										</p>
 										{#each megaCats[activeCat].items as item (item.slug)}
 											<a
 												href={resolve('/(marketing)/features/[slug]', { slug: item.slug })}
@@ -237,17 +247,38 @@
 												{item.name}
 											</a>
 										{/each}
+										<div
+											class="mt-auto flex items-center gap-3 rounded-xl bg-[var(--brand)] p-3.5 text-[var(--on-brand)]"
+										>
+											<div class="min-w-0 flex-1">
+												<p class="text-sm font-bold text-[var(--accent)]">
+													See it on your institution
+												</p>
+												<p
+													class="mt-0.5 text-xs leading-snug text-[color-mix(in_oklab,var(--on-brand)_66%,var(--brand))]"
+												>
+													A person walks you through it — no bots.
+												</p>
+											</div>
+											<a
+												href={resolve('/(marketing)/demo')}
+												onclick={() => (open = null)}
+												class="shrink-0 rounded-full bg-[var(--accent)] px-4 py-2 text-xs font-bold text-[var(--brand)] transition hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--brand))]"
+											>
+												Book a demo
+											</a>
+										</div>
 										<a
 											href={resolve('/(marketing)/features')}
 											onclick={() => (open = null)}
-											class="mt-auto rounded-lg border-t border-[var(--line)] px-3 pt-3 pb-1 text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
+											class="mt-1 px-3 py-1.5 text-center text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--brand)]"
 										>
-											Look through all of it
+											Look through all {FEATURES.length} features →
 										</a>
 									</div>
 								</div>
 							{:else}
-								<div class="w-[21rem] max-w-[90vw] p-2">
+								<div class="w-[22rem] max-w-[90vw] p-3">
 									{#each segmentLinks as sg (sg.slug)}
 										<a
 											href={resolve('/(marketing)/solutions/[slug]', { slug: sg.slug })}
@@ -255,7 +286,7 @@
 												open = null;
 												menuOpen = false;
 											}}
-											class="block rounded-xl p-3 transition hover:bg-[var(--surface-2)]"
+											class="block rounded-xl px-3 py-2.5 transition hover:bg-[var(--surface-2)]"
 										>
 											<span class="block text-sm font-bold text-[var(--ink)]">{sg.name}</span>
 											<span class="mt-0.5 block text-xs text-[var(--muted)]">{sg.kicker}</span>
