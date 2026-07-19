@@ -61,9 +61,13 @@
 		*run the institution*, not a tax on its money. Free to teach and sell; paid to
 		operate; unlimited/operations on request.
 
-		SUGGESTED STARTER PRICE, YOURS TO SET: ৳2,500/mo for Institute is a defensible
-		BD-market figure (fractions of a taka per student), not a decision. Change it,
-		or move to per-student, in this one array.
+		Price scales by size band, not a per-head meter — a threshold a school can
+		budget, where a raw per-student bill that moves every month cannot be. The band
+		is the loud line on each card.
+
+		SUGGESTED STARTER NUMBERS, YOURS TO SET: ৳2,500/mo and the 800-student cap are
+		defensible BD-market figures, not decisions. Change them here; to move to true
+		per-student, this is also the one place.
 	*/
 	const PLANS = [
 		{
@@ -573,13 +577,16 @@
 								: 'text-[var(--muted)]'}">{plan.per}</span
 						>
 					</p>
-					<p
-						class="mt-1 text-xs font-semibold {plan.featured
-							? 'text-[color-mix(in_oklab,var(--on-brand)_62%,var(--brand))]'
-							: 'text-[var(--ink-soft)]'}"
+					<!-- The size band, made loud: this is the axis the price scales on, so a
+					     reader sees at a glance which plan their headcount lands them in. -->
+					<span
+						class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold {plan.featured
+							? 'bg-[color-mix(in_oklab,var(--accent)_22%,var(--brand))] text-[var(--accent)]'
+							: 'bg-[var(--brand-tint)] text-[var(--brand)]'}"
 					>
+						<Icon icon={UserMultipleIcon} class="size-3.5" />
 						{plan.tag}
-					</p>
+					</span>
 					<p
 						class="mt-4 text-sm leading-relaxed {plan.featured
 							? 'text-[color-mix(in_oklab,var(--on-brand)_74%,var(--brand))]'
