@@ -1,16 +1,6 @@
-/**
- * Reveal an element as it scrolls into view — a fade and a short rise, once.
- *
- * The one rule this is built around: **content is visible without it**. The hidden
- * start state is added by this action, in JavaScript, so a browser that never runs
- * it — or a reader who asked for no motion — sees the element as it always was. A
- * past component hid its contents behind an IntersectionObserver and vanished the
- * day the observer did not fire; a reveal must never be able to lose the thing it
- * reveals.
- *
- * So: no JS → visible. Reduced motion → visible, no animation. Observed and on
- * screen → it animates in and the observer lets go. It only ever adds.
- */
+// Fade-and-rise once as an element scrolls in. Content is visible without this: the
+// hidden start is added in JS, so no-JS and reduced-motion stay visible, and the
+// observer only ever reveals — it can never lose what it reveals.
 export function reveal(node: HTMLElement, delay = 0) {
 	// The reader asked for stillness. Leave the element exactly as it is.
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

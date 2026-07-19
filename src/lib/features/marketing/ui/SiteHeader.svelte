@@ -6,39 +6,13 @@
 	import { FEATURES, GROUPS, featuresIn } from '$lib/content/features';
 	import { SEGMENTS } from '$lib/content/segments';
 
-	/*
-		The marketing site's header, owned by the (marketing) layout so every page wears
-		the same one. One dark pill holding the logo, the links, and the single call to
-		action — floating over the light hero gradient every page now opens on.
-
-		It had a `tone` prop for a second, cream variant; there is one backdrop now, and
-		a second variant is how the two drifted apart last time.
-
-		The Product menu is built from `content/features.ts`, the same file the landing
-		and every feature page read. It used to be sixteen labels typed in here under
-		four headings — Creation, Engagement, Monetization, Management — that named
-		nothing else on the site, drifted from the real seven groups nobody was
-		comparing them against, and still advertised "0% platform fee" long after the
-		page learnt to say which gateway that is true of. A taxonomy written twice is a
-		taxonomy that disagrees with itself.
-
-		And every one of those sixteen linked to /register. A menu whose every door is
-		the signup form is not navigation, it is a wall with labels painted on it. Each
-		item now goes to the page that describes it, and every link in this header
-		resolves to something that exists — that is the whole rule.
-	*/
+	// The shared marketing header. The Product menu is built from content/features.ts;
+	// every link resolves to a page that exists.
 	let menuOpen = $state(false);
 	let activeCat = $state(0);
 
-	/*
-		One open menu, not one flag each, and one card they share.
-
-		Each panel used to live inside its own trigger and bridge the gap up to it with
-		a pseudo-element. Moving the pointer diagonally — which is how a pointer moves —
-		left that strip and the menu shut in your face. The fix is structural: the
-		region that listens for the pointer now wraps the pill *and* the card, so going
-		from one to the other never leaves it and there is no gap to bridge.
-	*/
+	// One open menu, one shared card. The hover region wraps pill + card so a diagonal
+	// move between them never leaves it (the old per-trigger panels shut in your face).
 	type Menu = 'products' | 'solutions';
 	let open = $state<Menu | null>(null);
 	let closeTimer: ReturnType<typeof setTimeout>;
@@ -58,16 +32,8 @@
 		clearTimeout(closeTimer);
 		closeTimer = setTimeout(() => (open = null), 140);
 	}
-	/*
-		Hovering anything that is not a menu closes the open one, at once.
-
-		The shell listens for the pointer leaving, which is what stopped the card
-		vanishing on the way to it — but Pricing, FAQ, Support and the rest live inside
-		that same shell, so reaching them never leaves it and nothing said to close.
-		Standing on Support with the Solutions menu hanging open underneath is the
-		shape of that hole. Every sibling closes it explicitly; there is no delay here,
-		because arriving at another item is a decision, not a slip.
-	*/
+	// A plain nav link closes any open menu at once — it lives in the same hover shell,
+	// so nothing else would.
 	function dismiss() {
 		clearTimeout(closeTimer);
 		open = null;
