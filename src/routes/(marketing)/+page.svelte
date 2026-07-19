@@ -342,9 +342,9 @@
 			line: 'Sell through your own bKash or SSLCommerz and Muallim never holds your money, or takes any. Stripe, for learners abroad, is 2.5%.'
 		},
 		{
-			icon: Store01Icon,
-			title: "You're the merchant",
-			line: 'Sell a course through your own bKash or SSLCommerz and the money never passes through us. Stripe is there for learners abroad.'
+			icon: School01Icon,
+			title: 'One system, not five',
+			line: 'The register, the exams, the fees, the courses and the community in one place — not a login and a spreadsheet for each.'
 		},
 		{
 			icon: LanguageSkillIcon,
