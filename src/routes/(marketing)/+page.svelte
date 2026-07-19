@@ -11,6 +11,7 @@
 	 * that was never built — so: no invented feature, logo, testimonial, or number.
 	 */
 	import { fly } from 'svelte/transition';
+	import { reveal } from '$lib/reveal';
 	import { resolve } from '$app/paths';
 	import { Icon } from '$lib/components';
 	import { Button, FeatureCard, ShotCard, SiteCta } from '$lib/features/marketing/ui';
@@ -175,7 +176,6 @@
 
 	type Tab = {
 		key: string;
-		tab: string;
 		icon: typeof Book02Icon;
 		title: string;
 		lead: string;
@@ -185,7 +185,6 @@
 	const tabs: Tab[] = [
 		{
 			key: 'teaching',
-			tab: 'Teaching',
 			icon: Book02Icon,
 			title: 'Author, assess, and certify',
 			lead: 'Build a course in the order you teach it, mark the work, and hand out a certificate that verifies.',
@@ -198,7 +197,6 @@
 		},
 		{
 			key: 'management',
-			tab: 'Management',
 			icon: ClipboardIcon,
 			title: 'Roll-call to result card',
 			lead: 'The office side of the institution — the daily register through to the board result — in one place.',
@@ -206,12 +204,11 @@
 				'Attendance, class by class, day by day',
 				'Exams that roll up into GPA-5 report cards',
 				'Timetable, staff, students, and guardians',
-				'Transfer certificates and guardian SMS'
+				'Fees, admissions, and guardian SMS'
 			]
 		},
 		{
 			key: 'community',
-			tab: 'Community',
 			icon: Message02Icon,
 			title: 'Engage your learners',
 			lead: 'A course is a place, not a file drop — a forum to ask in, reviews to earn, and progress worth chasing.',
@@ -224,7 +221,6 @@
 		},
 		{
 			key: 'ai',
-			tab: 'AI Studio',
 			icon: AiBrain01Icon,
 			title: 'Draft it with AI Studio',
 			lead: 'Start from a prompt instead of a blank page, then edit everything the studio drafts for you.',
@@ -435,7 +431,7 @@
 	</section>
 
 	<!-- BUILD BLOCK -->
-	<section class="section grid gap-10">
+	<section use:reveal class="section grid gap-10">
 		<!-- The copy reads once across the top; the cards carry the rest. -->
 		<div class="grid items-start gap-x-12 lg:grid-cols-[0.9fr_1.1fr]">
 			<h2 class="h2 lg:row-span-2">Built for how your institution actually runs</h2>
@@ -467,7 +463,7 @@
 	<!-- SEE IT RUNNING: real screenshots, one call to action. The three cards this
 	     replaced drew the UI in HTML — a GPA nobody earned, a register nobody teaches —
 	     behind a stock photo of strangers, and repeated the build block's topics besides. -->
-	<section class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<div class="flex flex-wrap items-center justify-between gap-4">
 			<h2 class="h2">See it running</h2>
 			<a
@@ -493,7 +489,7 @@
 	<!-- id="pricing": the nav's Pricing points here. There is no pricing page — the
 	     price is this section, and a nav link to a page that does not exist is the
 	     thing this header was just cleaned of. -->
-	<section id="pricing" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="pricing" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<div class="grid items-center gap-10 md:grid-cols-2">
 			<div>
 				<h2 class="h2">Your money never<br />comes near us.</h2>
@@ -543,7 +539,8 @@
 	     to a third party and the page broke the day the URL moved. The band is the
 	     shape this site already uses to raise its voice, and it needs no permission. -->
 	<section
-		class="relative mt-24 overflow-hidden bg-[var(--brand)]"
+		use:reveal
+		class="relative mt-32 overflow-hidden bg-[var(--brand)]"
 		aria-roledescription="carousel"
 		aria-label="Why Muallim"
 	>
@@ -584,7 +581,7 @@
 	</section>
 
 	<!-- WHO IT'S FOR: colored persona cards -->
-	<section id="audiences" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="audiences" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Is this you?</p>
 		<h2 class="h2 mt-2">You have an institution to run — spread across too many books.</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -608,7 +605,7 @@
 	     `sticky` only hid it while you scrolled — at rest it was a paragraph adrift in
 	     a column of nothing. The header rhythm the build block uses fixes it properly,
 	     and the steps read in two columns instead of one long ladder. -->
-	<section id="journey" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="journey" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<div class="grid items-start gap-x-12 gap-y-4 lg:grid-cols-[0.9fr_1.1fr]">
 			<div>
 				<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
@@ -651,7 +648,7 @@
 	</section>
 
 	<!-- CAPABILITIES: colored feature cards -->
-	<section id="capabilities" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="capabilities" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Up close</p>
 		<h2 class="h2 mt-2">The same platform, four sides to it</h2>
 		<p class="mt-2 max-w-2xl leading-relaxed text-[var(--muted)]">
@@ -685,7 +682,7 @@
 
 	<!-- BREADTH: every feature group, linking into /features. The list is built from the
 	     content file, so the page cannot tick more than there are pages for. -->
-	<section id="everything" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="everything" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">
 			Everything in it
 		</p>
@@ -766,7 +763,7 @@
 	</section>
 
 	<!-- HONEST DIFFERENTIATORS: colored cards + olive stat panel -->
-	<section id="why" class="mx-auto mt-24 w-full max-w-[82rem] px-6">
+	<section id="why" use:reveal class="mx-auto mt-32 w-full max-w-[82rem] px-6">
 		<p class="text-xs font-bold tracking-[0.14em] text-[var(--ink-soft)] uppercase">Why Muallim</p>
 		<h2 class="h2 mt-2">No invented reviews. Just what the product actually does.</h2>
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -784,7 +781,7 @@
 	</section>
 
 	<!-- FAQ: dark-olive band, lime headline, accordion (Tailwind) -->
-	<section id="faq" class="mt-24 bg-[var(--brand)] py-20 text-[var(--brand-tint)]">
+	<section id="faq" use:reveal class="mt-32 bg-[var(--brand)] py-20 text-[var(--brand-tint)]">
 		<div class="mx-auto grid max-w-[82rem] gap-12 px-6 md:grid-cols-2">
 			<div>
 				<h2
@@ -1090,7 +1087,7 @@
 	/* Sections. */
 	.section {
 		max-width: 78rem;
-		margin: 6rem auto 0;
+		margin: 8rem auto 0;
 		padding: 0 1.5rem;
 	}
 	/*

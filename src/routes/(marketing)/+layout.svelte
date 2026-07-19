@@ -15,9 +15,51 @@
 		Every page opens on the same light hero gradient — the landing's and PageHero's
 		are the same recipe — so the one dark header pill floats over all of them.
 	*/
+	import { onMount } from 'svelte';
 	import { SiteFooter, SiteHeader } from '$lib/features/marketing/ui';
 
 	let { children } = $props();
+
+	/*
+		In-page links scroll; they do not stamp the URL.
+
+		`href="#faq"` and `href="/#pricing"` used to leave `#faq` in the address bar and
+		jump. One delegated listener turns every same-page hash link into a smooth
+		scroll that changes nothing you can see in the URL. Reduced motion gets the jump
+		it asked for. Cross-page links (`/#pricing` from another page) fall through
+		untouched — they need the hash to know where to land once the page has loaded.
+	*/
+	onMount(() => {
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth';
+
+		function scrollTo(hash: string) {
+			const target = document.querySelector(hash);
+			if (target) target.scrollIntoView({ behavior, block: 'start' });
+			return !!target;
+		}
+
+		function onClick(event: MouseEvent) {
+			if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey) return;
+			const link = (event.target as Element).closest('a[href]');
+			if (!(link instanceof HTMLAnchorElement)) return;
+
+			const url = new URL(link.href);
+			if (url.pathname !== location.pathname || url.search !== location.search || !url.hash) return;
+
+			if (scrollTo(url.hash)) event.preventDefault();
+		}
+
+		document.addEventListener('click', onClick);
+
+		// Landed on a deep link like /#faq: honour it once, then clean the address so
+		// it reads the same as arriving by a nav click.
+		if (location.hash && scrollTo(location.hash)) {
+			history.replaceState(null, '', location.pathname + location.search);
+		}
+
+		return () => document.removeEventListener('click', onClick);
+	});
 </script>
 
 <div class="marketing">
@@ -146,5 +188,29 @@
 		background: var(--bg);
 
 		color: var(--ink);
+	}
+
+	/*
+		Scroll reveal. The `reveal` action in `$lib/reveal` adds these; it never renders
+		without them, because a browser that skips the script never adds `reveal-init`
+		and the element stays at rest — visible. Global, because the action stamps the
+		class from outside any component's scope.
+	*/
+	/* Anchored sections stop clear of the fixed pill, not behind it. */
+	:global(section[id]) {
+		scroll-margin-top: 5.5rem;
+	}
+
+	:global(.reveal-init) {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	:global(.reveal-in) {
+		opacity: 1;
+		transform: none;
+		transition:
+			opacity 0.6s ease,
+			transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+		transition-delay: var(--reveal-delay, 0ms);
 	}
 </style>
