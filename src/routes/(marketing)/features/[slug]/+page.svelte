@@ -8,6 +8,7 @@
 	import { Icon } from '$lib/components';
 	import { Card, Button, Tag, PageHero, SiteCta, QUIET, LEAD } from '$lib/features/marketing/ui';
 	import { GROUPS } from '$lib/content/features';
+	import { reveal } from '$lib/reveal';
 	import { ArrowRight01Icon, ArrowLeft01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -56,7 +57,7 @@
 		{/snippet}
 	</PageHero>
 
-	<section class="section">
+	<section use:reveal class="section">
 		<h2 class="h2">What it does today</h2>
 		<p class="lead">Every line here is something the product does now.</p>
 		<Card class="mt-6">
@@ -72,7 +73,7 @@
 	</section>
 
 	{#if related.length > 0}
-		<section class="section">
+		<section use:reveal class="section">
 			<h2 class="h2">Goes with</h2>
 			<p class="lead">
 				The parts of Muallim people reach for alongside {feature.name.toLowerCase()}.

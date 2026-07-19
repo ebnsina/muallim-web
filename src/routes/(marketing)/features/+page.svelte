@@ -15,6 +15,7 @@
 		LEAD
 	} from '$lib/features/marketing/ui';
 	import { FEATURES, GROUPS, featuresIn } from '$lib/content/features';
+	import { reveal } from '$lib/reveal';
 	import { ArrowRight01Icon, ArrowUpRight01Icon } from '@hugeicons/core-free-icons';
 
 	// Each group leads with its first feature — wider, taller, and the loud tone.
@@ -72,7 +73,7 @@
 
 	{#each GROUPS as group, gi (group.key)}
 		{@const features = featuresIn(group.key)}
-		<section class="section" id={group.key}>
+		<section use:reveal class="section" id={group.key}>
 			<div class="group-head">
 				<IconChip icon={group.icon} tone="brand" />
 				<div>

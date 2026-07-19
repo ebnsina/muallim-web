@@ -17,6 +17,7 @@
 		SCRIM
 	} from '$lib/features/marketing/ui';
 	import { ArrowRight01Icon, ArrowUpRight01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+	import { reveal } from '$lib/reveal';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -57,7 +58,7 @@
 		{/snippet}
 	</PageHero>
 
-	<section class="section">
+	<section use:reveal class="section">
 		<h2 class="h2">Built for the way {segment.nav.toLowerCase()} actually work</h2>
 		<p class="lead">{segment.tagline}</p>
 		<div class="grid">
@@ -94,7 +95,7 @@
 		</div>
 	</section>
 
-	<section class="section">
+	<section use:reveal class="section">
 		<Card class="grid items-center gap-6 md:grid-cols-[1.2fr_0.9fr]">
 			<div>
 				<p class="eyebrow">{segment.highlight.label}</p>
